@@ -8,7 +8,7 @@ This module establishes the DevOps philosophy, CALMS model, flow, feedback, meas
 
 ## From ad hoc automation to DevOps
 
-Most learners already know how to automate a task. They can write a Python script, call an API, or run an Ansible playbook. The difficulty appears when other people must review it, run it on a clean system, release it safely, understand a failure, or support it after the original author has moved on.
+Task automation often begins with a Python script, an API integration, or an Ansible playbook created to meet an immediate operational need. This approach can be effective at small scale, but weaknesses emerge when the solution must be reviewed by a team, reproduced in a clean environment, released safely, diagnosed consistently, and supported independently of its original author.
 
 DevOps addresses that delivery problem. It brings development and operational responsibilities into one feedback system and applies proven software practices to the complete path from source change to operating service. When the application automates infrastructure or networks, the same model is sometimes called infrastructure DevOps or NetDevOps; the underlying delivery principles do not change.
 
