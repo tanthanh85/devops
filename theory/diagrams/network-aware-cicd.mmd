@@ -1,0 +1,12 @@
+flowchart LR
+  MR[Merge request] --> G[General runner<br/>validate, test, build]
+  G --> A[Digest, scan,<br/>and test evidence]
+  A --> AP{Approval}
+  AP --> P[Protected runner<br/>pre-check and deploy]
+  P --> O[Post-check, observe,<br/>promote or recover]
+  O -->|failure| R[Stop or recover]
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef gate fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  classDef blocked fill:#fde8e7,stroke:#c43c35,color:#5b1714,stroke-width:2px;
+  class MR,A source; class G,P,O action; class AP gate; class R blocked;

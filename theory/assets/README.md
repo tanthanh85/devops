@@ -4,6 +4,30 @@
 
 | Rendered diagram | Editable Mermaid source | Primary location |
 |---|---|---|
+| `diagrams/calms-feedback-loop.svg` | `../diagrams/calms-feedback-loop.mmd` | Module 1 |
+| `diagrams/devops-lifecycle-loop.svg` | `../diagrams/devops-lifecycle-loop.mmd` | Module 1 |
+| `diagrams/devops-evidence-chain.svg` | `../diagrams/devops-evidence-chain.mmd` | Module 1 |
+| `diagrams/network-automation-system.svg` | `../diagrams/network-automation-system.mmd` | Module 0 |
+| `diagrams/automation-to-devops-product.svg` | `../diagrams/automation-to-devops-product.mmd` | Module 0 |
+| `diagrams/devops-feedback-speeds.svg` | `../diagrams/devops-feedback-speeds.mmd` | Module 1 |
+| `diagrams/course-reference-architecture.svg` | `../diagrams/course-reference-architecture.mmd` | Module 1 |
+| `diagrams/container-runtime-boundary.svg` | `../diagrams/container-runtime-boundary.mmd` | Module 2 |
+| `diagrams/secure-image-supply-chain.svg` | `../diagrams/secure-image-supply-chain.mmd` | Module 3 |
+| `diagrams/network-job-trust-sequence.svg` | `../diagrams/network-job-trust-sequence.mmd` | Module 4 |
+| `diagrams/network-aware-cicd.svg` | `../diagrams/network-aware-cicd.mmd` | Module 5 |
+| `diagrams/artifact-vs-cache.svg` | `../diagrams/artifact-vs-cache.mmd` | Module 5 |
+| `diagrams/three-network-states.svg` | `../diagrams/three-network-states.mmd` | Module 6 |
+| `diagrams/network-change-state.svg` | `../diagrams/network-change-state.mmd` | Module 6 |
+| `diagrams/rollback-decision.svg` | `../diagrams/rollback-decision.mmd` | Module 6 |
+| `diagrams/terraform-ansible-handoff.svg` | `../diagrams/terraform-ansible-handoff.mmd` | Module 7 |
+| `diagrams/test-environment-lifecycle.svg` | `../diagrams/test-environment-lifecycle.mmd` | Module 7 |
+| `diagrams/monitoring-observability-telemetry.svg` | `../diagrams/monitoring-observability-telemetry.mmd` | Module 8 |
+| `diagrams/observability-architecture.svg` | `../diagrams/observability-architecture.mmd` | Module 8 |
+| `diagrams/change-correlation-timeline.svg` | `../diagrams/change-correlation-timeline.mmd` | Module 8 |
+| `diagrams/netdevops-trust-boundaries.svg` | `../diagrams/netdevops-trust-boundaries.mmd` | Module 9 |
+| `diagrams/credential-lifecycle.svg` | `../diagrams/credential-lifecycle.mmd` | Module 9 |
+| `diagrams/compromised-runner-response.svg` | `../diagrams/compromised-runner-response.mmd` | Module 9 |
+| `diagrams/platform-vs-network-pipeline.svg` | `../diagrams/platform-vs-network-pipeline.mmd` | Module 10 |
 | `diagrams/compose-automation-services.svg` | `../diagrams/compose-automation-services.mmd` | Module 4 |
 | `diagrams/iac-tool-ownership.svg` | `../diagrams/iac-tool-ownership.mmd` | Module 7 |
 | `diagrams/kubernetes-automation-platform.svg` | `../diagrams/kubernetes-automation-platform.mmd` | Module 10 |

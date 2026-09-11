@@ -4,9 +4,17 @@
 
 Passing unit tests does not prove that an application image is deployable or that a release produces the intended operational outcome. This module covers build validation, infrastructure validation, pre-deployment health checks, deployment strategies, post-deployment testing, idempotence, failure classification, rollback, remediation, and improved deployment flow. The principles apply to software deployment generally. Existing network tests supply one set of domain-specific acceptance evidence for the course application.
 
+Module 5 built the pipeline and its trust zones. Module 6 strengthens the promotion decision by asking what state existed before deployment, what actually changed, whether the service converged, and how recovery should proceed. Those controls require reliable environments, which Module 7 will define as code.
+
 ## Three forms of state in an automation application
 
 The automation application is assumed to know how to collect and interpret these states. This course uses them as deployment acceptance evidence and concentrates on when the pipeline collects them, how it evaluates them, and which result permits promotion or triggers recovery.
+
+The loop below shows why stored configuration is an intermediate result. Operational observations must be compared with the original intent.
+
+<p align="center">
+  <img src="assets/diagrams/three-network-states.svg" alt="Relationship among intended, configured, and operational network state" width="640" />
+</p>
 
 | State | Meaning | Routing-service scenario |
 |---|---|---|
@@ -17,6 +25,12 @@ The automation application is assumed to know how to collect and interpret these
 The three states can disagree. A template may correctly represent intent while the device rejects part of it. The device may accept every command while the SVI stays down. The SVI may come up while the test peer never learns the route. A complete pipeline compares all three.
 
 ## Network change state machine
+
+Timeout and partial outcomes leave the normal promotion path rather than being treated as safe failures.
+
+<p align="center">
+  <img src="assets/diagrams/network-change-state.svg" alt="Network change states including unknown and recovery paths" width="640" />
+</p>
 
 An `UNKNOWN/PARTIAL` state is important. A timeout after sending configuration does not prove that nothing changed. The workflow must collect current state before retrying.
 
@@ -303,6 +317,14 @@ Assume the new API container starts and its liveness probe passes, but workers f
 
 ## Rollback and remediation
 
+Recovery begins with causality and reversibility, not with an automatic rollback command.
+
+<p align="center">
+  <img src="assets/diagrams/rollback-decision.svg" alt="Decision tree for investigation, rollback, or forward remediation" width="640" />
+</p>
+
+Both recovery paths end in renewed validation; reversing commands is not itself proof of restored service.
+
 Rollback restores a prior artifact or configuration. It works best for stateless application changes with compatible data. Some database or infrastructure changes cannot be reversed safely.
 
 Network recovery mechanisms have different guarantees:
@@ -324,10 +346,6 @@ An improved flow uses an on-demand environment, immutable artifact, automatic he
 
 The improved flow validates the merge request, builds the image once, creates a test environment, deploys the image digest, runs system tests, collects evidence, and removes the test environment. Approval then promotes the same digest for final verification and observation.
 
-## Lab progression
-
-Learners validate the application build process, automate deployment, and improve the flow with environment pre-checks, application readiness, dependency checks, smoke and acceptance tests, retained evidence, and a recovery exercise. They introduce a safe application or test-infrastructure fault, diagnose the failing boundary, fix the infrastructure or deployment definition, and prove recovery. Existing network-domain tests may be called as acceptance checks without being developed from first principles.
-
 ## Knowledge check
 
 1. What information connects a post-deployment test to the source change it validates?
@@ -339,3 +357,5 @@ Learners validate the application build process, automate deployment, and improv
 ## Summary
 
 Deployment succeeds only when the intended service works, not when a tool reports that an update was accepted. The pipeline must connect source, artifact, target, rollout, and operational evidence; distinguish retryable failures from uncertain or partial changes; and choose rollback only when data and infrastructure remain compatible with the previous release.
+
+The validation model now needs disposable, reproducible infrastructure on which expensive tests can run safely. Continue to [Extending DevOps to Infrastructure and On-Demand Testing](module-07-infrastructure-devops.md).

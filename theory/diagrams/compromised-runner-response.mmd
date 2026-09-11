@@ -1,0 +1,9 @@
+flowchart LR
+  D[Detect] --> C[Contain<br/>disable runner and path]
+  C --> R[Revoke credentials]
+  R --> E[Preserve evidence<br/>find affected jobs]
+  E --> B[Rebuild runner<br/>verify managed state]
+  B --> S[Controlled return]
+  classDef alert fill:#fde8e7,stroke:#c43c35,color:#5b1714,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class D alert; class C,R,E,B,S action;

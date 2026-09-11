@@ -1,0 +1,11 @@
+flowchart LR
+  E[Engineer and Git] --> V[General runner and registry<br/>validate, build, identify]
+  V --> A{Approval}
+  A --> P[Protected runner and<br/>automation platform]
+  P --> X[Managed infrastructure]
+  X --> O[Operational evidence]
+  O --> E
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef safe fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef gate fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class E source; class V,P,X,O safe; class A gate;

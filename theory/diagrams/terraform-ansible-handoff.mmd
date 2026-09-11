@@ -1,0 +1,9 @@
+flowchart LR
+  G[GitLab] --> T[Terraform<br/>owns resource lifecycle]
+  T --> I[Inventory artifact]
+  I --> A[Ansible<br/>owns configuration]
+  A --> V[Python or pyATS<br/>validates outcome]
+  V -->|evidence retained| D[Terraform destroy<br/>owned resources only]
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class G,I source; class T,A,V,D action;

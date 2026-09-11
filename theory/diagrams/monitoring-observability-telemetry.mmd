@@ -1,0 +1,9 @@
+flowchart LR
+  T[Telemetry<br/>data] --> M[Monitoring<br/>known conditions]
+  T --> O[Observability<br/>explain behavior]
+  C[Context and correlation] --> O
+  M --> A[Action]
+  O --> A
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class T,C source; class M,O,A action;

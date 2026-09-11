@@ -1,0 +1,9 @@
+flowchart LR
+  L[Local script] --> G[Git and tests]
+  G --> C[Locked container]
+  C --> P[CI/CD and protected execution]
+  P --> O[Observable team product]
+  classDef start fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef build fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef run fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class L start; class G,C build; class P,O run;

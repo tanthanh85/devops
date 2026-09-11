@@ -1,0 +1,12 @@
+flowchart LR
+  F[Post-check failed] --> C{Change caused impact?}
+  C -->|no| I[Investigate separately]
+  C -->|yes| S{Rollback safe?}
+  S -->|yes| R[Rollback]
+  S -->|no| M[Forward remediation]
+  R --> V[Revalidate]
+  M --> V
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef gate fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  classDef fail fill:#fde8e7,stroke:#c43c35,color:#5b1714,stroke-width:2px;
+  class F fail; class C,S gate; class I,R,M,V action;

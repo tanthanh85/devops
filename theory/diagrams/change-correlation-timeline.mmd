@@ -1,0 +1,9 @@
+flowchart LR
+  C[Commit and pipeline] --> D[Deployment]
+  D --> N[Device and protocol events]
+  N --> T[Telemetry change]
+  T --> A[Alert or healthy result]
+  A --> I[Investigation by shared IDs]
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class C source; class D,N,T,A,I action;

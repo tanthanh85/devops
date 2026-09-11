@@ -1,0 +1,7 @@
+flowchart LR
+  I[Intent<br/>approved outcome] --> C[Configuration<br/>stored state]
+  C --> O[Operation<br/>observed behavior]
+  O -->|compare| I
+  classDef intent fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef state fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class I intent; class C,O state;

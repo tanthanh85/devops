@@ -6,6 +6,8 @@ DevOps is a way of organizing software and infrastructure delivery so that small
 
 This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation is simply the familiar workload used in selected examples.
 
+[Module 0](module-00-network-automation-review.md) reviewed how the supplied application turns intent and inventory into controlled network operations. Module 1 changes the point of view: the subject is now how a team develops, tests, releases, operates, and improves that application. The delivery model established here supplies the reasoning used by every later module.
+
 ## From ad hoc automation to DevOps
 
 Task automation often begins with a Python script, an API integration, or an Ansible playbook created to meet an immediate operational need. This approach can be effective at small scale, but weaknesses emerge when the solution must be reviewed by a team, reproduced in a clean environment, released safely, diagnosed consistently, and supported independently of its original author.
@@ -23,8 +25,6 @@ The contrast is important:
 | Success means the command completed | Acceptance checks prove the software and service outcome |
 | Knowledge remains with an individual | Code, evidence, runbooks, and decisions are shared |
 
-Network-facing applications add several operational considerations to the general software model:
-
 Network delivery has several characteristics that affect the implementation:
 
 - A single configuration error can affect many shared services.
@@ -38,7 +38,11 @@ NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts,
 
 ## CALMS applied to software delivery
 
-CALMS provides a useful assessment model:
+CALMS is a practical way to assess whether DevOps exists as an operating model rather than as a collection of tools. The letters represent **Culture, Automation, Lean, Measurement, and Sharing**. None of the dimensions is sufficient on its own. A pipeline without shared ownership can automate a poor handoff; extensive metrics without a learning culture can become surveillance; and a collaborative team without repeatable automation remains dependent on manual effort.
+
+<p align="center">
+  <img src="assets/diagrams/calms-feedback-loop.svg" alt="CALMS dimensions operating as a continuous learning loop" width="640" />
+</p>
 
 | Dimension | Software-delivery interpretation | Evidence in this course |
 |---|---|---|
@@ -48,7 +52,75 @@ CALMS provides a useful assessment model:
 | Measurement | Delivery and application behavior produce usable measures | Pipeline duration, failure rate, latency, availability, and telemetry |
 | Sharing | Code, intent, runbooks, findings, and reusable tests remain available to the team | One repository and retained pipeline evidence |
 
-CALMS exposes imbalance. A team may automate execution while leaving review, measurement, or knowledge sharing unchanged. That is scripting at scale, not a mature DevOps system.
+### Culture: shared responsibility for the outcome
+
+Culture concerns incentives, responsibilities, and working relationships. In a handoff-oriented organization, one group writes software, another deploys it, and operations inherits the consequences. Each group can complete its assigned task while the service still fails. DevOps replaces the handoff with shared responsibility for delivery and operation.
+
+Shared responsibility does not mean that every engineer has identical skills or unrestricted production access. Specialists remain important. It means that developers design for testability and supportability, operations engineers influence architecture and deployment, security engineers define controls early enough to automate them, and the team agrees on what constitutes a successful release.
+
+Evidence of a healthy culture includes blameless incident reviews, cross-functional merge-request review, explicit service ownership, accessible runbooks, and time allocated to reduce recurring operational work. Warning signs include deployments that require one particular engineer, failures thrown “over the wall,” incentives based only on change volume, and incidents in which the first question is who caused the problem rather than which control failed.
+
+For a network automation team, culture changes when the author of a playbook, the platform engineer operating the runner, and the network engineer responsible for the service agree on tests, release scope, observability, and recovery before deployment.
+
+### Automation: make the safe path repeatable
+
+Automation converts a reviewed procedure into consistent execution. Useful targets include build, test, dependency checks, security scanning, environment creation, deployment, health verification, evidence collection, rollback, and cleanup. The objective is not to automate every action immediately. The objective is to remove variation from frequent, error-prone work while preserving deliberate decisions where risk justifies them.
+
+Good automation is deterministic, versioned, testable, observable, and safe to retry where possible. It validates inputs, uses bounded timeouts, returns meaningful status, preserves failure evidence, and limits credentials and target scope. A long shell script that hides errors and can run only on its author's laptop is automated execution, but it is not yet dependable delivery automation.
+
+Teams should automate a stable and understood process. Automating an ambiguous approval path or an unreliable manual procedure usually makes the weakness operate faster. Manual approval may remain appropriate for production, but the approval should refer to an exact commit, artifact digest, environment, test result, and proposed effect.
+
+### Lean: improve flow and reduce batch risk
+
+Lean focuses on the flow of value and the removal of waste. In delivery work, waste appears as long queues, repeated manual setup, oversized releases, unused environments, duplicated approvals, late defect discovery, and work waiting for a specialist. Large batches increase risk because they contain more interactions, take longer to review, and are harder to reverse.
+
+A lean delivery system favors small changes, short-lived branches, early validation, limited work in progress, reusable environments, and fast feedback. It makes queues visible and treats waiting time as part of lead time. Optimizing one job in a pipeline has little value if a release then waits three days for an unavailable test environment.
+
+Lean does not mean removing necessary control. It means designing the control to supply evidence quickly and consistently. An automated policy check can provide stronger governance with less delay than a reviewer manually inspecting the same rule in every release.
+
+### Measurement: use evidence to guide improvement
+
+Measurement connects engineering work to delivery and service outcomes. Pipeline duration, test reliability, deployment frequency, lead time, change failure rate, recovery time, availability, latency, error rate, and resource saturation answer different questions. No single metric represents DevOps maturity.
+
+Measures must be defined precisely. For example, lead time could begin at the first commit, merge approval, or release request; the team must select one definition and use it consistently. A failed deployment should not disappear from change-failure data merely because it was repaired before customers opened a ticket.
+
+Metrics should support decisions rather than rank individuals. Measuring commits per developer rewards activity, not value. Measuring deployment frequency without change failure rate may encourage unsafe releases. A balanced view connects delivery speed, quality, reliability, and recovery.
+
+### Sharing: make knowledge part of the system
+
+Sharing prevents operational knowledge from remaining in private notes, terminal history, or one person's memory. Version-controlled code, review discussions, architecture decisions, test fixtures, dashboards, incident findings, and runbooks allow the team to reuse learning and challenge assumptions.
+
+Sharing also requires usable context. A repository full of unexplained scripts is technically accessible but operationally opaque. A strong project explains how to build and test the software, who owns it, how a release is identified, what evidence is retained, which dependencies it requires, and how to recover from common failures.
+
+Reusable knowledge shortens onboarding and recovery time. It also enables peer review: an assumption cannot be examined if it is never recorded.
+
+### How the CALMS dimensions reinforce one another
+
+The dimensions work as a system. Culture creates the trust to expose failures. Sharing turns those failures into team knowledge. Automation embeds the improved procedure. Lean reduces the size and delay of the next change. Measurement shows whether the improvement actually helped.
+
+Consider a Python automation service that is normally released by its author:
+
+1. **Culture:** the application, platform, security, and operations owners agree on release and recovery responsibilities.
+2. **Automation:** a pipeline builds a container, runs tests and scans, deploys the identified digest, and performs acceptance checks.
+3. **Lean:** changes remain small, inexpensive checks run first, and an on-demand test environment removes waiting.
+4. **Measurement:** the team tracks feedback time, failed deployments, recovery time, and application health after release.
+5. **Sharing:** the repository contains the pipeline, dependency declarations, test evidence, operating notes, and incident improvements.
+
+If only the automation step is implemented, the original dependency on one engineer may remain. CALMS exposes that imbalance and helps the team decide what to improve next.
+
+### CALMS assessment questions
+
+An engineering team can use the following questions during a retrospective or maturity review:
+
+| Dimension | Questions worth asking |
+|---|---|
+| Culture | Who owns the service after deployment? Can team members challenge an unsafe release? Are incidents used to improve the system? |
+| Automation | Can a clean runner reproduce the build and tests? Are errors, retries, cleanup, and recovery automated safely? |
+| Lean | Where does work wait? How large are release batches? Which manual approval or environment dependency is the current constraint? |
+| Measurement | Do measures cover both delivery and runtime outcomes? Are definitions consistent? Does the team act on what it measures? |
+| Sharing | Can another engineer build, release, troubleshoot, and recover the service from repository and operational records? |
+
+The result should not be reduced to a vanity score. The most useful output is a small number of observable weaknesses and an improvement experiment—for example, declaring dependencies and building on a clean runner, adding one reliable acceptance test, or publishing a tested recovery runbook.
 
 ## Three delivery models
 
@@ -68,11 +140,200 @@ Automation improves consistency, but DevOps connects automation to collaboration
 
 ## Complete DevOps lifecycle
 
-Every gate answers a question. Schema validation asks whether the intent has the required shape. Policy asks whether the requested values follow engineering standards. Pre-checks ask whether the network is safe to change. The configuration diff asks what will change. Post-checks ask whether the network achieved the desired service outcome.
+The DevOps lifecycle connects an idea to an operating service and then returns production knowledge to the next decision. It is often drawn as a loop because deployment is not the end of the work. Software must be observed, supported, improved, patched, and eventually retired.
+
+<p align="center">
+  <img src="assets/diagrams/devops-lifecycle-loop.svg" alt="Compact DevOps lifecycle from planning through operation and learning" width="640" />
+</p>
+
+Organizations use different labels, but a complete lifecycle normally includes:
+
+**Plan → Design → Develop → Integrate → Build → Test → Release → Deploy → Operate → Observe → Learn**
+
+The stages are logical responsibilities, not necessarily separate departments or long sequential phases. A small team may perform several stages in one workflow. Mature teams also move left and right through the lifecycle continuously: an operational finding may create a new test, a security finding may change design, and a failed build may send a developer directly back to the affected code.
+
+### 1. Plan: define the problem and expected outcome
+
+Planning establishes why a change is needed, who benefits, what is in scope, and how success will be judged. Useful inputs include a user story, defect, security finding, operational problem, compliance requirement, or improvement experiment.
+
+A plan should identify both functional and nonfunctional expectations. “Add an endpoint that returns device inventory” is functional. “Return 95 percent of requests within 500 milliseconds, require an authorized role, and retain an audit record” describes quality and operating constraints.
+
+Good planning produces testable acceptance criteria, ownership, risk, priority, and an initial recovery expectation. It avoids prescribing unnecessary implementation detail before the team has examined the design.
+
+For the supplied automation application, a requirement might be to run validation jobs without depending on an engineer's workstation. The DevOps outcome is broader than making the Python function work: another engineer must be able to review, build, deploy, observe, and support it through a controlled process.
+
+### 2. Design: decide how the change fits the system
+
+Design translates requirements into components, interfaces, data flow, trust boundaries, failure behavior, and deployment assumptions. Decisions at this stage affect testability and operability later.
+
+The team considers questions such as:
+
+- Which component owns the data or state transition?
+- Is the work synchronous, asynchronous, or scheduled?
+- What happens when a dependency is slow or unavailable?
+- Which credentials and network paths are required?
+- Which parts can be tested without external systems?
+- Does the change remain compatible with the previous release during rollout?
+- How will an operator know that the new behavior is healthy?
+- Can the previous version be restored safely if data has changed?
+
+Important choices belong in a short architecture decision record. The purpose is not to predict every detail. It is to preserve the assumptions and trade-offs that reviewers and future maintainers will need.
+
+### 3. Develop: implement a small, reviewable change
+
+Development takes place in version control, normally on a short-lived branch. The change should be coherent and small enough for a reviewer to understand. Source code, tests, dependency declarations, configuration contracts, documentation, and infrastructure definitions should change together when they represent one behavior.
+
+Developers run fast checks locally, but local success is only preliminary evidence. The shared pipeline must reproduce validation in a controlled environment. Secrets and environment-specific values remain outside the commit.
+
+Code quality at this stage includes more than formatting. The implementation should expose clear boundaries, return meaningful errors, use timeouts, avoid unsafe defaults, and produce the context needed for diagnosis. Tests should cover failure paths as well as the expected path.
+
+### 4. Integrate: combine work and obtain early feedback
+
+Continuous integration validates every proposed change against the shared codebase. A merge-request pipeline commonly performs formatting, static analysis, type checks, schema checks, unit tests, dependency checks, secret detection, and selected integration tests.
+
+The cheapest and fastest checks should run early. There is no value in provisioning a test environment for source that does not parse. Independent checks can run concurrently, while jobs that consume a generated artifact must declare that dependency explicitly.
+
+Peer review and automated validation answer different questions. Automation detects known, executable conditions consistently. A reviewer evaluates intent, design, maintainability, risk, missing assumptions, and whether the tests prove the right behavior. A green pipeline does not make human judgment unnecessary.
+
+### 5. Build: create an identifiable artifact
+
+The build converts reviewed source into something that can be promoted, such as a container image, package, binary, or deployment bundle. A defensible build starts from declared inputs in a controlled environment and produces an immutable artifact.
+
+The pipeline records at least the source commit, build job, dependency set, version, and artifact digest. Security controls may add an SBOM, vulnerability results, provenance, and a signature. These records establish artifact lineage: the team can determine exactly which source and process produced the bytes being deployed.
+
+The artifact should be built once. Rebuilding separately for test and production creates two artifacts even when both use the same tag. The production artifact would then lack the evidence collected from the tested one.
+
+### 6. Test: build confidence at several boundaries
+
+No single test proves a release. A practical test strategy layers evidence:
+
+| Test layer | Question answered | Typical environment |
+|---|---|---|
+| Static checks | Is the source structurally valid and free of selected defects? | CI runner |
+| Unit tests | Does isolated application logic behave correctly? | CI runner |
+| Component tests | Does the packaged component start and honor its runtime contract? | Container runtime |
+| Integration tests | Do application, database, queue, and API boundaries work together? | Compose or ephemeral services |
+| Security tests | Does the artifact meet dependency, secret, identity, and runtime policy? | Build and test environment |
+| System tests | Does the assembled application perform its important workflows? | On-demand test environment |
+| Acceptance tests | Does the release satisfy the user or operational outcome? | Representative environment |
+
+Tests should be reliable enough that the team trusts failures. A flaky test increases delay and eventually teaches engineers to ignore the pipeline. Test data and mocks must also be maintained; a mock that always returns an ideal response can conceal incorrect production assumptions.
+
+### 7. Release: make a version eligible for deployment
+
+A release is a versioned artifact accompanied by enough evidence to support a promotion decision. Releasing and deploying are not identical. A team can publish version `2.4.0` to a registry without immediately running it in production.
+
+Release controls may verify the artifact digest, test results, vulnerability policy, change record, approval, release notes, compatibility, and recovery plan. The decision must be bound to the exact artifact. Approving a tag such as `latest` is ambiguous because its target can change after review.
+
+Continuous delivery means that a valid release is always deployable through a controlled decision. Continuous deployment goes further and automatically deploys every qualifying release. The required confidence and recovery capability are higher for continuous deployment.
+
+### 8. Deploy: change the target environment safely
+
+Deployment places the released artifact and configuration into an environment. The workflow first verifies the target, current health, required capacity, configuration, credentials, and artifact identity. It then uses an appropriate strategy, such as recreate, rolling, blue-green, or canary.
+
+Deployment success means that the platform accepted the requested change. It does not yet prove that the application is usable. A container may start while its database migration is incompatible; a Kubernetes Deployment may become available while a background worker cannot process jobs.
+
+The deployment should therefore have bounded timeouts, visible progress, stop conditions, and a defined response to uncertain outcomes. A timeout after a change request is not automatically safe to retry. The workflow may need to rediscover actual state first.
+
+### 9. Operate: keep the service dependable
+
+Operation includes availability, capacity, backup, patching, incident response, credential rotation, dependency maintenance, support, and recovery. Operational ownership begins during design, not after deployment.
+
+Runbooks should explain common symptoms, diagnostic evidence, safe actions, escalation, and recovery. Service-level indicators and objectives define which behavior matters. Routine work should be automated when the process is understood, frequent, and measurable.
+
+For an automation service, operation also includes queue health, worker concurrency, external API limits, credential availability, evidence retention, and protection against two workers acting on the same target simultaneously.
+
+### 10. Observe: compare actual behavior with expectations
+
+Observability combines metrics, logs, traces, health checks, events, and release context. These signals should identify the application version, environment, and relevant request or job so an operator can connect a symptom to a release.
+
+Immediate post-deployment checks provide fast feedback, while an observation window can expose delayed failure, resource leakage, increasing queue delay, or a dependency problem. Alerts should represent actionable impact or loss of safety margin rather than every isolated error.
+
+An application health endpoint proves only the behavior it actually checks. Liveness may confirm that a process is running; readiness may confirm that it can accept work; an acceptance test may prove that a complete user-visible transaction succeeds. These signals should not be treated as interchangeable.
+
+### 11. Learn and improve: close the loop
+
+Delivery and operational evidence should change future work. A failed release may reveal a missing test, an unclear interface, a fragile dependency, an unsafe retry, a capacity assumption, or an approval gap. The improvement belongs in the delivery system: add the test, update the runbook, change the design, strengthen policy, or remove the repeated manual step.
+
+Incident reviews should examine contributing conditions and control failures rather than search for one person to blame. Useful findings have owners and measurable follow-up. If the same class of incident recurs, the organization collected information but did not complete the learning loop.
+
+### 12. Retire: remove software and access deliberately
+
+Retirement is often omitted from lifecycle diagrams, but abandoned software creates security and operational risk. Retirement includes stopping traffic and scheduled jobs, exporting or deleting data according to policy, revoking credentials, removing infrastructure, updating dependencies and documentation, preserving required audit evidence, and confirming that no consumer still relies on the service.
+
+Infrastructure cleanup must prove ownership before deletion. A broad cleanup command is not an acceptable substitute for a recorded environment identifier and reviewed destruction plan.
+
+### Gates, evidence, and promotion
+
+A gate is a decision point supported by evidence. It should answer a specific question rather than exist as an unexplained approval step.
+
+<p align="center">
+  <img src="assets/diagrams/devops-evidence-chain.svg" alt="Evidence chain from requirement and commit to controlled deployment and runtime evidence" width="640" />
+</p>
+
+| Gate | Decision | Minimum useful evidence |
+|---|---|---|
+| Merge | Is this change suitable for the shared source branch? | Diff, review, required CI results |
+| Build acceptance | Is the artifact identifiable and compliant? | Digest, tests, SBOM, scan and provenance results |
+| Test promotion | Is the release suitable for a representative environment? | Artifact identity, configuration, test plan |
+| Production promotion | Is the exact tested release acceptable at this time and scope? | Test evidence, target, risk, approval, recovery plan |
+| Rollout continuation | Should exposure increase? | Readiness, acceptance, error and performance signals |
+| Completion | Has the intended outcome been achieved? | Deployment record, acceptance result, observation evidence |
+| Recovery | Is rollback safe, or is forward remediation required? | Actual state, data compatibility, failure classification |
+
+Evidence must remain connected across stages. A reviewer should be able to follow one chain:
+
+**requirement → source change → commit → pipeline → test results → artifact digest → approval → deployment → runtime evidence**
+
+If a new commit, artifact, target, or configuration appears after approval, the earlier decision may no longer apply. Promotion should stop or require renewed validation.
+
+### Feedback loops at different speeds
+
+The lifecycle contains several feedback loops:
+
+The diagram orders feedback by typical response time. Faster is not always more important: production and architecture feedback answer questions that a unit test cannot reproduce.
+
+<p align="center">
+  <img src="assets/diagrams/devops-feedback-speeds.svg" alt="DevOps feedback loops from developer checks to long-term architecture learning" width="640" />
+</p>
+
+Each loop should have an owner and a path back into source, tests, policy, documentation, or design.
+
+- **Seconds to minutes:** formatter, linter, schema validation, and unit tests guide the developer.
+- **Minutes to hours:** integration, security, packaging, and system tests guide merge and release decisions.
+- **Hours to days:** deployment and runtime signals reveal behavior under representative or real workloads.
+- **Weeks to months:** delivery measures, incident patterns, dependency health, capacity, and architecture reviews guide investment.
+
+Fast feedback reduces the cost of correction, but slower feedback remains essential because a test environment cannot reproduce every production condition. The objective is not to force every signal into one pipeline. It is to connect signals to ownership and ensure that important findings return to planning and development.
+
+### Applied example: from commit to operating automation service
+
+Suppose a developer improves the error classification in a Python automation worker.
+
+1. The requirement defines which errors are retryable, permanent, or uncertain and how each appears to an operator.
+2. The developer changes the classifier, adds unit tests, and updates the operating note on uncertain completion.
+3. The merge-request pipeline runs static checks, unit tests, API fixtures, and secret detection.
+4. The build creates one non-root container image, generates an SBOM, scans it, and records its digest.
+5. An integration environment starts the API, queue, database, and worker. Tests inject a timeout and confirm that the job becomes `unknown` rather than being repeated automatically.
+6. Reviewers approve the exact commit and digest after examining the behavior and evidence.
+7. A rolling deployment introduces the image while the previous version remains available.
+8. Readiness and a representative job validate the service. Metrics compare queue delay, failure categories, and worker errors with the previous release.
+9. If uncertain jobs increase, rollout stops. The team restores the compatible earlier image or applies forward remediation according to actual state.
+10. The incident or release finding becomes a regression test and an updated runbook entry.
+
+The Python change may be small. The complete lifecycle is what makes it safe for a team to deliver and support repeatedly.
 
 ## A practical software delivery architecture
 
 The following responsibilities appear in most mature delivery systems, although the products and team boundaries vary.
+
+The reference architecture makes the most important trust transition visible: unprivileged validation produces an identified artifact before an approved protected runner receives management access.
+
+<p align="center">
+  <img src="assets/diagrams/course-reference-architecture.svg" alt="Course reference architecture from engineer and Git through separated runners to operational feedback" width="640" />
+</p>
+
+Operational evidence returns to the engineer and repository; it is not an isolated monitoring destination.
 
 - The Git repository stores intent, automation code, tests, policy, pipeline definitions, and operational documentation.
 - An unprivileged validation runner parses and normalizes intent, applies schema and policy, renders candidates, executes offline tests, and performs supply-chain checks. It has no device route or deployment credential.
@@ -84,53 +345,6 @@ The following responsibilities appear in most mature delivery systems, although 
 
 Modules 2–4 expand the runtime and service-platform blocks. Modules 5–6 expand pipeline gates, protected execution, and recovery. Module 7 assigns tool ownership. Module 8 builds the feedback path. Module 9 secures every boundary. Module 10 evaluates one optional platform implementation.
 
-## The delivery problem
-
-Traditional delivery often separates development, testing, release, and operations into handoffs. Each group may optimize its own work while the complete delivery flow remains slow and fragile. Large batches accumulate because releases are difficult. Manual steps differ between people and environments. Problems appear late because testing and operational review happen near the release date.
-
-DevOps reduces these risks by shortening the path between an idea and reliable evidence about it. A small change is easier to review, test, deploy, observe, and reverse than a large release containing many unrelated changes.
-
-For an application that also configures network or cloud infrastructure, the delivery system must control two related forms of change:
-
-- Application behavior, dependencies, and packaging
-- Infrastructure intent, configuration, access, and operational policy
-
-Both forms should use versioned definitions, automated validation, peer review, and auditable promotion.
-
-## DevOps principles
-
-### Shared ownership
-
-The team that changes a service must understand how the change behaves in operation. Developers need production feedback, and operations engineers need influence over architecture and testability. Shared ownership does not remove specialist roles. It makes reliability, security, and operability design concerns from the beginning.
-
-### Flow
-
-Flow describes how quickly a useful change moves from request to operation. Long queues, approval delays, unstable environments, and manual deployment reduce flow. Teams improve flow by reducing batch size, keeping work visible, limiting work in progress, and automating repeatable steps.
-
-### Feedback
-
-Feedback reveals whether a change works as intended. Unit tests provide fast feedback about code behavior. Integration tests reveal interface problems. Deployment checks show whether a release is reachable and correctly configured. Metrics and logs show how it behaves under real conditions.
-
-Fast feedback is valuable only when it is trustworthy. A test that passes despite a broken system produces false confidence. A noisy alert that everyone ignores does not protect reliability.
-
-### Learning and improvement
-
-Failures reveal weaknesses in design, automation, review, or operating assumptions. A useful review identifies the conditions that allowed a failure and improves the system. Blaming an individual discourages reporting and leaves the underlying weakness unchanged.
-
-## DevOps practices
-
-Common practices form a connected delivery system:
-
-- Version control stores application, infrastructure, pipeline, and operational definitions.
-- Continuous integration validates each proposed change.
-- Continuous delivery keeps a validated release ready for promotion.
-- Deployment automation performs the promotion consistently.
-- Infrastructure as Code creates repeatable environments.
-- Observability provides evidence about behavior after deployment.
-- Security controls operate throughout the workflow.
-
-Each practice supports the others. A pipeline cannot reproduce a deployment if the environment exists only as manual configuration. Monitoring cannot explain a release failure if logs lack version and request context.
-
 ## Continuous integration, delivery, and deployment
 
 These terms describe different levels of automation.
@@ -141,7 +355,7 @@ These terms describe different levels of automation.
 
 **Continuous deployment** means every change that passes the required controls proceeds automatically into production. This requires strong tests, reliable rollback or remediation, good observability, and confidence in the platform.
 
-The lab progression begins with continuous integration, can add automated deployment to a training environment, and may finish with a controlled Kubernetes platform exercise. Production deployment remains a design decision rather than an assumption.
+The course begins with continuous integration, adds automated deployment to a training environment, and may finish with a controlled Kubernetes platform exercise. Production deployment remains a design decision rather than an assumption.
 
 ## Value stream and constraints
 
@@ -237,109 +451,25 @@ The processing stages have different responsibilities:
 
 Schema success does not grant authorization, policy success does not prove correct rendering, configuration acceptance does not prove service health, and an immediate post-check does not replace continued telemetry.
 
-## Prerequisite automation decisions that affect DevOps design
+## Where implementation depth belongs
 
-| Interface | Strength | Limitation | Suitable network-automation use |
-|---|---|---|---|
-| SSH CLI | Broad platform familiarity and feature coverage | Text parsing, command order, weak transaction behavior | Baseline collection or controlled lab fallback |
-| REST API | Common request model and tooling | Platform-specific resources and transaction rules | Controllers and automation service interfaces |
-| RESTCONF | HTTP operations over YANG-modeled data | Model paths and support vary by release | Read or modify modeled network configuration |
-| NETCONF | Datastores, structured RPCs, filters, and error detail | XML and capability handling add complexity | Candidate validation and transactional changes where supported |
-| Ansible | Readable orchestration and reusable modules | Module behavior and collection versions matter | Multi-device configuration and workflow control |
-| Python | Maximum control over logic and integrations | Team owns testing, error handling, and lifecycle | Normalization, custom policy, API clients, and evidence processing |
-
-Interface selection is assumed network automation knowledge, but it changes pipeline safety and test design. Teams must discover device capabilities and validate models for the assigned platform and release. A DevOps pipeline should preserve capability evidence, test the selected client and transaction behavior, and avoid assuming that one resource path or rollback mechanism works everywhere.
-
-### Operational example: a script that works only on its author's laptop
-
-An engineer updates a parser and the local test passes. The shared runner fails because the laptop has an undeclared package and a different locale. The DevOps problem is not merely how to repair the parser; it is how to prevent an engineer-specific environment from becoming part of the release process. The team declares and locks the dependency, adds the failing output as a sanitized fixture, and runs the test in the same container image used by CI. The next parser change is judged against reproducible evidence rather than one workstation.
-
-## Mutable and immutable infrastructure
-
-Container images and pipeline artifacts can be immutable: the team creates a new version instead of editing the artifact. Network devices are generally mutable infrastructure: automation changes the state of a long-lived system.
-
-NetDevOps can still use immutable principles:
-
-- Keep intended state and release artifacts versioned.
-- Regenerate rather than hand-edit derived configuration.
-- Promote a tested automation image digest.
-- Treat pipeline definitions as code.
-- Recreate disposable test environments.
-
-Production devices require convergence, drift detection, and reconciliation rather than replacement after every change.
-
-## Blast radius
-
-Blast radius describes the possible impact of a failure. It depends on target count, network role, shared dependencies, privileges, command scope, protocol convergence, and recovery time.
-
-Controls include a test environment, one-device canary, inventory limits, rate controls, maintenance conditions, explicit diff review, routing-policy validation, out-of-band access, and automatic stop conditions. Concurrency should increase only after the team understands device and network behavior.
-
-## Version control as the system of record
-
-The study repository records intended state examples and the history of decisions. It can contain source code, tests, dependency declarations, Docker definitions, pipeline configuration, infrastructure code, optional Kubernetes manifests, documentation, and safe example configuration.
-
-It must not contain live credentials, tokens, private keys, generated state containing secrets, or uncontrolled build output.
-
-### Branch and merge-request workflow
-
-The course uses this change path:
-
-1. Update the local `main` branch.
-2. Create a short-lived feature branch.
-3. Make one coherent change.
-4. Test locally.
-5. Commit with a clear description.
-6. Push the branch and open a merge request.
-7. Let the pipeline validate the change.
-8. Review the code and evidence.
-9. Merge into `main`.
-10. Tag important course milestones.
-
-Short-lived branches reduce divergence. Merge requests provide a place for review, automated results, discussion, and approval.
-
-## Pipeline as executable delivery policy
-
-A pipeline describes the conditions a change must satisfy. An introductory workflow may run syntax, schema, and unit tests. A more capable workflow can build a container, validate its security properties, provision a lab, perform network pre-checks, execute a protected change, and retain operational evidence. Kubernetes is optional.
-
-Pipeline stages often include:
-
-The pipeline progresses through validation, testing, build, inspection, deployment, verification, and promotion.
-
-Stages express broad order. Jobs perform the actual work. Artifacts carry approved output or evidence between jobs. A runner executes jobs in a defined environment. Variables provide configuration, while protected variables restrict sensitive values to trusted branches or environments.
-
-## Automation boundaries
-
-Automation can reproduce mistakes quickly. Safe delivery requires boundaries:
-
-- Limit credentials to the permissions required by the job.
-- Separate read-only validation from change operations.
-- Display a plan or diff before a significant infrastructure change.
-- Restrict deployment jobs to trusted branches and environments.
-- Use an explicit target identifier instead of a broad default.
-- Make repeated execution safe where possible.
-- Preserve logs and test reports as evidence.
-- Provide a tested recovery path.
-
-## DevOps and network platform environments
-
-Network platforms may expose APIs, model-driven interfaces, controllers, sandboxes, and application-hosting capabilities that participate in a NetDevOps workflow. The examples use those interfaces to collect, model, deploy, and validate network state. Application delivery concepts appear when they support the automation platform.
-
-Network changes require particular care because shared infrastructure can affect many consumers. Preview, scope validation, change windows, pre-checks, post-checks, and recovery plans remain important even when the configuration is automated.
-
-## Lab progression
-
-Learners install and verify the workstation, inspect the supplied network automation application, create the course repository, and interact with GitLab CI. They identify the application's entry point, dependencies, configuration, test hooks, external services, and operational outputs. The first commit contains documentation, `.gitignore`, a safe `.env.example`, dependency declarations, and the supplied source and tests.
-
-Every later lab extends this repository. Learners do not create separate projects for Docker, Terraform, monitoring, or Kubernetes.
+Module 1 establishes the delivery model and the questions that each control must answer. Later chapters own the implementation detail: Modules 2–4 cover runtime and service architecture; Module 5 covers GitLab jobs, runners, artifacts, and promotion; Module 6 covers mutable network state, blast radius, convergence, and recovery; Module 7 covers infrastructure lifecycle and drift; Module 8 covers operational feedback; and Module 9 covers trust boundaries and credentials. This separation prevents the lifecycle overview from duplicating the engineering guidance where learners apply it.
 
 ## Knowledge check
 
-1. Why do small changes usually reduce delivery risk?
-2. How does continuous delivery differ from continuous deployment?
-3. Which network automation files belong in version control, and which sensitive values do not?
-4. What evidence should a reviewer see before approving a merge request?
-5. Why should a deployment job use more restricted credentials than a read-only validation job?
+1. Why can extensive pipeline automation still represent weak DevOps maturity?
+2. How do Culture and Sharing make Automation more sustainable?
+3. How can a team apply Lean thinking without weakening release controls?
+4. Which delivery and runtime measures should be evaluated together to avoid misleading conclusions?
+5. How does continuous delivery differ from continuous deployment?
+6. What evidence should a reviewer see before approving a release?
+7. Why should an artifact be built once and promoted by digest through later lifecycle stages?
+8. How do release, deployment, readiness, and acceptance represent different outcomes?
+9. Why must a deployment workflow rediscover actual state before retrying an operation with an uncertain result?
+10. How do fast CI feedback and slower production feedback contribute different knowledge?
 
 ## Summary
 
-DevOps changes the way a team makes and proves a change; it is not a synonym for scripting or for CI software. In a network context, the decisive controls are reproducibility, explicit scope, trustworthy pre- and post-change evidence, and a recovery path. The rest of the course applies those controls to an existing automation application.
+DevOps changes the way a team makes and proves a change; it is not a synonym for scripting or CI software. CALMS provides a balanced way to examine that change: Culture creates shared responsibility, Automation makes the safe path repeatable, Lean improves flow, Measurement tests whether the system is improving, and Sharing makes knowledge reusable. The rest of the course applies these ideas to the delivery of an existing Python automation application.
+
+Module 2 turns reproducibility from a principle into a runtime boundary by packaging the application and its dependencies with containers. Continue to [Introducing Containers](module-02-containers.md).

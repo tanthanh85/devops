@@ -1,0 +1,9 @@
+flowchart LR
+  I[Intent and inventory] --> S[Validate, normalize,<br/>and apply policy]
+  S --> T[Transform and execute]
+  T --> D[Device or controller]
+  D --> V[Verify and retain evidence]
+  classDef input fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef target fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class I input; class S,T,V action; class D target;

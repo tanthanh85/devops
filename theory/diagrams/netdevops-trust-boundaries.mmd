@@ -1,0 +1,13 @@
+flowchart LR
+  D[Developer and Git] --> V[Validation runner<br/>no device route]
+  V --> R[Registry]
+  R --> A{Approval}
+  A --> P[Protected runner]
+  S[Secret manager] --> P
+  P --> F[Management firewall]
+  F --> N[Network devices]
+  N --> E[Independent audit<br/>and evidence]
+  classDef low fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef protected fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef gate fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class D,V,R low; class P,S,F,N,E protected; class A gate;

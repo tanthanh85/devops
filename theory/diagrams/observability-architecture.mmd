@@ -1,0 +1,10 @@
+flowchart LR
+  N[Devices<br/>syslog, SNMP, MDT] --> C[Collectors]
+  A[Automation platform<br/>metrics, logs, traces] --> C
+  G[GitLab<br/>change events] --> C
+  C --> S[Metrics, logs,<br/>trace storage]
+  S --> D[Correlation and dashboards]
+  D --> F[Alerts and feedback]
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class N,A,G source; class C,S,D,F action;

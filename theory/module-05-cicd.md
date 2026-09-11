@@ -4,6 +4,8 @@
 
 A CI/CD pipeline converts a reviewed application change into tested, traceable artifacts and a controlled deployment. This module explains GitLab CI concepts, pipeline stages and dependencies, runners, variables, artifacts, caches, test automation, build-once promotion, environments, approvals, and failure handling. Network-specific validation is integrated as an application responsibility rather than taught from first principles.
 
+Modules 2–4 established the application artifact and its runtime architecture. Module 5 connects source review, tests, image construction, evidence, and deployment into one executable delivery policy. Module 6 then examines whether a technically successful pipeline has produced a genuinely safe and healthy release.
+
 ## Software delivery pipeline
 
 A pipeline does not treat a successful command or API response as final proof. Build completion proves that an artifact was created; deployment completion proves that a platform accepted a request. Health and acceptance checks must still prove that users or downstream systems receive the intended outcome. For a network automation application, that may include an existing read-only network test.
@@ -53,6 +55,14 @@ Important concepts include:
 | Manual approval | Deliberate promotion decision after diff and evidence review |
 
 ## Pipeline design
+
+The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate.
+
+<p align="center">
+  <img src="assets/diagrams/network-aware-cicd.svg" alt="Network-aware CI/CD pipeline separated into general and protected execution" width="640" />
+</p>
+
+The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner.
 
 A typical stage sequence is validation, testing, build, inspection, integration, deployment, and verification.
 
@@ -115,6 +125,14 @@ The build job should produce a versioned, immutable artifact. Later jobs deploy 
 For a container release, record the source commit, human-readable tag, and image digest. Deploy by digest for strong identity.
 
 ## Artifacts and caches
+
+The diagram distinguishes data required for correctness from data used only to improve speed.
+
+<p align="center">
+  <img src="assets/diagrams/artifact-vs-cache.svg" alt="Authoritative pipeline artifact compared with a disposable cache" width="640" />
+</p>
+
+A downstream job consumes an artifact deliberately. A cache may be missing or stale, so every job must remain correct without it.
 
 Artifacts are outputs that the pipeline needs to retain, such as test reports, coverage results, deployment plans, an SBOM, or packaged configuration. They should have an appropriate expiration and access policy.
 
@@ -316,10 +334,6 @@ A staging test may pass while production receives a rebuilt image carrying the s
 | Post-check | Prove configuration and service outcome | Device accepts commands but route or path is absent | Roll back or remediate according to evidence |
 | Telemetry observation | Detect delayed or collateral degradation | Packet loss rises after immediate checks pass | Halt promotion and invoke recovery policy |
 
-## Lab progression
-
-Learners implement `.gitlab-ci.yml` for the supplied application. The pipeline validates source and configuration, runs unit and integration tests, builds and scans the image, records its digest, publishes artifacts, deploys the Compose application to a controlled environment, and retains test and deployment evidence. Sensitive jobs use protected runners, variables, environments, and approval rules.
-
 ## Knowledge check
 
 1. How does an artifact differ from a cache?
@@ -331,3 +345,5 @@ Learners implement `.gitlab-ci.yml` for the supplied application. The pipeline v
 ## Summary
 
 A useful pipeline is an executable release policy with an audit trail. Its green status means something only when jobs test the same immutable artifact, privileged work is isolated, failures preserve evidence, and approval is bound to the reviewed commit, target, and digest. Speed comes from early feedback and safe concurrency—not from removing the controls that make promotion credible.
+
+The next module moves beyond pipeline completion to state, convergence, acceptance, and recovery. Continue to [Validating the Build and Improving the Deployment Flow](module-06-validation-deployment.md).

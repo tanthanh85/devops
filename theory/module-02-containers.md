@@ -4,6 +4,8 @@
 
 Containers package an existing application's code and user-space dependencies into a portable runtime unit. They allow engineers and CI runners to use the same runtime, libraries, clients, and validation logic. This module explains container architecture, Docker tooling, image and container lifecycle, storage, networking, configuration, and isolation.
 
+Module 1 established that a release must be reproducible and identifiable. Module 2 examines the mechanism used throughout the course to achieve that runtime consistency. It defines the boundary; Module 3 will turn the boundary into a secure release artifact.
+
 ## The application consistency problem
 
 An engineer runs `app.py` successfully from a laptop. The GitLab job fails with a different Python package version. Another engineer has an older Ansible collection, and a system Python upgrade changes a parser. The team describes this as “works on my laptop,” but the underlying problem is an undefined application runtime.
@@ -142,6 +144,14 @@ Avoid host networking as an unexplained fix. It removes a useful boundary and ca
 
 ## Runtime inputs for network jobs
 
+The container boundary is easiest to understand by separating fixed image content from values and state that must remain external.
+
+<p align="center">
+  <img src="assets/diagrams/container-runtime-boundary.svg" alt="Application content inside an automation image and configuration, credentials, and state outside it" width="640" />
+</p>
+
+The container receives the minimum runtime inputs required for one job and writes durable results to an external destination. Rebuilding the image is not a configuration-management or secret-rotation mechanism.
+
 The image should not contain live inventory or device credentials. A job receives:
 
 - A reviewed intended-state file from the repository
@@ -222,10 +232,6 @@ docker run --rm --name automation-check \
 
 This is a pattern, not a command to copy unchanged into production. The environment file must contain no long-lived device password, the digest must resolve in the chosen registry, and the application must support a read-only root filesystem. Because `--rm` deletes the stopped container, durable logs and reports must reach the evidence volume or a collector before exit.
 
-## Lab progression
-
-Learners explore Docker CLI commands using the supplied application: inspect images, create and run containers, view logs, execute a diagnostic command, inspect mounts and networks, stop the container, and remove disposable resources. They identify which application inputs must remain external to the image.
-
 ## Knowledge check
 
 1. Which dependencies does a container image control, and which remain part of the environment?
@@ -237,3 +243,5 @@ Learners explore Docker CLI commands using the supplied application: inspect ima
 ## Summary
 
 Containers remove a major source of delivery drift by packaging the application and its runtime dependencies together. They do not remove host-kernel, routing, DNS, certificate, storage, or identity dependencies. A production-ready container is replaceable, runs with limited privilege, receives configuration at runtime, and leaves durable evidence outside its writable layer.
+
+The next step is to encode these decisions in a Dockerfile and connect the image to supply-chain evidence. Continue to [Packaging an Application Using Docker](module-03-secure-images.md).

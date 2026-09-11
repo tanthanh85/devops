@@ -1,0 +1,10 @@
+flowchart LR
+  R[Request and plan] --> C[Create and configure]
+  C --> T[Test]
+  T --> E[Collect evidence]
+  E --> D[Controlled destroy]
+  C -. failure .-> D
+  T -. failure .-> E
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class R source; class C,T,E,D action;

@@ -1,0 +1,10 @@
+flowchart LR
+  S[Platform source] --> P[Platform pipeline<br/>test, build, scan, deploy]
+  P --> V[Automation platform<br/>version X]
+  I[Reviewed network intent] --> J[Network job pipeline<br/>validate and approve]
+  J --> V
+  V --> N[Network operation]
+  N --> E[Network evidence]
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class S,I,V source; class P,J,N,E action;

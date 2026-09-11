@@ -1,0 +1,10 @@
+stateDiagram-v2
+  direction LR
+  [*] --> Validated
+  Validated --> Approved: pre-check and diff
+  Approved --> Changing
+  Changing --> Validating: known result
+  Changing --> Unknown: timeout or partial result
+  Validating --> Verified: checks pass
+  Validating --> Recovery: checks fail
+  Recovery --> Validating: remediate

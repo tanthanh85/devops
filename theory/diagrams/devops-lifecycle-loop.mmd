@@ -1,0 +1,12 @@
+flowchart LR
+  PLAN[Plan and design] --> BUILD[Develop and build]
+  BUILD --> RELEASE[Test, release, and deploy]
+  RELEASE --> OPERATE[Operate, observe, and learn]
+  OPERATE -->|feedback| PLAN
+
+  classDef define fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef delivery fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef operation fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class PLAN define;
+  class BUILD,RELEASE delivery;
+  class OPERATE operation;

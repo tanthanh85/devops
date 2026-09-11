@@ -4,6 +4,8 @@
 
 The supplied Python application is expanded into a multitier service containing an API, worker, queue, data store, and monitoring components. This is a conventional software architecture: the worker's network-automation task is domain logic, while Docker networking, service contracts, persistence, readiness, timeouts, and failure handling are general application-delivery concerns.
 
+Module 3 produced a secure image. Module 4 asks what happens when that image must cooperate with other services and survive dependency failure. The resulting Compose stack becomes the first complete deployment target for the CI/CD pipeline introduced in Module 5.
+
 ## Multitier service architecture
 
 <p align="center">
@@ -15,6 +17,14 @@ Separating responsibilities allows each service to change, scale, recover, and r
 The worker is the only service that needs direct management-plane access. The API accepts a reference to reviewed intent and an approved operation. It must not accept arbitrary CLI commands from callers.
 
 ## Service contracts
+
+This sequence highlights why the public API does not need a route or credential to a device. Privileged access begins only in the protected worker after a validated job reaches the queue.
+
+<p align="center">
+  <img src="assets/diagrams/network-job-trust-sequence.svg" alt="Approved job sequence across API, queue, protected worker, secret service, and device" width="640" />
+</p>
+
+The worker returns structured evidence and final status through the application boundary. The credential is scoped to the job and is never placed on the queue.
 
 Each service needs an explicit contract:
 
@@ -205,13 +215,24 @@ Troubleshoot the stack from boundaries inward:
 
 `docker compose ps`, `docker compose logs`, `docker inspect`, `docker network inspect`, and targeted `curl` requests provide useful evidence.
 
+### Failure boundaries and controls
+
+A multitier incident should be classified at the boundary that failed. Restarting the entire stack destroys useful evidence and may amplify the original problem.
+
+| Symptom | Likely boundary | Evidence to collect | Appropriate control |
+|---|---|---|---|
+| API answers but jobs remain queued | API-to-queue or queue-to-worker | Request ID, queue depth, consumer state, worker logs | Contract test, queue health, bounded redelivery |
+| Worker starts but cannot reach targets | Worker-to-management network | Worker route, DNS, firewall decision, endpoint TLS/SSH identity | Dedicated network attachment and explicit egress policy |
+| Database container is running but API is unready | Application-to-database | Readiness result, connection error, migration status | Dependency-aware readiness and bounded connection retry |
+| Job runs twice after worker restart | Queue acknowledgement and job-state ownership | Delivery count, job state transitions, operation identifier | Idempotency key, per-target lock, uncertain-state handling |
+| Previous application cannot start after rollback | Application-to-schema compatibility | Migration version, application error, release history | Expand-and-contract migration or forward remediation |
+| Published endpoint works locally but not remotely | Host publishing, firewall, or proxy | Bound address, port mapping, proxy and firewall logs | Explicit exposure and end-to-end health check |
+
+The operating consequence determines severity. A failed dashboard query is different from a duplicated privileged job even when both appear as an HTTP error.
+
 ### Practical failure: the API is healthy but no job completes
 
 An HTTP 200 response from the API proves only that the request-facing process can answer. If jobs remain in `queued`, follow the job identifier across boundaries: confirm that the API published the message, inspect queue depth, check that the worker subscribed to the expected queue, and test management reachability from the worker namespace. A common cause is attaching the API to the published network while forgetting to attach the worker to the external management network. Restarting every container may hide the symptom without correcting the topology. The durable fix is a correct Compose network declaration plus an integration test that exercises one queued, read-only job.
-
-## Lab progression
-
-Learners build and deploy the application as a multitier Compose stack containing an API, restricted worker, queue or data service, and monitoring component. They explore Docker networking, add explicit networks and persistent state, validate configuration, define health checks and dependencies, and complete an end-to-end application transaction.
 
 ## Knowledge check
 
@@ -224,3 +245,5 @@ Learners build and deploy the application as a multitier Compose stack containin
 ## Summary
 
 A multitier service is easier to secure and scale only when its contracts are explicit. Compose makes those contracts inspectable: service names, networks, storage, configuration, health, and startup dependencies. The operator still has to reason across boundaries—especially queue redelivery, database migrations, worker reachability, and the difference between a live process and a completed job.
+
+The stack can now be started consistently, but its build and deployment still need automated policy and promotion. Continue to [Introducing CI/CD and Building the DevOps Flow](module-05-cicd.md).

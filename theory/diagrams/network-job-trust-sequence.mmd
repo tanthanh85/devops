@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant C as Client/GitLab
+  participant A as API (no device route)
+  participant Q as Queue
+  participant W as Protected worker
+  participant S as Secret service
+  participant D as Device
+  C->>A: Submit approved job
+  A->>Q: Validate and enqueue
+  Q->>W: Deliver job
+  W->>S: Request scoped credential
+  W->>D: Verify target and operate
+  D-->>W: Result
+  W-->>Q: Evidence and final status

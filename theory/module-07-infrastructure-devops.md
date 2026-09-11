@@ -4,6 +4,8 @@
 
 Application delivery depends on compute, networking, storage, test platforms, configuration, and access. This module extends version control, review, testing, automation, and evidence to infrastructure. It covers Infrastructure as Code, Terraform, Ansible, ownership boundaries, state, drift, on-demand test environments, pipeline integration, validation, and cleanup.
 
+Module 6 defined the evidence required before and after deployment. Module 7 makes the environment that produces that evidence repeatable. Terraform, Ansible, and Python receive explicit ownership boundaries so the pipeline can create, configure, test, and safely remove an isolated environment. Module 8 will use the resulting application and environment to build operational feedback.
+
 ## Three automation responsibilities
 
 <p align="center">
@@ -175,6 +177,14 @@ For an illustrative automation platform:
 
 ## On-demand test environments
 
+An ephemeral environment has a complete lifecycle, including evidence collection and controlled cleanup after failure.
+
+<p align="center">
+  <img src="assets/diagrams/test-environment-lifecycle.svg" alt="On-demand environment lifecycle with failure-safe evidence and cleanup" width="640" />
+</p>
+
+Cleanup retains the original failure and targets only resources whose ownership is proven.
+
 An on-demand environment gives a branch or merge request an isolated place for integration and system testing. A useful design includes:
 
 - Unique, validated naming
@@ -226,6 +236,12 @@ Cleanup should run when tests fail, but it must target only the environment crea
 
 ### Practical ownership boundary: Terraform hands off to Ansible
 
+The handoff is a machine-readable inventory artifact, making the ownership boundary visible.
+
+<p align="center">
+  <img src="assets/diagrams/terraform-ansible-handoff.svg" alt="Handoff from Terraform through Ansible to validation and cleanup" width="640" />
+</p>
+
 Consider an on-demand test environment. Terraform creates the isolated network, compute instances, security rules, and DNS records, then exports a machine-readable inventory. Ansible consumes that inventory to install the container runtime, configure trust anchors, and start the application. Terraform should not run a long sequence of remote shell provisioners, and Ansible should not create cloud networks through ad hoc tasks. The handoff artifact makes ownership visible and lets the pipeline prove that configuration targeted only resources created by that run.
 
 Before `apply`, a policy job can reject a plan that creates a public address or opens a management port to `0.0.0.0/0`. Before cleanup, the job compares the recorded environment identifier and ownership tags with current state. A missing or mismatched tag is a stop condition, not a reason to broaden the destroy command.
@@ -258,10 +274,6 @@ Controllers and network devices may expose declarative APIs, model-driven interf
 
 Shared network infrastructure requires strict target validation and change scoping. A sandbox, simulator, or dedicated training environment is appropriate for learning destructive lifecycle operations.
 
-## Lab progression
-
-Learners write a YAML Infrastructure as Code specification for the test environment, use Terraform to create and destroy assigned resources, and use Ansible to configure application prerequisites. GitLab creates the environment on demand, deploys the tested image, runs health and acceptance checks, retains evidence, and destroys only resources owned by the pipeline run.
-
 ## Knowledge check
 
 1. Why should Terraform state not be committed to Git?
@@ -273,3 +285,5 @@ Learners write a YAML Infrastructure as Code specification for the test environm
 ## Summary
 
 Infrastructure delivery needs the same review and evidence discipline as application delivery, but state and ownership make mistakes harder to reverse. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, plans must be reviewed as proposed changes, state must be protected, and cleanup must prove ownership before destroying anything.
+
+Repeatable infrastructure supplies a test target; the next requirement is evidence about behavior over time. Continue to [Monitoring DevOps and Engineering Visibility and Stability](module-08-observability.md).

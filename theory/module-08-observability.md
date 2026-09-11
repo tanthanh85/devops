@@ -4,7 +4,15 @@
 
 A pipeline can prove that a deployment passed immediate checks, but the team also needs evidence about the application and its supporting infrastructure over time. This module covers metrics, logs, traces, telemetry, dashboards, alerting, application instrumentation, health monitoring, stability engineering, and controlled chaos experiments. Network signals appear where they help evaluate the supplied application's output; they are not the primary monitoring subject.
 
+Modules 5–7 created a traceable release, validated it, and deployed it into controlled infrastructure. Module 8 closes the operational feedback loop by correlating application, platform, pipeline, and network signals. Module 9 will use those same identities, boundaries, and records to protect the workflow and investigate misuse.
+
 ## Monitoring, observability, and telemetry
+
+Telemetry supplies data; monitoring evaluates known conditions; observability combines signals and context to explain unfamiliar behavior.
+
+<p align="center">
+  <img src="assets/diagrams/monitoring-observability-telemetry.svg" alt="Relationship between telemetry, monitoring, observability, context, and action" width="640" />
+</p>
 
 | Term | Meaning | Network example |
 |---|---|---|
@@ -15,6 +23,14 @@ A pipeline can prove that a deployment passed immediate checks, but the team als
 Telemetry is the data. Monitoring evaluates selected signals. Observability is a property of the complete system, including instrumentation, context, retention, and investigation workflows.
 
 ## Feedback architecture requirements
+
+Device signals, application signals, and deployment events need a common correlation path.
+
+<p align="center">
+  <img src="assets/diagrams/observability-architecture.svg" alt="Observability architecture joining network, application, and pipeline signals" width="640" />
+</p>
+
+Shared identifiers and timestamps allow several storage systems to present one operational narrative.
 
 Every record should carry enough dimensions to identify environment, site, device, interface or protocol instance, collection method, and time. Change and pipeline identifiers connect delivery events to operational effects.
 
@@ -204,6 +220,14 @@ For the automation platform, instrument request and job count, queue delay, devi
 
 ## Change correlation
 
+An investigation follows the release through device events and telemetry using shared identifiers.
+
+<p align="center">
+  <img src="assets/diagrams/change-correlation-timeline.svg" alt="Timeline from commit through deployment, telemetry, and investigation" width="640" />
+</p>
+
+Correlation narrows the search; it does not by itself prove causality.
+
 Correlation turns separate data into a delivery feedback loop:
 
 For example, a commit starts a pipeline with a recorded automation image digest and change identifier. The deployment timestamp, worker activity, device event, and acceptance result form one ordered timeline. The exact network signals depend on the operation being delivered.
@@ -267,10 +291,6 @@ A responsible experiment defines:
 
 In a training environment, deleting one disposable application instance or temporarily blocking one dependency can demonstrate self-healing or alert behavior. The experiment must stay within the assigned environment.
 
-## Lab progression
-
-Learners centralize application and worker logs, visualize them in the selected log platform, create a system dashboard focused on metrics, define alerts and thresholds, instrument application monitoring, and notify a webhook or collaboration endpoint. A bounded failure experiment confirms that health signals, alerts, evidence, and recovery behavior agree.
-
 ## Knowledge check
 
 1. How does observability differ from monitoring?
@@ -282,3 +302,5 @@ Learners centralize application and worker logs, visualize them in the selected 
 ## Summary
 
 Observability is useful when an operator can move from a symptom to the affected release, dependency, and change without guessing. Metrics show patterns, logs explain individual events, traces connect service calls, and deployment annotations supply change context. Good alerts describe sustained impact and a response; good resilience tests verify a stated hypothesis within an explicit safety boundary.
+
+Operational visibility reveals how the system behaves; the next module protects who may change it and which components must be trusted. Continue to [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md).

@@ -1,0 +1,9 @@
+flowchart LR
+  S[Source, dependencies,<br/>and build context] --> I[Controlled build<br/>and image digest]
+  I --> E[SBOM, scan,<br/>signature, provenance]
+  E --> R[Registry and digest<br/>verification]
+  N[Secrets] -.->|must not enter| I
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef blocked fill:#fde8e7,stroke:#c43c35,color:#5b1714,stroke-width:2px;
+  class S,I source; class E,R action; class N blocked;

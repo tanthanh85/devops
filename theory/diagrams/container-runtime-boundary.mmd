@@ -1,0 +1,8 @@
+flowchart LR
+  IN[Inside image<br/>code, Python, libraries,<br/>collections, templates] --> RUN[Running container]
+  OUT[Runtime inputs<br/>configuration, inventory,<br/>short-lived credentials] --> RUN
+  RUN --> EXT[External state<br/>database, devices,<br/>telemetry, evidence]
+  classDef image fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef runtime fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef external fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  class IN image; class RUN runtime; class OUT,EXT external;

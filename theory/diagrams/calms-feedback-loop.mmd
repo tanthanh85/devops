@@ -1,0 +1,13 @@
+flowchart LR
+  C[Culture] --> A[Automation]
+  A --> L[Lean flow]
+  L --> M[Measurement]
+  M --> S[Sharing]
+  S -->|learning| C
+
+  classDef people fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef practice fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef evidence fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class C,S people;
+  class A,L practice;
+  class M evidence;

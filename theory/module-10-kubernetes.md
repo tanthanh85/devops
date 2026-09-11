@@ -4,6 +4,8 @@
 
 This module explains Kubernetes building blocks and APIs by deploying the same Python application used with Docker and Compose. It covers Pods, Deployments, Services, configuration, storage, scheduling, probes, scaling, rolling updates, advanced deployment patterns, CI/CD integration, security, monitoring, logging, troubleshooting, and multidata-center considerations. These are general software-platform capabilities. The worker's optional access to managed networks is treated as an additional security boundary, not as the purpose of Kubernetes.
 
+Modules 1–9 progressively created the delivery model, image, multitier service, pipeline, validation strategy, infrastructure, observability, and security boundaries. Module 10 combines those decisions on an orchestration platform. Kubernetes changes scheduling and reconciliation; it does not replace any earlier requirement for artifact identity, safe network execution, acceptance evidence, or recovery.
+
 ## Platform architecture
 
 <p align="center">
@@ -242,6 +244,14 @@ Avoid mutable image tags and broad cluster-admin credentials. Give the deploymen
 
 ### Platform pipeline and network change pipeline
 
+The pipelines meet at a versioned automation platform but have different triggers and outcomes.
+
+<p align="center">
+  <img src="assets/diagrams/platform-vs-network-pipeline.svg" alt="Separation between the platform delivery pipeline and network job pipeline" width="640" />
+</p>
+
+Deploying application code must not implicitly authorize a network operation.
+
 Keep two concerns distinguishable:
 
 - The platform pipeline tests and deploys the automation API, worker, validation service, and collectors.
@@ -320,10 +330,6 @@ Networking and policy platforms may connect data-center, cloud, and Kubernetes e
 
 Avoid allowing independent clusters to change the same device concurrently. Assign device or site ownership, use a shared coordination service, or route all change jobs through one control boundary. Disaster recovery should preserve job state and ensure that an uncertain in-flight change is inspected before another region retries it.
 
-## Lab progression
-
-Learners explore the Kubernetes environment and deploy the same application image digest already tested with Compose. They configure a namespace, Deployments, Services, ConfigMaps, external secret integration or lab-safe Secret delivery, RBAC, probes, resource controls, and NetworkPolicy. GitLab validates and deploys the manifests, waits for readiness, runs an application acceptance check, and collects evidence. Learners modify the Kubernetes pipeline, test Pod recovery and rolling updates, and inspect Kubernetes logs, events, and metrics.
-
 ## Knowledge check
 
 1. What does reconciliation mean in Kubernetes?
@@ -335,3 +341,5 @@ Learners explore the Kubernetes environment and deploy the same application imag
 ## Summary
 
 Kubernetes provides reconciliation, scheduling, and rollout machinery; it does not make an application reliable by itself. Safe delivery still requires an immutable image, compatible data changes, meaningful probes, least-privilege identities, enforced network policy, bounded worker concurrency, and evidence from the rollout. A team should choose Kubernetes only when these platform capabilities repay its additional operating and security burden.
+
+This completes the course progression: a familiar automation script has become a reviewed, reproducible, secure, observable, and supportable software product. Return to the [course overview](README.md) to review the learning outcomes and five-day path.

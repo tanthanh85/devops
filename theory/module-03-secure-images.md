@@ -4,6 +4,8 @@
 
 This module packages the supplied Python application into a reproducible and defensible Docker image. It covers Dockerfile responsibilities, build context, dependency control, layer design, multistage builds, non-root execution, metadata, testing, scanning, SBOMs, signing, provenance, and registry handling. Network libraries are application dependencies; the packaging method is the same one used for other Python services.
 
+Module 2 separated fixed image content from runtime configuration and external state. Module 3 now builds, tests, and identifies that image. Module 4 will deploy the same artifact as part of a service containing an API, worker, queue, and database.
+
 ## Application image contents
 
 The image should contain only the runtime components required by the application. In this course, that may include:
@@ -154,6 +156,14 @@ The pipeline should promote an already tested image digest. Rebuilding from the 
 
 Each output has a purpose. The SBOM inventories components. The vulnerability scan compares those components with known findings. A signature binds an identity to the digest. Provenance describes how the build occurred. None of these controls substitutes for the others.
 
+The supply chain below shows that evidence is attached to the immutable digest before it reaches a registry. The deployment verifies that identity rather than rebuilding or resolving a mutable tag.
+
+<p align="center">
+  <img src="assets/diagrams/secure-image-supply-chain.svg" alt="Secure image supply chain with build evidence and a prohibited secret path" width="640" />
+</p>
+
+Secrets may be exposed temporarily through a supported build-secret mechanism when private dependencies require them, but they must not enter the build context, layer history, final image, or provenance output.
+
 ## Compromised dependency scenario
 
 Assume a new parsing package executes unexpected code during installation. If the build job can reach the management network or access deployment variables, the dependency can steal credentials before an image is created.
@@ -165,6 +175,22 @@ Build isolation therefore matters as much as runtime hardening. The untrusted de
 A registry should enforce authentication, encrypted transport, access control, immutability where appropriate, scanning, and retention policy. Developer accounts may push to development repositories, while production promotion should use a controlled service identity.
 
 Retention must balance storage cost, investigation needs, and rollback. Removing every previous image immediately can make recovery impossible.
+
+### Packaging failure patterns
+
+The image review should connect a defect to its operational consequence rather than report only that a rule failed.
+
+| Failure pattern | Why it matters | Control and evidence |
+|---|---|---|
+| Mutable base tag | A rebuild can change without a source commit | Pin and record the base digest; use a scheduled update workflow |
+| Unlocked Python or collection dependency | Identical source can resolve to different behavior | Generate a reviewed lock or constraints file and test dependency updates |
+| Secret copied during an early layer | Later deletion does not remove it from image history | Exclude it from context and use an ephemeral build-secret mechanism |
+| Root runtime user | Application compromise gains unnecessary container privileges | Create a numeric non-root UID and test the effective identity |
+| Build tools retained in the final stage | Attack surface and vulnerability count increase | Use a multistage build and inspect installed packages |
+| Release rebuilt after testing | Production bytes are not the tested bytes | Promote the original digest and verify it at deployment |
+| Scan exception without expiry | Temporary risk acceptance becomes permanent | Record owner, justification, affected digest, compensating control, and expiry |
+
+These controls do not guarantee that the application behaves correctly. They establish that the team knows what it built, can reproduce the decision, and can reject an artifact whose identity or evidence changes.
 
 ## Example network automation packaging pattern
 
@@ -196,10 +222,6 @@ This example illustrates separation of build and runtime stages, dependency cach
 
 Suppose a merge request changes only `requirements.txt`. Source tests pass, but the lock file now pulls a new transitive SSH library. The reviewer should ask three separate questions: did application behavior change, did the runtime inventory change, and does the new component alter the security boundary? A defensible pipeline rebuilds from a clean context, compares the SBOM with the previous release, runs connection and parser fixtures, scans the resulting digest, and records an approved exception if a finding cannot yet be fixed. Reusing an old scan report would miss the exact risk introduced by the dependency-only change.
 
-## Lab progression
-
-Learners package and run the supplied application. They add a Dockerfile, `.dockerignore`, locked dependencies, OCI labels, non-root execution, a defined entry point, and image tests. They inspect layers, generate an SBOM, scan the image, record its digest, and prove that configuration and sensitive values remain external.
-
 ## Knowledge check
 
 1. What risks arise from an overly broad Docker build context?
@@ -211,3 +233,5 @@ Learners package and run the supplied application. They add a Dockerfile, `.dock
 ## Summary
 
 An image is trustworthy only when its contents, build process, test evidence, and identity can be traced together. A small image is useful, but reproducibility, patchability, non-root execution, secret discipline, dependency control, SBOM comparison, and digest-based promotion matter more than size alone.
+
+With an immutable application artifact available, the course can examine service dependencies and runtime failure boundaries. Continue to [Deploying a Multitier Application](module-04-multitier-compose.md).

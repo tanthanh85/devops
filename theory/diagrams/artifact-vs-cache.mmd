@@ -1,0 +1,9 @@
+flowchart LR
+  J[Pipeline job] --> A[Artifact<br/>authoritative output]
+  A --> N[Next job or release]
+  C[Cache<br/>disposable optimization] -. speeds up .-> J
+  X[Empty cache] -.->|job must still pass| J
+  classDef evidence fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef neutral fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  class A evidence; class J,N action; class C,X neutral;

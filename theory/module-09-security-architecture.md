@@ -4,7 +4,15 @@
 
 This module secures the complete DevOps workflow and examines the architecture choices around it. It covers repository and pipeline security, secrets, runners, application and container controls, supply-chain integrity, audit, microservices, synchronous and asynchronous interaction, and public, private, hybrid, and multicloud deployment considerations.
 
+Module 8 showed how identities and correlation data connect an operational event to a release. Module 9 applies that traceability to trust: source, runner, artifact, credential, management path, runtime, and evidence all require protection. The architecture choices examined here prepare the decision about whether Kubernetes is justified in Module 10.
+
 ## DevOps trust boundaries
+
+The architecture separates repository-controlled validation from privileged deployment and preserves an independent audit path.
+
+<p align="center">
+  <img src="assets/diagrams/netdevops-trust-boundaries.svg" alt="NetDevOps trust boundaries through protected execution and independent audit" width="640" />
+</p>
 
 Crossing a boundary requires authenticated identity, authorized purpose, encrypted transport, input validation, controlled output, and audit evidence.
 
@@ -49,6 +57,12 @@ For each boundary, identify authentication, authorization, encryption, input val
 | Evidence | Exposure or alteration of configuration and topology | Encryption, access control, integrity, retention policy |
 
 ## Secrets management
+
+Short-lived credentials have a lifecycle tied to workload identity and job scope.
+
+<p align="center">
+  <img src="assets/diagrams/credential-lifecycle.svg" alt="Credential lifecycle from identity through authorization, audit, and revocation" width="640" />
+</p>
 
 A secret is sensitive information used to authenticate or protect another asset. Examples include passwords, API tokens, private keys, signing keys, and database credentials.
 
@@ -121,6 +135,14 @@ The protected runner should:
 Runner registration and authentication tokens are sensitive. Rotating device credentials does not repair a runner that remains compromised.
 
 ## Compromised-runner scenario
+
+Contain access before rebuilding the execution environment.
+
+<p align="center">
+  <img src="assets/diagrams/compromised-runner-response.svg" alt="Containment and recovery flow for a compromised runner" width="640" />
+</p>
+
+The affected period remains untrusted until job history and managed state are independently verified.
 
 Assume an attacker gains code execution on the protected GitLab runner. The incident review must answer:
 
@@ -246,10 +268,6 @@ A merge request that changes `.gitlab-ci.yml`, deployment policy, or secret-retr
 
 This design also narrows incident response. If the general runner is compromised, revoke its registry and source access without rotating every device credential. If the protected runner is compromised, stop deployment jobs, revoke the workload identity, preserve runner and secret-service audit logs, and treat any job executed during the exposure window as untrusted.
 
-## Lab progression
-
-Learners secure infrastructure access in the CI/CD pipeline. They add protected-variable or secret-manager retrieval, TLS and SSH trust, repository secret scanning, dependency and image scanning, protected deployment rules, restricted runner routing, and audit evidence. They then compare monolithic and microservices designs and evaluate public, private, hybrid, and multicloud placement tradeoffs.
-
 ## Knowledge check
 
 1. Why does masking a pipeline variable not provide complete secret protection?
@@ -261,3 +279,5 @@ Learners secure infrastructure access in the CI/CD pipeline. They add protected-
 ## Summary
 
 Security depends on an unbroken chain of controls across source, build, artifact, identity, runner, runtime, and evidence. Short-lived credentials and segmentation reduce impact, while protected reviews and signed digests preserve intent and artifact identity. Microservices and multicloud are architectural choices, not maturity badges; adopt them only when their isolation, ownership, placement, or resilience benefits justify the additional failure modes.
+
+The final module applies the complete delivery, observability, and security model to Kubernetes while keeping platform releases separate from network jobs. Continue to [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md).

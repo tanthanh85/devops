@@ -25,11 +25,11 @@ The application's internal network logic is treated as supplied functionality. T
 
 ## Five-day distribution
 
-The course allocates approximately 20 hours to theory and 20 hours to cumulative lab work. Installation occupies the first lab block. Instructors can move selected reference sections to pre-reading when learners already understand Python, Git, or containers.
+The course allocates approximately 20 hours to theory and 20 hours to cumulative lab work. Module 0 is a prerequisite review and transition into the main course; it can be assigned as pre-reading or taught selectively at the start of Day 1. Installation occupies the first lab block.
 
 | Day | Theory aligned to the DEVOPS outline | Evolving lab capability | Theory | Lab |
 |---|---|---|---:|---:|
-| 1 | DevOps model, containers, and Docker tooling | Install the lab environment; inspect the supplied application; package and run its first container | 4 h | 4 h |
+| 1 | Network automation review, DevOps model, containers, and Docker tooling | Install the lab environment; inspect the supplied application; package and run its first container | 4 h | 4 h |
 | 2 | Secure image packaging, container networking, and multitier applications | Build the application image; deploy API, worker, data, and supporting services with Compose | 4 h | 4 h |
 | 3 | CI/CD, DevOps flow, build validation, and improved deployment | Implement GitLab CI; automate build, test, deployment, health checks, and recovery evidence | 4 h | 4 h |
 | 4 | Infrastructure DevOps, on-demand test environments, monitoring, and visibility | Provision an isolated test environment; integrate Ansible/Terraform; add logs, metrics, dashboards, and alerts | 4 h | 4 h |
@@ -39,6 +39,7 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 | Module | Subject | Central engineering question |
 |---|---|---|
+| 0 | [Network Automation Review and the Path to DevOps](module-00-network-automation-review.md) | Which automation foundations do learners already have, and how does DevOps turn them into a dependable team delivery system? |
 | 1 | [Introducing the DevOps Model](module-01-devops-model.md) | How do DevOps philosophy, flow, feedback, measurement, and shared ownership improve software delivery? |
 | 2 | [Introducing Containers](module-02-containers.md) | How do containers create a consistent runtime and isolation boundary? |
 | 3 | [Packaging an Application Using Docker](module-03-secure-images.md) | How is an existing Python application packaged into a secure, reproducible image? |
@@ -54,6 +55,7 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 After completing the guide and labs, learners should be able to:
 
+- Relate existing Python, Ansible, API, structured-data, and network-validation knowledge to a controlled software delivery lifecycle.
 - Describe DevOps philosophy and practices and apply them to operational delivery challenges.
 - Explain container architecture and use Docker tooling.
 - Package an existing Python application into a secure container image.
@@ -67,18 +69,3 @@ After completing the guide and labs, learners should be able to:
 - Compare modern application, microservices, public/private cloud, and multicloud deployment architectures.
 - Explain Kubernetes building blocks, use its APIs and manifests to deploy an application, and implement an automated deployment pipeline.
 - Explain multidata-center Kubernetes design and Kubernetes monitoring, logging, and visibility.
-
-## How to use the guide
-
-1. Complete the modules in order or use individual chapters as topic references.
-2. Begin with the supplied Python network automation application. Treat its device-facing logic as existing application functionality and concentrate on software delivery.
-3. Extend the same lab repository with containers, tests, pipelines, infrastructure definitions, monitoring, security controls, and deployment manifests as new topics are introduced.
-4. Distinguish a successful deployment action from a healthy, usable application outcome.
-5. Use only dedicated equipment, simulations, or authorized sandbox resources for optional network-facing tests.
-6. Keep credentials, private keys, live inventory values, state files, and sensitive evidence outside Git.
-
-## Lab and production boundaries
-
-The course uses an all-in-one Ubuntu learning workstation and may use an authorized vendor sandbox, virtual network devices, a simulator, or instructor-provided mock services. This improves portability but does not represent a production architecture. Production designs normally isolate runners, secret management, registries, observability, control-plane services, and network access.
-
-All configuration examples require adaptation to the assigned network operating system, release, and topology. Learners must verify data models, resource paths, transaction capabilities, and device behavior rather than assume that one payload works on every platform.

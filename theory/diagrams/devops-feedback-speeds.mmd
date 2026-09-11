@@ -1,0 +1,8 @@
+flowchart LR
+  D[Developer<br/>seconds–minutes] --> C[CI<br/>minutes]
+  C --> R[Release<br/>minutes–hours]
+  R --> O[Operations<br/>hours–days]
+  O --> A[Architecture<br/>weeks–months]
+  classDef fast fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef slow fill:#fff4d6,stroke:#b66a00,color:#5c3500,stroke-width:2px;
+  class D,C,R fast; class O,A slow;
