@@ -2,11 +2,9 @@
 
 ## Purpose
 
-Passing unit tests does not prove that an application image is deployable or that an automation release produces the intended operational outcome. This module covers build validation, infrastructure validation, pre-deployment health checks, deployment strategies, post-deployment testing, idempotence, failure classification, rollback, remediation, and improved deployment flow. Existing network validation code supplies domain-specific acceptance evidence.
+Passing unit tests does not prove that an application image is deployable or that a release produces the intended operational outcome. This module covers build validation, infrastructure validation, pre-deployment health checks, deployment strategies, post-deployment testing, idempotence, failure classification, rollback, remediation, and improved deployment flow. The principles apply to software deployment generally. Existing network tests supply one set of domain-specific acceptance evidence for the course application.
 
-> **Reference-architecture focus:** the protected worker-to-device sequence, state validation, blast-radius controls, stop conditions, and recovery decision.
-
-## Three forms of network state
+## Three forms of state in an automation application
 
 The automation application is assumed to know how to collect and interpret these states. This course uses them as deployment acceptance evidence and concentrates on when the pipeline collects them, how it evaluates them, and which result permits promotion or triggers recovery.
 
@@ -61,10 +59,6 @@ Infrastructure definitions need their own controls:
 The plan is evidence, not approval by itself. Reviewers must understand the target and the meaning of the proposed actions.
 
 ## Pre-deployment health checks
-
-<p align="center">
-  <img src="assets/diagrams/network-change-sequence.svg" alt="End-to-end sequence for pre-check, review, deployment, validation, and recovery" width="720" />
-</p>
 
 Before a release changes an environment, verify that the environment is safe to change. Useful checks include:
 
@@ -209,7 +203,7 @@ Production code needs robust structured traversal, explicit expected neighbor id
 ## Applied failure scenario: configuration accepted, routing service fails
 
 <p align="center">
-  <img src="assets/diagrams/ospf-failure-response.svg" alt="Decision flow after a device accepts configuration but OSPF or reachability validation fails" width="720" />
+  <img src="assets/diagrams/ospf-failure-response.svg" alt="Decision flow after a device accepts configuration but OSPF or reachability validation fails" width="640" />
 </p>
 
 In this routing-failure example, the pipeline successfully applies an authorized lab interface and routing change. The device returns no configuration error, but post-checks show:
@@ -303,6 +297,10 @@ Different failures need different responses:
 - A failed health check may require rollback or investigation.
 - A partially applied infrastructure change requires state inspection before retry.
 
+### Practical failure: a healthy container with an incompatible dependency
+
+Assume the new API container starts and its liveness probe passes, but workers fail when reading jobs created by the previous version. The deployment platform sees a running process; users see stalled automation. The post-deployment check must therefore submit a representative job and verify its terminal state, not merely call `/health`. If the database change is backward compatible, shift traffic back to the previous image and investigate. If the migration is irreversible, rolling back the image may make matters worse; stop promotion, preserve the queue and schema evidence, and use the documented forward-remediation path.
+
 ## Rollback and remediation
 
 Rollback restores a prior artifact or configuration. It works best for stateless application changes with compatible data. Some database or infrastructure changes cannot be reversed safely.
@@ -340,4 +338,4 @@ Learners validate the application build process, automate deployment, and improv
 
 ## Summary
 
-Validation creates an evidence chain from source to operating release. Reliable deployment checks the artifact and target, uses an appropriate rollout strategy, proves meaningful behavior after change, and preserves a tested recovery option. Failure handling must distinguish defects, transient conditions, access problems, and partial changes.
+Deployment succeeds only when the intended service works, not when a tool reports that an update was accepted. The pipeline must connect source, artifact, target, rollout, and operational evidence; distinguish retryable failures from uncertain or partial changes; and choose rollback only when data and infrastructure remain compatible with the previous release.

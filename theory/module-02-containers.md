@@ -4,11 +4,9 @@
 
 Containers package an existing application's code and user-space dependencies into a portable runtime unit. They allow engineers and CI runners to use the same runtime, libraries, clients, and validation logic. This module explains container architecture, Docker tooling, image and container lifecycle, storage, networking, configuration, and isolation.
 
-> **Reference-architecture focus:** the reproducible automation runtime and the boundary between application-service networking and protected device-management networking.
+## The application consistency problem
 
-## The network automation consistency problem
-
-An engineer runs `deploy.py` successfully from a laptop. The GitLab job fails with a different `ncclient` version. Another engineer has an older vendor network collection. A system Python upgrade changes a parsing library. A TextFSM template exists on one workstation but not another. The team describes this as “works on my laptop,” but the underlying problem is an undefined runtime.
+An engineer runs `app.py` successfully from a laptop. The GitLab job fails with a different Python package version. Another engineer has an older Ansible collection, and a system Python upgrade changes a parser. The team describes this as “works on my laptop,” but the underlying problem is an undefined application runtime.
 
 A network automation container makes the runtime explicit:
 
@@ -16,7 +14,7 @@ The versioned automation image combines a fixed Python version, locked packages,
 
 The same image can render the proposed configuration, execute offline tests, collect pre-checks, and run a controlled deployment. Environment-specific inventory and credentials remain outside the image.
 
-## Why network engineers containerize automation
+## Why teams containerize applications
 
 | Workload | Benefit of a container | Important boundary |
 |---|---|---|
@@ -57,7 +55,7 @@ A container remains a process on the host. If it receives excessive privileges o
 ## Docker architecture
 
 <p align="center">
-  <img src="assets/diagrams/docker-architecture.svg" alt="Docker client, Engine API, daemon, BuildKit, container runtime, registry, networks, and storage" width="720" />
+  <img src="assets/diagrams/docker-architecture.svg" alt="Docker client, Engine API, daemon, BuildKit, container runtime, registry, networks, and storage" width="640" />
 </p>
 
 The Docker client sends API requests to the Docker daemon. The daemon manages images, networks, volumes, and containers. A registry stores and distributes images.
@@ -89,7 +87,7 @@ Development workflows may use readable version tags. Promotion and controlled de
 ## Image layers and cache
 
 <p align="center">
-  <img src="assets/diagrams/docker-image-container-lifecycle.svg" alt="Lifecycle from Docker build inputs through immutable image layers and a disposable runtime container" width="720" />
+  <img src="assets/diagrams/docker-image-container-lifecycle.svg" alt="Lifecycle from Docker build inputs through immutable image layers and a disposable runtime container" width="640" />
 </p>
 
 Most Dockerfile instructions create layers. Docker can reuse unchanged layers during later builds. Layer order therefore affects build speed. Stable dependency installation usually belongs before frequently changing application source.
@@ -119,7 +117,7 @@ Applications should state clearly which data is persistent, which is cache, and 
 ## Container networking
 
 <p align="center">
-  <img src="assets/diagrams/container-network-planes.svg" alt="Separation of the application service network from the protected device-management network" width="720" />
+  <img src="assets/diagrams/container-network-planes.svg" alt="Separation of the application service network from the protected device-management network" width="640" />
 </p>
 
 Containers on a user-defined Docker network can normally resolve one another by service name. Applications should connect to the logical service name rather than a temporary container IP address.
@@ -208,6 +206,22 @@ A disciplined Docker workflow includes:
 
 Useful commands include `docker build`, `docker image inspect`, `docker history`, `docker run`, `docker ps`, `docker logs`, `docker exec`, `docker stats`, and `docker network inspect`.
 
+### Practical run pattern
+
+This example keeps configuration outside the image, mounts it read-only, limits resources, removes unnecessary Linux capabilities, and gives generated evidence a dedicated writable location:
+
+```bash
+docker run --rm --name automation-check \
+  --env-file ./lab.env \
+  --mount type=bind,src="$PWD/config",dst=/app/config,readonly \
+  --mount type=volume,src=automation-evidence,dst=/evidence \
+  --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+  --cap-drop ALL --memory 512m --cpus 1 \
+  registry.example/automation@sha256:APPROVED_DIGEST validate
+```
+
+This is a pattern, not a command to copy unchanged into production. The environment file must contain no long-lived device password, the digest must resolve in the chosen registry, and the application must support a read-only root filesystem. Because `--rm` deletes the stopped container, durable logs and reports must reach the evidence volume or a collector before exit.
+
 ## Lab progression
 
 Learners explore Docker CLI commands using the supplied application: inspect images, create and run containers, view logs, execute a diagnostic command, inspect mounts and networks, stop the container, and remove disposable resources. They identify which application inputs must remain external to the image.
@@ -222,4 +236,4 @@ Learners explore Docker CLI commands using the supplied application: inspect ima
 
 ## Summary
 
-Containers provide a repeatable application unit while sharing the host kernel. Images, containers, registries, networks, and volumes have distinct roles. Reliable packaging keeps configuration and secrets outside the image, treats containers as replaceable, limits access and resources, and preserves traceability from source to image.
+Containers remove a major source of delivery drift by packaging the application and its runtime dependencies together. They do not remove host-kernel, routing, DNS, certificate, storage, or identity dependencies. A production-ready container is replaceable, runs with limited privilege, receives configuration at runtime, and leaves durable evidence outside its writable layer.

@@ -4,12 +4,10 @@
 
 Application delivery depends on compute, networking, storage, test platforms, configuration, and access. This module extends version control, review, testing, automation, and evidence to infrastructure. It covers Infrastructure as Code, Terraform, Ansible, ownership boundaries, state, drift, on-demand test environments, pipeline integration, validation, and cleanup.
 
-> **Reference-architecture focus:** ownership of environment lifecycle, multi-device configuration, custom logic, operational verification, and workflow orchestration.
-
 ## Three automation responsibilities
 
 <p align="center">
-  <img src="assets/diagrams/iac-tool-ownership.svg" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="720" />
+  <img src="assets/diagrams/iac-tool-ownership.svg" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="640" />
 </p>
 
 Infrastructure provisioning, device configuration, and custom workflow logic overlap, but they are not identical. The course assigns clear ownership:
@@ -113,7 +111,7 @@ Before an unusual recovery or import action, inspect the configuration, state, a
 ## Drift
 
 <p align="center">
-  <img src="assets/diagrams/drift-reconciliation.svg" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="720" />
+  <img src="assets/diagrams/drift-reconciliation.svg" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="640" />
 </p>
 
 Drift occurs when real infrastructure differs from the controlled definition. It may result from manual changes, another tool, platform defaults, or failed operations.
@@ -149,7 +147,7 @@ all:
         lab-edge-01:
           ansible_host: 192.0.2.11
           role_id: edge
-          intended_state: examples/scenario-s2/compliance-intent.yml
+          intended_state: examples/compliance-intent.yml
       vars:
         ansible_network_os: vendor.collection.network_os
         ansible_connection: ansible.netcommon.network_cli
@@ -226,6 +224,12 @@ The infrastructure pipeline formats and validates the definitions, applies polic
 
 Cleanup should run when tests fail, but it must target only the environment created for the pipeline. Store the exact environment identifier as an artifact. Avoid a wildcard cleanup operation.
 
+### Practical ownership boundary: Terraform hands off to Ansible
+
+Consider an on-demand test environment. Terraform creates the isolated network, compute instances, security rules, and DNS records, then exports a machine-readable inventory. Ansible consumes that inventory to install the container runtime, configure trust anchors, and start the application. Terraform should not run a long sequence of remote shell provisioners, and Ansible should not create cloud networks through ad hoc tasks. The handoff artifact makes ownership visible and lets the pipeline prove that configuration targeted only resources created by that run.
+
+Before `apply`, a policy job can reject a plan that creates a public address or opens a management port to `0.0.0.0/0`. Before cleanup, the job compares the recorded environment identifier and ownership tags with current state. A missing or mismatched tag is a stop condition, not a reason to broaden the destroy command.
+
 ## Secrets and access
 
 Infrastructure jobs often hold powerful credentials. Use separate identities for planning, applying, configuration, and deployment when practical. Restrict each identity to the target environment and required operations.
@@ -268,4 +272,4 @@ Learners write a YAML Infrastructure as Code specification for the test environm
 
 ## Summary
 
-Infrastructure DevOps brings controlled source, automated validation, review, and repeatable execution to environments. Terraform manages resource lifecycle and state. Ansible configures systems through explicit inventories and modules. A safe on-demand workflow validates, plans, applies, configures, deploys, tests, preserves evidence, and removes only its own disposable resources.
+Infrastructure delivery needs the same review and evidence discipline as application delivery, but state and ownership make mistakes harder to reverse. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, plans must be reviewed as proposed changes, state must be protected, and cleanup must prove ownership before destroying anything.

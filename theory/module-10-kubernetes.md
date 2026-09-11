@@ -2,14 +2,12 @@
 
 ## Purpose
 
-This module explains Kubernetes building blocks and APIs by deploying the course application. It covers Pods, Deployments, Services, configuration, storage, scheduling, probes, scaling, rolling updates, advanced deployment patterns, CI/CD integration, security, monitoring, logging, troubleshooting, and multidata-center considerations. Kubernetes remains an architectural option rather than a maturity requirement.
-
-> **Reference-architecture focus:** an optional runtime implementation for automation services, with worker isolation and device reachability kept separate from general cluster access.
+This module explains Kubernetes building blocks and APIs by deploying the same Python application used with Docker and Compose. It covers Pods, Deployments, Services, configuration, storage, scheduling, probes, scaling, rolling updates, advanced deployment patterns, CI/CD integration, security, monitoring, logging, troubleshooting, and multidata-center considerations. These are general software-platform capabilities. The worker's optional access to managed networks is treated as an additional security boundary, not as the purpose of Kubernetes.
 
 ## Platform architecture
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-automation-platform.svg" alt="Kubernetes-hosted network automation platform and restricted management paths" width="720" />
+  <img src="assets/diagrams/kubernetes-automation-platform.svg" alt="Kubernetes-hosted network automation platform and restricted management paths" width="640" />
 </p>
 
 Only job workers need network-device access. API, dashboard, and general validation Pods should not share that route by default. Kubernetes NetworkPolicy, external firewalls, worker placement, and service-account policy work together to enforce the design.
@@ -17,7 +15,7 @@ Only job workers need network-device access. API, dashboard, and general validat
 ## Should the team use Kubernetes?
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-suitability.svg" alt="Decision flow for choosing Kubernetes, Compose, or a protected runner for network automation" width="720" />
+  <img src="assets/diagrams/kubernetes-suitability.svg" alt="Decision flow for choosing Kubernetes, Compose, or a protected runner for network automation" width="640" />
 </p>
 
 Kubernetes is useful when the platform needs several independently operated services, concurrent workers, declarative rollout, self-healing, workload scheduling, standardized observability, or integration with an existing organizational cluster platform.
@@ -46,7 +44,7 @@ The course uses Minikube to teach the model. It does not claim that the producti
 ## Three valid platform architectures
 
 <p align="center">
-  <img src="assets/diagrams/automation-platform-options.svg" alt="Comparison of a protected runner, Docker Compose platform, and Kubernetes automation platform" width="720" />
+  <img src="assets/diagrams/automation-platform-options.svg" alt="Comparison of a protected runner, Docker Compose platform, and Kubernetes automation platform" width="640" />
 </p>
 
 | Factor | Protected GitLab runner and scripts | Docker Compose platform | Kubernetes platform |
@@ -65,7 +63,7 @@ Kubernetes solves automation-platform scheduling and lifecycle problems. It does
 ## Kubernetes worker-to-device security
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-worker-device-security.svg" alt="Kubernetes security controls from validated queue input through an isolated worker to explicitly authorized devices" width="720" />
+  <img src="assets/diagrams/kubernetes-worker-device-security.svg" alt="Kubernetes security controls from validated queue input through an isolated worker to explicitly authorized devices" width="640" />
 </p>
 
 NetworkPolicy controls Pod traffic only when the cluster networking implementation enforces it; it does not replace the external management firewall or device AAA. General API, dashboard, and validation workloads should have no device route. A worker receives a validated job, signed image, dedicated service account, short-lived credential, narrow egress rule, explicit target list, and independent evidence destination.
@@ -117,7 +115,7 @@ A Service provides stable discovery and traffic distribution for selected Pods. 
 
 A ConfigMap stores non-sensitive configuration. A Secret stores sensitive data in a Kubernetes object. Secret protection still requires encryption at rest, RBAC, careful mounting, and safe application behavior.
 
-A scenario deployment can use a ConfigMap for permitted inventory references, protocol timeouts, and feature settings. Network credentials should preferably arrive through workload identity or an external secret integration. Storing a long-lived device password in a manifest, even if base64-encoded, is unsafe.
+A deployment can use a ConfigMap for permitted inventory references, protocol timeouts, and feature settings. Network credentials should preferably arrive through workload identity or an external secret integration. Storing a long-lived device password in a manifest, even if base64-encoded, is unsafe.
 
 ### Ingress or gateway
 
@@ -152,6 +150,44 @@ Kubernetes supports:
 - Liveness probes for process recovery
 
 Probe timing and thresholds should reflect application behavior. A liveness probe that fires during normal startup can create a restart loop. Readiness should change when the instance cannot serve requests but might recover without restart.
+
+### Compact deployment example
+
+This fragment shows the controls that reviewers should look for rather than a complete production manifest:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: automation-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: automation-api}
+  template:
+    metadata:
+      labels: {app: automation-api}
+    spec:
+      serviceAccountName: automation-api
+      containers:
+        - name: api
+          image: registry.example/automation@sha256:APPROVED_DIGEST
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe:
+            httpGet: {path: /ready, port: http}
+          livenessProbe:
+            httpGet: {path: /live, port: http}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+```
+
+The immutable digest preserves artifact identity. Separate readiness and liveness paths avoid restarting a recoverable instance merely because a dependency is temporarily unavailable. Resource values are hypotheses that must be adjusted from observed demand, and Pod security controls do not replace RBAC or network policy.
 
 ## Scaling and self-healing
 
@@ -209,9 +245,9 @@ Avoid mutable image tags and broad cluster-admin credentials. Give the deploymen
 Keep two concerns distinguishable:
 
 - The platform pipeline tests and deploys the automation API, worker, validation service, and collectors.
-- A network job pipeline submits reviewed scenario input to an approved platform version and evaluates network evidence.
+- A network job pipeline submits reviewed change input to an approved platform version and evaluates network evidence.
 
-Updating the worker image and changing network state in the same uncontrolled step makes troubleshooting difficult. Record both the platform image digest and the scenario-input commit in every job.
+Updating the worker image and changing network state in the same uncontrolled step makes troubleshooting difficult. Record both the platform image digest and the change-input commit in every job.
 
 ## Kubernetes networking
 
@@ -298,4 +334,4 @@ Learners explore the Kubernetes environment and deploy the same application imag
 
 ## Summary
 
-Kubernetes uses an API and controllers to reconcile desired and actual state. Deployments, Pods, Services, configuration objects, storage, probes, and resource controls form the application platform. Safe delivery promotes an immutable image, validates manifests, limits credentials, observes rollout health, and preserves evidence. Advanced rollout and multicluster designs require compatible data, strong telemetry, and explicit policy ownership.
+Kubernetes provides reconciliation, scheduling, and rollout machinery; it does not make an application reliable by itself. Safe delivery still requires an immutable image, compatible data changes, meaningful probes, least-privilege identities, enforced network policy, bounded worker concurrency, and evidence from the rollout. A team should choose Kubernetes only when these platform capabilities repay its additional operating and security burden.

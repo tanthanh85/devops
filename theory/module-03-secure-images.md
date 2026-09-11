@@ -2,13 +2,11 @@
 
 ## Purpose
 
-This module packages the existing automation application into a reproducible and defensible Docker image. It covers Dockerfile responsibilities, build context, dependency control, layer design, multistage builds, non-root execution, metadata, testing, scanning, SBOMs, signing, provenance, and registry handling.
+This module packages the supplied Python application into a reproducible and defensible Docker image. It covers Dockerfile responsibilities, build context, dependency control, layer design, multistage builds, non-root execution, metadata, testing, scanning, SBOMs, signing, provenance, and registry handling. Network libraries are application dependencies; the packaging method is the same one used for other Python services.
 
-> **Reference-architecture focus:** the trusted artifact path from reviewed source and dependencies to a signed image digest accepted by a protected worker.
+## Application image contents
 
-## Automation image contents
-
-An automation image can support the complete network change workflow:
+The image should contain only the runtime components required by the application. In this course, that may include:
 
 | Component | Purpose |
 |---|---|
@@ -104,7 +102,7 @@ Do not copy SSH private keys, NETCONF usernames, RESTCONF passwords, controller 
 ## Image metadata and traceability
 
 <p align="center">
-  <img src="assets/diagrams/image-evidence-lineage.svg" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="720" />
+  <img src="assets/diagrams/image-evidence-lineage.svg" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="640" />
 </p>
 
 OCI labels can record the source repository, source revision, version, description, authorship, and license. The pipeline should apply a tag derived from the release version or commit and record the resulting digest.
@@ -194,6 +192,10 @@ CMD ["--help"]
 
 This example illustrates separation of build and runtime stages, dependency caching, a non-root identity, and an explicit entry point. A real project should pin the base digest, control dependency versions, add health behavior, and validate the image in CI.
 
+### Review example: a harmless-looking dependency change
+
+Suppose a merge request changes only `requirements.txt`. Source tests pass, but the lock file now pulls a new transitive SSH library. The reviewer should ask three separate questions: did application behavior change, did the runtime inventory change, and does the new component alter the security boundary? A defensible pipeline rebuilds from a clean context, compares the SBOM with the previous release, runs connection and parser fixtures, scans the resulting digest, and records an approved exception if a finding cannot yet be fixed. Reusing an old scan report would miss the exact risk introduced by the dependency-only change.
+
 ## Lab progression
 
 Learners package and run the supplied application. They add a Dockerfile, `.dockerignore`, locked dependencies, OCI labels, non-root execution, a defined entry point, and image tests. They inspect layers, generate an SBOM, scan the image, record its digest, and prove that configuration and sensitive values remain external.
@@ -208,4 +210,4 @@ Learners package and run the supplied application. They add a Dockerfile, `.dock
 
 ## Summary
 
-Secure packaging treats the image as a controlled supply-chain artifact. Base selection, dependency locking, build context, runtime identity, secrets handling, tests, metadata, registry controls, and provenance all contribute to trust. The pipeline must connect the final image digest to the source and evidence that produced it.
+An image is trustworthy only when its contents, build process, test evidence, and identity can be traced together. A small image is useful, but reproducibility, patchability, non-root execution, secret discipline, dependency control, SBOM comparison, and digest-based promotion matter more than size alone.

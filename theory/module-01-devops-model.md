@@ -4,13 +4,26 @@
 
 DevOps is a way of organizing software and infrastructure delivery so that small changes move through a controlled, repeatable feedback loop. It combines shared responsibility, version control, automation, testing, operational evidence, and continuous improvement. A team has adopted DevOps only when these practices change how it delivers and operates a system. Installing a pipeline product alone does not achieve that result.
 
-This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. Network automation is the existing application domain, not a programming topic to relearn.
+This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation is simply the familiar workload used in selected examples.
 
-> **Reference-architecture focus:** the complete path from engineer and network intent through Git, validation, controlled execution, operational evidence, and feedback.
+## From ad hoc automation to DevOps
 
-## DevOps and NetDevOps
+Most learners already know how to automate a task. They can write a Python script, call an API, or run an Ansible playbook. The difficulty appears when other people must review it, run it on a clean system, release it safely, understand a failure, or support it after the original author has moved on.
 
-DevOps emerged from software delivery, but its principles apply to network services. NetDevOps uses software engineering practices to control network intent, automation code, configuration, validation, and operational evidence.
+DevOps addresses that delivery problem. It brings development and operational responsibilities into one feedback system and applies proven software practices to the complete path from source change to operating service. When the application automates infrastructure or networks, the same model is sometimes called infrastructure DevOps or NetDevOps; the underlying delivery principles do not change.
+
+The contrast is important:
+
+| Ad hoc automation | DevOps delivery |
+|---|---|
+| An engineer runs a local script | A versioned application runs in a defined environment |
+| Dependencies are installed from memory | Dependencies are declared, locked, built, and scanned |
+| Testing depends on the author | Automated tests run for every proposed change |
+| Credentials live on a workstation | Workload identities and secrets are supplied at runtime |
+| Success means the command completed | Acceptance checks prove the software and service outcome |
+| Knowledge remains with an individual | Code, evidence, runbooks, and decisions are shared |
+
+Network-facing applications add several operational considerations to the general software model:
 
 Network delivery has several characteristics that affect the implementation:
 
@@ -23,47 +36,43 @@ Network delivery has several characteristics that affect the implementation:
 
 NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts, configuration diffs, post-change operational validation, and tested recovery.
 
-## CALMS applied to network engineering
+## CALMS applied to software delivery
 
 CALMS provides a useful assessment model:
 
-| Dimension | Network engineering interpretation | Evidence in this course |
+| Dimension | Software-delivery interpretation | Evidence in this course |
 |---|---|---|
-| Culture | Network, security, platform, and application teams share service outcomes | Merge-request review and joint acceptance criteria |
-| Automation | Repeatable collection, rendering, testing, deployment, and recovery replace engineer-specific commands | Python, Ansible, pyATS, GitLab, and container jobs |
-| Lean | Small network changes move through a visible flow with limited work in progress | One VLAN and routing change on a short-lived branch |
-| Measurement | Delivery and network behavior produce usable measures | Pipeline duration, failure rate, OSPF state, reachability, and telemetry |
+| Culture | Developers, security, platform, and operations teams share service outcomes | Merge-request review and joint acceptance criteria |
+| Automation | Repeatable building, testing, deployment, and recovery replace engineer-specific procedures | GitLab jobs, automated tests, containers, and deployment code |
+| Lean | Small, independently reviewable changes move through a visible flow with limited work in progress | One application change on a short-lived branch |
+| Measurement | Delivery and application behavior produce usable measures | Pipeline duration, failure rate, latency, availability, and telemetry |
 | Sharing | Code, intent, runbooks, findings, and reusable tests remain available to the team | One repository and retained pipeline evidence |
 
-CALMS exposes an imbalance. A team may automate device commands while leaving review, measurement, or knowledge sharing unchanged. That is scripting at scale, not a mature NetDevOps system.
+CALMS exposes imbalance. A team may automate execution while leaving review, measurement, or knowledge sharing unchanged. That is scripting at scale, not a mature DevOps system.
 
-## Three network change models
+## Three delivery models
 
-<p align="center">
-  <img src="assets/diagrams/network-change-models.svg" alt="Comparison of traditional, automated, and NetDevOps network change models" width="720" />
-</p>
-
-| Characteristic | Traditional change | Automated change | NetDevOps pipeline |
+| Characteristic | Manual delivery | Ad hoc automation | DevOps pipeline |
 |---|---|---|---|
-| Source of truth | Ticket and engineer notes | Script inputs or spreadsheet | Versioned, schema-validated intent |
-| Execution | Manual CLI | Script or playbook | Controlled job using a reviewed artifact |
-| Review | Command list | Code review may occur | Intent, code, rendered diff, policy, and evidence review |
-| Validation | Engineer checks selected commands | Script may run checks | Required pre-check and post-check suites |
-| Credentials | Personal account | Often local environment values | Short-lived or protected service identity |
-| Target control | Human selection | Inventory argument | Protected environment, inventory fingerprint, explicit limit |
-| Evidence | Screenshots or copied output | Script log | Structured artifacts tied to commit and pipeline |
-| Recovery | Engineer reverses commands | Separate rollback script | Tested checkpoint, rollback, or remediation workflow |
-| Feedback | Incident or ticket closure | Script result | Pipeline result plus operational telemetry |
+| Source of truth | Ticket and engineer notes | Script inputs or local files | Reviewed source in version control |
+| Execution | Engineer follows a procedure | Author runs a script or playbook | Controlled job deploys an identified artifact |
+| Review | Release checklist | Code review may occur | Source, tests, dependencies, policy, and evidence are reviewed |
+| Validation | Engineer performs selected checks | Script may run checks | Required build, integration, security, and acceptance tests |
+| Credentials | Personal account | Often local environment values | Short-lived or protected workload identity |
+| Environment control | Manually prepared host | Author's workstation or shared server | Defined, reproducible, protected environment |
+| Evidence | Screenshots or copied output | Console log | Structured artifacts tied to commit and pipeline |
+| Recovery | Engineer reverses steps | Separate rollback script | Tested rollback or forward-remediation workflow |
+| Feedback | Incident or ticket closure | Script result | Pipeline result plus application telemetry |
 
-Automation improves consistency, but NetDevOps connects automation to governance and operational truth.
+Automation improves consistency, but DevOps connects automation to collaboration, governance, and operational truth.
 
-## Complete NetDevOps lifecycle
+## Complete DevOps lifecycle
 
 Every gate answers a question. Schema validation asks whether the intent has the required shape. Policy asks whether the requested values follow engineering standards. Pre-checks ask whether the network is safe to change. The configuration diff asks what will change. Post-checks ask whether the network achieved the desired service outcome.
 
-## Course-wide reference NetDevOps architecture
+## A practical software delivery architecture
 
-The course uses this logical architecture repeatedly. It is a responsibility model, not a requirement to buy or deploy every component.
+The following responsibilities appear in most mature delivery systems, although the products and team boundaries vary.
 
 - The Git repository stores intent, automation code, tests, policy, pipeline definitions, and operational documentation.
 - An unprivileged validation runner parses and normalizes intent, applies schema and policy, renders candidates, executes offline tests, and performs supply-chain checks. It has no device route or deployment credential.
@@ -159,9 +168,9 @@ DORA measures require careful interpretation in a network context:
 
 | Measure | Network interpretation | Example |
 |---|---|---|
-| Deployment frequency | Successful approved network changes delivered per period | Number of branch intent changes promoted each week |
-| Lead time for changes | Time from reviewed intent commit to verified operational outcome | Merge of VLAN request to confirmed route and reachability |
-| Change failure rate | Portion of changes requiring rollback, remediation, or incident response | OSPF adjacency failure after a deployed change |
+| Deployment frequency | Successful approved changes delivered per period | Number of automation releases promoted each week |
+| Lead time for changes | Time from reviewed commit to verified operational outcome | Merge of a policy update to confirmed enforcement |
+| Change failure rate | Portion of changes requiring rollback, remediation, or incident response | A parser upgrade produces incomplete validation results |
 | Time to restore service | Time from detected degradation to verified recovery | Alert to restored adjacency and reachability |
 
 The team should also measure pipeline feedback time, percentage of changes with complete evidence, drift age, policy failure reasons, and automation job reliability. Do not compare teams without accounting for network scope, risk, and change type.
@@ -174,23 +183,20 @@ YAML is convenient for human review but has traps: indentation controls structur
 
 JSON has stricter syntax and maps naturally to REST payloads. XML remains important for NETCONF and many YANG-encoded operations. Jinja2 converts validated data into platform configuration when a structured API is unavailable or unsuitable.
 
-The data path is:
-
 The data path moves from reviewed intent through schema validation and a normalized model to a renderer or API payload. After deployment, the workflow collects device state and compares it with the same intent.
 
 Templates must not contain business logic that belongs in validation or normalization. A rendered configuration is derived output; reviewed intent remains the source.
 
-### Existing application input used by the pipeline
+### Example input consumed by an existing application
 
 The following supplied application input is illustrative. Learners are not expected to design its schema or network logic during this course. They use it to implement linting, schema validation, policy checks, rendering tests, artifact handling, promotion, and operational evidence.
 
 ```yaml
 ---
 schema_version: 1
-scenario_id: S3
-change_id: CHG-LAB-0042
-site: branch01
-device: edge01
+change_id: CHG-2026-0042
+site: campus-west
+device: distribution-01
 platform: lab-nos
 service:
   vlan:
@@ -212,7 +218,7 @@ validation:
 
 | Field group | Meaning | Validation responsibility |
 |---|---|---|
-| `schema_version`, `scenario_id`, `change_id` | Contract and traceability identity | Required, correctly formatted, and recognized |
+| `schema_version`, `change_id` | Contract and traceability identity | Required, correctly formatted, and recognized |
 | `site`, `device`, `platform` | Target selection context | Must resolve to an approved inventory object; never trust free text as authorization |
 | `service.vlan` | Requested logical service | VLAN range, reserved identifiers, naming, and local uniqueness |
 | `interface` | Platform-neutral gateway intent | Interface-name policy, valid prefix, address ownership, and overlap detection |
@@ -243,6 +249,10 @@ Schema success does not grant authorization, policy success does not prove corre
 | Python | Maximum control over logic and integrations | Team owns testing, error handling, and lifecycle | Normalization, custom policy, API clients, and evidence processing |
 
 Interface selection is assumed network automation knowledge, but it changes pipeline safety and test design. Teams must discover device capabilities and validate models for the assigned platform and release. A DevOps pipeline should preserve capability evidence, test the selected client and transaction behavior, and avoid assuming that one resource path or rollback mechanism works everywhere.
+
+### Operational example: a script that works only on its author's laptop
+
+An engineer updates a parser and the local test passes. The shared runner fails because the laptop has an undeclared package and a different locale. The DevOps problem is not merely how to repair the parser; it is how to prevent an engineer-specific environment from becoming part of the release process. The team declares and locks the dependency, adds the failing output as a sanitized fixture, and runs the test in the same container image used by CI. The next parser change is judged against reproducible evidence rather than one workstation.
 
 ## Mutable and immutable infrastructure
 
@@ -332,4 +342,4 @@ Every later lab extends this repository. Learners do not create separate project
 
 ## Summary
 
-DevOps improves the complete delivery system through shared responsibility, small controlled changes, automated feedback, operational evidence, and continuous learning. Git records intent and history. Merge requests combine peer review with automated evidence. Pipelines turn delivery policy into repeatable execution. The remaining modules add capabilities to this foundation.
+DevOps changes the way a team makes and proves a change; it is not a synonym for scripting or for CI software. In a network context, the decisive controls are reproducibility, explicit scope, trustworthy pre- and post-change evidence, and a recovery path. The rest of the course applies those controls to an existing automation application.

@@ -4,11 +4,9 @@
 
 A CI/CD pipeline converts a reviewed application change into tested, traceable artifacts and a controlled deployment. This module explains GitLab CI concepts, pipeline stages and dependencies, runners, variables, artifacts, caches, test automation, build-once promotion, environments, approvals, and failure handling. Network-specific validation is integrated as an application responsibility rather than taught from first principles.
 
-> **Reference-architecture focus:** the unprivileged validation path, artifact lineage, protected promotion gate, and handoff to the network runner.
+## Software delivery pipeline
 
-## Network change pipeline
-
-The pipeline never treats a successful SSH, NETCONF, or RESTCONF response as final proof. Operational checks determine whether the service outcome exists.
+A pipeline does not treat a successful command or API response as final proof. Build completion proves that an artifact was created; deployment completion proves that a platform accepted a request. Health and acceptance checks must still prove that users or downstream systems receive the intended outcome. For a network automation application, that may include an existing read-only network test.
 
 ## Pipeline objectives
 
@@ -55,8 +53,6 @@ Important concepts include:
 | Manual approval | Deliberate promotion decision after diff and evidence review |
 
 ## Pipeline design
-
-One possible progression is:
 
 A typical stage sequence is validation, testing, build, inspection, integration, deployment, and verification.
 
@@ -127,7 +123,7 @@ A cache accelerates work by reusing dependency downloads or build intermediates.
 ## Runner design
 
 <p align="center">
-  <img src="assets/diagrams/runner-trust-model.svg" alt="Separation of the general validation runner from the protected network runner and management zone" width="720" />
+  <img src="assets/diagrams/runner-trust-model.svg" alt="Separation of the general validation runner from the protected network runner and management zone" width="640" />
 </p>
 
 A runner executes repository-controlled commands, so its trust boundary matters. A runner with access to the Docker daemon, internal network, deployment credentials, or host filesystem can affect more than one job.
@@ -205,7 +201,7 @@ default:
     - test -n "$CI_COMMIT_SHA"
 
 variables:
-  INTENT_FILE: examples/scenario-s3/service-intent.yml
+  INTENT_FILE: examples/service-intent.yml
   TARGET_LIMIT: lab-edge-01
   TARGET_PLATFORM: lab-nos
   EVIDENCE_DIR: evidence-output
@@ -295,6 +291,10 @@ This is a teaching example. GitLab syntax and feature availability depend on the
 
 Real pipelines should pass the exact image digest and evidence artifacts between jobs, verify that the approved diff belongs to the same commit and target, and define cleanup or recovery behavior.
 
+### Practical review: passing jobs, wrong artifact
+
+A staging test may pass while production receives a rebuilt image carrying the same tag. The dashboard looks green, yet the production bytes were never tested. To detect this class of error, the build job records the image digest; scan, integration, approval, and deployment jobs consume that digest as an artifact; and the deployment record reports the same value. If any stage resolves a mutable tag again, the evidence chain is broken and promotion should stop.
+
 ## Why each gate exists
 
 | Gate | Why it exists | Example failure | Required response |
@@ -330,4 +330,4 @@ Learners implement `.gitlab-ci.yml` for the supplied application. The pipeline v
 
 ## Summary
 
-A pipeline is executable delivery policy. It validates small changes, produces an immutable artifact, preserves evidence, and controls promotion. Reliable design separates job responsibilities, protects runners and secrets, uses artifacts and caches correctly, and makes failures easy to classify.
+A useful pipeline is an executable release policy with an audit trail. Its green status means something only when jobs test the same immutable artifact, privileged work is isolated, failures preserve evidence, and approval is bound to the reviewed commit, target, and digest. Speed comes from early feedback and safe concurrency—not from removing the controls that make promotion credible.

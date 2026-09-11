@@ -4,9 +4,7 @@
 
 This module secures the complete DevOps workflow and examines the architecture choices around it. It covers repository and pipeline security, secrets, runners, application and container controls, supply-chain integrity, audit, microservices, synchronous and asynchronous interaction, and public, private, hybrid, and multicloud deployment considerations.
 
-> **Reference-architecture focus:** every trust transition from engineer identity and repository review through artifact verification, workload identity, management access, AAA, and protected evidence.
-
-## NetDevOps trust boundaries
+## DevOps trust boundaries
 
 Crossing a boundary requires authenticated identity, authorized purpose, encrypted transport, input validation, controlled output, and audit evidence.
 
@@ -242,6 +240,12 @@ An architecture decision record captures the decision, context, considered optio
 
 Recording decisions prevents future maintainers from treating deliberate constraints as accidental choices.
 
+### Practical control chain for a protected deployment
+
+A merge request that changes `.gitlab-ci.yml`, deployment policy, or secret-retrieval code requires review from the platform or security owner. After merge, an unprivileged runner builds and scans the image without a route to managed infrastructure. A protected job exchanges its workload identity for a short-lived credential, verifies the approved image digest, runs on a restricted runner, and loses the credential when the job ends. Repository approval, artifact signature, workload identity, network segmentation, and audit logging protect different boundaries; none is a substitute for the others.
+
+This design also narrows incident response. If the general runner is compromised, revoke its registry and source access without rotating every device credential. If the protected runner is compromised, stop deployment jobs, revoke the workload identity, preserve runner and secret-service audit logs, and treat any job executed during the exposure window as untrusted.
+
 ## Lab progression
 
 Learners secure infrastructure access in the CI/CD pipeline. They add protected-variable or secret-manager retrieval, TLS and SSH trust, repository secret scanning, dependency and image scanning, protected deployment rules, restricted runner routing, and audit evidence. They then compare monolithic and microservices designs and evaluate public, private, hybrid, and multicloud placement tradeoffs.
@@ -256,4 +260,4 @@ Learners secure infrastructure access in the CI/CD pipeline. They add protected-
 
 ## Summary
 
-Secure DevOps protects source, builds, artifacts, credentials, deployments, runtime systems, and operational evidence. Modern architecture needs clear boundaries and observable, replaceable components. Microservices and multicloud can solve specific scale, ownership, resilience, or placement needs, but both add operating complexity that the design must justify.
+Security depends on an unbroken chain of controls across source, build, artifact, identity, runner, runtime, and evidence. Short-lived credentials and segmentation reduce impact, while protected reviews and signed digests preserve intent and artifact identity. Microservices and multicloud are architectural choices, not maturity badges; adopt them only when their isolation, ownership, placement, or resilience benefits justify the additional failure modes.

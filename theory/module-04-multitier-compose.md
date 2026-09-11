@@ -2,14 +2,12 @@
 
 ## Purpose
 
-The supplied automation application is expanded into a multitier service containing an API, worker, queue, data store, and monitoring components. This module uses Docker networking and Compose to explain service separation, configuration, persistence, readiness, timeouts, dependencies, deployment, and failure behavior.
+The supplied Python application is expanded into a multitier service containing an API, worker, queue, data store, and monitoring components. This is a conventional software architecture: the worker's network-automation task is domain logic, while Docker networking, service contracts, persistence, readiness, timeouts, and failure handling are general application-delivery concerns.
 
-> **Reference-architecture focus:** the optional API, queue, restricted worker, evidence store, and telemetry services between a pipeline and network infrastructure.
-
-## Network automation service architecture
+## Multitier service architecture
 
 <p align="center">
-  <img src="assets/diagrams/compose-automation-services.svg" alt="Docker Compose architecture for the network automation API, worker, supporting services, and network targets" width="720" />
+  <img src="assets/diagrams/compose-automation-services.svg" alt="Docker Compose architecture for the network automation API, worker, supporting services, and network targets" width="640" />
 </p>
 
 Separating responsibilities allows each service to change, scale, recover, and receive access control independently. The course stack contains an automation API, job worker, queue, job database, telemetry collector, and dashboard.
@@ -17,10 +15,6 @@ Separating responsibilities allows each service to change, scale, recover, and r
 The worker is the only service that needs direct management-plane access. The API accepts a reference to reviewed intent and an approved operation. It must not accept arbitrary CLI commands from callers.
 
 ## Service contracts
-
-<p align="center">
-  <img src="assets/diagrams/network-job-sequence.svg" alt="Sequence from an authorized automation request through queue, worker, network device, and evidence storage" width="720" />
-</p>
 
 Each service needs an explicit contract:
 
@@ -41,7 +35,7 @@ Containers change IP addresses when recreated. Consumers should use stable servi
 {
   "change_id": "CHG-2026-0120",
   "commit_sha": "0123456789abcdef",
-  "intent_path": "examples/scenario-s2/compliance-intent.yml",
+  "intent_path": "requests/compliance-intent.yml",
   "inventory": "lab",
   "operation": "precheck",
   "requested_by": "gitlab-pipeline-1842"
@@ -179,7 +173,7 @@ The course progresses from mock validation to an authorized virtual or sandbox d
 ## Health model
 
 <p align="center">
-  <img src="assets/diagrams/service-readiness-chain.svg" alt="Readiness and failure behavior across the automation service dependency chain" width="720" />
+  <img src="assets/diagrams/service-readiness-chain.svg" alt="Readiness and failure behavior across the automation service dependency chain" width="640" />
 </p>
 
 A multitier application benefits from several health views:
@@ -211,6 +205,10 @@ Troubleshoot the stack from boundaries inward:
 
 `docker compose ps`, `docker compose logs`, `docker inspect`, `docker network inspect`, and targeted `curl` requests provide useful evidence.
 
+### Practical failure: the API is healthy but no job completes
+
+An HTTP 200 response from the API proves only that the request-facing process can answer. If jobs remain in `queued`, follow the job identifier across boundaries: confirm that the API published the message, inspect queue depth, check that the worker subscribed to the expected queue, and test management reachability from the worker namespace. A common cause is attaching the API to the published network while forgetting to attach the worker to the external management network. Restarting every container may hide the symptom without correcting the topology. The durable fix is a correct Compose network declaration plus an integration test that exercises one queued, read-only job.
+
 ## Lab progression
 
 Learners build and deploy the application as a multitier Compose stack containing an API, restricted worker, queue or data service, and monitoring component. They explore Docker networking, add explicit networks and persistent state, validate configuration, define health checks and dependencies, and complete an end-to-end application transaction.
@@ -225,4 +223,4 @@ Learners build and deploy the application as a multitier Compose stack containin
 
 ## Summary
 
-A multitier design separates responsibilities and failure domains, but it introduces network and operational contracts. Compose records the services, networks, storage, configuration, and health model. Reliable services use discovery names, explicit timeouts, bounded retries, persistent storage outside disposable containers, and correlated operational evidence.
+A multitier service is easier to secure and scale only when its contracts are explicit. Compose makes those contracts inspectable: service names, networks, storage, configuration, health, and startup dependencies. The operator still has to reason across boundaries—especially queue redelivery, database migrations, worker reachability, and the difference between a live process and a completed job.

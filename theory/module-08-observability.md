@@ -1,10 +1,8 @@
-# Module 8: Monitoring NetDevOps and Engineering Visibility and Stability
+# Module 8: Monitoring DevOps and Engineering Visibility and Stability
 
 ## Purpose
 
-A pipeline can prove that a deployment passed immediate checks, but the team also needs evidence about the automation application, its infrastructure, and the network outcomes it manages over time. This module covers metrics, logs, traces, telemetry, dashboards, alerting, application instrumentation, health monitoring, stability engineering, and controlled chaos experiments.
-
-> **Reference-architecture focus:** the return path from network and automation signals to correlated evidence, alerts, incidents, and pipeline feedback.
+A pipeline can prove that a deployment passed immediate checks, but the team also needs evidence about the application and its supporting infrastructure over time. This module covers metrics, logs, traces, telemetry, dashboards, alerting, application instrumentation, health monitoring, stability engineering, and controlled chaos experiments. Network signals appear where they help evaluate the supplied application's output; they are not the primary monitoring subject.
 
 ## Monitoring, observability, and telemetry
 
@@ -53,7 +51,7 @@ Deployment, configuration, scaling, and infrastructure events add essential cont
 ## Network data collection methods
 
 <p align="center">
-  <img src="assets/diagrams/network-telemetry-methods.svg" alt="Selection and normalization of syslog, SNMP, model-driven telemetry, APIs, and OpenTelemetry" width="720" />
+  <img src="assets/diagrams/network-telemetry-methods.svg" alt="Selection and normalization of syslog, SNMP, model-driven telemetry, APIs, and OpenTelemetry" width="640" />
 </p>
 
 ### Syslog
@@ -206,13 +204,9 @@ For the automation platform, instrument request and job count, queue delay, devi
 
 ## Change correlation
 
-<p align="center">
-  <img src="assets/diagrams/change-correlation-sequence.svg" alt="Sequence correlating a Git commit, pipeline, network change, telemetry, and alert" width="720" />
-</p>
-
 Correlation turns separate data into a delivery feedback loop:
 
-For example, a commit starts a pipeline with a recorded automation image digest and scenario identifier. The deployment timestamp, neighbor transition, route installation, and reachability result form one ordered timeline. Exact identifiers and protocols depend on the selected lab scenario.
+For example, a commit starts a pipeline with a recorded automation image digest and change identifier. The deployment timestamp, worker activity, device event, and acceptance result form one ordered timeline. The exact network signals depend on the operation being delivered.
 
 The pipeline emits a change event before and after deployment. Dashboards annotate the event, and evidence records the telemetry window. This supports both successful convergence analysis and failure investigation.
 
@@ -227,6 +221,16 @@ A useful correlation view should let an engineer answer, without manually joinin
 - Was the automation platform healthy, or did queue delay, worker failure, clock skew, or missing telemetry distort the result?
 
 Join records with stable identifiers and bounded-cardinality labels. Commit SHA, pipeline ID, change ID, device identity, interface, and routing process are useful correlation fields; credentials, full command output, and unbounded request strings are not metric labels.
+
+### Practical incident trace
+
+At 10:04 a deployment finishes, at 10:05 queue delay rises, and at 10:06 the first job times out. CPU and memory are normal. A structured worker log shows `dependency=job-db`, `error=connection_pool_exhausted`, together with the image digest and pipeline ID. The team can now separate an application-release problem from device reachability. The alert should point to the correlated timeline and runbook; it should not page merely because one request was slow.
+
+```json
+{"timestamp":"2026-09-11T10:06:14Z","service":"worker","release":"sha256:7ab...","pipeline_id":"1842","change_id":"CHG-2026-0042","dependency":"job-db","outcome":"timeout","duration_ms":5000}
+```
+
+The same values do not all belong in metric labels. `service`, `outcome`, and a bounded dependency name are useful dimensions. A unique change identifier belongs in logs or traces, because using it as a time-series label creates unbounded cardinality.
 
 ## Telemetry quality
 
@@ -277,4 +281,4 @@ Learners centralize application and worker logs, visualize them in the selected 
 
 ## Summary
 
-Operational visibility combines metrics, logs, traces, health checks, and change events. Dashboards should answer questions, and alerts should lead to action. Instrumentation must protect sensitive information and control label cardinality. Stability mechanisms and bounded failure experiments help teams verify how the system behaves when dependencies or workloads fail.
+Observability is useful when an operator can move from a symptom to the affected release, dependency, and change without guessing. Metrics show patterns, logs explain individual events, traces connect service calls, and deployment annotations supply change context. Good alerts describe sustained impact and a response; good resilience tests verify a stated hypothesis within an explicit safety boundary.
