@@ -1,0 +1,48 @@
+flowchart LR
+  subgraph GENERAL[General cluster workloads]
+    API[Automation API Pod]
+    UI[Dashboard Pod]
+    VAL[Validation Pod]
+  end
+
+  Q[(Authenticated job queue)]
+
+  subgraph WORKER[Restricted worker namespace and node pool]
+    SA[Dedicated service account]
+    WP[Worker Pod<br/>signed image digest]
+    SEC[Read-only root filesystem<br/>non-root, seccomp, resources]
+    SA --> WP
+    SEC --> WP
+  end
+
+  subgraph ID[External identity and control]
+    OIDC[OIDC or workload identity]
+    VAULT[Secret broker<br/>short-lived credential]
+    POL[Admission, RBAC,<br/>and image policy]
+    OIDC --> VAULT
+    POL --> WP
+    VAULT --> WP
+  end
+
+  subgraph MGMT[Protected management zone]
+    FW[Egress firewall and allowlist]
+    AAA[AAA authorization<br/>and accounting]
+    DEV[Explicit device targets]
+    FW --> AAA --> DEV
+  end
+
+  API -->|validated job| Q -->|authorized scope| WP
+  WP -->|required protocol and port only| FW
+  WP --> EV[(Independent evidence sink)]
+  GENERAL -. NetworkPolicy denies<br/>device path .-> BLOCK[Blocked]
+
+  classDef general fill:#f4f4f5,stroke:#667085,color:#1d2939,stroke-width:2px;
+  classDef worker fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef protected fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef decision fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:2px;
+  classDef blocked fill:#fdecec,stroke:#c62828,color:#681414,stroke-width:2px;
+  class API,UI,VAL,Q general;
+  class SA,WP,SEC worker;
+  class OIDC,VAULT,POL decision;
+  class FW,AAA,DEV,EV protected;
+  class BLOCK blocked;

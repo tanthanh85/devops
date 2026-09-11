@@ -1,0 +1,23 @@
+flowchart LR
+  CLIENT[GitLab or engineer] --> API{API ready?}
+  API -- No --> AFAIL[Reject new work]
+  API -- Yes --> QUEUE{Queue available?}
+  QUEUE -- No --> QFAIL[Backpressure and alert]
+  QUEUE -- Yes --> WORKER{Worker ready?}
+  WORKER -- No --> WFAIL[Hold job and alert]
+  WORKER -- Yes --> SECRET{Credential service available?}
+  SECRET -- No --> SFAIL[Fail closed]
+  SECRET -- Yes --> TARGET{Target baseline healthy?}
+  TARGET -- No --> TFAIL[Block deployment and retain pre-check]
+  TARGET -- Yes --> RUN[Execute approved network job]
+  RUN --> EVID{Evidence stored?}
+  EVID -- No --> EFAIL[Mark job incomplete and escalate]
+  EVID -- Yes --> DONE[Return verified result]
+
+  classDef decision fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef failure fill:#fde8e8,stroke:#b42318,color:#5a1010,stroke-width:2px;
+  class API,QUEUE,WORKER,SECRET,TARGET,EVID decision;
+  class CLIENT,RUN,DONE action;
+  class AFAIL,QFAIL,WFAIL,SFAIL,TFAIL,EFAIL failure;
+

@@ -1,0 +1,19 @@
+flowchart LR
+  T["<b>Traditional change</b><br/>Ticket and command plan<br/>Manual CLI execution<br/>Selected manual checks<br/>Screenshots as evidence"]
+  A["<b>Task automation</b><br/>Structured script input<br/>Script or playbook execution<br/>Automated command output<br/>Execution log"]
+  D["<b>NetDevOps delivery</b><br/>Schema-validated intent<br/>Review, policy, and automated tests<br/>Pre-check, diff, and approval<br/>Scoped deployment and telemetry"]
+
+  T -->|Standardize repeatable work| A
+  A -->|Add governance, testing, and feedback| D
+
+  N1["Primary gain: consistency"] -.-> A
+  N2["Primary gain: controlled change with evidence"] -.-> D
+
+  classDef traditional fill:#f5f5f5,stroke:#667085,color:#1d2939,stroke-width:2px;
+  classDef automated fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef netdevops fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef note fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:1.5px;
+  class T traditional;
+  class A automated;
+  class D netdevops;
+  class N1,N2 note;

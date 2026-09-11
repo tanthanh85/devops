@@ -1,0 +1,29 @@
+sequenceDiagram
+  autonumber
+  actor Reviewer
+  participant CI as GitLab Pipeline
+  participant Worker as Protected Worker
+  participant BR as Authorized lab target
+  participant Core as Test Peer/Core
+  participant Evidence
+  CI->>Worker: Start approved pre-check job
+  Worker->>BR: Verify identity and collect configuration
+  Worker->>BR: Collect interfaces, CPU, memory, and OSPF state
+  Worker->>Core: Collect route and reachability baseline
+  Worker->>Evidence: Store baseline, backup, and proposed diff
+  CI-->>Reviewer: Present scope, diff, and pre-check evidence
+  Reviewer->>CI: Approve lab deployment
+  CI->>Worker: Deploy bound commit, image, target, and diff
+  Worker->>BR: Apply approved scenario intent
+  BR-->>Worker: Configuration response
+  Worker->>BR: Read configuration and operational state
+  Worker->>Core: Verify route and reachability
+  Worker->>Evidence: Store post-check and change transcript
+  alt All required outcomes pass
+    CI-->>Reviewer: Permit promotion
+  else Configuration or operation fails
+    CI->>Worker: Stop promotion and run approved recovery
+    Worker->>BR: Roll back or remediate
+    Worker->>Core: Validate restored service
+    Worker->>Evidence: Store recovery evidence
+  end

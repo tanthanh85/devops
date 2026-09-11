@@ -1,0 +1,35 @@
+flowchart LR
+  CLIENT[GitLab or authorized engineer] --> ING[Automation API Service]
+  subgraph K8S[Kubernetes cluster]
+    API[Automation API Pods]
+    Q[(Queue)]
+    WORK[Restricted worker Pods]
+    VALID[Validation service]
+    EVID[(Evidence store)]
+    OTEL[Telemetry collector]
+    DASH[Dashboard]
+    ING --> API
+    API --> Q
+    Q --> WORK
+    WORK --> VALID
+    WORK --> EVID
+    API --> OTEL
+    WORK --> OTEL
+    OTEL --> DASH
+    EVID --> DASH
+  end
+  WORK -->|approved path| FW[Management policy boundary]
+  FW --> R[Router]
+  FW --> S[Switch]
+  FW --> C[Controller]
+  R --> NTEL[Network telemetry gateway]
+  S --> NTEL
+  C --> NTEL
+  NTEL --> OTEL
+
+  classDef platform fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef data fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef network fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class CLIENT,ING,API,WORK,VALID,OTEL,DASH platform;
+  class Q,EVID data;
+  class FW,R,S,C,NTEL network;

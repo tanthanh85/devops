@@ -1,0 +1,60 @@
+flowchart LR
+  subgraph INPUTS[Build inputs]
+    direction LR
+    DF[Dockerfile]
+    CTX[Build context]
+    IGN[.dockerignore]
+    LOCK[Locked dependencies]
+  end
+
+  BUILD[BuildKit build]
+
+  subgraph IMAGE[Immutable image]
+    direction LR
+    L1[Base OS and runtime layer]
+    L2[Dependency layer]
+    L3[Automation code layer]
+    CFG[Image config<br/>entrypoint, user, labels]
+    MAN[Manifest and content digest]
+    L1 --> L2 --> L3 --> MAN
+    CFG --> MAN
+  end
+
+  REG[(Registry)]
+
+  subgraph RUNTIME[Runtime instance]
+    direction LR
+    RO[Read-only image layers]
+    RW[Thin writable layer]
+    IN[Runtime inputs<br/>inventory, configuration, secrets]
+    JOB[Container process]
+    OUT[External evidence and persistent data]
+    RO --> JOB
+    RW --> JOB
+    IN --> JOB
+    JOB --> OUT
+  end
+
+  DF --> BUILD
+  CTX --> BUILD
+  IGN --> BUILD
+  LOCK --> BUILD
+  BUILD --> L1
+  MAN -->|push by digest| REG
+  REG -->|pull exact digest| RO
+
+  STOP{Job complete?}
+  JOB --> STOP
+  STOP -->|yes| REMOVE[Remove container<br/>writable layer discarded]
+  STOP -->|no| JOB
+
+  classDef input fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef build fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:2px;
+  classDef immutable fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef runtime fill:#f4f4f5,stroke:#667085,color:#1d2939,stroke-width:2px;
+  classDef endstate fill:#fdecec,stroke:#c62828,color:#681414,stroke-width:2px;
+  class DF,CTX,IGN,LOCK input;
+  class BUILD,STOP build;
+  class L1,L2,L3,CFG,MAN,REG immutable;
+  class RO,RW,IN,JOB,OUT runtime;
+  class REMOVE endstate;

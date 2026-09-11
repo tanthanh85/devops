@@ -1,0 +1,37 @@
+flowchart LR
+  USER[Engineer or GitLab] -->|authorized request| API[Automation API]
+  API --> Q[Job queue]
+  Q --> WORKER[Restricted job worker]
+  WORKER -->|credential reference| VAULT[Vault]
+  WORKER -->|SSH, NETCONF, RESTCONF| DEV[Network devices]
+  WORKER --> DB[(Job database)]
+  WORKER --> EVID[(Evidence volume)]
+  API --> DB
+  API --> MET[Telemetry collector]
+  WORKER --> MET
+  DEV -->|syslog and telemetry| MET
+  MET --> DASH[Dashboard]
+  DB --> DASH
+
+  subgraph API_ZONE[API network]
+    API
+  end
+  subgraph SERVICE_ZONE[Internal services network]
+    Q
+    DB
+    EVID
+    MET
+    DASH
+  end
+  subgraph MANAGEMENT_ZONE[Protected management path]
+    WORKER
+    VAULT
+    DEV
+  end
+
+  classDef api fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef service fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef protected fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class USER,API api;
+  class Q,DB,EVID,MET,DASH service;
+  class WORKER,VAULT,DEV protected;

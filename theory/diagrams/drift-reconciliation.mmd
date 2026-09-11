@@ -1,0 +1,29 @@
+flowchart LR
+  INTENT[Reviewed intended state] --> COLLECT[Scheduled read-only collection]
+  ACTUAL[Device configuration and operation] --> COLLECT
+  COLLECT --> NORMAL[Normalize modeled and parsed data]
+  NORMAL --> COMPARE{Difference found?}
+  COMPARE -- No --> COMPLIANT[Record compliant state]
+  COMPARE -- Yes --> CLASS{Classify difference}
+  CLASS --> MANUAL[Unauthorized manual configuration]
+  CLASS --> CONTROL[Controller or competing owner]
+  CLASS --> DEFAULT[Platform default or normalization issue]
+  CLASS --> OPER[Operational drift without config drift]
+  MANUAL --> REVIEW{Safe automatic reconciliation?}
+  CONTROL --> OWN[Resolve ownership before change]
+  DEFAULT --> MODEL[Correct model or exception]
+  OPER --> INCIDENT[Investigate service health]
+  REVIEW -- Yes --> PIPE[Open controlled remediation pipeline]
+  REVIEW -- No --> HUMAN[Create reviewed change]
+  PIPE --> ACTUAL
+  HUMAN --> ACTUAL
+
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef decision fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef issue fill:#fde8e8,stroke:#b42318,color:#5a1010,stroke-width:2px;
+  class INTENT,ACTUAL source;
+  class COMPARE,CLASS,REVIEW decision;
+  class COLLECT,NORMAL,COMPLIANT,PIPE,HUMAN action;
+  class MANUAL,CONTROL,DEFAULT,OPER,OWN,MODEL,INCIDENT issue;
+

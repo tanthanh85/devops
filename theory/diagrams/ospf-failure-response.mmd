@@ -1,0 +1,27 @@
+flowchart LR
+  PUSH[Device accepts VLAN and OSPF configuration] --> CONFIG{Configuration matches intent?}
+  CONFIG -- No --> CFGFIX[Correct or roll back configuration]
+  CONFIG -- Yes --> ADJ{Required neighbor FULL<br/>within convergence window?}
+  ADJ -- Yes --> ROUTE{Expected route on peer?}
+  ADJ -- No --> BASE{Was adjacency healthy<br/>before the change?}
+  BASE -- No --> PREEXIST[Mark unhealthy baseline<br/>separate remediation]
+  BASE -- Yes --> DIAG[Inspect MTU, authentication,<br/>network type, timers, and logs]
+  DIAG --> CAUSED{Change caused degradation?}
+  CAUSED -- Yes --> ROLLBACK[Run tested rollback]
+  CAUSED -- Unclear --> HOLD[Freeze state and escalate]
+  ROUTE -- No --> ADV[Check passive policy, network statement,<br/>filtering, and convergence]
+  ROUTE -- Yes --> REACH{Required reachability passes?}
+  REACH -- No --> PATH[Inspect ARP, forwarding, ACL,<br/>return path, and packet loss]
+  REACH -- Yes --> PASS[Retain evidence and permit promotion]
+  CFGFIX --> VERIFY[Repeat complete post-check]
+  ROLLBACK --> VERIFY
+  ADV --> VERIFY
+  PATH --> VERIFY
+
+  classDef decision fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef failure fill:#fde8e8,stroke:#b42318,color:#5a1010,stroke-width:2px;
+  class CONFIG,ADJ,BASE,CAUSED,ROUTE,REACH decision;
+  class PUSH,PASS,VERIFY action;
+  class CFGFIX,PREEXIST,DIAG,ROLLBACK,HOLD,ADV,PATH failure;
+

@@ -1,0 +1,23 @@
+flowchart LR
+  REQ[Automation workload<br/>and operating requirements]
+
+  A["<b>Option A: protected runner</b><br/>Pipeline or schedule<br/>Protected runner<br/>Authorized devices"]
+  B["<b>Option B: Docker Compose</b><br/>API and queue<br/>Restricted worker<br/>Authorized devices"]
+  C["<b>Option C: Kubernetes</b><br/>Services and queue<br/>Isolated worker pools<br/>Authorized devices"]
+
+  X["Few sequential jobs<br/>Lowest platform burden"]
+  Y["Small always-on platform<br/>Moderate operations"]
+  Z["Scale, isolation, and availability<br/>Highest operations burden"]
+
+  REQ --> A --> X
+  REQ --> B --> Y
+  REQ --> C --> Z
+
+  classDef runner fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef compose fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:2px;
+  classDef kube fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef note fill:#f4f4f5,stroke:#667085,color:#1d2939,stroke-width:1.5px;
+  class REQ,X,Y,Z note;
+  class A runner;
+  class B compose;
+  class C kube;

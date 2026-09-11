@@ -1,0 +1,24 @@
+sequenceDiagram
+  autonumber
+  participant Git as Git commit
+  participant CI as Pipeline 1842
+  participant Worker
+  participant BR as Authorized lab target
+  participant Peer as Test Peer
+  participant Telemetry
+  participant Alert
+  Git->>CI: Commit 0123456 starts pipeline
+  CI->>Worker: Deploy image digest with CHG-2026-0120
+  Worker->>Telemetry: Emit deployment-start annotation
+  Worker->>BR: Apply approved scenario intent
+  BR-->>Worker: Configuration accepted
+  BR->>Telemetry: Interface and OSPF events
+  Worker->>Peer: Validate route and reachability
+  Peer-->>Worker: Operational result
+  Worker->>Telemetry: Emit deployment result and evidence link
+  alt Required state converges
+    Telemetry-->>CI: Observation window healthy
+  else Adjacency or reachability fails
+    Telemetry->>Alert: Correlated network-impact condition
+    Alert-->>CI: Block promotion and attach runbook
+  end

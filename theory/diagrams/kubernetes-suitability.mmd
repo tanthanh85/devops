@@ -1,0 +1,23 @@
+flowchart LR
+  START[Network automation platform requirement] --> MULTI{Several independently operated<br/>services or worker pools?}
+  MULTI -- No --> SIMPLE[Prefer scheduled runner or Compose]
+  MULTI -- Yes --> SCALE{Need scheduling, scaling,<br/>rolling updates, or self-healing?}
+  SCALE -- No --> SIMPLE
+  SCALE -- Yes --> PLATFORM{Organization already operates<br/>a secured Kubernetes platform?}
+  PLATFORM -- No --> SKILLS{Can the team own cluster,<br/>RBAC, networking, storage, and upgrades?}
+  PLATFORM -- Yes --> PATH{Can worker nodes reach devices<br/>through controlled management paths?}
+  SKILLS -- No --> SIMPLE
+  SKILLS -- Yes --> PATH
+  PATH -- No --> ALT[Use a protected runner closer<br/>to the management zone]
+  PATH -- Yes --> STATE{Queue, database, and evidence<br/>services have durable design?}
+  STATE -- No --> DESIGN[Complete state and recovery design]
+  STATE -- Yes --> K8S[Kubernetes is a justified option]
+  DESIGN --> STATE
+
+  classDef decision fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef simple fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef good fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class MULTI,SCALE,PLATFORM,SKILLS,PATH,STATE decision;
+  class SIMPLE,ALT simple;
+  class START,DESIGN,K8S good;
+

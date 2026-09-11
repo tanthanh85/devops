@@ -1,0 +1,21 @@
+flowchart LR
+  REQ[Network environment and change requirement] --> Q1{Create or remove<br/>lifecycle-managed resources?}
+  Q1 -- Yes --> TF[Terraform<br/>providers, resources, plan, state]
+  Q1 -- No --> Q2{Configure many devices with<br/>supported modules and playbooks?}
+  Q2 -- Yes --> ANS[Ansible<br/>inventory, roles, templates, assertions]
+  Q2 -- No --> PY[Python<br/>custom API, normalization, policy, evidence]
+  TF --> OUT[Environment outputs and sanitized inventory]
+  OUT --> ANS
+  PY --> ANS
+  ANS --> VERIFY[Independent operational validation]
+  PY --> VERIFY
+  TF --> VERIFY
+  VERIFY --> DRIFT[Scheduled drift and compliance feedback]
+
+  classDef question fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef tool fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef outcome fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class Q1,Q2 question;
+  class TF,ANS,PY tool;
+  class REQ,OUT,VERIFY,DRIFT outcome;
+

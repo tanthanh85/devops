@@ -1,0 +1,23 @@
+flowchart LR
+  COMMIT[Source commit] --> PIPE[Build pipeline ID]
+  LOCK[Dependency lock] --> PIPE
+  BASE[Base-image digest] --> PIPE
+  PIPE --> IMG[Automation image digest]
+  PIPE --> TEST[Test reports]
+  PIPE --> SBOM[SBOM]
+  PIPE --> PROV[Build provenance]
+  IMG --> SIGN[Artifact signature]
+  IMG --> DEPLOY[Deployment job]
+  SIGN --> DEPLOY
+  PROV --> DEPLOY
+  DEPLOY --> TARGET[Target inventory fingerprint]
+  DEPLOY --> CHANGE[Network change ID]
+  DEPLOY --> RESULTS[Post-change evidence]
+
+  classDef source fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef evidence fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef action fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class COMMIT,LOCK,BASE,IMG source;
+  class TEST,SBOM,PROV,SIGN,TARGET,CHANGE,RESULTS evidence;
+  class PIPE,DEPLOY action;
+

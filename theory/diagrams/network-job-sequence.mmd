@@ -1,0 +1,25 @@
+sequenceDiagram
+  autonumber
+  actor Engineer
+  participant API as Automation API
+  participant Queue as Job Queue
+  participant Worker as Restricted Worker
+  participant Vault
+  participant Device as Network device
+  participant Evidence
+  Engineer->>API: Submit reviewed intent reference and operation
+  API->>API: Validate identity, scope, and schema
+  API->>Queue: Enqueue non-secret job reference
+  API-->>Engineer: Return job ID
+  Queue->>Worker: Deliver job
+  Worker->>Vault: Request scoped short-lived credential
+  Vault-->>Worker: Issue credential
+  Worker->>Device: Verify identity and collect pre-checks
+  Device-->>Worker: Configuration and operational facts
+  Worker->>Device: Apply approved operation when authorized
+  Device-->>Worker: Protocol response
+  Worker->>Device: Read configuration and operational state
+  Device-->>Worker: Post-change facts
+  Worker->>Evidence: Store sanitized evidence and result
+  Worker->>Vault: Revoke or release credential
+  API-->>Engineer: Return status and evidence reference

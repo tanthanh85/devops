@@ -1,0 +1,39 @@
+flowchart LR
+  U[Operator or pipeline]
+
+  subgraph APP[Application service network]
+    API[Automation API]
+    Q[(Job queue)]
+    DB[(Results database)]
+    API -->|submit job| Q
+    API -->|read status| DB
+  end
+
+  subgraph BOUNDARY[Controlled dual-homed boundary]
+    W[Authorized worker<br/>least privilege and job identity]
+  end
+
+  subgraph MGMT[Protected management network]
+    FW[Firewall and AAA]
+    R1[Network device 1]
+    R2[Network device 2]
+    C[Controller or platform API]
+    FW --> R1
+    FW --> R2
+    FW --> C
+  end
+
+  U -->|HTTPS| API
+  Q -->|authorized job only| W
+  W -->|structured evidence| DB
+  W -->|SSH, NETCONF, RESTCONF, or API| FW
+  API -. no direct device route .-> X[Blocked]
+
+  classDef service fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef boundary fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:2px;
+  classDef protected fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef blocked fill:#fdecec,stroke:#c62828,color:#681414,stroke-width:2px;
+  class U,API,Q,DB service;
+  class W boundary;
+  class FW,R1,R2,C protected;
+  class X blocked;

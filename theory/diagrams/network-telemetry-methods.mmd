@@ -1,0 +1,26 @@
+flowchart LR
+  QUESTIONS[Operational questions] --> EVENTS{Need discrete state change?}
+  QUESTIONS --> COUNTERS{Need standard counters or status?}
+  QUESTIONS --> STREAM{Need frequent modeled updates?}
+  QUESTIONS --> DETAIL{Need targeted structured detail?}
+  QUESTIONS --> PATH{Need end-to-end request timing?}
+  EVENTS -- Yes --> SYSLOG[Syslog and platform events]
+  COUNTERS -- Yes --> SNMP[SNMPv3 polling]
+  STREAM -- Yes --> MDT[Model-driven telemetry]
+  DETAIL -- Yes --> API[REST, RESTCONF, NETCONF, or structured CLI]
+  PATH -- Yes --> OTEL[OpenTelemetry for automation services]
+  SYSLOG --> COL[Collectors and normalizers]
+  SNMP --> COL
+  MDT --> COL
+  API --> COL
+  OTEL --> COL
+  COL --> QUALITY[Time, identity, units, gaps,<br/>cardinality, retention]
+  QUALITY --> STORE[Metric, log, trace, and event stores]
+  STORE --> USE[Dashboards, alerts, evidence, and investigation]
+
+  classDef question fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef method fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef outcome fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  class EVENTS,COUNTERS,STREAM,DETAIL,PATH question;
+  class SYSLOG,SNMP,MDT,API,OTEL method;
+  class QUESTIONS,COL,QUALITY,STORE,USE outcome;

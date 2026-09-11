@@ -1,0 +1,40 @@
+flowchart LR
+  CLI[Docker CLI<br/>docker build, pull, run]
+  API[Docker Engine API<br/>Unix socket or protected TCP]
+
+  subgraph HOST[Docker host]
+    D[Docker daemon<br/>dockerd]
+    B[BuildKit<br/>image builds]
+    C[containerd<br/>image and container lifecycle]
+    R[runc<br/>creates isolated process]
+    IMG[(Local image store)]
+    NET[Docker networks]
+    VOL[(Volumes and bind mounts)]
+    PROC[Container process<br/>namespaces and cgroups]
+
+    D --> B
+    D --> C
+    C --> R
+    R --> PROC
+    B --> IMG
+    C <--> IMG
+    D --> NET
+    D --> VOL
+    NET --> PROC
+    VOL --> PROC
+  end
+
+  REG[(Container registry<br/>repositories, tags, digests)]
+
+  CLI --> API --> D
+  B -->|push image| REG
+  REG -->|pull manifest and layers| C
+
+  classDef client fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef engine fill:#fff7e6,stroke:#d97706,color:#7c2d12,stroke-width:2px;
+  classDef runtime fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef data fill:#f4f4f5,stroke:#667085,color:#1d2939,stroke-width:2px;
+  class CLI,API client;
+  class D,B engine;
+  class C,R,PROC,NET runtime;
+  class IMG,VOL,REG data;

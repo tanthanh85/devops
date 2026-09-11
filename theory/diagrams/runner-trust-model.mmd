@@ -1,0 +1,24 @@
+flowchart LR
+  MR[Merge-request code] --> GENERAL[General validation runner]
+  GENERAL --> OFFLINE[Schema, lint, render, policy, fixtures]
+  OFFLINE --> ART[Validated artifacts]
+  ART --> MAIN{Reviewed merge to protected main?}
+  MAIN -- No --> STOP[No device access or deployment secret]
+  MAIN -- Yes --> PROTECTED[Protected network runner]
+  REG[Signed automation image digest] --> PROTECTED
+  IDP[Short-lived workload identity] --> PROTECTED
+  PROTECTED --> FW[Management firewall and AAA]
+  FW --> DEV[Explicit network-device targets]
+  DEV --> AUDIT[Independent syslog, AAA, and telemetry]
+  PROTECTED --> EVID[Protected pipeline evidence]
+
+  classDef low fill:#f4f7fb,stroke:#52677a,color:#172a3a,stroke-width:2px;
+  classDef protected fill:#e8f1fb,stroke:#1769aa,color:#0b2540,stroke-width:2px;
+  classDef network fill:#e5f7f4,stroke:#087f6d,color:#063a33,stroke-width:2px;
+  classDef decision fill:#fff4d6,stroke:#b26a00,color:#4a2b00,stroke-width:2px;
+  classDef failure fill:#fde8e8,stroke:#b42318,color:#5a1010,stroke-width:2px;
+  class MR,GENERAL,OFFLINE,ART low;
+  class REG,IDP,PROTECTED,EVID protected;
+  class FW,DEV,AUDIT network;
+  class MAIN decision;
+  class STOP failure;
