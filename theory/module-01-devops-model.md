@@ -38,7 +38,7 @@ NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts,
 
 ## 3. CALMS applied to software delivery
 
-CALMS is a practical way to assess whether DevOps exists as an operating model rather than as a collection of tools. The letters represent **Culture, Automation, Lean, Measurement, and Sharing**. None of the dimensions is sufficient on its own. A pipeline without shared ownership can automate a poor handoff; extensive metrics without a learning culture can become surveillance; and a collaborative team without repeatable automation remains dependent on manual effort.
+CALMS assesses DevOps as an operating model rather than a collection of tools. It represents **Culture, Automation, Lean, Measurement, and Sharing**. The dimensions work together: automation without ownership can accelerate a poor process, while collaboration without repeatable execution remains dependent on individuals.
 
 <p align="center">
   <img src="assets/diagrams/calms-feedback-loop.svg" alt="CALMS dimensions operating as a continuous learning loop" width="640" />
@@ -54,59 +54,27 @@ CALMS is a practical way to assess whether DevOps exists as an operating model r
 
 ### 3.1 Culture: shared responsibility for the outcome
 
-Culture concerns incentives, responsibilities, and working relationships. In a handoff-oriented organization, one group writes software, another deploys it, and operations inherits the consequences. Each group can complete its assigned task while the service still fails. DevOps replaces the handoff with shared responsibility for delivery and operation.
-
-Shared responsibility does not mean that every engineer has identical skills or unrestricted production access. Specialists remain important. It means that developers design for testability and supportability, operations engineers influence architecture and deployment, security engineers define controls early enough to automate them, and the team agrees on what constitutes a successful release.
-
-Evidence of a healthy culture includes blameless incident reviews, cross-functional merge-request review, explicit service ownership, accessible runbooks, and time allocated to reduce recurring operational work. Warning signs include deployments that require one particular engineer, failures thrown “over the wall,” incentives based only on change volume, and incidents in which the first question is who caused the problem rather than which control failed.
-
-For a network automation team, culture changes when the author of a playbook, the platform engineer operating the runner, and the network engineer responsible for the service agree on tests, release scope, observability, and recovery before deployment.
+Culture replaces isolated handoffs with shared responsibility for delivery and operation. Specialists retain distinct roles and access, but application, platform, security, and operations owners agree on acceptance criteria, release scope, observability, and recovery before deployment. Useful evidence includes cross-functional review, explicit ownership, accessible runbooks, and incident reviews that improve controls rather than assign blame.
 
 ### 3.2 Automation: make the safe path repeatable
 
-Automation converts a reviewed procedure into consistent execution. Useful targets include build, test, dependency checks, security scanning, environment creation, deployment, health verification, evidence collection, rollback, and cleanup. The objective is not to automate every action immediately. The objective is to remove variation from frequent, error-prone work while preserving deliberate decisions where risk justifies them.
-
-Good automation is deterministic, versioned, testable, observable, and safe to retry where possible. It validates inputs, uses bounded timeouts, returns meaningful status, preserves failure evidence, and limits credentials and target scope. A long shell script that hides errors and can run only on its author's laptop is automated execution, but it is not yet dependable delivery automation.
-
-Teams should automate a stable and understood process. Automating an ambiguous approval path or an unreliable manual procedure usually makes the weakness operate faster. Manual approval may remain appropriate for production, but the approval should refer to an exact commit, artifact digest, environment, test result, and proposed effect.
+Automation makes reviewed work repeatable across build, test, security, deployment, verification, recovery, and cleanup. Dependable automation is versioned, testable, observable, bounded by timeouts and scope, and explicit about failure. Teams should first understand the process being automated; otherwise ambiguity and unsafe behavior merely execute faster. Manual approval may remain, but it should reference an exact commit, artifact, environment, proposed effect, and evidence.
 
 ### 3.3 Lean: improve flow and reduce batch risk
 
-Lean focuses on the flow of value and the removal of waste. In delivery work, waste appears as long queues, repeated manual setup, oversized releases, unused environments, duplicated approvals, late defect discovery, and work waiting for a specialist. Large batches increase risk because they contain more interactions, take longer to review, and are harder to reverse.
-
-A lean delivery system favors small changes, short-lived branches, early validation, limited work in progress, reusable environments, and fast feedback. It makes queues visible and treats waiting time as part of lead time. Optimizing one job in a pipeline has little value if a release then waits three days for an unavailable test environment.
-
-Lean does not mean removing necessary control. It means designing the control to supply evidence quickly and consistently. An automated policy check can provide stronger governance with less delay than a reviewer manually inspecting the same rule in every release.
+Lean improves the flow of small, reviewable changes. It exposes queues, repeated setup, oversized releases, late testing, and work waiting for a specialist. Short-lived branches, early checks, limited work in progress, and reusable test environments reduce delay and batch risk. Lean does not remove necessary controls; it designs them to provide evidence quickly and consistently.
 
 ### 3.4 Measurement: use evidence to guide improvement
 
-Measurement connects engineering work to delivery and service outcomes. Pipeline duration, test reliability, deployment frequency, lead time, change failure rate, recovery time, availability, latency, error rate, and resource saturation answer different questions. No single metric represents DevOps maturity.
-
-Measures must be defined precisely. For example, lead time could begin at the first commit, merge approval, or release request; the team must select one definition and use it consistently. A failed deployment should not disappear from change-failure data merely because it was repaired before customers opened a ticket.
-
-Metrics should support decisions rather than rank individuals. Measuring commits per developer rewards activity, not value. Measuring deployment frequency without change failure rate may encourage unsafe releases. A balanced view connects delivery speed, quality, reliability, and recovery.
+Measurement connects delivery activity with service outcomes. Useful measures include feedback time, deployment frequency, lead time, change failure rate, recovery time, availability, latency, and error rate. Definitions must remain consistent, and the measures should guide improvement rather than rank individuals. A balanced view considers speed, quality, reliability, and recovery together.
 
 ### 3.5 Sharing: make knowledge part of the system
 
-Sharing prevents operational knowledge from remaining in private notes, terminal history, or one person's memory. Version-controlled code, review discussions, architecture decisions, test fixtures, dashboards, incident findings, and runbooks allow the team to reuse learning and challenge assumptions.
-
-Sharing also requires usable context. A repository full of unexplained scripts is technically accessible but operationally opaque. A strong project explains how to build and test the software, who owns it, how a release is identified, what evidence is retained, which dependencies it requires, and how to recover from common failures.
-
-Reusable knowledge shortens onboarding and recovery time. It also enables peer review: an assumption cannot be examined if it is never recorded.
+Sharing moves knowledge from private notes and memory into version-controlled code, reviews, decisions, tests, dashboards, incident findings, and runbooks. Access alone is insufficient: another engineer should be able to build, release, diagnose, and recover the service from the recorded context. Shared knowledge shortens onboarding and makes assumptions available for review.
 
 ### 3.6 How the CALMS dimensions reinforce one another
 
-The dimensions work as a system. Culture creates the trust to expose failures. Sharing turns those failures into team knowledge. Automation embeds the improved procedure. Lean reduces the size and delay of the next change. Measurement shows whether the improvement actually helped.
-
-Consider a Python automation service that is normally released by its author:
-
-1. **Culture:** the application, platform, security, and operations owners agree on release and recovery responsibilities.
-2. **Automation:** a pipeline builds a container, runs tests and scans, deploys the identified digest, and performs acceptance checks.
-3. **Lean:** changes remain small, inexpensive checks run first, and an on-demand test environment removes waiting.
-4. **Measurement:** the team tracks feedback time, failed deployments, recovery time, and application health after release.
-5. **Sharing:** the repository contains the pipeline, dependency declarations, test evidence, operating notes, and incident improvements.
-
-If only the automation step is implemented, the original dependency on one engineer may remain. CALMS exposes that imbalance and helps the team decide what to improve next.
+The dimensions form a feedback system. Culture makes failures discussable; Sharing preserves what was learned; Automation embeds the improved procedure; Lean reduces the delay and size of the next change; and Measurement shows whether the change helped. CALMS exposes imbalance—for example, a sophisticated pipeline that still depends on one engineer to approve, diagnose, and recover every release.
 
 ### 3.7 CALMS assessment questions
 
@@ -120,7 +88,7 @@ An engineering team can use the following questions during a retrospective or ma
 | Measurement | Do measures cover both delivery and runtime outcomes? Are definitions consistent? Does the team act on what it measures? |
 | Sharing | Can another engineer build, release, troubleshoot, and recover the service from repository and operational records? |
 
-The result should not be reduced to a vanity score. The most useful output is a small number of observable weaknesses and an improvement experiment—for example, declaring dependencies and building on a clean runner, adding one reliable acceptance test, or publishing a tested recovery runbook.
+Do not reduce the result to a maturity score. Select an observable weakness and a small improvement experiment, such as building on a clean runner, adding one reliable acceptance test, or publishing a tested recovery procedure.
 
 ## 4. Three delivery models
 
