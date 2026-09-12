@@ -13,7 +13,7 @@ The architecture separates repository-controlled validation from privileged depl
 This view extends the Module 1 reference architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
 
 <p align="center">
-  <img src="assets/diagrams/netdevops-trust-boundaries.svg" alt="NetDevOps trust boundaries through protected execution and independent audit" width="640" />
+  <img src="assets/course-figures/netdevops-trust-boundaries.png" alt="NetDevOps trust boundaries through protected execution and independent audit" width="860" />
 </p>
 
 Crossing a boundary requires authenticated identity, authorized purpose, encrypted transport, input validation, controlled output, and audit evidence.

@@ -137,7 +137,7 @@ For a container release, record the source commit, human-readable tag, and image
 The diagram distinguishes data required for correctness from data used only to improve speed.
 
 <p align="center">
-  <img src="assets/diagrams/artifact-vs-cache.svg" alt="Authoritative pipeline artifact compared with a disposable cache" width="640" />
+  <img src="assets/course-figures/artifact-vs-cache.png" alt="Authoritative pipeline artifact compared with a disposable cache" width="860" />
 </p>
 
 A downstream job consumes an artifact deliberately. A cache may be missing or stale, so every job must remain correct without it.
@@ -190,7 +190,7 @@ The Shell executor is not inherently wrong, and the Docker executor is not inher
 The runner model identifies where repository-controlled commands execute and why general validation and management-plane deployment require different trust levels.
 
 <p align="center">
-  <img src="assets/diagrams/runner-trust-model.svg" alt="Separation of the general validation runner from the protected network runner and management zone" width="640" />
+  <img src="assets/course-figures/runner-trust-model.png" alt="Separation of the general validation runner from the protected network runner and management zone" width="860" />
 </p>
 
 As shown in Module 1, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.

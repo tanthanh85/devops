@@ -26,6 +26,10 @@ After completing this review, learners should be able to:
 
 Network automation is sometimes introduced as a faster way to execute commands. That description is incomplete. A useful automation solution is a software system that interprets intent, obtains trusted data, communicates with external systems, changes or observes state, handles failure, and produces evidence.
 
+<p align="center">
+  <img src="assets/course-figures/module-00-automation-system.png" alt="Icon-led flow from intent and source of truth through logic, validation, and evidence" width="860" />
+</p>
+
 A typical solution contains several responsibilities. The transport is only one stage; inventory, validation, policy, verification, and evidence determine whether the software can be trusted as an operational system.
 
 | Responsibility | Typical implementation | Engineering question |
@@ -80,6 +84,10 @@ The important features are not the Python syntax. The function has one responsib
 ### 4.3 Structured data forms a contract
 
 JSON, YAML, XML, and CSV represent data; they do not automatically make the data valid. Parsing answers whether a document is syntactically readable. Schema validation answers whether required fields, types, ranges, and structures follow a contract. Policy validation answers whether the requested values are permitted in a particular organization or environment.
+
+<p align="center">
+  <img src="assets/course-figures/module-00-structured-data.png" alt="YAML, JSON, and XML normalized into one Python dictionary through parsing and validation" width="860" />
+</p>
 
 Learners should recall the usual roles:
 
@@ -283,6 +291,12 @@ It should not contain live credentials, private keys, tokens, uncontrolled state
 Git alone is not DevOps. It becomes part of DevOps when small changes are reviewed, automatically validated, connected to an identifiable artifact, and promoted through a controlled workflow.
 
 ## 5. Optional refresher and reference: automation interfaces
+
+The available interfaces overlap, but they expose different control and failure semantics. The following visual provides a quick comparison before the detailed review.
+
+<p align="center">
+  <img src="assets/course-figures/module-00-interface-selection.png" alt="Comparison of SSH CLI, REST APIs, NETCONF with YANG, and controller APIs" width="860" />
+</p>
 
 An automation application reaches infrastructure through an interface with its own data model, failure modes, and security properties. Choosing an interface therefore affects not only how code is written, but also how safely the resulting change can be validated and repeated.
 
@@ -494,6 +508,10 @@ The `202` response states that a job was accepted, not completed. A complete con
 
 Model-driven telemetry publishes structured operational data identified by model paths. Unlike periodic CLI scraping, the collector does not need to reconstruct meaning from human-formatted text. Unlike traditional polling, a subscription can stream updates at a requested interval or when state changes, subject to platform capability.
 
+<p align="center">
+  <img src="assets/course-figures/module-00-telemetry-flow.png" alt="Model-driven telemetry flow from devices through subscriptions, collection, normalization, and observation" width="860" />
+</p>
+
 A typical path is:
 
 **Device or controller → subscription transport → collector → validation and enrichment → time-series or event storage → dashboard and alerting**
@@ -652,6 +670,10 @@ State deserves particular attention. Terraform state maps declarations to real r
 
 A source of truth is the authoritative record for a defined class of data. It may contain device identity, site membership, addressing, connections, services, or policy. Authority must be explicit. If a spreadsheet, controller, inventory file, and live device can all overwrite the same value, the organization has several competing sources rather than one source of truth.
 
+<p align="center">
+  <img src="assets/course-figures/module-00-three-states.png" alt="Intended, configured, and operational state shown as three distinct views" width="860" />
+</p>
+
 Three states should remain distinct:
 
 | State | Question | Example evidence |
@@ -716,6 +738,10 @@ These are delivery problems, not failures of Python, Ansible, or the API. Adding
 ## 11. How DevOps improves network automation
 
 DevOps practices developed in software engineering provide a disciplined path from useful automation to an operable product.
+
+<p align="center">
+  <img src="assets/course-figures/module-00-devops-transition.png" alt="DevOps lifecycle showing planning, code, build, release, operation, and feedback" width="860" />
+</p>
 
 | Network automation activity | Ad hoc approach | DevOps practice applied |
 |---|---|---|

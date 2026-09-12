@@ -61,7 +61,7 @@ A container remains a process on the host. If it receives excessive privileges o
 The Docker architecture diagram answers a practical control question: which component receives the engineer's command, which component holds host-level authority, and where image distribution, runtime isolation, networking, and storage enter the path?
 
 <p align="center">
-  <img src="assets/diagrams/docker-architecture.svg" alt="Docker client, Engine API, daemon, BuildKit, container runtime, registry, networks, and storage" width="640" />
+  <img src="assets/course-figures/docker-architecture.png" alt="Docker client, Engine API, daemon, BuildKit, container runtime, registry, networks, and storage" width="860" />
 </p>
 
 The Docker client sends API requests to the daemon. The daemon coordinates the container runtime; manages images, networks, volumes, and containers; and communicates with registries that store and distribute images.
@@ -96,7 +96,7 @@ Development workflows may use readable version tags. Promotion and controlled de
 The image lifecycle distinguishes reusable build content from a disposable container instance and its writable runtime layer.
 
 <p align="center">
-  <img src="assets/diagrams/docker-image-container-lifecycle.svg" alt="Lifecycle from Docker build inputs through immutable image layers and a disposable runtime container" width="640" />
+  <img src="assets/course-figures/docker-image-container-lifecycle.png" alt="Lifecycle from Docker build inputs through immutable image layers and a disposable runtime container" width="860" />
 </p>
 
 Most Dockerfile instructions create layers. Docker can reuse unchanged layers during later builds. Layer order therefore affects build speed. Stable dependency installation usually belongs before frequently changing application source.
@@ -128,7 +128,7 @@ Applications should state clearly which data is persistent, which is cache, and 
 The following boundary view explains why application-service connectivity and privileged management connectivity should not be treated as one undifferentiated container network.
 
 <p align="center">
-  <img src="assets/diagrams/container-network-planes.svg" alt="Separation of the application service network from the protected device-management network" width="640" />
+  <img src="assets/course-figures/container-network-planes.png" alt="Separation of the application service network from the protected device-management network" width="860" />
 </p>
 
 Containers on a user-defined Docker network can normally resolve one another by service name. Applications should connect to the logical service name rather than a temporary container IP address.
@@ -156,7 +156,7 @@ Avoid host networking as an unexplained fix. It removes a useful boundary and ca
 The container boundary is easiest to understand by separating fixed image content from values and state that must remain external.
 
 <p align="center">
-  <img src="assets/diagrams/container-runtime-boundary.svg" alt="Application content inside an automation image and configuration, credentials, and state outside it" width="640" />
+  <img src="assets/course-figures/container-runtime-boundary.png" alt="Application content inside an automation image and configuration, credentials, and state outside it" width="860" />
 </p>
 
 The container receives the minimum runtime inputs required for one job and writes durable results to an external destination. Rebuilding the image is not a configuration-management or secret-rotation mechanism.

@@ -11,7 +11,7 @@ Modules 5–7 created a traceable release, validated it, and deployed it into co
 Telemetry supplies data; monitoring evaluates known conditions; observability combines signals and context to explain unfamiliar behavior.
 
 <p align="center">
-  <img src="assets/diagrams/monitoring-observability-telemetry.svg" alt="Relationship between telemetry, monitoring, observability, context, and action" width="640" />
+  <img src="assets/course-figures/monitoring-observability-telemetry.png" alt="Relationship between telemetry, monitoring, observability, context, and action" width="860" />
 </p>
 
 | Term | Meaning | Network example |
@@ -27,7 +27,7 @@ Telemetry is the data. Monitoring evaluates selected signals. Observability is a
 Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 1 reference architecture rather than creating a separate monitoring destination.
 
 <p align="center">
-  <img src="assets/diagrams/observability-architecture.svg" alt="Observability architecture joining network, application, and pipeline signals" width="640" />
+  <img src="assets/course-figures/observability-architecture.png" alt="Observability architecture joining network, application, and pipeline signals" width="860" />
 </p>
 
 Shared identifiers and timestamps allow several storage systems to present one operational narrative.

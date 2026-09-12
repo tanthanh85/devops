@@ -13,7 +13,7 @@ The automation application is assumed to know how to collect and interpret these
 The loop below shows why stored configuration is an intermediate result. Operational observations must be compared with the original intent.
 
 <p align="center">
-  <img src="assets/diagrams/three-network-states.svg" alt="Relationship among intended, configured, and operational network state" width="640" />
+  <img src="assets/course-figures/three-network-states.png" alt="Relationship among intended, configured, and operational network state" width="860" />
 </p>
 
 | State | Meaning | Routing-service scenario |
@@ -29,7 +29,7 @@ The three states can disagree. A template may correctly represent intent while t
 Timeout and partial outcomes leave the normal promotion path rather than being treated as safe failures.
 
 <p align="center">
-  <img src="assets/diagrams/network-change-state.svg" alt="Network change states including unknown and recovery paths" width="640" />
+  <img src="assets/course-figures/network-change-state.png" alt="Network change states including unknown and recovery paths" width="860" />
 </p>
 
 An `UNKNOWN/PARTIAL` state is important. A timeout after sending configuration does not prove that nothing changed. The workflow must collect current state before retrying.
@@ -323,7 +323,7 @@ Assume the new API container starts and its liveness probe passes, but workers f
 Recovery begins with causality and reversibility, not with an automatic rollback command.
 
 <p align="center">
-  <img src="assets/diagrams/rollback-decision.svg" alt="Decision tree for investigation, rollback, or forward remediation" width="640" />
+  <img src="assets/course-figures/rollback-decision.png" alt="Decision tree for investigation, rollback, or forward remediation" width="860" />
 </p>
 
 Both recovery paths end in renewed validation; reversing commands is not itself proof of restored service.

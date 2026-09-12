@@ -106,7 +106,7 @@ Do not copy SSH private keys, NETCONF usernames, RESTCONF passwords, controller 
 The evidence-lineage view asks whether an operator can trace a deployed runtime and its results back to the exact source, dependencies, build, tests, and approved digest.
 
 <p align="center">
-  <img src="assets/diagrams/image-evidence-lineage.svg" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="640" />
+  <img src="assets/course-figures/image-evidence-lineage.png" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="860" />
 </p>
 
 OCI labels can record the source repository, source revision, version, description, authorship, and license. The pipeline should apply a tag derived from the release version or commit and record the resulting digest.
@@ -163,7 +163,7 @@ Each output has a purpose. The SBOM inventories components. The vulnerability sc
 The supply chain below shows that evidence is attached to the immutable digest before it reaches a registry. The deployment verifies that identity rather than rebuilding or resolving a mutable tag.
 
 <p align="center">
-  <img src="assets/diagrams/secure-image-supply-chain.svg" alt="Secure image supply chain with build evidence and a prohibited secret path" width="640" />
+  <img src="assets/course-figures/secure-image-supply-chain.png" alt="Secure image supply chain with build evidence and a prohibited secret path" width="860" />
 </p>
 
 Secrets may be exposed temporarily through a supported build-secret mechanism when private dependencies require them, but they must not enter the build context, layer history, final image, or provenance output.

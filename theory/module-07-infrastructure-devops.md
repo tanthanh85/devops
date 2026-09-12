@@ -11,7 +11,7 @@ Module 6 defined the evidence required before and after deployment. Module 7 mak
 The ownership flow distinguishes resource lifecycle, ordered configuration, and custom application logic before a team selects Terraform, Ansible, or Python for a task.
 
 <p align="center">
-  <img src="assets/diagrams/iac-tool-ownership.svg" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="640" />
+  <img src="assets/course-figures/iac-tool-ownership.png" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="860" />
 </p>
 
 Infrastructure provisioning, device configuration, and custom workflow logic overlap, but they are not identical. The course assigns clear ownership:
@@ -119,7 +119,7 @@ Before an unusual recovery or import action, inspect the configuration, state, a
 The reconciliation flow asks who owns a changed attribute and whether the correct response is acceptance, controlled correction, or escalation rather than automatic overwrite.
 
 <p align="center">
-  <img src="assets/diagrams/drift-reconciliation.svg" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="640" />
+  <img src="assets/course-figures/drift-reconciliation.png" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="860" />
 </p>
 
 Drift occurs when real infrastructure differs from the controlled definition. It may result from manual changes, another tool, platform defaults, or failed operations.
@@ -186,7 +186,7 @@ For an illustrative automation platform:
 An ephemeral environment has a complete lifecycle, including evidence collection and controlled cleanup after failure.
 
 <p align="center">
-  <img src="assets/diagrams/test-environment-lifecycle.svg" alt="On-demand environment lifecycle with failure-safe evidence and cleanup" width="640" />
+  <img src="assets/course-figures/test-environment-lifecycle.png" alt="On-demand environment lifecycle with failure-safe evidence and cleanup" width="860" />
 </p>
 
 Cleanup retains the original failure and targets only resources whose ownership is proven.

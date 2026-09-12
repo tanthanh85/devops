@@ -11,7 +11,7 @@ Modules 1–9 progressively created the delivery model, image, multitier service
 The platform view identifies which Kubernetes workloads need ordinary service connectivity and which worker path requires tightly controlled access to managed infrastructure.
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-automation-platform.svg" alt="Kubernetes-hosted network automation platform and restricted management paths" width="640" />
+  <img src="assets/course-figures/kubernetes-automation-platform.png" alt="Kubernetes-hosted network automation platform and restricted management paths" width="860" />
 </p>
 
 Only job workers need network-device access. API, dashboard, and general validation Pods should not share that route by default. Kubernetes NetworkPolicy, external firewalls, worker placement, and service-account policy work together to enforce the design.
@@ -21,7 +21,7 @@ Only job workers need network-device access. API, dashboard, and general validat
 The decision flow tests whether orchestration capabilities solve an actual operating requirement or merely add a larger platform and security burden.
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-suitability.svg" alt="Decision flow for choosing Kubernetes, Compose, or a protected runner for network automation" width="640" />
+  <img src="assets/course-figures/kubernetes-suitability.png" alt="Decision flow for choosing Kubernetes, Compose, or a protected runner for network automation" width="860" />
 </p>
 
 Kubernetes is useful when the platform needs several independently operated services, concurrent workers, declarative rollout, self-healing, workload scheduling, standardized observability, or integration with an existing organizational cluster platform.
@@ -52,7 +52,7 @@ The course uses Minikube to teach the model. It does not claim that the producti
 The comparison separates three legitimate operating models so that Kubernetes is evaluated against simpler alternatives rather than assumed to be the target state.
 
 <p align="center">
-  <img src="assets/diagrams/automation-platform-options.svg" alt="Comparison of a protected runner, Docker Compose platform, and Kubernetes automation platform" width="640" />
+  <img src="assets/course-figures/automation-platform-options.png" alt="Comparison of a protected runner, Docker Compose platform, and Kubernetes automation platform" width="860" />
 </p>
 
 | Factor | Protected GitLab runner and scripts | Docker Compose platform | Kubernetes platform |
@@ -73,7 +73,7 @@ Kubernetes solves automation-platform scheduling and lifecycle problems. It does
 The security path shows the controls required between a validated queue item and an explicitly authorized device when a worker executes inside a cluster.
 
 <p align="center">
-  <img src="assets/diagrams/kubernetes-worker-device-security.svg" alt="Kubernetes security controls from validated queue input through an isolated worker to explicitly authorized devices" width="640" />
+  <img src="assets/course-figures/kubernetes-worker-device-security.png" alt="Kubernetes security controls from validated queue input through an isolated worker to explicitly authorized devices" width="860" />
 </p>
 
 NetworkPolicy controls Pod traffic only when the cluster networking implementation enforces it; it does not replace the external management firewall or device AAA. General API, dashboard, and validation workloads should have no device route. A worker receives a validated job, signed image, dedicated service account, short-lived credential, narrow egress rule, explicit target list, and independent evidence destination.
@@ -262,7 +262,7 @@ Avoid mutable image tags and broad cluster-admin credentials. Give the deploymen
 The pipelines meet at a versioned automation platform but have different triggers and outcomes.
 
 <p align="center">
-  <img src="assets/diagrams/platform-vs-network-pipeline.svg" alt="Separation between the platform delivery pipeline and network job pipeline" width="640" />
+  <img src="assets/course-figures/platform-vs-network-pipeline.png" alt="Separation between the platform delivery pipeline and network job pipeline" width="860" />
 </p>
 
 Deploying application code must not implicitly authorize a network operation.

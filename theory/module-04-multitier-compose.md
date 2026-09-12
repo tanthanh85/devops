@@ -11,7 +11,7 @@ Module 3 produced a secure image. Module 4 asks what happens when that image mus
 The architecture separates request handling from privileged execution so that only the worker crosses into the management network and every job retains durable state and evidence.
 
 <p align="center">
-  <img src="assets/diagrams/compose-automation-services.svg" alt="Docker Compose architecture for the network automation API, worker, supporting services, and network targets" width="640" />
+  <img src="assets/course-figures/compose-automation-services.png" alt="Docker Compose architecture for the network automation API, worker, supporting services, and network targets" width="860" />
 </p>
 
 Separating responsibilities allows each service to change, scale, recover, and receive access control independently. The course stack contains an automation API, job worker, queue, job database, telemetry collector, and dashboard.
@@ -23,7 +23,7 @@ The worker is the only service that needs direct management-plane access. The AP
 This sequence highlights why the public API does not need a route or credential to a device. Privileged access begins only in the protected worker after a validated job reaches the queue.
 
 <p align="center">
-  <img src="assets/diagrams/network-job-trust-sequence.svg" alt="Approved job sequence across API, queue, protected worker, secret service, and device" width="640" />
+  <img src="assets/course-figures/network-job-trust-sequence.png" alt="Approved job sequence across API, queue, protected worker, secret service, and device" width="860" />
 </p>
 
 The worker returns structured evidence and final status through the application boundary. The credential is scoped to the job and is never placed on the queue.
@@ -199,7 +199,7 @@ The course progresses from mock validation to an authorized virtual or sandbox d
 The readiness chain shows why a healthy API process does not prove that a queued network job can pass through every dependency and complete successfully.
 
 <p align="center">
-  <img src="assets/diagrams/service-readiness-chain.svg" alt="Readiness and failure behavior across the automation service dependency chain" width="640" />
+  <img src="assets/course-figures/service-readiness-chain.png" alt="Readiness and failure behavior across the automation service dependency chain" width="860" />
 </p>
 
 A multitier application benefits from several health views:

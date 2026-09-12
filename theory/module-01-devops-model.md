@@ -41,7 +41,7 @@ NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts,
 CALMS assesses DevOps as an operating model rather than a collection of tools. It represents **Culture, Automation, Lean, Measurement, and Sharing**. The dimensions work together: automation without ownership can accelerate a poor process, while collaboration without repeatable execution remains dependent on individuals.
 
 <p align="center">
-  <img src="assets/diagrams/calms-feedback-loop.svg" alt="CALMS dimensions operating as a continuous learning loop" width="640" />
+  <img src="assets/course-figures/module-01-calms.png" alt="Icon-led CALMS model showing Culture, Automation, Lean, Measurement, and Sharing as a continuous improvement loop" width="860" />
 </p>
 
 | Dimension | Software-delivery interpretation | Evidence in this course |
@@ -94,6 +94,10 @@ Do not reduce the result to a maturity score. Select an observable weakness and 
 
 DevOps is easier to understand when it is compared with the delivery models it replaces or improves. The following comparison shows how ownership, evidence, execution, and recovery change as work moves from manual delivery through isolated automation to an engineered pipeline.
 
+<p align="center">
+  <img src="assets/course-figures/module-01-delivery-models.png" alt="Visual comparison of manual delivery, ad hoc automation, and a DevOps pipeline" width="860" />
+</p>
+
 | Characteristic | Manual delivery | Ad hoc automation | DevOps pipeline |
 |---|---|---|---|
 | Source of truth | Ticket and engineer notes | Script inputs or local files | Reviewed source in version control |
@@ -113,7 +117,7 @@ Automation improves consistency, but DevOps connects automation to collaboration
 The DevOps lifecycle connects an idea to an operating service and returns operational knowledge to the next decision. Deployment is therefore not the end: software must be operated, observed, improved, secured, and eventually retired.
 
 <p align="center">
-  <img src="assets/diagrams/devops-lifecycle-loop.svg" alt="Compact DevOps lifecycle from planning through operation and learning" width="640" />
+  <img src="assets/course-figures/module-01-lifecycle.png" alt="Icon-led DevOps lifecycle from planning through development, qualification, release, operation, and learning" width="860" />
 </p>
 
 **Plan → Design → Develop → Integrate → Build → Test → Release → Deploy → Operate → Observe → Learn**
@@ -185,7 +189,7 @@ Retirement stops traffic and scheduled work, handles data according to policy, r
 A gate is a decision supported by evidence, not an unexplained approval step.
 
 <p align="center">
-  <img src="assets/diagrams/devops-evidence-chain.svg" alt="Evidence chain from requirement and commit to controlled deployment and runtime evidence" width="640" />
+  <img src="assets/course-figures/module-01-evidence-chain.png" alt="Evidence chain connecting requirement, commit, pipeline, artifact, deployment, and runtime evidence" width="860" />
 </p>
 
 | Gate | Decision | Minimum useful evidence |
@@ -205,6 +209,10 @@ Evidence must remain connected along this chain. A new commit, artifact, target,
 ### 5.14 Feedback loops at different speeds
 
 Feedback arrives at different speeds, and each loop needs an owner and a path back into source, tests, policy, documentation, or design:
+
+<p align="center">
+  <img src="assets/course-figures/module-01-feedback-speeds.png" alt="Feedback loops grouped by seconds, minutes, hours, and weeks" width="860" />
+</p>
 
 - **Seconds to minutes:** formatter, linter, schema validation, and unit tests guide the developer.
 - **Minutes to hours:** integration, security, packaging, and system tests guide merge and release decisions.
@@ -236,7 +244,7 @@ The reference architecture makes the most important trust transition visible: un
 > A runner is not safe merely because the CI platform labels it protected. Its effective trust boundary is determined by which jobs it accepts, which identities it can obtain, and which endpoints it can reach.
 
 <p align="center">
-  <img src="assets/diagrams/course-reference-architecture.svg" alt="Course reference architecture from engineer and Git through separated runners to operational feedback" width="640" />
+  <img src="assets/course-figures/module-01-delivery-architecture.png" alt="Delivery architecture separating unprivileged validation from protected deployment" width="860" />
 </p>
 
 Operational evidence returns to the engineer and repository; it is not an isolated monitoring destination.
@@ -266,6 +274,10 @@ The course begins with continuous integration, adds automated deployment to a tr
 ## 8. Value stream and constraints
 
 A value stream describes the work from request to operational outcome. Useful questions include:
+
+<p align="center">
+  <img src="assets/course-figures/module-01-value-stream.png" alt="Value stream showing work time, waiting time, and the delivery constraint" width="860" />
+</p>
 
 - Where does work wait?
 - Which steps depend on one person?
