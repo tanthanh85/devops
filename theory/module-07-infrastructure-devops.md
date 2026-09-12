@@ -31,6 +31,8 @@ Select the tool that has the clearest ownership and most reliable model for the 
 
 ### 2.1 Practical tool-selection decisions
 
+Tool choice should follow the type of resource, the available interface, and the operating model of the team. These guidelines highlight common strengths without treating any tool as a universal solution.
+
 - Use **Terraform** when an API resource has a stable lifecycle, dependency relationships, and a provider that can plan and reconcile it reliably. Avoid it for procedural diagnostics, unsupported device features, or objects also owned by another controller.
 - Use **Ansible** when the work is ordered, human-readable orchestration across inventories and supported network modules express the intended change. Validate module idempotence and check/diff behavior on the actual platform.
 - Write **Python** when the workflow requires custom data normalization, policy, correlation, API pagination, transaction handling, or error logic that modules do not expose. Accept that the team owns tests, retries, idempotence, packaging, and maintenance.
@@ -200,6 +202,8 @@ The environment should resemble the target environment in the characteristics re
 
 ## 12. Network test environment options
 
+Test environments trade speed and cost against behavioral fidelity. The table compares common choices so that an engineering team can match the environment to the risk and evidence required from a test.
+
 | Platform | Strength | Limitation | Suitable course use |
 |---|---|---|---|
 | Vendor sandbox | Authorized access to hosted network platforms with low setup effort | Reservation, VPN, shared or reset behavior, Internet dependency | Real API and device capability exercises |
@@ -275,6 +279,8 @@ Controllers and network devices may expose declarative APIs, model-driven interf
 Shared network infrastructure requires strict target validation and change scoping. A sandbox, simulator, or dedicated training environment is appropriate for learning destructive lifecycle operations.
 
 ## 18. Knowledge check
+
+Use these questions to evaluate infrastructure state, test-environment selection, and the controls required for repeatable provisioning.
 
 1. Why should Terraform state not be committed to Git?
 2. What should a reviewer inspect in a Terraform plan?

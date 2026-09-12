@@ -194,6 +194,8 @@ These controls do not guarantee that the application behaves correctly. They est
 
 ## 17. Example network automation packaging pattern
 
+The following Dockerfile brings the preceding controls together in a small packaging pattern. Read it as an example of deliberate build decisions—base image, dependency installation, ownership, and runtime identity—not as a production template that can be copied without review.
+
 ```dockerfile
 FROM python:3.13-slim AS builder
 WORKDIR /build
@@ -223,6 +225,8 @@ This example illustrates separation of build and runtime stages, dependency cach
 Suppose a merge request changes only `requirements.txt`. Source tests pass, but the lock file now pulls a new transitive SSH library. The reviewer should ask three separate questions: did application behavior change, did the runtime inventory change, and does the new component alter the security boundary? A defensible pipeline rebuilds from a clean context, compares the SBOM with the previous release, runs connection and parser fixtures, scans the resulting digest, and records an approved exception if a finding cannot yet be fixed. Reusing an old scan report would miss the exact risk introduced by the dependency-only change.
 
 ## 18. Knowledge check
+
+Use these questions to evaluate whether an image build is reproducible, traceable, and appropriately hardened.
 
 1. What risks arise from an overly broad Docker build context?
 2. Why does deleting a copied secret in a later layer fail to protect it?

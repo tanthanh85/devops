@@ -46,6 +46,8 @@ For each boundary, identify authentication, authorization, encryption, input val
 
 ### 4.1 Assets and threats
 
+Security design begins by identifying what must be protected and how it could be misused or exposed. The table connects representative delivery assets with threats and the direction of an appropriate control.
+
 | Asset | Example threat | Control direction |
 |---|---|---|
 | Intended-state repository | Unauthorized VLAN, prefix, or routing-policy change | Protected branch, review, signed commits where required, policy checks |
@@ -79,6 +81,8 @@ Good secret handling includes:
 Vault can issue or store training credentials, while GitLab protected variables can supply selected jobs. Kubernetes Secrets provide an API object and distribution mechanism, but their confidentiality depends on cluster encryption, RBAC, node security, and application handling.
 
 ### 5.1 Network credential types
+
+Automation workflows may require several forms of authentication material, each with different storage, rotation, and exposure risks. Common examples include:
 
 - SSH private keys and known-hosts trust
 - Device usernames and passwords
@@ -160,6 +164,8 @@ Containment disables the runner, blocks new jobs, removes its network route, rev
 No pipeline setting makes a privileged runner harmless. Architecture must assume that a boundary can fail.
 
 ## 8. Secure protocol use
+
+Encryption alone does not make an automation channel trustworthy. Client configuration must also authenticate the endpoint, constrain credentials, handle errors safely, and preserve enough evidence for investigation.
 
 ### 8.1 SSH
 
@@ -269,6 +275,8 @@ A merge request that changes `.gitlab-ci.yml`, deployment policy, or secret-retr
 This design also narrows incident response. If the general runner is compromised, revoke its registry and source access without rotating every device credential. If the protected runner is compromised, stop deployment jobs, revoke the workload identity, preserve runner and secret-service audit logs, and treat any job executed during the exposure window as untrusted.
 
 ## 18. Knowledge check
+
+Use these questions to test whether you can apply least privilege, secret protection, trust verification, and architectural isolation to a delivery workflow.
 
 1. Why does masking a pipeline variable not provide complete secret protection?
 2. Which repository changes deserve stricter ownership or review?

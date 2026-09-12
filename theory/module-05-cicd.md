@@ -41,6 +41,8 @@ Important concepts include:
 
 ### 4.1 GitLab concepts in network automation
 
+GitLab combines source control, review, pipeline execution, and evidence management. The table maps its principal delivery concepts to the responsibilities they can support in an automation system.
+
 | Concept | Network automation use |
 |---|---|
 | Pipeline | Complete evaluation of one commit and target context |
@@ -71,6 +73,8 @@ Each job should have one clear outcome. A large script that builds, deploys, and
 Dependencies can express which artifacts a job actually needs. Independent jobs can run concurrently, reducing feedback time.
 
 ## 6. Validation and testing layers
+
+No single test can establish that a change is safe. Effective pipelines build confidence progressively, starting with inexpensive source checks and advancing toward tests that require integrated services or representative environments.
 
 ### 6.1 Static validation
 
@@ -104,6 +108,8 @@ Policy checks examine intent and derived configuration before device access. Dep
 Policy should report the exact object and rule. A vague `compliance failed` result wastes review time.
 
 ### 6.6 Test environment and limitation matrix
+
+Each validation layer answers a different question and depends on a different level of environmental realism. This matrix helps teams select the least expensive test that can provide meaningful evidence for a given risk.
 
 | Test layer | Typical tools | Environment required | Detects | Important limitation |
 |---|---|---|---|---|
@@ -209,6 +215,8 @@ Jobs should return a nonzero status on failure and preserve relevant evidence. S
 
 ## 15. Illustrative `.gitlab-ci.yml`
 
+The pipeline below demonstrates how the validation layers can be ordered and how artifacts can pass evidence between jobs. It is deliberately illustrative: runners, credentials, approval rules, and deployment commands must be adapted to the target environment.
+
 ```yaml
 stages: [validate, render, test, build, precheck, deploy, postcheck, observe]
 
@@ -293,6 +301,8 @@ This is a teaching example. GitLab syntax and feature availability depend on the
 
 ## 16. Explanation of the pipeline blocks
 
+Each block in the example has a distinct control purpose. Together they make the delivery path visible, preserve evidence, and prevent a later stage from running when an earlier assumption has failed.
+
 - `stages` makes the network controls visible in order.
 - `default.image` pins the validation runtime instead of using a mutable tag.
 - `INTENT_FILE` selects one reviewed source document.
@@ -315,6 +325,8 @@ A staging test may pass while production receives a rebuilt image carrying the s
 
 ## 17. Why each gate exists
 
+A gate is useful only when its failure has a defined meaning and response. The table relates each gate to the risk it controls and the action engineers should take when that control rejects a change.
+
 | Gate | Why it exists | Example failure | Required response |
 |---|---|---|---|
 | Intent parsing | Reject unreadable source before interpreting it | Duplicate YAML key changes a value silently | Fail and correct source |
@@ -335,6 +347,8 @@ A staging test may pass while production receives a rebuilt image carrying the s
 | Telemetry observation | Detect delayed or collateral degradation | Packet loss rises after immediate checks pass | Halt promotion and invoke recovery policy |
 
 ## 18. Knowledge check
+
+Use these questions to test your understanding of pipeline structure, evidence flow, and the boundaries between build, test, and deployment.
 
 1. How does an artifact differ from a cache?
 2. Why should untrusted branches not use a privileged deployment runner?

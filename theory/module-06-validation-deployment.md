@@ -90,6 +90,8 @@ Deploying into an already degraded environment can make diagnosis and recovery h
 
 ### 7.1 Example pre-check set for a routing-service scenario
 
+Pre-checks should establish whether the target is the expected system and whether its present condition permits the approved change. The following set illustrates checks that can stop deployment before any configuration is modified.
+
 | Check | Reason | Blocking condition |
 |---|---|---|
 | DNS, route, and management port | Prove the runner can reach the management interface | Target unreachable or wrong path |
@@ -128,6 +130,8 @@ Filters and exact syntax depend on the rendering environment and target network 
 The proposed diff must identify additions, removals, replacements, and unexpected lines. Review should assess protocol effect, device count, configuration section, and recovery path rather than only line count.
 
 ## 9. Deployment interfaces and transactions
+
+Deployment safety depends partly on the transaction semantics offered by the target interface. The following subsections compare common approaches and show why the same validation and recovery design cannot be assumed for every interface.
 
 ### 9.1 SSH CLI
 
@@ -347,6 +351,8 @@ An improved flow uses an on-demand environment, immutable artifact, automatic he
 The improved flow validates the merge request, builds the image once, creates a test environment, deploys the image digest, runs system tests, collects evidence, and removes the test environment. Approval then promotes the same digest for final verification and observation.
 
 ## 21. Knowledge check
+
+Use these questions to assess whether you can connect an approved artifact to controlled deployment, post-change evidence, and recovery decisions.
 
 1. What information connects a post-deployment test to the source change it validates?
 2. Why should a pipeline inspect environment health before changing it?

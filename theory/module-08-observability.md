@@ -44,6 +44,8 @@ The two reinforce each other. Monitoring detects important known failures. Rich,
 
 ## 5. Operational signals
 
+Observability draws on several complementary forms of evidence. Metrics reveal patterns, logs preserve discrete events, traces connect work across components, and external checks confirm the service outcome visible to a consumer.
+
 ### 5.1 Metrics
 
 Metrics are numeric measurements associated with time and labels. They support aggregation, comparison, trends, dashboards, and alerts. Common application signals include request rate, error rate, latency, queue depth, resource use, and dependency behavior.
@@ -292,6 +294,8 @@ A responsible experiment defines:
 In a training environment, deleting one disposable application instance or temporarily blocking one dependency can demonstrate self-healing or alert behavior. The experiment must stay within the assigned environment.
 
 ## 19. Knowledge check
+
+Use these questions to verify that you can turn operational signals into service understanding and actionable delivery feedback.
 
 1. How does observability differ from monitoring?
 2. Why should request identifiers not become unrestricted metric labels?

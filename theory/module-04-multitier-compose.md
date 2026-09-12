@@ -41,6 +41,8 @@ Containers change IP addresses when recreated. Consumers should use stable servi
 
 ### 3.1 Job contract
 
+A worker and its callers need an explicit agreement about the data exchanged between them. This compact JSON example illustrates a job request that can be validated, queued, processed, and correlated with later evidence.
+
 ```json
 {
   "change_id": "CHG-2026-0120",
@@ -77,6 +79,8 @@ A Compose file defines a related application stack. Main elements include:
 Compose is useful for development, integration testing, demonstrations, and smaller deployments. Kubernetes provides a broader orchestration model for clustered operation.
 
 ### 5.1 Illustrative Compose structure
+
+The following Compose definition shows how the application tiers can be declared as one system while retaining separate runtime responsibilities. The values are intentionally minimal so that the service relationships remain visible.
 
 ```yaml
 services:
@@ -235,6 +239,8 @@ The operating consequence determines severity. A failed dashboard query is diffe
 An HTTP 200 response from the API proves only that the request-facing process can answer. If jobs remain in `queued`, follow the job identifier across boundaries: confirm that the API published the message, inspect queue depth, check that the worker subscribed to the expected queue, and test management reachability from the worker namespace. A common cause is attaching the API to the published network while forgetting to attach the worker to the external management network. Restarting every container may hide the symptom without correcting the topology. The durable fix is a correct Compose network declaration plus an integration test that exercises one queued, read-only job.
 
 ## 16. Knowledge check
+
+Use these questions to confirm that you can reason about service discovery, state, health, and failure isolation in a multitier deployment.
 
 1. Why should the application connect to a service name rather than a container IP address?
 2. What is the difference between starting a database process and proving database readiness?

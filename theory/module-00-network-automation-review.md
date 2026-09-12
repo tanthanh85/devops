@@ -51,6 +51,8 @@ The implementation may be a small command-line program or a multitier service. T
 
 ## 4. Foundation knowledge to recall
 
+Reliable delivery depends on several disciplines working together. Networking knowledge defines the intended behavior, programming and data models express it, and version control preserves both the implementation and the decisions behind it.
+
 ### 4.1 Networking remains the operational foundation
 
 Automation does not remove the need to understand the system being automated. An engineer must still reason about addressing, routing, switching, DNS, transport protocols, management reachability, security policy, and failure domains.
@@ -285,6 +287,8 @@ It should not contain live credentials, private keys, tokens, uncontrolled state
 Git alone is not DevOps. It becomes part of DevOps when small changes are reviewed, automatically validated, connected to an identifiable artifact, and promoted through a controlled workflow.
 
 ## 5. Interfaces used by network automation
+
+An automation application reaches infrastructure through an interface with its own data model, failure modes, and security properties. Choosing an interface therefore affects not only how code is written, but also how safely the resulting change can be validated and repeated.
 
 ### 5.1 CLI over SSH
 

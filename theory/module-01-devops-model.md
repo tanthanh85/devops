@@ -124,6 +124,8 @@ The result should not be reduced to a vanity score. The most useful output is a 
 
 ## 4. Three delivery models
 
+DevOps is easier to understand when it is compared with the delivery models it replaces or improves. The following comparison shows how ownership, evidence, execution, and recovery change as work moves from manual delivery through isolated automation to an engineered pipeline.
+
 | Characteristic | Manual delivery | Ad hoc automation | DevOps pipeline |
 |---|---|---|---|
 | Source of truth | Ticket and engineer notes | Script inputs or local files | Reviewed source in version control |
@@ -456,6 +458,8 @@ Schema success does not grant authorization, policy success does not prove corre
 Module 1 establishes the delivery model and the questions that each control must answer. Later chapters own the implementation detail: Modules 2–4 cover runtime and service architecture; Module 5 covers GitLab jobs, runners, artifacts, and promotion; Module 6 covers mutable network state, blast radius, convergence, and recovery; Module 7 covers infrastructure lifecycle and drift; Module 8 covers operational feedback; and Module 9 covers trust boundaries and credentials. This separation prevents the lifecycle overview from duplicating the engineering guidance where learners apply it.
 
 ## 11. Knowledge check
+
+Use these questions to test whether you can connect DevOps principles to engineering decisions rather than recall definitions alone.
 
 1. Why can extensive pipeline automation still represent weak DevOps maturity?
 2. How do Culture and Sharing make Automation more sustainable?

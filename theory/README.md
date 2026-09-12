@@ -37,6 +37,8 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 ## 5. Modules
 
+The modules follow the path of a software delivery system: establish the automation foundation, package and integrate the application, control its release, and then operate it securely at scale. The table summarizes the engineering focus of each stage.
+
 | Module | Subject | Central engineering question |
 |---|---|---|
 | 0 | [Network Automation Review and the Path to DevOps](module-00-network-automation-review.md) | Which automation foundations do learners already have, and how does DevOps turn them into a dependable team delivery system? |

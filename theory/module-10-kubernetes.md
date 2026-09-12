@@ -95,6 +95,8 @@ Managed services may hide control-plane operation, but users still need to under
 
 ## 8. Core objects
 
+Kubernetes expresses application intent through a set of related API objects. Understanding the responsibility and lifecycle of each object is essential before combining them into a deployment design.
+
 ### 8.1 Namespace
 
 A Namespace groups resources and supports names, access control, quotas, and policy. It does not replace all security isolation.
@@ -210,6 +212,8 @@ The release must support version overlap. API contracts, sessions, and database 
 Kubernetes can pause, resume, and undo Deployment revisions, but rollback only changes the workload template. It does not reverse external database migrations or infrastructure side effects.
 
 ## 14. Advanced deployment patterns
+
+Deployment patterns control how a new version is introduced and how risk is distributed during the transition. The appropriate pattern depends on capacity, compatibility, observability, and the speed at which traffic can be redirected or a release reversed.
 
 ### 14.1 Blue-green
 
@@ -331,6 +335,8 @@ Networking and policy platforms may connect data-center, cloud, and Kubernetes e
 Avoid allowing independent clusters to change the same device concurrently. Assign device or site ownership, use a shared coordination service, or route all change jobs through one control boundary. Disaster recovery should preserve job state and ensure that an uncertain in-flight change is inspected before another region retries it.
 
 ## 22. Knowledge check
+
+Use these questions to assess whether you can relate Kubernetes reconciliation, workload identity, rollout behavior, and multidata-center design to DevOps delivery controls.
 
 1. What does reconciliation mean in Kubernetes?
 2. Why should clients use a Service rather than a Pod IP?

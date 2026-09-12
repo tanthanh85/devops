@@ -18,6 +18,8 @@ The same image can render the proposed configuration, execute offline tests, col
 
 ## 3. Why teams containerize applications
 
+Containerization creates a consistent unit of packaging and execution, but it does not remove every environmental dependency. The comparison below identifies where containers provide strong control and where platform or operational responsibilities remain.
+
 | Workload | Benefit of a container | Important boundary |
 |---|---|---|
 | Python API or SSH client | Reproducible interpreter and packages | Device addresses and credentials remain external |
@@ -233,6 +235,8 @@ docker run --rm --name automation-check \
 This is a pattern, not a command to copy unchanged into production. The environment file must contain no long-lived device password, the digest must resolve in the chosen registry, and the application must support a read-only root filesystem. Because `--rm` deletes the stopped container, durable logs and reports must reach the evidence volume or a collector before exit.
 
 ## 20. Knowledge check
+
+Use these questions to verify that you can distinguish image, container, host, and runtime responsibilities in a practical deployment.
 
 1. Which dependencies does a container image control, and which remain part of the environment?
 2. Why is an image digest stronger evidence than the `latest` tag?
