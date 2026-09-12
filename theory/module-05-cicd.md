@@ -1,16 +1,16 @@
 # Module 5: Introducing CI/CD and Building the DevOps Flow
 
-## Purpose
+## 1. Purpose
 
 A CI/CD pipeline converts a reviewed application change into tested, traceable artifacts and a controlled deployment. This module explains GitLab CI concepts, pipeline stages and dependencies, runners, variables, artifacts, caches, test automation, build-once promotion, environments, approvals, and failure handling. Network-specific validation is integrated as an application responsibility rather than taught from first principles.
 
 Modules 2–4 established the application artifact and its runtime architecture. Module 5 connects source review, tests, image construction, evidence, and deployment into one executable delivery policy. Module 6 then examines whether a technically successful pipeline has produced a genuinely safe and healthy release.
 
-## Software delivery pipeline
+## 2. Software delivery pipeline
 
 A pipeline does not treat a successful command or API response as final proof. Build completion proves that an artifact was created; deployment completion proves that a platform accepted a request. Health and acceptance checks must still prove that users or downstream systems receive the intended outcome. For a network automation application, that may include an existing read-only network test.
 
-## Pipeline objectives
+## 3. Pipeline objectives
 
 A useful pipeline should answer these questions:
 
@@ -24,7 +24,7 @@ A useful pipeline should answer these questions:
 
 The pipeline should fail early on inexpensive, high-value checks. Slow environment provisioning should not run when syntax or unit tests already fail.
 
-## GitLab pipeline model
+## 4. GitLab pipeline model
 
 GitLab reads `.gitlab-ci.yml` from the repository. A pipeline contains jobs organized into stages or a dependency graph. Runners execute jobs.
 
@@ -39,7 +39,7 @@ Important concepts include:
 - Environment: named deployment target with history
 - Rule: condition controlling whether a job appears or runs
 
-### GitLab concepts in network automation
+### 4.1 GitLab concepts in network automation
 
 | Concept | Network automation use |
 |---|---|
@@ -54,7 +54,7 @@ Important concepts include:
 | Rule | Condition that prevents change jobs on untrusted branches |
 | Manual approval | Deliberate promotion decision after diff and evidence review |
 
-## Pipeline design
+## 5. Pipeline design
 
 The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate.
 
@@ -70,25 +70,25 @@ Each job should have one clear outcome. A large script that builds, deploys, and
 
 Dependencies can express which artifacts a job actually needs. Independent jobs can run concurrently, reducing feedback time.
 
-## Validation and testing layers
+## 6. Validation and testing layers
 
-### Static validation
+### 6.1 Static validation
 
 Static checks inspect files without running the complete application. Examples include YAML parsing, Dockerfile linting, formatting checks, type checks, Terraform validation, and Kubernetes schema validation.
 
-### Unit testing
+### 6.2 Unit testing
 
 Unit tests isolate application behavior and should provide fast feedback. They should not require a live network, shared database, or production account.
 
-### Integration testing
+### 6.3 Integration testing
 
 Integration tests examine boundaries such as application-to-database interaction or an HTTP request through the proxy. They need controlled dependencies and reliable cleanup.
 
-### System and acceptance testing
+### 6.4 System and acceptance testing
 
 These tests evaluate the assembled system and user-visible outcomes. They cost more to run, so teams select a focused set for each change and reserve broader suites for scheduled or release pipelines.
 
-### Network policy validation
+### 6.5 Network policy validation
 
 Policy checks examine intent and derived configuration before device access. Depending on the scenario, they can enforce:
 
@@ -103,7 +103,7 @@ Policy checks examine intent and derived configuration before device access. Dep
 
 Policy should report the exact object and rule. A vague `compliance failed` result wastes review time.
 
-### Test environment and limitation matrix
+### 6.6 Test environment and limitation matrix
 
 | Test layer | Typical tools | Environment required | Detects | Important limitation |
 |---|---|---|---|---|
@@ -118,13 +118,13 @@ Policy should report the exact object and rule. A vague `compliance failed` resu
 
 A strong pipeline uses many cheap offline tests and a smaller number of increasingly realistic tests. Production telemetry closes the feedback loop; it must not become the first place a predictable defect is tested.
 
-## Build once and promote
+## 7. Build once and promote
 
 The build job should produce a versioned, immutable artifact. Later jobs deploy the same artifact. Rebuilding separately for staging and production allows dependencies or build conditions to change and invalidates earlier evidence.
 
 For a container release, record the source commit, human-readable tag, and image digest. Deploy by digest for strong identity.
 
-## Artifacts and caches
+## 8. Artifacts and caches
 
 The diagram distinguishes data required for correctness from data used only to improve speed.
 
@@ -138,7 +138,7 @@ Artifacts are outputs that the pipeline needs to retain, such as test reports, c
 
 A cache accelerates work by reusing dependency downloads or build intermediates. Jobs must remain correct when the cache is empty. Never use a cache as the only copy of a release artifact or security report.
 
-## Runner design
+## 9. Runner design
 
 <p align="center">
   <img src="assets/diagrams/runner-trust-model.svg" alt="Separation of the general validation runner from the protected network runner and management zone" width="640" />
@@ -155,13 +155,13 @@ The reference architecture uses at least two trust levels:
 
 If Docker builds require a privileged mechanism, isolate that builder from the network runner. Mounting `/var/run/docker.sock` gives a job control over the Docker host and is equivalent to a powerful host capability.
 
-## Variables and secrets
+## 10. Variables and secrets
 
 Non-sensitive configuration may live in the repository. Secrets should use protected and masked variables or an external secret manager. Masking only reduces accidental log display; it does not prevent a malicious job from transmitting an available secret.
 
 Control secret exposure through job rules, protected branches, protected environments, short-lived credentials, narrow permissions, and runner isolation.
 
-## Pipeline rules
+## 11. Pipeline rules
 
 Different events need different work:
 
@@ -173,13 +173,13 @@ Different events need different work:
 
 Rules should be understandable and tested. A critical security job that silently disappears due to a complex rule creates a dangerous gap.
 
-## Environments and promotion
+## 12. Environments and promotion
 
 GitLab environments record deployments to targets such as review, test, staging, and production. A review environment can give each merge request an isolated endpoint. A stop job removes it when no longer needed.
 
 Promotion policy may require successful checks, peer approval, change-window conditions, or an environment owner. The approval should act on the tested artifact identity.
 
-## Pipeline efficiency
+## 13. Pipeline efficiency
 
 Improve feedback time by:
 
@@ -192,7 +192,7 @@ Improve feedback time by:
 
 Efficiency must not remove evidence needed for safety.
 
-## Pipeline failure categories
+## 14. Pipeline failure categories
 
 A useful failure message separates:
 
@@ -207,7 +207,7 @@ A useful failure message separates:
 
 Jobs should return a nonzero status on failure and preserve relevant evidence. Scripts that continue after a failed command can create false success.
 
-## Illustrative `.gitlab-ci.yml`
+## 15. Illustrative `.gitlab-ci.yml`
 
 ```yaml
 stages: [validate, render, test, build, precheck, deploy, postcheck, observe]
@@ -291,7 +291,7 @@ network_postcheck:
 
 This is a teaching example. GitLab syntax and feature availability depend on the deployed GitLab version and tier. Validate it against the target instance.
 
-## Explanation of the pipeline blocks
+## 16. Explanation of the pipeline blocks
 
 - `stages` makes the network controls visible in order.
 - `default.image` pins the validation runtime instead of using a mutable tag.
@@ -309,11 +309,11 @@ This is a teaching example. GitLab syntax and feature availability depend on the
 
 Real pipelines should pass the exact image digest and evidence artifacts between jobs, verify that the approved diff belongs to the same commit and target, and define cleanup or recovery behavior.
 
-### Practical review: passing jobs, wrong artifact
+### 16.1 Practical review: passing jobs, wrong artifact
 
 A staging test may pass while production receives a rebuilt image carrying the same tag. The dashboard looks green, yet the production bytes were never tested. To detect this class of error, the build job records the image digest; scan, integration, approval, and deployment jobs consume that digest as an artifact; and the deployment record reports the same value. If any stage resolves a mutable tag again, the evidence chain is broken and promotion should stop.
 
-## Why each gate exists
+## 17. Why each gate exists
 
 | Gate | Why it exists | Example failure | Required response |
 |---|---|---|---|
@@ -334,7 +334,7 @@ A staging test may pass while production receives a rebuilt image carrying the s
 | Post-check | Prove configuration and service outcome | Device accepts commands but route or path is absent | Roll back or remediate according to evidence |
 | Telemetry observation | Detect delayed or collateral degradation | Packet loss rises after immediate checks pass | Halt promotion and invoke recovery policy |
 
-## Knowledge check
+## 18. Knowledge check
 
 1. How does an artifact differ from a cache?
 2. Why should untrusted branches not use a privileged deployment runner?
@@ -342,7 +342,7 @@ A staging test may pass while production receives a rebuilt image carrying the s
 4. Which checks should run before an expensive test environment is created?
 5. Why is a masked variable insufficient protection against a malicious job?
 
-## Summary
+## 19. Summary
 
 A useful pipeline is an executable release policy with an audit trail. Its green status means something only when jobs test the same immutable artifact, privileged work is isolated, failures preserve evidence, and approval is bound to the reviewed commit, target, and digest. Speed comes from early feedback and safe concurrency—not from removing the controls that make promotion credible.
 

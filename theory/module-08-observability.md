@@ -1,12 +1,12 @@
 # Module 8: Monitoring DevOps and Engineering Visibility and Stability
 
-## Purpose
+## 1. Purpose
 
 A pipeline can prove that a deployment passed immediate checks, but the team also needs evidence about the application and its supporting infrastructure over time. This module covers metrics, logs, traces, telemetry, dashboards, alerting, application instrumentation, health monitoring, stability engineering, and controlled chaos experiments. Network signals appear where they help evaluate the supplied application's output; they are not the primary monitoring subject.
 
 Modules 5–7 created a traceable release, validated it, and deployed it into controlled infrastructure. Module 8 closes the operational feedback loop by correlating application, platform, pipeline, and network signals. Module 9 will use those same identities, boundaries, and records to protect the workflow and investigate misuse.
 
-## Monitoring, observability, and telemetry
+## 2. Monitoring, observability, and telemetry
 
 Telemetry supplies data; monitoring evaluates known conditions; observability combines signals and context to explain unfamiliar behavior.
 
@@ -22,7 +22,7 @@ Telemetry supplies data; monitoring evaluates known conditions; observability co
 
 Telemetry is the data. Monitoring evaluates selected signals. Observability is a property of the complete system, including instrumentation, context, retention, and investigation workflows.
 
-## Feedback architecture requirements
+## 3. Feedback architecture requirements
 
 Device signals, application signals, and deployment events need a common correlation path.
 
@@ -34,7 +34,7 @@ Shared identifiers and timestamps allow several storage systems to present one o
 
 Every record should carry enough dimensions to identify environment, site, device, interface or protocol instance, collection method, and time. Change and pipeline identifiers connect delivery events to operational effects.
 
-## Monitoring and observability
+## 4. Monitoring and observability
 
 Monitoring evaluates known conditions. It asks questions such as whether an endpoint is reachable, error rate exceeds a threshold, or disk space is low.
 
@@ -42,63 +42,63 @@ Observability describes how well a team can understand internal behavior from sy
 
 The two reinforce each other. Monitoring detects important known failures. Rich, connected telemetry helps explain them.
 
-## Operational signals
+## 5. Operational signals
 
-### Metrics
+### 5.1 Metrics
 
 Metrics are numeric measurements associated with time and labels. They support aggregation, comparison, trends, dashboards, and alerts. Common application signals include request rate, error rate, latency, queue depth, resource use, and dependency behavior.
 
 Labels must remain controlled. User identifiers, request identifiers, or arbitrary URLs can create excessive cardinality and storage cost.
 
-### Logs
+### 5.2 Logs
 
 Logs record discrete events. Structured logs make fields searchable and reduce parsing ambiguity. A useful application event may contain timestamp, severity, service, version, environment, event name, and correlation identifier.
 
 Logs should provide diagnostic context without exposing credentials, session tokens, personal information, or sensitive payloads.
 
-### Traces
+### 5.3 Traces
 
 Distributed traces follow a request across service boundaries. Spans describe work performed by each component and show timing, errors, and relationships. Trace and correlation identifiers can connect traces with logs.
 
-### Events and changes
+### 5.4 Events and changes
 
 Deployment, configuration, scaling, and infrastructure events add essential context. A dashboard should make it possible to compare a behavior change with a deployment or platform event.
 
-## Network data collection methods
+## 6. Network data collection methods
 
 <p align="center">
   <img src="assets/diagrams/network-telemetry-methods.svg" alt="Selection and normalization of syslog, SNMP, model-driven telemetry, APIs, and OpenTelemetry" width="640" />
 </p>
 
-### Syslog
+### 6.1 Syslog
 
 Syslog provides event-oriented messages from network devices. It is valuable for interface transitions, routing changes, authentication events, configuration actions, and system faults. Configure accurate time, consistent severity policy, protected transport where supported, and centralized retention.
 
 Text varies by platform and release. Parse important messages into structured fields while preserving the original record. Do not treat absence of a syslog message as proof that a condition did not occur.
 
-### SNMP
+### 6.2 SNMP
 
 SNMP remains useful for widely supported counters and status. Prefer SNMPv3 with authentication and privacy when available. Counter semantics, polling interval, rollover, discontinuity, and interface identity affect interpretation.
 
 Polling every interface at a very short interval can load devices and collectors. Select intervals based on the operational question.
 
-### REST API and CLI polling
+### 6.3 REST API and CLI polling
 
 Controller APIs, RESTCONF, NETCONF, and structured CLI collection can answer targeted questions. Polling offers explicit control but consumes management-plane capacity and produces snapshots. Apply timeouts, rate limits, and caching where appropriate.
 
-### Model-driven telemetry
+### 6.4 Model-driven telemetry
 
 Model-driven telemetry streams YANG-addressed data using a supported transport and encoding. Dial-out has the device initiate a subscription toward a collector. Dial-in has the collector establish and manage the subscription.
 
 Before deployment, confirm the network operating-system release, model path, subscription mode, encoding, transport, update policy, and receiver compatibility. A syntactically valid sensor path can still produce no data if the platform does not support it operationally.
 
-### OpenTelemetry
+### 6.5 OpenTelemetry
 
 OpenTelemetry provides common APIs, SDKs, semantic conventions, and collector components for application metrics, logs, and traces. It is particularly useful for the automation API and workers. Device telemetry does not automatically become OpenTelemetry data; a collector or translation layer may normalize network observations into the chosen model.
 
 Use a trace to follow a job from API request to queue, worker, credential lookup, device RPC, validation, and evidence write. Do not include secret values or full configurations in span attributes.
 
-## Health checks
+## 7. Health checks
 
 Health checks serve different consumers:
 
@@ -109,7 +109,7 @@ Health checks serve different consumers:
 
 Checks should be fast, deterministic, and inexpensive. A check that always returns success protects nothing. A check that depends on every external system may create false restarts.
 
-## Service objectives
+## 8. Service objectives
 
 A service-level indicator measures behavior that matters to consumers, such as successful request ratio or response latency. A service-level objective defines the desired target over a period.
 
@@ -117,7 +117,7 @@ Error budget is the allowed amount of unreliability within the objective. It pro
 
 An internal component metric can help diagnosis but does not automatically represent user experience.
 
-## Metrics collection architecture
+## 9. Metrics collection architecture
 
 A metrics system usually contains:
 
@@ -139,7 +139,7 @@ The scenario environment exports automation-service metrics and collects selecte
 | Automation | Queue depth, job duration, success rate, retry count, devices changed |
 | Delivery | Pipeline duration, gate failures, rollback rate, evidence completeness |
 
-## Log collection architecture
+## 10. Log collection architecture
 
 Application and platform logs flow through a collector or agent into searchable storage and a visualization interface. Traditional ELK terminology refers to Elasticsearch, Logstash, and Kibana, although modern deployments may use other shippers and compatible storage components.
 
@@ -147,7 +147,7 @@ The architecture must account for parsing, buffering, backpressure, retention, a
 
 If the logging platform fails, the application should avoid blocking indefinitely. It may buffer a controlled amount, degrade logging, or use local output collected by the platform.
 
-## Dashboards
+## 11. Dashboards
 
 A dashboard should answer an operational question. A service overview might show traffic, failures, latency, saturation, dependency health, and recent deployments.
 
@@ -155,7 +155,7 @@ Avoid displaying many unrelated metrics without context. Provide units, useful t
 
 Different audiences need different views. A service owner needs diagnostic detail, while a course demonstration dashboard should clearly show the effect of a deployment or failure.
 
-### Network change dashboard scenario
+### 11.1 Network change dashboard scenario
 
 For a routing-service example, a dashboard can display:
 
@@ -171,7 +171,7 @@ For a routing-service example, a dashboard can display:
 
 The dashboard should distinguish `no data` from zero and identify whether a signal comes from a real device, simulator, or mock.
 
-## Alert design
+## 12. Alert design
 
 An alert should indicate a condition that requires timely action. It needs:
 
@@ -198,13 +198,13 @@ Runbook: verify management reachability, link state, MTU, authentication, logs, 
 
 Combining state and impact can reduce noise, but the team may still retain a lower-severity event for a neighbor transition that recovers quickly.
 
-## Webhook notifications
+## 13. Webhook notifications
 
 Alert systems can notify a webhook listener, collaboration platform, or incident-management system. Protect the destination token, validate TLS, restrict message content, and handle delivery failure.
 
 A notification should include what failed, where, when, current value, relevant threshold, and a link to evidence. It should not include secrets or a full sensitive log record.
 
-## Application instrumentation
+## 14. Application instrumentation
 
 Instrumentation should begin with a small, stable set of signals:
 
@@ -218,7 +218,7 @@ Business or workflow metrics can show whether the service produces its intended 
 
 For the automation platform, instrument request and job count, queue delay, device connection duration, RPC or command duration, validation failure category, configuration lines changed, rollback outcome, and evidence-write result. Never use a device password, token, full command output, or unbounded job identifier as a metric label.
 
-## Change correlation
+## 15. Change correlation
 
 An investigation follows the release through device events and telemetry using shared identifiers.
 
@@ -246,7 +246,7 @@ A useful correlation view should let an engineer answer, without manually joinin
 
 Join records with stable identifiers and bounded-cardinality labels. Commit SHA, pipeline ID, change ID, device identity, interface, and routing process are useful correlation fields; credentials, full command output, and unbounded request strings are not metric labels.
 
-### Practical incident trace
+### 15.1 Practical incident trace
 
 At 10:04 a deployment finishes, at 10:05 queue delay rises, and at 10:06 the first job times out. CPU and memory are normal. A structured worker log shows `dependency=job-db`, `error=connection_pool_exhausted`, together with the image digest and pipeline ID. The team can now separate an application-release problem from device reachability. The alert should point to the correlated timeline and runbook; it should not page merely because one request was slow.
 
@@ -256,13 +256,13 @@ At 10:04 a deployment finishes, at 10:05 queue delay rises, and at 10:06 the fir
 
 The same values do not all belong in metric labels. `service`, `outcome`, and a bounded dependency name are useful dimensions. A unique change identifier belongs in logs or traces, because using it as a time-series label creates unbounded cardinality.
 
-## Telemetry quality
+## 16. Telemetry quality
 
 Operational data can be missing, delayed, duplicated, mislabelled, or out of order. Collection success does not guarantee correct interpretation.
 
 Time synchronization matters across application hosts, containers, network devices, and pipeline systems. Retention and sampling policies should preserve enough evidence for expected investigations.
 
-## Stability engineering
+## 17. Stability engineering
 
 Reliability improves when the design anticipates failure:
 
@@ -276,7 +276,7 @@ Reliability improves when the design anticipates failure:
 
 Every mechanism has tradeoffs. Retries increase load. Circuit breakers can reject work after a dependency recovers until their state changes. Operational signals must show what the mechanism is doing.
 
-## Chaos engineering
+## 18. Chaos engineering
 
 Chaos engineering uses controlled experiments to test a specific resilience hypothesis. It is not random destruction.
 
@@ -291,7 +291,7 @@ A responsible experiment defines:
 
 In a training environment, deleting one disposable application instance or temporarily blocking one dependency can demonstrate self-healing or alert behavior. The experiment must stay within the assigned environment.
 
-## Knowledge check
+## 19. Knowledge check
 
 1. How does observability differ from monitoring?
 2. Why should request identifiers not become unrestricted metric labels?
@@ -299,7 +299,7 @@ In a training environment, deleting one disposable application instance or tempo
 4. Which information makes an alert actionable?
 5. What separates a chaos experiment from uncontrolled failure injection?
 
-## Summary
+## 20. Summary
 
 Observability is useful when an operator can move from a symptom to the affected release, dependency, and change without guessing. Metrics show patterns, logs explain individual events, traces connect service calls, and deployment annotations supply change context. Good alerts describe sustained impact and a response; good resilience tests verify a stated hypothesis within an explicit safety boundary.
 

@@ -1,12 +1,12 @@
 # Module 3: Packaging an Application Using Docker
 
-## Purpose
+## 1. Purpose
 
 This module packages the supplied Python application into a reproducible and defensible Docker image. It covers Dockerfile responsibilities, build context, dependency control, layer design, multistage builds, non-root execution, metadata, testing, scanning, SBOMs, signing, provenance, and registry handling. Network libraries are application dependencies; the packaging method is the same one used for other Python services.
 
 Module 2 separated fixed image content from runtime configuration and external state. Module 3 now builds, tests, and identifies that image. Module 4 will deploy the same artifact as part of a service containing an API, worker, queue, and database.
 
-## Application image contents
+## 2. Application image contents
 
 The image should contain only the runtime components required by the application. In this course, that may include:
 
@@ -24,7 +24,7 @@ The image should contain only the runtime components required by the application
 
 Tool selection should remain narrow. Installing every vendor collection and parser increases build time, image size, vulnerabilities, and dependency conflicts.
 
-## Dockerfile responsibilities
+## 3. Dockerfile responsibilities
 
 A Dockerfile records how the builder creates an image. It should make the runtime dependency boundary understandable and repeatable.
 
@@ -42,7 +42,7 @@ Common instructions include:
 
 The Dockerfile should reveal the runtime contract without requiring hidden manual changes.
 
-## Base-image selection
+## 4. Base-image selection
 
 A good base image supports the required runtime, processor architecture, patch process, and operational tools while minimizing unnecessary software.
 
@@ -57,7 +57,7 @@ Questions for base-image review include:
 - Can the scanning and runtime platforms inspect it correctly?
 - How will the project detect that the pinned base has become outdated?
 
-## Build context and `.dockerignore`
+## 5. Build context and `.dockerignore`
 
 The build context contains files available to `COPY` and `ADD`. A broad context can send credentials, Git history, test output, local databases, or large development directories to the builder.
 
@@ -65,7 +65,7 @@ The build context contains files available to `COPY` and `ADD`. A broad context 
 
 Exclusion protects both build efficiency and information security. A file does not need to appear in the final filesystem to create risk; build systems may preserve context or intermediate layers.
 
-## Dependency control
+## 6. Dependency control
 
 Reproducible builds need declared dependency versions. Loose ranges can cause identical source commits to produce different images at different times. Fully pinned dependencies improve repeatability but require an update process.
 
@@ -75,25 +75,25 @@ Ansible collections also need controlled versions. A change in a vendor collecti
 
 Offline parser fixtures reduce risk. Store sanitized `show interfaces`, `show ip ospf neighbor`, and `show ip route` samples in tests so a dependency update can reveal changed structured output before a live device job.
 
-## Layer design
+## 7. Layer design
 
 Layer design affects cache behavior, image size, and secret exposure. Copy dependency declarations and install dependencies before copying frequently changing application code. Remove package-manager caches in the same layer that creates them.
 
 Do not combine unrelated actions merely to minimize the number of layers. Readability and predictable behavior matter more than a superficial layer count.
 
-## Multistage builds
+## 8. Multistage builds
 
 A multistage Dockerfile separates build tools from the final runtime. The builder stage can compile code or install dependencies. The final stage receives only the artifacts required to run.
 
 This approach can reduce size and attack surface. It also makes the boundary between build-time and runtime dependencies explicit. The final stage still needs certificates, timezone data, shared libraries, and other runtime components required by the application.
 
-## Runtime user and privileges
+## 9. Runtime user and privileges
 
 Applications should run as a non-root user unless a documented requirement prevents it. File ownership and port selection must support that user. Binding to high-numbered ports avoids unnecessary privilege.
 
 At runtime, remove Linux capabilities that the application does not need, avoid privileged mode, use a read-only root filesystem when practical, and mount only required writable locations.
 
-## Secrets during builds
+## 10. Secrets during builds
 
 Passing a secret through `ARG`, copying it into the context, or embedding it in a `RUN` instruction can expose it through layers, build history, logs, or metadata.
 
@@ -101,7 +101,7 @@ When a private dependency requires authentication, use the builder's secret-moun
 
 Do not copy SSH private keys, NETCONF usernames, RESTCONF passwords, controller tokens, Vault tokens, GitLab deploy tokens, or lab `.env` files into the image. A later `RUN rm` cannot erase a value preserved in an earlier layer.
 
-## Image metadata and traceability
+## 11. Image metadata and traceability
 
 <p align="center">
   <img src="assets/diagrams/image-evidence-lineage.svg" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="640" />
@@ -116,7 +116,7 @@ Traceability should answer:
 - Which base image and dependencies were used?
 - Which environments deployed this digest?
 
-## Testing an image
+## 12. Testing an image
 
 Testing should cover more than successful process startup. A build workflow can perform:
 
@@ -132,7 +132,7 @@ Testing should cover more than successful process startup. A build workflow can 
 
 A scanner finding requires interpretation. Severity, exploitability, exposure, available remediation, and application context influence the decision. Suppression should include an owner, justification, and expiration.
 
-### Network-specific runtime tests
+### 12.1 Network-specific runtime tests
 
 The pipeline should also verify that:
 
@@ -146,13 +146,13 @@ The pipeline should also verify that:
 
 Separating a validation image from a deployment image can reduce capability. The validation image needs schemas, linters, renderers, and offline tests. The deployment image also needs device clients and may run only on a protected runner.
 
-## Image signing and provenance
+## 13. Image signing and provenance
 
 Signing allows a consumer to verify who approved an image. Build provenance records information about how the artifact was produced. These controls are most useful when the deployment platform enforces them. A signature stored but never verified provides limited protection.
 
 The pipeline should promote an already tested image digest. Rebuilding from the same source for production creates a different artifact and breaks the evidence chain.
 
-## Secure build pipeline
+## 14. Secure build pipeline
 
 Each output has a purpose. The SBOM inventories components. The vulnerability scan compares those components with known findings. A signature binds an identity to the digest. Provenance describes how the build occurred. None of these controls substitutes for the others.
 
@@ -164,19 +164,19 @@ The supply chain below shows that evidence is attached to the immutable digest b
 
 Secrets may be exposed temporarily through a supported build-secret mechanism when private dependencies require them, but they must not enter the build context, layer history, final image, or provenance output.
 
-## Compromised dependency scenario
+## 15. Compromised dependency scenario
 
 Assume a new parsing package executes unexpected code during installation. If the build job can reach the management network or access deployment variables, the dependency can steal credentials before an image is created.
 
 Build isolation therefore matters as much as runtime hardening. The untrusted dependency-resolution stage should not receive network device secrets or management-plane access. Protected deployment occurs later with the already scanned and identified image.
 
-## Registries and retention
+## 16. Registries and retention
 
 A registry should enforce authentication, encrypted transport, access control, immutability where appropriate, scanning, and retention policy. Developer accounts may push to development repositories, while production promotion should use a controlled service identity.
 
 Retention must balance storage cost, investigation needs, and rollback. Removing every previous image immediately can make recovery impossible.
 
-### Packaging failure patterns
+### 16.1 Packaging failure patterns
 
 The image review should connect a defect to its operational consequence rather than report only that a rule failed.
 
@@ -192,7 +192,7 @@ The image review should connect a defect to its operational consequence rather t
 
 These controls do not guarantee that the application behaves correctly. They establish that the team knows what it built, can reproduce the decision, and can reject an artifact whose identity or evidence changes.
 
-## Example network automation packaging pattern
+## 17. Example network automation packaging pattern
 
 ```dockerfile
 FROM python:3.13-slim AS builder
@@ -218,11 +218,11 @@ CMD ["--help"]
 
 This example illustrates separation of build and runtime stages, dependency caching, a non-root identity, and an explicit entry point. A real project should pin the base digest, control dependency versions, add health behavior, and validate the image in CI.
 
-### Review example: a harmless-looking dependency change
+### 17.1 Review example: a harmless-looking dependency change
 
 Suppose a merge request changes only `requirements.txt`. Source tests pass, but the lock file now pulls a new transitive SSH library. The reviewer should ask three separate questions: did application behavior change, did the runtime inventory change, and does the new component alter the security boundary? A defensible pipeline rebuilds from a clean context, compares the SBOM with the previous release, runs connection and parser fixtures, scans the resulting digest, and records an approved exception if a finding cannot yet be fixed. Reusing an old scan report would miss the exact risk introduced by the dependency-only change.
 
-## Knowledge check
+## 18. Knowledge check
 
 1. What risks arise from an overly broad Docker build context?
 2. Why does deleting a copied secret in a later layer fail to protect it?
@@ -230,7 +230,7 @@ Suppose a merge request changes only `requirements.txt`. Source tests pass, but 
 4. Why should the pipeline promote a digest instead of rebuilding for each environment?
 5. What information should accompany an accepted scanner exception?
 
-## Summary
+## 19. Summary
 
 An image is trustworthy only when its contents, build process, test evidence, and identity can be traced together. A small image is useful, but reproducibility, patchability, non-root execution, secret discipline, dependency control, SBOM comparison, and digest-based promotion matter more than size alone.
 

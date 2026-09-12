@@ -1,12 +1,12 @@
 # Module 0: Network Automation Review and the Path to DevOps
 
-## Purpose
+## 1. Purpose
 
 This module reviews the network automation knowledge expected at the start of the course and connects it to the DevOps practices developed in later modules. It is not a replacement for CCNA Automation, DEVASC, or DEVCOR study. Its purpose is to restore the common mental model learners need before working on software delivery.
 
 Learners are expected to recognize Python, Ansible, Git, structured data, APIs, model-driven interfaces, authentication, and operational validation. They may already use these technologies effectively for individual tasks. The next challenge is to make the resulting software reproducible, reviewable, testable, releasable, observable, and supportable by a team.
 
-## Learning objectives
+## 2. Learning objectives
 
 After completing this review, learners should be able to:
 
@@ -22,7 +22,7 @@ After completing this review, learners should be able to:
 - Map network automation activities to high-level DevOps practices.
 - Explain why successful automation execution is not the same as reliable software delivery.
 
-## 1. Network automation as a software system
+## 3. Network automation as a software system
 
 Network automation is sometimes introduced as a faster way to execute commands. That description is incomplete. A useful automation solution is a software system that interprets intent, obtains trusted data, communicates with external systems, changes or observes state, handles failure, and produces evidence.
 
@@ -49,9 +49,9 @@ The transport is only one stage. Inventory, validation, policy, verification, an
 
 The implementation may be a small command-line program or a multitier service. The responsibilities still exist. When they are hidden inside one script, they become harder to test and govern independently.
 
-## 2. Foundation knowledge to recall
+## 4. Foundation knowledge to recall
 
-### 2.1 Networking remains the operational foundation
+### 4.1 Networking remains the operational foundation
 
 Automation does not remove the need to understand the system being automated. An engineer must still reason about addressing, routing, switching, DNS, transport protocols, management reachability, security policy, and failure domains.
 
@@ -59,7 +59,7 @@ For example, a Python HTTPS request can fail because of name resolution, routing
 
 The same principle applies after a change. A successful response means that an endpoint accepted or processed a request according to its contract. It does not prove that users can reach the service, that a routing protocol converged, or that an unrelated policy was left untouched.
 
-### 2.2 Python provides application logic
+### 4.2 Python provides application logic
 
 At associate level, learners should be comfortable with variables, collections, conditions, loops, functions, exceptions, modules, packages, file handling, and virtual environments. At this stage, Python should be treated as application code rather than as a collection of copied snippets.
 
@@ -83,7 +83,7 @@ def select_targets(inventory: dict, site: str, limit: int = 10) -> list[dict]:
 
 The important features are not the Python syntax. The function has one responsibility, validates assumptions, fails explicitly, and enforces a scope limit. Unit tests can exercise unknown sites, empty groups, disabled devices, and an excessive target count without contacting a network.
 
-### 2.3 Structured data forms a contract
+### 4.3 Structured data forms a contract
 
 JSON, YAML, XML, and CSV represent data; they do not automatically make the data valid. Parsing answers whether a document is syntactically readable. Schema validation answers whether required fields, types, ranges, and structures follow a contract. Policy validation answers whether the requested values are permitted in a particular organization or environment.
 
@@ -96,7 +96,7 @@ Learners should recall the usual roles:
 
 Data should be normalized before it reaches templates or API clients. Addresses, prefixes, interface names, booleans, enumerated values, and identifiers should have one internal representation. This prevents each downstream component from interpreting the same input differently.
 
-#### One inventory represented in YAML, JSON, XML, and Python
+#### 4.3.1 One inventory represented in YAML, JSON, XML, and Python
 
 The examples below describe the same two devices. Seeing the equivalent structures helps when an application reads one format, uses Python dictionaries internally, and sends another format to an API.
 
@@ -191,7 +191,7 @@ inventory = {
 }
 ```
 
-#### Parsing and normalizing the formats
+#### 4.3.2 Parsing and normalizing the formats
 
 Python's standard library handles JSON and XML. YAML normally uses PyYAML. `yaml.safe_load()` is important because the general loader can construct unsafe Python objects from untrusted YAML.
 
@@ -267,7 +267,7 @@ def normalize_inventory(raw: dict) -> dict:
 
 All three loaders return the same internal shape, and normalization establishes canonical values. A production application should add schema validation, reject unexpected fields when appropriate, use a hardened XML parser for untrusted XML, and test missing, duplicated, malformed, and boundary values.
 
-### 2.4 Git records source and decisions
+### 4.4 Git records source and decisions
 
 Git stores versions of source code and supporting definitions. Learners should be able to create a branch, inspect a diff, stage deliberate changes, commit them with a useful message, resolve straightforward conflicts, and participate in review.
 
@@ -284,15 +284,15 @@ It should not contain live credentials, private keys, tokens, uncontrolled state
 
 Git alone is not DevOps. It becomes part of DevOps when small changes are reviewed, automatically validated, connected to an identifiable artifact, and promoted through a controlled workflow.
 
-## 3. Interfaces used by network automation
+## 5. Interfaces used by network automation
 
-### 3.1 CLI over SSH
+### 5.1 CLI over SSH
 
 SSH CLI automation remains useful when a required function lacks a suitable structured interface. Libraries such as Netmiko or Scrapli handle prompts, command timing, and platform behavior more reliably than a general-purpose interactive shell implementation.
 
 CLI output is intended primarily for people and may vary by platform, release, privilege, width, localization, or command form. Structured parsing with TextFSM or Genie is preferable to fragile `split()` logic, but the parser and its expected data shape still require tests. Configuration workflows also need target verification, configuration preview, timeouts, failure classification, post-checks, and a recovery plan.
 
-#### Netmiko review
+#### 5.1.1 Netmiko review
 
 Netmiko provides network-device connection handling on top of SSH. This read-only example takes credentials from the environment, uses explicit timeouts, requests structured output when a supported TextFSM template is available, and closes the session through a context manager:
 
@@ -325,7 +325,7 @@ except NetmikoTimeoutException as exc:
 
 The command and `device_type` are platform-dependent. Tests should use sanitized command-output fixtures instead of requiring a live device for every commit. Production logs must not print the connection dictionary because it contains a password.
 
-### 3.2 REST APIs
+### 5.2 REST APIs
 
 Learners should recognize the parts of an HTTP request: method, URL, headers, authentication, query parameters, and optional body. They should interpret status codes and parse the response only after checking that its status and media type match expectations.
 
@@ -333,7 +333,7 @@ Reliable API clients address more than the successful `200` path. They use TLS v
 
 Retry behavior deserves particular care. A read request may be safe to retry after a transient connection failure. Repeating a create or change request after an uncertain timeout can duplicate work. The client may first need to query a request identifier or rediscover actual state.
 
-#### `requests` review
+#### 5.2.1 `requests` review
 
 The `requests` library provides a direct and readable HTTP client. A `Session` reuses connections and common headers. Timeouts and TLS verification must be explicit; `verify=False` is not an acceptable production shortcut.
 
@@ -383,7 +383,7 @@ def get_devices(base_url: str, ca_bundle: str) -> list[dict]:
 
 The retry policy deliberately covers only safe read methods. Retrying `POST` or `PATCH` requires an application-specific idempotency key or a reliable way to discover the result of the earlier request.
 
-### 3.3 NETCONF, RESTCONF, and YANG
+### 5.3 NETCONF, RESTCONF, and YANG
 
 YANG defines structured configuration and operational data. NETCONF exchanges RPC messages and can provide datastores and transaction capabilities. RESTCONF exposes YANG-modeled resources through HTTP. Actual model and capability support varies across platforms and software releases.
 
@@ -391,7 +391,7 @@ A model-driven workflow should discover capabilities, identify the correct schem
 
 Model-driven does not mean risk-free. The application still needs authorization, target control, transaction handling, diff or preview, post-change validation, and evidence.
 
-#### `ncclient` review
+#### 5.3.1 `ncclient` review
 
 `ncclient` is a Python NETCONF client. The example performs a read with a subtree filter and parses the returned XML. Namespace values and model paths are illustrative and must be discovered from the target's advertised capabilities.
 
@@ -437,7 +437,7 @@ except RPCError as exc:
 
 Configuration code must additionally consider datastore selection, locking, validation, confirmed commit, capability support, error options, and recovery. A successful `<ok/>` confirms protocol acceptance, not the final operational result.
 
-### 3.4 Controllers and platform APIs
+### 5.4 Controllers and platform APIs
 
 Controllers provide higher-level inventory, policy, assurance, topology, or service abstractions. Their API often has a different consistency and task model from a device API. A request may create a background task, and several reads may be required before the final state becomes visible.
 
@@ -451,7 +451,7 @@ Before integrating with a controller, determine:
 - How state is verified independently
 - How changes made outside the controller create drift
 
-### 3.5 Flask as an automation service interface
+### 5.5 Flask as an automation service interface
 
 Flask can expose existing Python logic through an HTTP API. It does not supply production authentication, authorization, rate limiting, durable jobs, TLS termination, or observability automatically; those controls must be designed around it.
 
@@ -490,7 +490,7 @@ def create_validation_job():
 
 The `202` response states that a job was accepted, not completed. A complete contract would provide a job-status URL, authentication and authorization, request-size limits, correlation IDs, structured logs, an OpenAPI description, and tests for invalid and unauthorized requests. Run Flask behind a production WSGI server or an appropriate platform runtime rather than using its development server for production.
 
-### 3.6 Model-driven telemetry review
+### 5.6 Model-driven telemetry review
 
 Model-driven telemetry publishes structured operational data identified by model paths. Unlike periodic CLI scraping, the collector does not need to reconstruct meaning from human-formatted text. Unlike traditional polling, a subscription can stream updates at a requested interval or when state changes, subject to platform capability.
 
@@ -550,7 +550,7 @@ Counter interpretation requires more than storing values. Octet and packet count
 
 Telemetry becomes part of DevOps when it closes the release feedback loop. Deployment events should annotate dashboards, and application logs should carry the same release, pipeline, and change identifiers used in retained evidence. This allows the team to distinguish a software regression, a collector failure, and a genuine network-state change.
 
-## 4. Ansible and orchestration review
+## 6. Ansible and orchestration review
 
 Ansible provides inventories, variables, collections, modules, roles, handlers, conditions, and playbooks for describing ordered work across targets. Agentless operation is particularly familiar in network environments, although module behavior and platform support still depend on collection versions and device capabilities.
 
@@ -568,7 +568,7 @@ Learners should recall these principles:
 
 Idempotence means that repeated execution converges on the intended state without creating unnecessary additional changes. It does not mean that every task is automatically safe to retry. A playbook can contain a non-idempotent command, call an asynchronous API, or repeat an operation whose previous outcome is uncertain.
 
-### 4.1 Example Ansible playbook
+### 6.1 Example Ansible playbook
 
 The following vendor-neutral pattern validates scope, collects a baseline, applies a role in small batches, and verifies the result. Concrete module names and returned data vary by collection and platform.
 
@@ -624,7 +624,7 @@ The following vendor-neutral pattern validates scope, collects a baseline, appli
 
 The `network_service` role would contain platform-aware, preferably idempotent resource modules. The playbook does not embed credentials, limits concurrent targets with `serial`, stops after a failure, distinguishes collection from change, and delegates acceptance logic to testable application code. In a real pipeline, baseline and post-check results should be sanitized and retained as artifacts. `no_log: false` is shown only because the illustrative read command is nonsensitive; tasks handling credentials or sensitive payloads require deliberate log protection.
 
-### 4.2 Infrastructure as Code and tool selection
+### 6.2 Infrastructure as Code and tool selection
 
 Infrastructure as Code represents infrastructure or configuration in version-controlled, machine-readable definitions and applies it through a repeatable workflow. Useful IaC practice includes review, validation, plan or preview, controlled execution, state protection, drift detection, testing, and traceable evidence. A file becomes IaC because of the lifecycle around it, not merely because it uses YAML or a declarative syntax.
 
@@ -648,7 +648,7 @@ Combining tools is normal, but two tools should not independently own the same a
 
 State deserves particular attention. Terraform state maps declarations to real resources and must be stored with locking, encryption, access control, backup, and recovery. Puppet and Chef maintain convergence knowledge through their control systems and node reports. Ansible has no equivalent global state file, but remote systems, inventory, cached facts, and job artifacts still hold state that affects later execution.
 
-## 5. Source of truth, intent, and state
+## 7. Source of truth, intent, and state
 
 A source of truth is the authoritative record for a defined class of data. It may contain device identity, site membership, addressing, connections, services, or policy. Authority must be explicit. If a spreadsheet, controller, inventory file, and live device can all overwrite the same value, the organization has several competing sources rather than one source of truth.
 
@@ -662,7 +662,7 @@ Three states should remain distinct:
 
 Configuration can match intent while operation remains unhealthy. Operational state can appear healthy temporarily while configuration has drifted from policy. Reliable verification selects evidence appropriate to the requested outcome.
 
-## 6. Safety and reliability fundamentals
+## 8. Safety and reliability fundamentals
 
 Network automation can apply the same error consistently across many targets, so scale increases both value and risk. The following controls should already be familiar:
 
@@ -680,7 +680,7 @@ Network automation can apply the same error consistently across many targets, so
 
 Concurrency is not merely a performance setting. Fifty simultaneous sessions may overload a management plane, controller, authentication service, or WAN link. Operations touching the same device or shared service may require locking even when the worker platform can execute them in parallel.
 
-## 7. Testing network automation
+## 9. Testing network automation
 
 Tests should be selected according to the boundary they can prove:
 
@@ -695,7 +695,7 @@ Tests should be selected according to the boundary they can prove:
 
 Tests become more expensive and realistic toward the bottom of the table. A sound strategy runs many fast offline tests and a smaller number of controlled system tests. A live production target should not be the first place a predictable parser, validation, or error-handling defect is discovered.
 
-## 8. Where ad hoc automation reaches its limit
+## 10. Where ad hoc automation reaches its limit
 
 The transition below groups the capabilities added around an existing script. Application logic remains useful; each step removes a different dependency on the original author's workstation or memory.
 
@@ -719,7 +719,7 @@ An individual automation script can be technically correct and still be difficul
 
 These are delivery problems, not failures of Python, Ansible, or the API. Adding more application logic does not solve them. The team needs practices around the automation.
 
-## 9. How DevOps improves network automation
+## 11. How DevOps improves network automation
 
 DevOps practices developed in software engineering provide a disciplined path from useful automation to an operable product.
 
@@ -740,7 +740,7 @@ DevOps practices developed in software engineering provide a disciplined path fr
 
 The important shift is from automating an action to engineering a delivery system. Python and Ansible remain valuable implementation tools. APIs remain the interfaces. DevOps supplies the collaborative process, reproducible runtime, validation gates, artifact lineage, controlled promotion, operational feedback, and security boundaries around them.
 
-## 10. High-level DevOps application areas
+## 12. High-level DevOps application areas
 
 The remainder of this course applies DevOps in the following areas:
 
@@ -757,7 +757,7 @@ The remainder of this course applies DevOps in the following areas:
 
 Not every automation project requires Kubernetes, microservices, or continuous deployment. DevOps maturity is demonstrated by choosing controls that fit the risk and operating model, not by maximizing the number of products in the architecture.
 
-## Practical transition example
+## 13. Practical transition example
 
 Consider a Python program that reads inventory, retrieves operational data through an API, evaluates policy, and writes a report. One engineer currently runs it every Monday from a virtual environment.
 
@@ -776,7 +776,7 @@ The first DevOps iteration does not need to redesign it as microservices. A sens
 
 The application's network logic has not fundamentally changed. Its delivery and operating model has. Another qualified engineer can now review, reproduce, execute, diagnose, and improve it without depending on undocumented knowledge.
 
-## Readiness check
+## 14. Readiness check
 
 Before continuing to Module 1, learners should be able to answer these questions:
 
@@ -793,7 +793,7 @@ Before continuing to Module 1, learners should be able to answer these questions
 11. How do model-driven network telemetry and OpenTelemetry complement one another?
 12. Which production controls must be added around a basic Flask API?
 
-## Summary
+## 15. Summary
 
 CCNA-level network automation provides the technical foundation: Python, structured data, Git, CLI and API interfaces, models, Ansible, infrastructure tooling, telemetry, security, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries; Ansible, Terraform, Puppet, and Chef address different aspects of orchestration and infrastructure lifecycle. Those skills answer how to build and automate a task. DevOps addresses the broader question of how a team develops, tests, packages, releases, observes, secures, and improves the automation as software.
 

@@ -1,12 +1,12 @@
 # Module 9: Securing DevOps Workflows and Examining Deployment Architectures
 
-## Purpose
+## 1. Purpose
 
 This module secures the complete DevOps workflow and examines the architecture choices around it. It covers repository and pipeline security, secrets, runners, application and container controls, supply-chain integrity, audit, microservices, synchronous and asynchronous interaction, and public, private, hybrid, and multicloud deployment considerations.
 
 Module 8 showed how identities and correlation data connect an operational event to a release. Module 9 applies that traceability to trust: source, runner, artifact, credential, management path, runtime, and evidence all require protection. The architecture choices examined here prepare the decision about whether Kubernetes is justified in Module 10.
 
-## DevOps trust boundaries
+## 2. DevOps trust boundaries
 
 The architecture separates repository-controlled validation from privileged deployment and preserves an independent audit path.
 
@@ -16,7 +16,7 @@ The architecture separates repository-controlled validation from privileged depl
 
 Crossing a boundary requires authenticated identity, authorized purpose, encrypted transport, input validation, controlled output, and audit evidence.
 
-## Security throughout delivery
+## 3. Security throughout delivery
 
 Security should operate from design through retirement:
 
@@ -30,7 +30,7 @@ Security should operate from design through retirement:
 
 Moving a final security review earlier can find defects sooner, but early checks do not replace runtime protection and operational response.
 
-## Threat modelling a NetDevOps workflow
+## 4. Threat modelling a NetDevOps workflow
 
 Typical network automation workflows contain several trust boundaries:
 
@@ -44,7 +44,7 @@ Typical network automation workflows contain several trust boundaries:
 
 For each boundary, identify authentication, authorization, encryption, input validation, logging, failure behavior, and credential scope.
 
-### Assets and threats
+### 4.1 Assets and threats
 
 | Asset | Example threat | Control direction |
 |---|---|---|
@@ -56,7 +56,7 @@ For each boundary, identify authentication, authorization, encryption, input val
 | Network management plane | Unauthorized access or lateral movement | Firewall, AAA, RBAC, protocol security, audit |
 | Evidence | Exposure or alteration of configuration and topology | Encryption, access control, integrity, retention policy |
 
-## Secrets management
+## 5. Secrets management
 
 Short-lived credentials have a lifecycle tied to workload identity and job scope.
 
@@ -78,7 +78,7 @@ Good secret handling includes:
 
 Vault can issue or store training credentials, while GitLab protected variables can supply selected jobs. Kubernetes Secrets provide an API object and distribution mechanism, but their confidentiality depends on cluster encryption, RBAC, node security, and application handling.
 
-### Network credential types
+### 5.1 Network credential types
 
 - SSH private keys and known-hosts trust
 - Device usernames and passwords
@@ -93,7 +93,7 @@ Host-key and TLS validation protect endpoint identity. A secret sent to an impos
 
 Prefer a dedicated automation identity with command authorization or API permissions limited to the intended configuration domain. A read-only collector should use a separate identity from the deployment worker.
 
-## Pipeline security
+## 6. Pipeline security
 
 The pipeline is a privileged software system. Threats include a malicious dependency, compromised runner, altered pipeline file, exposed variable, poisoned cache, substituted image, or unauthorized promotion.
 
@@ -112,13 +112,13 @@ Controls include:
 
 Scan results need policy. The team should define which findings block a merge, which require review, and how a temporary exception expires.
 
-### Git security
+### 6.1 Git security
 
 Protect the default branch, require merge requests, restrict force pushes, and require successful pipelines. Changes to `.gitlab-ci.yml`, container definitions, credential integrations, inventory, and deployment roles deserve designated reviewers.
 
 A reviewer should inspect semantic intent, not merely approve a familiar author. A small YAML change can advertise the wrong prefix to the entire routing domain.
 
-### Runner security
+### 6.2 Runner security
 
 The protected runner should:
 
@@ -134,7 +134,7 @@ The protected runner should:
 
 Runner registration and authentication tokens are sensitive. Rotating device credentials does not repair a runner that remains compromised.
 
-## Compromised-runner scenario
+## 7. Compromised-runner scenario
 
 Contain access before rebuilding the execution environment.
 
@@ -159,21 +159,21 @@ Containment disables the runner, blocks new jobs, removes its network route, rev
 
 No pipeline setting makes a privileged runner harmless. Architecture must assume that a boundary can fail.
 
-## Secure protocol use
+## 8. Secure protocol use
 
-### SSH
+### 8.1 SSH
 
 Use modern algorithms supported by organizational policy, validate host keys, restrict service-account commands, and protect private keys. Do not automatically trust a new key during a deployment job.
 
-### NETCONF
+### 8.2 NETCONF
 
 NETCONF over SSH inherits SSH authentication and host identity requirements. Validate capabilities and RPC errors. Limit the account to required datastores or configuration domains where the platform supports it.
 
-### RESTCONF and controller APIs
+### 8.3 RESTCONF and controller APIs
 
 Validate TLS certificates and hostnames. Limit tokens by scope and lifetime. Do not place tokens in URLs. Handle redirect, proxy, and debug logging behavior carefully. Rate-limit clients and distinguish authorization failure from a transient platform error.
 
-## Application security
+## 9. Application security
 
 The application should validate untrusted input, encode output for its context, use parameterized database operations, enforce authorization on the server, and protect sessions or tokens.
 
@@ -181,7 +181,7 @@ TLS protects data in transit when certificate identity and trust are validated. 
 
 Logs and error responses should provide enough context for support without exposing internal secrets or sensitive data.
 
-## Container and orchestrator security
+## 10. Container and orchestrator security
 
 Container controls include trusted base images, non-root execution, removed capabilities, read-only filesystems, controlled mounts, resource limits, and restricted network access.
 
@@ -189,7 +189,7 @@ Kubernetes adds RBAC, service accounts, namespaces, network policy, security con
 
 The Kubernetes deployment worker should use a service account with only the required secret reference and job permissions. NetworkPolicy should permit the worker to reach approved management endpoints while blocking the API and dashboard services from direct device access.
 
-## Modern application architecture
+## 11. Modern application architecture
 
 A modern application often separates user interface, APIs, background processing, data services, and platform integrations. It may use containers and managed services, but the architecture should follow requirements rather than fashion.
 
@@ -206,7 +206,7 @@ Important qualities include:
 
 The twelve-factor application principles provide useful guidance for configuration, backing services, build and run separation, disposable processes, environment parity, logs, and administrative tasks. Teams should apply the principles according to the system's actual needs.
 
-## Microservices
+## 12. Microservices
 
 Microservices divide a system into independently deployable services aligned with bounded responsibilities. Potential benefits include independent release, targeted scaling, fault isolation, and team ownership.
 
@@ -214,19 +214,19 @@ Costs include distributed transactions, network failure, version compatibility, 
 
 Service boundaries should follow ownership and data behavior. Splitting code into containers without independent responsibility creates a distributed monolith.
 
-## Synchronous and asynchronous interaction
+## 13. Synchronous and asynchronous interaction
 
 Synchronous APIs provide immediate responses but couple availability and latency between services. Asynchronous messaging can absorb bursts and reduce temporal coupling, but it introduces eventual consistency, duplicate delivery, ordering questions, and message lifecycle management.
 
 Consumers should handle duplicate messages safely. Producers and consumers need compatible schema evolution. Operational evidence should expose queue delay and failed-message behavior.
 
-## Public, private, and hybrid deployments
+## 14. Public, private, and hybrid deployments
 
 A private environment can provide direct control, locality, and integration with existing systems. Public cloud can provide rapid provisioning, managed services, geographic options, and consumption-based scaling. Neither model is inherently safer or cheaper in every case.
 
 A mixed deployment may be described as hybrid or multicloud depending on whether it combines private and public environments or uses services from multiple public providers. The design should state the actual placement and dependency model rather than rely on the label.
 
-## Multicloud design considerations
+## 15. Multicloud design considerations
 
 Evaluate:
 
@@ -243,13 +243,13 @@ Evaluate:
 
 Using only common-denominator services can reduce provider dependence but may sacrifice valuable managed capabilities. An abstraction layer also becomes software that the team must own.
 
-## Network platform role
+## 16. Network platform role
 
 Networking, security, observability, and controller platforms can connect application and infrastructure domains. APIs and policy systems can participate in controlled workflows, while telemetry can supply network context for application behavior.
 
 Automation must respect controller ownership and transactional behavior. Direct device changes that bypass the system of record can create conflict and drift.
 
-## Architecture decision records
+## 17. Architecture decision records
 
 An architecture decision record captures the decision, context, considered options, consequences, and status. Useful project decisions include:
 
@@ -262,13 +262,13 @@ An architecture decision record captures the decision, context, considered optio
 
 Recording decisions prevents future maintainers from treating deliberate constraints as accidental choices.
 
-### Practical control chain for a protected deployment
+### 17.1 Practical control chain for a protected deployment
 
 A merge request that changes `.gitlab-ci.yml`, deployment policy, or secret-retrieval code requires review from the platform or security owner. After merge, an unprivileged runner builds and scans the image without a route to managed infrastructure. A protected job exchanges its workload identity for a short-lived credential, verifies the approved image digest, runs on a restricted runner, and loses the credential when the job ends. Repository approval, artifact signature, workload identity, network segmentation, and audit logging protect different boundaries; none is a substitute for the others.
 
 This design also narrows incident response. If the general runner is compromised, revoke its registry and source access without rotating every device credential. If the protected runner is compromised, stop deployment jobs, revoke the workload identity, preserve runner and secret-service audit logs, and treat any job executed during the exposure window as untrusted.
 
-## Knowledge check
+## 18. Knowledge check
 
 1. Why does masking a pipeline variable not provide complete secret protection?
 2. Which repository changes deserve stricter ownership or review?
@@ -276,7 +276,7 @@ This design also narrows incident response. If the general runner is compromised
 4. Which factors influence workload placement across private and public environments?
 5. Why should the team document tool ownership of infrastructure settings?
 
-## Summary
+## 19. Summary
 
 Security depends on an unbroken chain of controls across source, build, artifact, identity, runner, runtime, and evidence. Short-lived credentials and segmentation reduce impact, while protected reviews and signed digests preserve intent and artifact identity. Microservices and multicloud are architectural choices, not maturity badges; adopt them only when their isolation, ownership, placement, or resilience benefits justify the additional failure modes.
 

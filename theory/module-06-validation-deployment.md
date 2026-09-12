@@ -1,12 +1,12 @@
 # Module 6: Validating the Build and Improving the Deployment Flow
 
-## Purpose
+## 1. Purpose
 
 Passing unit tests does not prove that an application image is deployable or that a release produces the intended operational outcome. This module covers build validation, infrastructure validation, pre-deployment health checks, deployment strategies, post-deployment testing, idempotence, failure classification, rollback, remediation, and improved deployment flow. The principles apply to software deployment generally. Existing network tests supply one set of domain-specific acceptance evidence for the course application.
 
 Module 5 built the pipeline and its trust zones. Module 6 strengthens the promotion decision by asking what state existed before deployment, what actually changed, whether the service converged, and how recovery should proceed. Those controls require reliable environments, which Module 7 will define as code.
 
-## Three forms of state in an automation application
+## 2. Three forms of state in an automation application
 
 The automation application is assumed to know how to collect and interpret these states. This course uses them as deployment acceptance evidence and concentrates on when the pipeline collects them, how it evaluates them, and which result permits promotion or triggers recovery.
 
@@ -24,7 +24,7 @@ The loop below shows why stored configuration is an intermediate result. Operati
 
 The three states can disagree. A template may correctly represent intent while the device rejects part of it. The device may accept every command while the SVI stays down. The SVI may come up while the test peer never learns the route. A complete pipeline compares all three.
 
-## Network change state machine
+## 3. Network change state machine
 
 Timeout and partial outcomes leave the normal promotion path rather than being treated as safe failures.
 
@@ -34,7 +34,7 @@ Timeout and partial outcomes leave the normal promotion path rather than being t
 
 An `UNKNOWN/PARTIAL` state is important. A timeout after sending configuration does not prove that nothing changed. The workflow must collect current state before retrying.
 
-## Evidence chain
+## 4. Evidence chain
 
 A release should accumulate evidence as it moves through the pipeline:
 
@@ -42,7 +42,7 @@ The evidence chain begins with source review and continues through static checks
 
 Each result should identify the source commit, artifact, pipeline, and target environment. This traceability supports approval, troubleshooting, and audit.
 
-## Build validation
+## 5. Build validation
 
 Build validation confirms that the repository produces the expected artifact under controlled conditions. It may include:
 
@@ -57,7 +57,7 @@ Build validation confirms that the repository produces the expected artifact und
 
 A successful build should not depend on files that exist only on a developer workstation.
 
-## Infrastructure validation
+## 6. Infrastructure validation
 
 Infrastructure definitions need their own controls:
 
@@ -72,7 +72,7 @@ Infrastructure definitions need their own controls:
 
 The plan is evidence, not approval by itself. Reviewers must understand the target and the meaning of the proposed actions.
 
-## Pre-deployment health checks
+## 7. Pre-deployment health checks
 
 Before a release changes an environment, verify that the environment is safe to change. Useful checks include:
 
@@ -88,7 +88,7 @@ Before a release changes an environment, verify that the environment is safe to 
 
 Deploying into an already degraded environment can make diagnosis and recovery harder.
 
-### Example pre-check set for a routing-service scenario
+### 7.1 Example pre-check set for a routing-service scenario
 
 | Check | Reason | Blocking condition |
 |---|---|---|
@@ -105,7 +105,7 @@ Deploying into an already degraded environment can make diagnosis and recovery h
 
 Thresholds must be policy, not arbitrary constants hidden in code.
 
-## Configuration generation and diff
+## 8. Configuration generation and diff
 
 The pipeline loads the reviewed YAML intent, validates it, normalizes addresses, and renders platform-specific configuration. A Jinja2 fragment might be:
 
@@ -127,31 +127,31 @@ Filters and exact syntax depend on the rendering environment and target network 
 
 The proposed diff must identify additions, removals, replacements, and unexpected lines. Review should assess protocol effect, device count, configuration section, and recovery path rather than only line count.
 
-## Deployment interfaces and transactions
+## 9. Deployment interfaces and transactions
 
-### SSH CLI
+### 9.1 SSH CLI
 
 CLI automation may enter configuration commands and collect output. It needs prompt handling, timeouts, error-pattern detection, and post-write verification. Command echo does not prove configuration acceptance.
 
-### NETCONF
+### 9.2 NETCONF
 
 NETCONF exchanges capabilities and structured RPCs. Where supported, candidate configuration and `validate`, confirmed commit, or rollback-on-error can improve transaction safety. Capabilities vary, so the client must inspect the server response rather than assume support.
 
-### RESTCONF
+### 9.3 RESTCONF
 
 RESTCONF exposes YANG-modeled data through HTTP. The client must construct the correct resource path, content type, method, and payload for the device release. It should validate TLS, distinguish HTTP errors from YANG errors, and read state back after modification.
 
-### Ansible
+### 9.4 Ansible
 
 Ansible can coordinate modules, templates, backups, and assertions across devices. Check and diff modes are useful only when the selected module and platform support them accurately. Review collection documentation and test behavior.
 
-## Scoped deployment controls
+## 10. Scoped deployment controls
 
 The change job should require an explicit environment, site, and device limit. It verifies inventory fingerprint, device identity, change ID, commit, approved diff hash, and automation image digest.
 
 For multiple branches, use a canary and bounded batches. Stop when failure rate, protocol convergence, or telemetry crosses policy. Do not launch the maximum parallelism simply because the tool supports it.
 
-### Network blast-radius framework
+### 10.1 Network blast-radius framework
 
 Blast radius is multidimensional. Count devices, but also identify routing domains, redundancy pairs, controller scopes, tenants, sites, services, and management dependencies. Changing two route reflectors in the same cluster can be riskier than changing ten independent access switches.
 
@@ -166,7 +166,7 @@ Blast radius is multidimensional. Count devices, but also identify routing domai
 
 Stop conditions must be machine-readable where possible: identity mismatch, unhealthy baseline, unexpected diff, excessive target count, lost management access, convergence timeout, new critical logs, increased packet loss, or failure of an unaffected-service check.
 
-## Network post-checks
+## 11. Network post-checks
 
 Post-checks should compare the new state with both intent and baseline:
 
@@ -183,7 +183,7 @@ Post-checks should compare the new state with both intent and baseline:
 
 Some checks need a convergence window. Poll with a bounded timeout and preserve intermediate observations. A fixed long sleep wastes time and hides convergence behavior.
 
-## pyATS and Genie validation
+## 12. pyATS and Genie validation
 
 pyATS provides a test framework, while Genie parsers convert supported device output into structured data. A testbed file defines devices and connection details, with secrets supplied externally.
 
@@ -214,7 +214,7 @@ class VerifyRouting(aetest.Testcase):
 
 Production code needs robust structured traversal, explicit expected neighbor identity, meaningful failure evidence, and parser-error handling. Tests should distinguish unavailable parser support from an absent network state.
 
-## Applied failure scenario: configuration accepted, routing service fails
+## 13. Applied failure scenario: configuration accepted, routing service fails
 
 <p align="center">
   <img src="assets/diagrams/ospf-failure-response.svg" alt="Decision flow after a device accepts configuration but OSPF or reachability validation fails" width="640" />
@@ -238,7 +238,7 @@ The pipeline must fail the release and stop promotion. Possible causes include M
 5. Otherwise preserve the change state, mark the environment unhealthy, and remediate the peer under a separate controlled action.
 6. Run the full post-check suite again.
 
-## Deployment strategies
+## 14. Deployment strategies
 
 Application deployment names are useful only after translating them into network control mechanisms:
 
@@ -250,29 +250,29 @@ Application deployment names are useful only after translating them into network
 | Feature flag | Pre-stage configuration and activate a controlled policy/object later | Prevent stale dormant configuration and audit activation ownership |
 | Recreate | Remove and replace a disposable lab service or virtual appliance | Rarely appropriate for a shared physical router or switch |
 
-### Recreate
+### 14.1 Recreate
 
 Stop the old version and start the new version. This is simple but normally creates interruption. It may suit a training or low-criticality environment.
 
-### Rolling update
+### 14.2 Rolling update
 
 Replace instances gradually while some old instances remain available. The application and schema must tolerate temporary version overlap.
 
-### Blue-green
+### 14.3 Blue-green
 
 Run old and new environments in parallel, validate the new environment, then switch traffic. Recovery can be fast if the old environment remains intact. The approach needs additional capacity and careful data handling.
 
-### Canary
+### 14.4 Canary
 
 Send a small portion of traffic to the new version and compare behavior before increasing exposure. Canary analysis needs reliable metrics and a clear decision policy.
 
-### Feature control
+### 14.5 Feature control
 
 Deploy code with a feature disabled, then enable it for selected users or environments. This separates deployment from feature exposure but adds configuration lifecycle and cleanup work.
 
 No strategy removes risk. Database changes, external side effects, stateful protocols, and long-running work need special handling.
 
-## Post-deployment validation
+## 15. Post-deployment validation
 
 Deployment success means more than a command returning zero. Validation should proceed from cheap technical checks to meaningful service behavior:
 
@@ -287,19 +287,19 @@ Synthetic transactions should use isolated test data and safe cleanup.
 
 For a network change, replace an application-only `HTTP 200` test with layered evidence: confirm the stored configuration, interface state, protocol adjacency, expected and forbidden routes, next hop, forwarding path, loss and latency, device resources, new errors, and unaffected baseline services. The selected checks must derive from intent rather than from whatever commands are convenient to collect.
 
-## Smoke, integration, and acceptance checks
+## 16. Smoke, integration, and acceptance checks
 
 A smoke test answers whether basic critical behavior works. An integration check examines a component boundary. An acceptance test evaluates a user or business outcome.
 
 The pipeline needs a compact set that completes quickly while detecting common release failures. Broader tests can run in the on-demand environment or on a schedule.
 
-## Idempotence and repeatability
+## 17. Idempotence and repeatability
 
 An idempotent operation reaches the same intended state when repeated. It does not mean the operation performs no work or produces identical logs. Deployment scripts should inspect current state and change only what is required.
 
 Repeatability matters when a job is retried after an uncertain failure. The workflow should avoid duplicating resources or corrupting state.
 
-## Failure handling
+## 18. Failure handling
 
 The pipeline should stop at the failing boundary and preserve evidence. Cleanup should remove disposable resources without hiding the original error.
 
@@ -311,11 +311,11 @@ Different failures need different responses:
 - A failed health check may require rollback or investigation.
 - A partially applied infrastructure change requires state inspection before retry.
 
-### Practical failure: a healthy container with an incompatible dependency
+### 18.1 Practical failure: a healthy container with an incompatible dependency
 
 Assume the new API container starts and its liveness probe passes, but workers fail when reading jobs created by the previous version. The deployment platform sees a running process; users see stalled automation. The post-deployment check must therefore submit a representative job and verify its terminal state, not merely call `/health`. If the database change is backward compatible, shift traffic back to the previous image and investigate. If the migration is irreversible, rolling back the image may make matters worse; stop promotion, preserve the queue and schema evidence, and use the documented forward-remediation path.
 
-## Rollback and remediation
+## 19. Rollback and remediation
 
 Recovery begins with causality and reversibility, not with an automatic rollback command.
 
@@ -340,13 +340,13 @@ Forward remediation applies a new corrective change. Teams often need both optio
 
 Test recovery before an incident. An undocumented rollback command that no one has exercised is only a hypothesis.
 
-## Improved deployment flow
+## 20. Improved deployment flow
 
 An improved flow uses an on-demand environment, immutable artifact, automatic health checks, and controlled promotion:
 
 The improved flow validates the merge request, builds the image once, creates a test environment, deploys the image digest, runs system tests, collects evidence, and removes the test environment. Approval then promotes the same digest for final verification and observation.
 
-## Knowledge check
+## 21. Knowledge check
 
 1. What information connects a post-deployment test to the source change it validates?
 2. Why should a pipeline inspect environment health before changing it?
@@ -354,7 +354,7 @@ The improved flow validates the merge request, builds the image once, creates a 
 4. Why might database migration prevent a simple rollback?
 5. When is retrying a failed operation unsafe?
 
-## Summary
+## 22. Summary
 
 Deployment succeeds only when the intended service works, not when a tool reports that an update was accepted. The pipeline must connect source, artifact, target, rollout, and operational evidence; distinguish retryable failures from uncertain or partial changes; and choose rollback only when data and infrastructure remain compatible with the previous release.
 

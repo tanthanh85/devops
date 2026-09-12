@@ -1,12 +1,12 @@
 # Module 7: Extending DevOps to Infrastructure and On-Demand Testing
 
-## Purpose
+## 1. Purpose
 
 Application delivery depends on compute, networking, storage, test platforms, configuration, and access. This module extends version control, review, testing, automation, and evidence to infrastructure. It covers Infrastructure as Code, Terraform, Ansible, ownership boundaries, state, drift, on-demand test environments, pipeline integration, validation, and cleanup.
 
 Module 6 defined the evidence required before and after deployment. Module 7 makes the environment that produces that evidence repeatable. Terraform, Ansible, and Python receive explicit ownership boundaries so the pipeline can create, configure, test, and safely remove an isolated environment. Module 8 will use the resulting application and environment to build operational feedback.
 
-## Three automation responsibilities
+## 2. Three automation responsibilities
 
 <p align="center">
   <img src="assets/diagrams/iac-tool-ownership.svg" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="640" />
@@ -29,7 +29,7 @@ Infrastructure provisioning, device configuration, and custom workflow logic ove
 
 Select the tool that has the clearest ownership and most reliable model for the target. Do not call Terraform, Ansible, and Python against the same configuration object without an explicit handoff.
 
-### Practical tool-selection decisions
+### 2.1 Practical tool-selection decisions
 
 - Use **Terraform** when an API resource has a stable lifecycle, dependency relationships, and a provider that can plan and reconcile it reliably. Avoid it for procedural diagnostics, unsupported device features, or objects also owned by another controller.
 - Use **Ansible** when the work is ordered, human-readable orchestration across inventories and supported network modules express the intended change. Validate module idempotence and check/diff behavior on the actual platform.
@@ -40,7 +40,7 @@ Select the tool that has the clearest ownership and most reliable model for the 
 - Use a **simple protected runner** when jobs are few, sequential, and do not require an always-on API or independent worker pools.
 - Use **Kubernetes** only when platform scheduling, isolation, scale, availability, and an operationally capable cluster team justify its cost.
 
-## Infrastructure as Code
+## 3. Infrastructure as Code
 
 Infrastructure as Code records intended infrastructure in machine-readable files. It provides reviewable change history and repeatable execution. The definition may describe resources declaratively or express a procedural workflow.
 
@@ -55,7 +55,7 @@ IaC benefits include:
 
 IaC does not guarantee correctness. Incorrect code can reproduce an unsafe design consistently.
 
-## Desired state and orchestration
+## 4. Desired state and orchestration
 
 Declarative tools describe the desired result. The tool compares desired state with observed or recorded state and determines actions. Procedural automation specifies operations in order.
 
@@ -63,7 +63,7 @@ Most delivery systems use both. Terraform can create infrastructure resources, w
 
 Ownership must remain clear. Two tools attempting to control the same setting can create oscillation and drift.
 
-## Terraform model
+## 5. Terraform model
 
 Terraform configuration commonly contains:
 
@@ -77,7 +77,7 @@ Terraform configuration commonly contains:
 
 Terraform builds a dependency graph from references and can perform independent operations concurrently.
 
-### Network example
+### 5.1 Network example
 
 Terraform may create a controller-managed tenant policy, cloud network, virtual network-device instance, simulated lab definition through an available provider, or infrastructure supporting the automation platform. Provider maturity and platform API behavior determine suitability.
 
@@ -87,7 +87,7 @@ The test environment contains a management network, a virtual network device, a 
 
 Terraform outputs can generate a sanitized inventory input, but credentials should come from a protected identity system.
 
-## Terraform lifecycle
+## 6. Terraform lifecycle
 
 The normal lifecycle includes:
 
@@ -102,7 +102,7 @@ The normal lifecycle includes:
 
 A plan can become stale when configuration, state, variables, credentials, or real infrastructure changes. Apply should use the reviewed plan artifact within a controlled window.
 
-## State
+## 7. State
 
 Terraform state maps configuration addresses to real resources and stores attributes used for planning. State can contain sensitive values even when configuration marks output as sensitive.
 
@@ -110,7 +110,7 @@ Team use requires a protected remote backend with access control, locking, encry
 
 Before an unusual recovery or import action, inspect the configuration, state, and real platform. Guessing can cause replacement or loss.
 
-## Drift
+## 8. Drift
 
 <p align="center">
   <img src="assets/diagrams/drift-reconciliation.svg" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="640" />
@@ -120,7 +120,7 @@ Drift occurs when real infrastructure differs from the controlled definition. It
 
 A scheduled plan can detect drift. The response depends on ownership and intent: revert the manual change, update code to adopt it, import an existing resource, or investigate a provider difference. Automatically applying every detected change may be unsafe.
 
-## Ansible model
+## 9. Ansible model
 
 Ansible uses inventories, variables, playbooks, roles or collections, and modules. Network automation often connects through SSH or APIs without installing an agent on the managed device.
 
@@ -137,7 +137,7 @@ Useful design practices include:
 - Use handlers for changes that require a restart.
 - Make failure and rollback behavior visible.
 
-### Inventory and variables
+### 9.1 Inventory and variables
 
 An inventory identifies targets and groups. It should separate environment-specific addressing from reusable roles. Group variables can define platform defaults, while host variables define required exceptions.
 
@@ -157,13 +157,13 @@ all:
 
 Do not store the password in this file. The playbook receives a protected runtime credential or uses an approved credential plugin.
 
-### Playbooks, roles, and templates
+### 9.2 Playbooks, roles, and templates
 
 A playbook connects targets and ordered outcomes. A role packages reusable tasks, handlers, templates, defaults, and tests. A Jinja2 template converts normalized intent into platform configuration.
 
 Keep validation separate from rendering. Ansible should fail before device access when an intended object or prefix violates policy. Use `serial` or explicit batching for a controlled rollout. Use `--limit lab-edge-01` or an equivalent pipeline constraint and display the selected hosts before change.
 
-## Provisioning and configuration boundary
+## 10. Provisioning and configuration boundary
 
 Terraform normally owns lifecycle-oriented infrastructure resources. Ansible normally owns configuration within reachable hosts or devices. The exact boundary depends on provider quality and team design.
 
@@ -175,7 +175,7 @@ For an illustrative automation platform:
 - Validation scripts assess the running service.
 - Terraform removes the environment after evidence collection.
 
-## On-demand test environments
+## 11. On-demand test environments
 
 An ephemeral environment has a complete lifecycle, including evidence collection and controlled cleanup after failure.
 
@@ -198,7 +198,7 @@ An on-demand environment gives a branch or merge request an isolated place for i
 
 The environment should resemble the target environment in the characteristics relevant to the test. It does not need production scale for every merge request.
 
-## Network test environment options
+## 12. Network test environment options
 
 | Platform | Strength | Limitation | Suitable course use |
 |---|---|---|---|
@@ -211,7 +211,7 @@ The environment should resemble the target environment in the characteristics re
 
 The course must remain usable without production access. Offline checks and mocks run for every learner. Real-device jobs use an authorized sandbox, virtual lab, or instructor-provided environment.
 
-## Network drift and compliance
+## 13. Network drift and compliance
 
 Configuration drift is a difference between controlled intent and actual configuration. Operational drift is a difference between the expected and observed service state. The two can occur independently.
 
@@ -226,7 +226,7 @@ A scheduled read-only pipeline can collect modeled configuration and operational
 
 Compliance rules should identify ownership, severity, tolerated exceptions, and remediation path. A permanent exception belongs in reviewed policy data, not a hidden `if` statement.
 
-## Pipeline integration
+## 14. Pipeline integration
 
 A safe infrastructure pipeline separates responsibilities:
 
@@ -234,7 +234,7 @@ The infrastructure pipeline formats and validates the definitions, applies polic
 
 Cleanup should run when tests fail, but it must target only the environment created for the pipeline. Store the exact environment identifier as an artifact. Avoid a wildcard cleanup operation.
 
-### Practical ownership boundary: Terraform hands off to Ansible
+### 14.1 Practical ownership boundary: Terraform hands off to Ansible
 
 The handoff is a machine-readable inventory artifact, making the ownership boundary visible.
 
@@ -246,13 +246,13 @@ Consider an on-demand test environment. Terraform creates the isolated network, 
 
 Before `apply`, a policy job can reject a plan that creates a public address or opens a management port to `0.0.0.0/0`. Before cleanup, the job compares the recorded environment identifier and ownership tags with current state. A missing or mismatched tag is a stop condition, not a reason to broaden the destroy command.
 
-## Secrets and access
+## 15. Secrets and access
 
 Infrastructure jobs often hold powerful credentials. Use separate identities for planning, applying, configuration, and deployment when practical. Restrict each identity to the target environment and required operations.
 
 Prefer short-lived credentials issued to the job. Protect state, plans, logs, and artifacts because they may expose addresses, identifiers, or sensitive values.
 
-## Infrastructure testing
+## 16. Infrastructure testing
 
 Testing can include:
 
@@ -268,13 +268,13 @@ Testing can include:
 
 Independent verification is valuable. A tool reporting successful apply confirms API operations, but it does not prove that users can reach the service or that the security policy works as intended.
 
-## Network platform considerations
+## 17. Network platform considerations
 
 Controllers and network devices may expose declarative APIs, model-driven interfaces, and Ansible or Terraform integrations. Before automation, determine object hierarchy, transaction behavior, eventual consistency, rate limits, and rollback capability.
 
 Shared network infrastructure requires strict target validation and change scoping. A sandbox, simulator, or dedicated training environment is appropriate for learning destructive lifecycle operations.
 
-## Knowledge check
+## 18. Knowledge check
 
 1. Why should Terraform state not be committed to Git?
 2. What should a reviewer inspect in a Terraform plan?
@@ -282,7 +282,7 @@ Shared network infrastructure requires strict target validation and change scopi
 4. Why must cleanup use the exact environment identifier created by the pipeline?
 5. What evidence proves more than a successful infrastructure API response?
 
-## Summary
+## 19. Summary
 
 Infrastructure delivery needs the same review and evidence discipline as application delivery, but state and ownership make mistakes harder to reverse. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, plans must be reviewed as proposed changes, state must be protected, and cleanup must prove ownership before destroying anything.
 

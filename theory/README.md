@@ -1,12 +1,12 @@
 # Implementing DevOps Solutions and Practices using Cisco Platforms (DevOps) v1.0
 
-## Study guide purpose
+## 1. Study guide purpose
 
 This independent five-day study guide follows the scope and sequence of **Implementing DevOps Solutions and Practices using Cisco Platforms (DevOps) v1.0**. It is not an official Cisco publication. The subject is DevOps for software delivery: container packaging, multitier deployment, GitLab CI/CD, automated testing, Infrastructure as Code, on-demand environments, observability, security, multicloud design, and Kubernetes. A network automation application provides a familiar lab workload, but the practices apply to software applications generally.
 
 The guide is intended for network and infrastructure professionals who can already automate technical work but have not yet turned that automation into a dependable software delivery system.
 
-## Prerequisite knowledge
+## 2. Prerequisite knowledge
 
 Learners should have completed, or possess knowledge equivalent to:
 
@@ -17,13 +17,13 @@ The course assumes that learners can write Python scripts, build Ansible playboo
 
 DevOps closes that gap by applying practices that software teams have refined over many years: shared source control, peer review, reproducible builds, automated tests, immutable artifacts, controlled promotion, observability, security throughout the lifecycle, and rapid feedback from operation. The course does not reteach Python, Ansible, API, YANG, or network-programmability fundamentals. It teaches learners how to engineer, release, and operate the resulting software as a team.
 
-## Course outcome
+## 3. Course outcome
 
 Learners take an existing Python application and progressively turn it into a controlled software delivery solution. The supplied application happens to perform network automation, allowing learners to reuse their domain knowledge without spending the course rebuilding the automation logic. One evolving repository is used throughout the five days. Learners containerize the application, deploy supporting services, build a GitLab pipeline, automate tests and releases, provision test infrastructure, add monitoring and logging, secure the workflow, and evaluate Kubernetes deployment.
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
-## Five-day distribution
+## 4. Five-day distribution
 
 The course allocates approximately 20 hours to theory and 20 hours to cumulative lab work. Module 0 is a prerequisite review and transition into the main course; it can be assigned as pre-reading or taught selectively at the start of Day 1. Installation occupies the first lab block.
 
@@ -35,7 +35,7 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 | 4 | Infrastructure DevOps, on-demand test environments, monitoring, and visibility | Provision an isolated test environment; integrate Ansible/Terraform; add logs, metrics, dashboards, and alerts | 4 h | 4 h |
 | 5 | Secure workflows, multicloud and application architectures, Kubernetes, and Kubernetes visibility | Secure the pipeline; compare deployment architectures; deploy and monitor the application on Kubernetes when justified | 4 h | 4 h |
 
-## Modules
+## 5. Modules
 
 | Module | Subject | Central engineering question |
 |---|---|---|
@@ -51,7 +51,7 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 | 9 | [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md) | How are secrets, pipelines, application architecture, and public/private cloud placement secured? |
 | 10 | [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md) | How are applications deployed, updated, secured, and observed with Kubernetes? |
 
-## Learning outcomes
+## 6. Learning outcomes
 
 After completing the guide and labs, learners should be able to:
 
