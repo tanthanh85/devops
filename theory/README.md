@@ -23,6 +23,8 @@ Learners take an existing Python application and progressively turn it into a co
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
+Each module resolves a problem exposed by the preceding one. The automation review identifies uncontrolled state and individual execution. Infrastructure as Code establishes declared ownership and repeatable environments. The DevOps model generalizes those controls into shared flow and feedback. Application packaging creates the identified artifact and runtime contracts needed by that model. CI/CD turns the contracts into an executable promotion and validation policy. Security and observability protect the resulting system and return operational evidence to the next planning decision.
+
 ## 4. Course reference scenario
 
 The course follows a network engineering team as it turns an existing Python automation utility into an operated software service. Reviewed intent enters through GitLab. An unprivileged validation runner checks schema and policy, runs tests, renders a candidate, builds and scans an image, and records its digest. After approval, a protected worker obtains a short-lived credential, reaches only the named targets, performs pre-checks, executes the approved change, verifies operational state, and retains evidence. Telemetry then informs promotion, recovery, and subsequent improvement.
@@ -50,13 +52,13 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 | Day | Theory aligned to the DEVOPS outline | Reference system at the end of the day | Theory | Lab |
 |---|---|---|---:|---:|
-| 1 | Network automation review and the DevOps model | Installed environment; supplied automation application reviewed as a software product; delivery risks and lifecycle controls identified | 4 h | 4 h |
-| 2 | Application packaging, Docker, Compose, and Kubernetes | Locked non-root image; multitier service deployed with explicit networks, health contracts, state, and an orchestration decision | 4 h | 4 h |
-| 3 | Infrastructure as Code and on-demand environments | Disposable environment with explicit Terraform, Ansible, and Python ownership, protected state, validation, and cleanup | 4 h | 4 h |
+| 1 | Network automation review and Infrastructure as Code foundations | Installed environment; automation foundations refreshed; Terraform, Ansible, and Python ownership established | 4 h | 4 h |
+| 2 | DevOps model, container fundamentals, and secure image packaging | Delivery risks and lifecycle controls identified; application packaged as a locked, non-root image | 4 h | 4 h |
+| 3 | Multitier application operation, Kubernetes, and on-demand environment integration | Application deployed with explicit networks, health contracts, state, and an orchestration decision in a controlled environment | 4 h | 4 h |
 | 4 | CI/CD, automated qualification, deployment validation, and recovery | GitLab pipeline that builds once, promotes by digest, controls protected execution, verifies operational outcomes, and retains evidence | 4 h | 4 h |
 | 5 | Security and observability | Trust boundaries and short-lived identity applied; application, delivery, platform, and network signals correlated for detection, response, and improvement | 4 h | 4 h |
 
-The repository grows with the system. Day 1 establishes application source and tests; Day 2 adds container, Compose, and optional Kubernetes definitions; Day 3 adds infrastructure definitions and environment lifecycle; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
+The repository grows with the system. Day 1 establishes application source, tests, and infrastructure definitions; Day 2 adds delivery controls and container packaging; Day 3 adds Compose, optional Kubernetes definitions, and on-demand environment integration; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
 
 ```text
 network-devops/
@@ -78,14 +80,14 @@ network-devops/
 
 ## 6. Modules
 
-The modules follow the requested learning sequence: review the automation foundation, introduce the DevOps model, package and operate the application, define infrastructure as code, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
+The modules follow the requested learning sequence: review the automation foundation, establish Infrastructure as Code, introduce the DevOps model, package and operate the application, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
 
 | Module | Subject | Central engineering question |
 |---|---|---|
 | 0 | [Network Automation Review and the Path to DevOps](module-00-network-automation-review.md) | Which automation foundations do learners already have, and how does DevOps turn them into a dependable team delivery system? |
-| 1 | [Introducing the DevOps Model](module-01-devops-model.md) | How do DevOps philosophy, flow, feedback, measurement, and shared ownership improve software delivery? |
-| 2 | [Packaging and Operating Applications](module-02-packaging-applications.md) | How is one application packaged, composed into a service, and operated with Docker, Compose, and Kubernetes? |
-| 3 | [Infrastructure as Code and On-Demand Environments](module-03-infrastructure-as-code.md) | How do Terraform, Ansible, Python, and pipelines create and govern controlled infrastructure? |
+| 1 | [Infrastructure as Code and On-Demand Environments](module-01-infrastructure-as-code.md) | How do Terraform, Ansible, Python, and pipelines create and govern controlled infrastructure? |
+| 2 | [Introducing the DevOps Model](module-02-devops-model.md) | How do DevOps philosophy, flow, feedback, measurement, and shared ownership improve software delivery? |
+| 3 | [Packaging and Operating Applications](module-03-packaging-applications.md) | How is one application packaged, composed into a service, and operated with Docker, Compose, and Kubernetes? |
 | 4 | [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md) | How does GitLab CI convert source into a tested artifact, deploy it safely, verify the outcome, and support recovery? |
 | 5 | [Security and Observability](module-05-security-observability.md) | How are delivery boundaries protected and correlated evidence used to operate and improve the system? |
 
@@ -94,12 +96,12 @@ The modules follow the requested learning sequence: review the automation founda
 After completing the guide and labs, learners should be able to:
 
 - Relate existing Python, Ansible, API, structured-data, and network-validation knowledge to a controlled software delivery lifecycle.
+- Apply DevOps principles to infrastructure and create on-demand test environments with Terraform and Ansible.
 - Describe DevOps philosophy and practices and apply them to operational delivery challenges.
 - Explain container architecture and use Docker tooling.
 - Package an existing Python application into a secure container image.
 - Use container networking and Compose to deploy a multitier application.
 - Explain Kubernetes building blocks, APIs, manifests, deployment automation, multidata-center considerations, monitoring, and logging.
-- Apply DevOps principles to infrastructure and create on-demand test environments with Terraform and Ansible.
 - Explain CI/CD concepts and implement a GitLab pipeline that builds, tests, and deploys applications.
 - Automate build and deployment validation and improve the deployment flow with health checks, controlled promotion, and recovery.
 - Implement metric and log collection, dashboards, analysis, alerts, and application instrumentation.

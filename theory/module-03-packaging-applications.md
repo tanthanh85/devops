@@ -1,10 +1,10 @@
-# Module 2: Packaging and Operating Applications
+# Module 3: Packaging and Operating Applications
 
 ## 1. Purpose
 
-A reproducible application release needs more than a container image. The image must be constructed from controlled inputs, deployed with its supporting services, operated across explicit network and trust boundaries, and placed on an orchestration platform only when the workload justifies that complexity. This module develops those decisions as one connected architecture.
+Module 2 established that a release should promote one identified artifact through increasingly protected environments. Module 3 defines that artifact and the runtime system around it. A container image captures code and fixed dependencies, but a dependable application also needs external configuration, secrets, storage, networking, health behavior, service contracts, and an operating platform.
 
-Module 1 established the DevOps delivery model. Module 2 applies that model to the application runtime: first defining the container boundary, then producing a secure image, composing a multitier service, and finally evaluating Kubernetes for clustered operation. The same identified artifact moves through every stage; only configuration, identity, scale, and platform controls change.
+Module 1 established repeatable infrastructure lifecycle and Module 2 introduced the DevOps delivery model. Module 3 applies those foundations to the application runtime: first defining the container boundary, then producing a secure image, composing a multitier service, and finally evaluating Kubernetes for clustered operation. The same identified artifact moves through every stage; only configuration, identity, scale, and platform controls change.
 
 ## 2. Container runtime fundamentals
 
@@ -366,7 +366,7 @@ The evidence-lineage view asks whether an operator can trace a deployed runtime 
 
 OCI labels can record the source repository, source revision, version, description, authorship, and license. The pipeline should apply a tag derived from the release version or commit and record the resulting digest.
 
-This is the build-and-artifact portion of the course reference architecture introduced in Module 1. The protected worker should receive the resulting digest and evidence; it should not rebuild the application inside the management trust zone.
+This is the build-and-artifact portion of the delivery architecture introduced in Module 2. The protected worker should receive the resulting digest and evidence; it should not rebuild the application inside the management trust zone.
 
 Traceability should answer:
 
@@ -1143,6 +1143,6 @@ Use these questions to assess whether you can relate Kubernetes reconciliation, 
 
 A container establishes a repeatable process and dependency boundary. A controlled Dockerfile turns that boundary into an identifiable, testable, and defensible image. Compose demonstrates how the same image participates in a service with APIs, workers, queues, databases, networks, health contracts, and persistent state. Kubernetes extends the operating model with scheduling, reconciliation, scaling, policy, and clustered availability when those capabilities justify the additional platform responsibility.
 
-Across every platform, the engineering invariants remain the same: build once, promote by digest, keep configuration and secrets outside the image, separate application traffic from privileged target access, verify readiness at the service boundary, constrain concurrency and blast radius, correlate execution with operational evidence, and recover from observed state rather than assuming a retry is safe.
+Across every platform, the engineering invariants remain the same: build once, promote by digest, keep configuration and secrets outside the image, separate application traffic from privileged target access, verify readiness at the service boundary, constrain concurrency and blast radius, correlate execution with operational evidence, and recover from observed state rather than assuming a retry is safe. Module 1 supplies the environment; Module 2 supplies the delivery principles; Module 3 now supplies the deployable artifact and runtime contracts.
 
-**What the next module adds:** Module 3 applies the same versioning, review, desired-state, validation, and evidence principles to infrastructure and on-demand environments. Continue to [Infrastructure as Code and On-Demand Environments](module-03-infrastructure-as-code.md).
+**What the next module adds:** Module 4 connects the application artifact and controlled infrastructure to source review, automated qualification, immutable evidence, protected deployment, and recovery. Continue to [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md).

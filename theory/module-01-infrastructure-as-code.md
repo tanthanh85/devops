@@ -1,10 +1,12 @@
-# Module 3: Infrastructure as Code and On-Demand Environments
+# Module 1: Infrastructure as Code and On-Demand Environments
 
 ## 1. Purpose
 
-Application delivery depends on compute, networking, storage, test platforms, configuration, and access. This module extends version control, review, testing, automation, and evidence to infrastructure. It covers Infrastructure as Code, Terraform, Ansible, ownership boundaries, state, drift, on-demand test environments, pipeline integration, validation, and cleanup.
+Module 0 ended with a state-management problem: automation can change infrastructure, but repeatability depends on knowing which definition is authoritative, which tool owns each attribute, and how actual state is compared with intent. Infrastructure as Code makes that problem concrete by treating infrastructure definitions, plans, state transitions, validation, and cleanup as engineered artifacts.
 
-Modules 1 and 2 established DevOps lifecycle controls and a reproducible application architecture. Module 3 applies those practices to the infrastructure on which applications and tests depend. Terraform, Ansible, and Python receive explicit ownership boundaries so the delivery workflow can create, configure, test, and safely remove consistent environments.
+This module covers Terraform, Ansible, ownership boundaries, protected state, drift, on-demand test environments, pipeline integration, validation, and cleanup. The objective is not to promote one tool. It is to establish a controlled lifecycle in which a reviewer can understand what will change, an operator can determine what changed, and the system can be recreated or removed without relying on undocumented knowledge.
+
+Module 0 reviewed the automation foundations used to describe intent, call APIs, configure systems, and verify operational state. Module 1 applies those capabilities to repeatable infrastructure lifecycle and on-demand environments. Terraform, Ansible, and Python receive explicit ownership boundaries so later delivery workflows can create, configure, test, and safely remove consistent environments.
 
 ## 2. Three automation responsibilities
 
@@ -298,8 +300,10 @@ Use these questions to evaluate infrastructure state, test-environment selection
 
 ## 19. Summary
 
-Infrastructure delivery needs the same review and evidence discipline as application delivery, but state and ownership make mistakes harder to reverse. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, plans must be reviewed as proposed changes, state must be protected, and cleanup must prove ownership before destroying anything.
+Infrastructure delivery introduces the first complete delivery control chain in the guide: declared intent, authoritative ownership, a proposed plan, review, controlled execution, observed state, retained evidence, and reconciliation. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, state must be protected, and cleanup must prove ownership before destroying anything.
 
 **What the learner now has:** an explicit ownership boundary among Terraform, Ansible, and Python, plus a pipeline-controlled lifecycle for disposable infrastructure, validation evidence, and cleanup.
 
-**What the next module adds:** Module 4 connects the application artifact and controlled infrastructure to source review, automated qualification, immutable evidence, protected deployment, and recovery. Continue to [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md).
+IaC solves important technical problems, but a repository and an automated plan do not by themselves define team responsibility, release flow, useful measurement, or continuous improvement. Those organizational and lifecycle questions require a broader model.
+
+**What the next module adds:** Module 2 introduces the DevOps operating model that governs how infrastructure and application changes move through shared ownership, flow, feedback, measurement, and continuous improvement. Continue to [Introducing the DevOps Model](module-02-devops-model.md).

@@ -1,10 +1,12 @@
-# Module 0: Network Automation Review and the Path to DevOps
+# Module 0: Network Automation Review
 
 ## 1. Purpose
 
-This module reviews the network automation knowledge expected at the start of the course and connects it to the DevOps practices developed in later modules. It is not a replacement for CCNA Automation, DEVASC, or DEVCOR study. Its purpose is to restore the common mental model learners need before working on software delivery.
+This module reviews the network automation knowledge expected at the start of the course. It is not a replacement for CCNA Automation, DEVASC, or DEVCOR study. Its purpose is to restore a common technical model for building, operating, and troubleshooting network automation solutions.
 
-Learners are expected to recognize Python, Ansible, Git, structured data, APIs, model-driven interfaces, authentication, and operational validation. They may already use these technologies effectively for individual tasks. The next challenge is to make the resulting software reproducible, reviewable, testable, releasable, observable, and supportable by a team.
+Learners are expected to recognize Python, Ansible, Git, structured data, APIs, model-driven interfaces, authentication, and operational validation. The review concentrates on how these technologies exchange data, select targets, execute operations, handle failure, and verify network state.
+
+The material follows automation from input to outcome. Intent and inventory become structured data; Python or Ansible applies logic; an interface changes or queries a target; validation compares intended, configured, and operational state; and telemetry records what happened.
 
 ## 2. Learning objectives
 
@@ -14,13 +16,12 @@ After completing this review, learners should be able to:
 - Explain how Python, Ansible, APIs, models, inventory, and source control fit together.
 - Parse equivalent YAML, JSON, and XML data into a normalized Python dictionary.
 - Recognize appropriate uses and safety considerations for Netmiko, `ncclient`, `requests`, and Flask.
-- Compare Ansible, Terraform, Puppet, and Chef by execution model, ownership, and lifecycle.
-- Explain model-driven telemetry subscriptions, collection, normalization, storage, and DevOps correlation.
+- Explain Ansible inventory, variables, playbooks, modules, templates, idempotence, and execution behavior.
+- Explain model-driven telemetry subscriptions, collection, normalization, storage, and correlation.
 - Distinguish intended state, configuration state, and operational state.
 - Identify safety requirements for data validation, credentials, targeting, concurrency, and recovery.
 - Recognize the limitations of scripts and playbooks operated by one engineer.
-- Map network automation activities to high-level DevOps practices.
-- Explain why successful automation execution is not the same as reliable software delivery.
+- Explain why successful command execution is not the same as a verified network outcome.
 
 ## 3. Network automation as a software system
 
@@ -288,7 +289,7 @@ A network automation repository can contain:
 
 It should not contain live credentials, private keys, tokens, uncontrolled state files, or sensitive device output. Git history is durable: deleting a secret in a later commit does not remove the earlier exposure.
 
-Git alone is not DevOps. It becomes part of DevOps when small changes are reviewed, automatically validated, connected to an identifiable artifact, and promoted through a controlled workflow.
+Git provides useful history only when changes are committed with meaningful context, reviewed where appropriate, and tied to the inputs and results of an automation run.
 
 ## 5. Optional refresher and reference: automation interfaces
 
@@ -566,7 +567,7 @@ def normalize_interface_counter(update: dict, inventory: dict) -> dict:
 
 Counter interpretation requires more than storing values. Octet and packet counters normally increase monotonically and may reset after reboot or process restart. A collector calculates rates from successive samples only when timestamps are ordered and the counter has not reset or wrapped. Missing updates, duplicated timestamps, clock error, subscription loss, and collector backlog must be visible; otherwise a flat graph can be mistaken for a healthy interface when data collection has actually failed.
 
-Telemetry becomes part of DevOps when it closes the release feedback loop. Deployment events should annotate dashboards, and application logs should carry the same release, pipeline, and change identifiers used in retained evidence. This allows the team to distinguish a software regression, a collector failure, and a genuine network-state change.
+Telemetry is most useful when network observations can be correlated with collection time, target identity, software version, and the operation that preceded a change. This allows an engineer to distinguish an automation defect, a collector failure, and a genuine network-state change.
 
 ## 6. Core review: Ansible, orchestration, and tool ownership
 
@@ -642,30 +643,6 @@ The following vendor-neutral pattern validates scope, collects a baseline, appli
 
 The `network_service` role would contain platform-aware, preferably idempotent resource modules. The playbook does not embed credentials, limits concurrent targets with `serial`, stops after a failure, distinguishes collection from change, and delegates acceptance logic to testable application code. In a real pipeline, baseline and post-check results should be sanitized and retained as artifacts. `no_log: false` is shown only because the illustrative read command is nonsensitive; tasks handling credentials or sensitive payloads require deliberate log protection.
 
-### 6.2 Infrastructure as Code and tool selection
-
-Infrastructure as Code represents infrastructure or configuration in version-controlled, machine-readable definitions and applies it through a repeatable workflow. Useful IaC practice includes review, validation, plan or preview, controlled execution, state protection, drift detection, testing, and traceable evidence. A file becomes IaC because of the lifecycle around it, not merely because it uses YAML or a declarative syntax.
-
-Ansible, Terraform, Puppet, and Chef overlap, but they began with different operating models:
-
-| Tool | Primary model | State and execution | Strong fit | Important cautions |
-|---|---|---|---|---|
-| Ansible | Agentless orchestration and configuration | Push execution from a control node; modules report task state | Network configuration, ordered workflows, application setup, mixed API/SSH tasks | Idempotence depends on the module and task; inventory, collection versions, and secrets need control |
-| Terraform | Declarative resource lifecycle | Compares configuration, provider data, and protected state to produce a plan | Creating and removing API-managed cloud, platform, and infrastructure resources | State can contain sensitive data; provider ownership must be clear; imperative provisioners are fragile |
-| Puppet | Declarative configuration management | Agents normally retrieve catalogs and converge nodes periodically | Continuous policy enforcement across long-lived server fleets | Agent and server infrastructure add operating cost; uncontrolled convergence may conflict with change windows |
-| Chef | Recipe-based configuration management | Agents normally apply cookbooks and report convergence | Programmable server configuration and compliance across established Chef estates | Ruby-based flexibility can add complexity; cookbook testing, dependency control, and server operation are required |
-
-Tool selection should begin with resource ownership and lifecycle:
-
-- Use Terraform when the workflow owns creation, update, and destruction of API-managed resources and needs a reviewable plan.
-- Use Ansible when the workflow configures existing systems or orchestrates ordered actions across several interfaces.
-- Use Puppet or Chef when an organization already operates their agent-based convergence model for long-lived systems and continuous enforcement is required.
-- Use Python when custom policy, transformation, API behavior, or evidence processing does not fit an existing module cleanly.
-
-Combining tools is normal, but two tools should not independently own the same attribute. A common pattern is Terraform creating compute, networks, and security rules; Terraform exports an inventory artifact; Ansible configures the created hosts and deploys the application. The pipeline records the handoff and destroys only resources associated with its exact state and ownership tags.
-
-State deserves particular attention. Terraform state maps declarations to real resources and must be stored with locking, encryption, access control, backup, and recovery. Puppet and Chef maintain convergence knowledge through their control systems and node reports. Ansible has no equivalent global state file, but remote systems, inventory, cached facts, and job artifacts still hold state that affects later execution.
-
 ## 7. Source of truth, intent, and state
 
 A source of truth is the authoritative record for a defined class of data. It may contain device identity, site membership, addressing, connections, services, or policy. Authority must be explicit. If a spreadsheet, controller, inventory file, and live device can all overwrite the same value, the organization has several competing sources rather than one source of truth.
@@ -717,7 +694,7 @@ Tests should be selected according to the boundary they can prove:
 
 Tests become more expensive and realistic toward the bottom of the table. A sound strategy runs many fast offline tests and a smaller number of controlled system tests. A live production target should not be the first place a predictable parser, validation, or error-handling defect is discovered.
 
-## 10. Where ad hoc automation reaches its limit
+## 10. Limits of individually operated automation
 
 The capabilities added around an existing script remove different dependencies on the original author's workstation or memory. Containerization alone is not the destination. The result becomes a product when a team can review, release, operate, diagnose, and improve it through a documented delivery system.
 
@@ -735,70 +712,9 @@ An individual automation script can be technically correct and still be difficul
 
 These are delivery problems, not failures of Python, Ansible, or the API. Adding more application logic does not solve them. The team needs practices around the automation.
 
-## 11. How DevOps improves network automation
+## 11. Readiness check
 
-DevOps practices developed in software engineering provide a disciplined path from useful automation to an operable product.
-
-<p align="center">
-  <img src="assets/course-figures/module-00-devops-transition.png" alt="DevOps lifecycle showing planning, code, build, release, operation, and feedback" width="860" />
-</p>
-
-| Network automation activity | Ad hoc approach | DevOps practice applied |
-|---|---|---|
-| Develop Python or Ansible content | Edit and run on one workstation | Git branch, peer review, coding standards, automated tests |
-| Install dependencies | Manual `pip` and collection installation | Locked dependencies and reproducible container image |
-| Validate data | Check selected examples by hand | Schema, policy, unit, and negative tests in CI |
-| Package the runtime | Copy source to a shared host | Build once, scan, identify, and publish an immutable artifact |
-| Execute automation | Engineer supplies local credentials | Protected runner and short-lived workload identity |
-| Select targets | Command-line argument or edited inventory | Approved inventory, explicit scope, policy, and concurrency controls |
-| Prepare a test system | Wait for or manually rebuild a lab | On-demand, versioned test infrastructure |
-| Approve a change | Verbal confirmation or ticket note | Approval bound to commit, artifact, target, diff, and test evidence |
-| Verify success | Check command completion | Automated health, integration, and domain acceptance tests |
-| Investigate failure | Search terminal output | Structured logs, metrics, traces, retained artifacts, correlation IDs |
-| Recover | Author improvises reversal | Tested rollback or forward-remediation workflow |
-| Improve | Fix the immediate script | Measure flow and reliability; share incident learning |
-
-The important shift is from automating an action to engineering a delivery system. Python and Ansible remain valuable implementation tools. APIs remain the interfaces. DevOps supplies the collaborative process, reproducible runtime, validation gates, artifact lineage, controlled promotion, operational feedback, and security boundaries around them.
-
-## 12. High-level DevOps application areas
-
-The remainder of this course applies DevOps in the following areas:
-
-1. **Culture and collaboration:** establish shared ownership, review, visible work, reusable knowledge, and agreed acceptance criteria.
-2. **Version control:** manage application code, tests, data contracts, infrastructure definitions, pipeline configuration, and documentation together.
-3. **Containers:** provide a consistent runtime for Python, Ansible collections, API clients, parsers, and supporting libraries.
-4. **Continuous integration:** validate every proposed change with static checks, unit tests, fixtures, security scans, and integration tests.
-5. **Continuous delivery:** build an immutable artifact once and promote the same tested identity through controlled environments.
-6. **Infrastructure as Code:** create repeatable test infrastructure and remove only resources owned by the workflow.
-7. **Observability:** connect logs, metrics, traces, deployment events, and domain evidence to the exact software release.
-8. **Security:** protect source, dependencies, runners, secrets, identities, artifacts, runtime systems, and evidence throughout delivery.
-9. **Reliability:** use timeouts, bounded retries, health checks, idempotence, backpressure, safe concurrency, and tested recovery.
-10. **Orchestration platforms:** use Compose or Kubernetes when service separation, scale, availability, or organizational platform standards justify them.
-
-Not every automation project requires Kubernetes, microservices, or continuous deployment. DevOps maturity is demonstrated by choosing controls that fit the risk and operating model, not by maximizing the number of products in the architecture.
-
-## 13. Practical transition example
-
-Consider a Python program that reads inventory, retrieves operational data through an API, evaluates policy, and writes a report. One engineer currently runs it every Monday from a virtual environment.
-
-The first DevOps iteration does not need to redesign it as microservices. A sensible progression is:
-
-1. Place the source, dependency declaration, safe example configuration, and tests in Git.
-2. Separate credentials and environment-specific inventory from the source.
-3. Add unit tests for policy logic and fixture tests for API responses.
-4. Build a non-root container image from a controlled dependency set.
-5. Run linting, tests, secret detection, and image scanning in CI.
-6. Publish the tested image with a commit-derived tag and immutable digest.
-7. Schedule it on a protected runner using a scoped runtime identity.
-8. Store the report and structured execution record as retained evidence.
-9. Measure execution duration, failure category, report completeness, and recovery time.
-10. Document ownership, normal operation, failure handling, and credential revocation.
-
-The application's network logic has not fundamentally changed. Its delivery and operating model has. Another qualified engineer can now review, reproduce, execute, diagnose, and improve it without depending on undocumented knowledge.
-
-## 14. Readiness check
-
-Before continuing to Module 1, learners should be able to answer these questions:
+Learners should be able to answer these questions:
 
 1. What is the difference between parsing data, validating its schema, and enforcing policy?
 2. Why does a successful API response not necessarily prove the final service outcome?
@@ -808,15 +724,11 @@ Before continuing to Module 1, learners should be able to answer these questions
 6. Which tests can run without network access, and what evidence requires a sandbox or authorized target?
 7. Which files belong in Git, and which values must remain in a secret or protected runtime system?
 8. What prevents a locally successful script from being reproducible by another engineer?
-9. Which DevOps control would address each weakness in an existing automation workflow?
-10. When would Terraform be a better owner than Ansible, and why should both tools not manage the same attribute?
-11. How do model-driven network telemetry and OpenTelemetry complement one another?
-12. Which production controls must be added around a basic Flask API?
+9. How do model-driven network telemetry and OpenTelemetry complement one another?
+10. Which production controls must be added around a basic Flask API?
 
-## 15. Summary
+## 12. Summary
 
-CCNA-level network automation provides the technical foundation: Python, structured data, Git, CLI and API interfaces, models, Ansible, infrastructure tooling, telemetry, security, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries; Ansible, Terraform, Puppet, and Chef address different aspects of orchestration and infrastructure lifecycle. Those skills answer how to build and automate a task. DevOps addresses the broader question of how a team develops, tests, packages, releases, observes, secures, and improves the automation as software.
+Network automation combines Python, structured data, Git, CLI and API interfaces, models, Ansible, telemetry, authentication, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries, while Ansible supplies reusable inventory, templating, orchestration, and network modules. Reliable automation depends on validated inputs, explicit targets, bounded operations, secure credentials, deterministic processing, structured evidence, and verification of actual network behavior.
 
-**What the learner now has:** a refreshed model of automation inputs, interfaces, state, tool ownership, testing, and operational safety, with detailed protocol and Python examples available as optional reference.
-
-**What the next module adds:** Module 1 introduces the DevOps operating model and CALMS: Culture, Automation, Lean, Measurement, and Sharing.
+The learner now has a refreshed model of automation inputs, interfaces, data formats, execution behavior, state, testing, telemetry, and operational safety, with protocol and Python examples available for reference.

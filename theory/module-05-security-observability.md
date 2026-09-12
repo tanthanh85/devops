@@ -2,7 +2,9 @@
 
 ## 1. Purpose
 
-A dependable delivery system must protect every trust boundary and make its behavior visible. Security limits who and what may act; observability supplies the evidence needed to understand what happened, detect unsafe behavior, evaluate service health, and improve the system. This module develops those responsibilities together because controls without visibility are difficult to verify, while telemetry without protection can become misleading or sensitive data.
+Module 4 produced a working delivery control system: reviewed source becomes an identified artifact, protected execution changes an environment, and validation records an immediate result. Module 5 addresses the controls that must remain effective before, during, and after that pipeline run.
+
+A dependable delivery system must protect every trust boundary and make its behavior visible. Security limits who and what may act; observability supplies the evidence needed to understand what happened, detect unsafe behavior, evaluate service health, and improve the system. These responsibilities belong together because controls without visibility are difficult to verify, while telemetry without protection can expose sensitive data or provide misleading evidence.
 
 Module 4 created a controlled CI/CD and deployment workflow. Module 5 secures its repositories, dependencies, artifacts, runners, credentials, management paths, application components, and infrastructure, then correlates logs, metrics, traces, events, network telemetry, and release identities into operational feedback.
 
@@ -12,7 +14,7 @@ Module 4 created a controlled CI/CD and deployment workflow. Module 5 secures it
 
 The architecture separates repository-controlled validation from privileged deployment and preserves an independent audit path.
 
-This view extends the Module 1 reference architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
+This view extends the Module 2 delivery architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
 
 <p align="center">
   <img src="assets/course-figures/netdevops-trust-boundaries.png" alt="NetDevOps trust boundaries through protected execution and independent audit" width="860" />
@@ -317,7 +319,7 @@ Telemetry is the data. Monitoring evaluates selected signals. Observability is a
 
 ### 3.2 Feedback architecture requirements
 
-Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 1 reference architecture rather than creating a separate monitoring destination.
+Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 2 delivery architecture rather than creating a separate monitoring destination.
 
 <p align="center">
   <img src="assets/course-figures/observability-architecture.png" alt="Observability architecture joining network, application, and pipeline signals" width="860" />
@@ -612,6 +614,6 @@ Use these questions to verify that you can turn operational signals into service
 
 ## 5. Summary
 
-Security and observability form the operating control plane of DevOps. Protected source, verified dependencies, identified artifacts, isolated runners, short-lived credentials, restricted network paths, runtime hardening, and independent audit reduce the opportunity and impact of misuse. Correlated metrics, logs, traces, events, deployment records, and network telemetry reveal whether those controls and the delivered service behave as intended. Together they support rapid detection, evidence-based response, recovery, and continuous improvement.
+Security and observability form the operating control plane of DevOps. Protected source, verified dependencies, identified artifacts, isolated runners, short-lived credentials, restricted network paths, runtime hardening, and independent audit reduce the opportunity and impact of misuse. Correlated metrics, logs, traces, events, deployment records, and network telemetry reveal whether those controls and the delivered service behave as intended. Together they close the loop opened in Module 0: automation begins with declared intent, moves through controlled infrastructure and software delivery, and returns operational evidence that informs the next change.
 
 This final module completes the guide by joining delivery controls with the evidence required to operate and improve the system safely.

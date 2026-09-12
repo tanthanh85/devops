@@ -2,9 +2,11 @@
 
 ## 1. Purpose
 
-A delivery pipeline must do more than run commands after a commit. It must convert reviewed source into an identified artifact, accumulate evidence, control promotion, constrain deployment, verify the resulting service, and support recovery when the outcome is uncertain. This module treats CI/CD and deployment validation as one continuous control system.
+A delivery pipeline connects the components established so far. Module 1 provides controlled infrastructure and test environments. Module 2 defines flow, feedback, evidence, and promotion. Module 3 provides an identified application artifact, service contracts, and runtime health behavior. Module 4 turns those separate capabilities into one executable delivery policy.
 
-Module 2 produced the application artifact and runtime architecture, while Module 3 defined controlled infrastructure and test environments. Module 4 connects those foundations to GitLab jobs, runner trust zones, automated tests, release gates, pre-deployment checks, controlled rollout, post-deployment evidence, rollback, and remediation.
+The pipeline must do more than run commands after a commit. It must convert reviewed source into an identified artifact, accumulate evidence, control promotion, constrain deployment, verify the resulting service, and support recovery when the outcome is uncertain. This module therefore treats CI/CD and deployment validation as one continuous control system.
+
+Module 4 connects these foundations to GitLab jobs, runner trust zones, automated tests, release gates, pre-deployment checks, controlled rollout, post-deployment evidence, rollback, and remediation.
 
 ## 2. CI/CD delivery flow
 
@@ -68,7 +70,7 @@ Approval applies to the reviewed commit and evidence. A new commit invalidates c
 
 ### 2.4 Pipeline design
 
-The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate. The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner. The compact reference architecture in Module 1 shows this separation.
+The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate. The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner. The compact reference architecture in Module 2 shows this separation.
 
 <p align="center">
   <img src="assets/course-figures/pipeline-gates.png" alt="Progressive commit, qualification, release, and deployment gates" width="860" />
@@ -203,7 +205,7 @@ The runner model identifies where repository-controlled commands execute and why
   <img src="assets/course-figures/runner-trust-model.png" alt="Separation of the general validation runner from the protected network runner and management zone" width="860" />
 </p>
 
-As shown in Module 1, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.
+As shown in Module 2, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.
 
 - A general validation runner has Internet or registry access but no production device route or deployment secret.
 - A protected network runner reaches the management network and runs only protected-branch or approved-environment jobs.
@@ -828,6 +830,6 @@ Use these questions to assess whether you can connect an approved artifact to co
 
 ## 5. Summary
 
-CI/CD converts delivery policy into an executable and reviewable workflow. Fast source checks, layered tests, protected runners, immutable artifacts, environment approvals, scoped credentials, pre-checks, controlled deployment, post-checks, and retained evidence work together. Pipeline success is not the final objective; the release is complete only when the deployed service produces the expected operational outcome and recovery remains possible.
+CI/CD converts delivery policy into an executable and reviewable workflow. Fast source checks, layered tests, protected runners, immutable artifacts, environment approvals, scoped credentials, pre-checks, controlled deployment, post-checks, and retained evidence work together. Pipeline success is not the final objective; the release is complete only when the deployed service produces the expected operational outcome and recovery remains possible. The remaining question is whether every privileged boundary is adequately protected and whether the team can understand behavior after immediate pipeline evidence expires.
 
 **What the next module adds:** Module 5 applies security and observability across the complete delivery and operating system. Continue to [Security and Observability](module-05-security-observability.md).
