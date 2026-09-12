@@ -8,7 +8,34 @@ A dependable delivery system must protect every trust boundary and make its beha
 
 Module 4 created a controlled CI/CD and deployment workflow. Module 5 secures its repositories, dependencies, artifacts, runners, credentials, management paths, application components, and infrastructure, then correlates logs, metrics, traces, events, network telemetry, and release identities into operational feedback.
 
+The automated system creates two critical questions:
+
+1. **Can we trust it?** Security must protect source, dependencies, artifacts, identities, runners, platforms, targets, and evidence.
+2. **Can we understand what it is doing?** Observability must connect delivery activity with application behavior and network outcomes.
+
+### Reference System Before This Module
+
+- Identified application artifacts and controlled runtime platforms
+- GitLab delivery policy with protected execution
+- Separate platform-release and network-change workflows
+- Immediate deployment and network-validation evidence
+
+### What This Module Adds
+
+- End-to-end trust-boundary and identity controls
+- Security checks across source, runners, artifacts, platforms, and management paths
+- Application, platform, and network telemetry
+- Change-aware correlation, alerting, investigation, and improvement
+
+### Reference System After This Module
+
+- The delivery system can be trusted, observed, and investigated
+- Releases and approved network changes are traceable to operational behavior
+- Operational feedback informs the next controlled improvement
+
 ## 2. Security across the delivery system
+
+> **CORE CONCEPT**
 
 ### 2.1 DevOps trust boundaries
 
@@ -104,6 +131,10 @@ Host-key and TLS validation protect endpoint identity. A secret sent to an impos
 Prefer a dedicated automation identity with command authorization or API permissions limited to the intended configuration domain. A read-only collector should use a separate identity from the deployment worker.
 
 ### 2.5 Pipeline security
+
+> **CORE CONCEPT**
+
+The runner trust zones introduced in Module 4 are now evaluated as security boundaries rather than repeated as pipeline mechanics.
 
 The pipeline is a privileged software system. Threats include a malicious dependency, compromised runner, altered pipeline file, exposed variable, poisoned cache, substituted image, or unauthorized promotion.
 
@@ -214,13 +245,23 @@ Logs and error responses should provide enough context for support without expos
 
 ### 2.9 Container and orchestrator security
 
+Module 3 established the mechanics of building and running container images. This section revisits those mechanics as security boundaries: which source and base image can be trusted, what the workload may do at runtime, which identities it receives, and which systems it may reach.
+
+The Kubernetes worker model from Module 3 is now evaluated through workload identity, RBAC, secret access, and restricted egress. These controls secure the platform; they do not merge the platform-release and network-change approval paths established in Module 4.
+
 Container controls include trusted base images, non-root execution, removed capabilities, read-only filesystems, controlled mounts, resource limits, and restricted network access.
 
 Kubernetes adds RBAC, service accounts, namespaces, network policy, security context, admission policy, secret handling, audit, and node security. A namespace is an organizational and policy boundary, but it is not a complete hostile-tenant isolation mechanism by itself.
 
 The Kubernetes deployment worker should use a service account with only the required secret reference and job permissions. NetworkPolicy should permit the worker to reach approved management endpoints while blocking the API and dashboard services from direct device access.
 
-### 2.10 Modern application architecture
+### 2.10 Advanced architecture reference
+
+> **ADVANCED / REFERENCE**
+
+Sections 2.10–2.16 are optional architecture reference material. They may be skipped during the main classroom path, which continues at Section 3 with observability.
+
+#### 2.10.1 Modern application architecture
 
 A modern application often separates user interface, APIs, background processing, data services, and platform integrations. It may use containers and managed services, but the architecture should follow requirements rather than fashion.
 
@@ -237,7 +278,7 @@ Important qualities include:
 
 The twelve-factor application principles provide useful guidance for configuration, backing services, build and run separation, disposable processes, environment parity, logs, and administrative tasks. Teams should apply the principles according to the system's actual needs.
 
-### 2.11 Microservices
+#### 2.10.2 Microservices
 
 Microservices divide a system into independently deployable services aligned with bounded responsibilities. Potential benefits include independent release, targeted scaling, fault isolation, and team ownership.
 
@@ -245,19 +286,19 @@ Costs include distributed transactions, network failure, version compatibility, 
 
 Service boundaries should follow ownership and data behavior. Splitting code into containers without independent responsibility creates a distributed monolith.
 
-### 2.12 Synchronous and asynchronous interaction
+#### 2.10.3 Synchronous and asynchronous interaction
 
 Synchronous APIs provide immediate responses but couple availability and latency between services. Asynchronous messaging can absorb bursts and reduce temporal coupling, but it introduces eventual consistency, duplicate delivery, ordering questions, and message lifecycle management.
 
 Consumers should handle duplicate messages safely. Producers and consumers need compatible schema evolution. Operational evidence should expose queue delay and failed-message behavior.
 
-### 2.13 Public, private, and hybrid deployments
+#### 2.10.4 Public, private, and hybrid deployments
 
 A private environment can provide direct control, locality, and integration with existing systems. Public cloud can provide rapid provisioning, managed services, geographic options, and consumption-based scaling. Neither model is inherently safer or cheaper in every case.
 
 A mixed deployment may be described as hybrid or multicloud depending on whether it combines private and public environments or uses services from multiple public providers. The design should state the actual placement and dependency model rather than rely on the label.
 
-### 2.14 Multicloud design considerations
+#### 2.10.5 Multicloud design considerations
 
 Evaluate:
 
@@ -274,13 +315,13 @@ Evaluate:
 
 Using only common-denominator services can reduce provider dependence but may sacrifice valuable managed capabilities. An abstraction layer also becomes software that the team must own.
 
-### 2.15 Network platform role
+#### 2.10.6 Network platform role
 
 Networking, security, observability, and controller platforms can connect application and infrastructure domains. APIs and policy systems can participate in controlled workflows, while telemetry can supply network context for application behavior.
 
 Automation must respect controller ownership and transactional behavior. Direct device changes that bypass the system of record can create conflict and drift.
 
-### 2.16 Architecture decision records
+#### 2.10.7 Architecture decision records
 
 An architecture decision record captures the decision, context, considered options, consequences, and status. Useful project decisions include:
 
@@ -293,13 +334,15 @@ An architecture decision record captures the decision, context, considered optio
 
 Recording decisions prevents future maintainers from treating deliberate constraints as accidental choices.
 
-#### 2.16.1 Practical control chain for a protected deployment
+##### 2.10.7.1 Practical control chain for a protected deployment
 
 A merge request that changes `.gitlab-ci.yml`, deployment policy, or secret-retrieval code requires review from the platform or security owner. After merge, an unprivileged runner builds and scans the image without a route to managed infrastructure. A protected job exchanges its workload identity for a short-lived credential, verifies the approved image digest, runs on a restricted runner, and loses the credential when the job ends. Repository approval, artifact signature, workload identity, network segmentation, and audit logging protect different boundaries; none is a substitute for the others.
 
 This design also narrows incident response. If the general runner is compromised, revoke its registry and source access without rotating every device credential. If the protected runner is compromised, stop deployment jobs, revoke the workload identity, preserve runner and secret-service audit logs, and treat any job executed during the exposure window as untrusted.
 
 ## 3. Observability and stability engineering
+
+> **CORE CONCEPT**
 
 ### 3.1 Monitoring, observability, and telemetry
 
@@ -366,6 +409,8 @@ Distributed traces follow a request across service boundaries. Spans describe wo
 Deployment, configuration, scaling, and infrastructure events add essential context. A dashboard should make it possible to compare a behavior change with a deployment or platform event.
 
 ### 3.5 Network data collection methods
+
+> **LAB REQUIRED**
 
 No collection method supplies every signal. The following sections distinguish event streams, counters, polled state, modeled subscriptions, and application instrumentation so that each is used for evidence it can actually provide.
 
@@ -517,9 +562,19 @@ Business or workflow metrics can show whether the service produces its intended 
 
 For the automation platform, instrument request and job count, queue delay, device connection duration, RPC or command duration, validation failure category, configuration lines changed, rollback outcome, and evidence-write result. Never use a device password, token, full command output, or unbounded job identifier as a metric label.
 
-### 3.14 Change correlation
+### 3.14 Change-aware observability and correlation
 
-An investigation follows the release through device events and telemetry using shared identifiers. Correlation narrows the search; it does not by itself prove causality.
+> **CORE CONCEPT**
+>
+> **SIGNATURE COURSE DISTINCTION:** Change-aware observability
+>
+> **LAB REQUIRED**
+
+An investigation follows commit SHA → pipeline ID → image digest → deployment event → automation job → change ID → target device → protocol or forwarding behavior → telemetry → alert → investigation → feedback. Correlation narrows the search; it does not by itself prove causality. The objective is not merely to detect that a routing neighbor or application process is unhealthy. It is to determine whether behavior changed during or after a particular software release or approved network operation, and to assemble enough evidence to evaluate that relationship.
+
+<p align="center">
+  <img src="assets/course-figures/change-aware-feedback-loop.png" alt="Change-aware feedback from commit and image digest through deployment, network behavior, telemetry, investigation, and improvement" width="860" />
+</p>
 
 <p align="center">
   <img src="assets/course-figures/change-correlation-model.png" alt="Correlation model joining delivery events, device events, service signals, and evidence" width="860" />
@@ -541,7 +596,7 @@ A useful correlation view should let an engineer answer, without manually joinin
 - Which pipeline introduced the change, and did later jobs touch the same domain?
 - Was the automation platform healthy, or did queue delay, worker failure, clock skew, or missing telemetry distort the result?
 
-Join records with stable identifiers and bounded-cardinality labels. Commit SHA, pipeline ID, change ID, device identity, interface, and routing process are useful correlation fields; credentials, full command output, and unbounded request strings are not metric labels.
+Join records with shared identifiers: `commit`, `pipeline`, `digest`, `change_id`, `target`, `environment`, and `timestamp`. These values belong in event, log, trace, and evidence records; only bounded dimensions should become metric labels. Credentials, full command output, and unbounded request strings are never metric labels.
 
 #### 3.14.1 Practical incident trace
 
@@ -616,4 +671,8 @@ Use these questions to verify that you can turn operational signals into service
 
 Security and observability form the operating control plane of DevOps. Protected source, verified dependencies, identified artifacts, isolated runners, short-lived credentials, restricted network paths, runtime hardening, and independent audit reduce the opportunity and impact of misuse. Correlated metrics, logs, traces, events, deployment records, and network telemetry reveal whether those controls and the delivered service behave as intended. Together they close the loop opened in Module 0: automation begins with declared intent, moves through controlled infrastructure and software delivery, and returns operational evidence that informs the next change.
 
-This final module completes the guide by joining delivery controls with the evidence required to operate and improve the system safely.
+**What the learner now has:** a production-style delivery system with protected trust boundaries and change-aware operational evidence.
+
+**What is still missing:** nothing in the course control chain; further work is environment-specific hardening, scale, and operational maturity.
+
+**What the next module adds:** there is no further theory module; the final capstone uses trustworthy release and network-change feedback to drive the next controlled improvement.

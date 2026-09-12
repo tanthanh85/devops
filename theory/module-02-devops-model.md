@@ -8,9 +8,32 @@ DevOps organizes delivery so that small changes move through a controlled, repea
 
 This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation provides the primary engineering workload through which the practices are applied throughout the course.
 
+The central question is practical: **How do we turn useful network automation into a dependable software system that a team can build, package, deploy, operate, secure, observe, and improve?** Module 2 supplies the operating model; later modules implement it.
+
 [Module 0](module-00-network-automation-review.md) reviewed how the supplied application turns intent and inventory into controlled network operations, and Module 1 applied repeatability and desired-state practices to infrastructure. Module 2 now changes the point of view: the subject is how a team develops, tests, releases, operates, and improves the complete system. The delivery model established here supplies the reasoning used by every later module.
 
+### Reference System Before This Module
+
+- Verified Python and Ansible automation
+- Git-based intent and evidence
+- Reproducible, explicitly owned test infrastructure
+
+### What This Module Adds
+
+- CALMS, shared ownership, flow, feedback, and measurement
+- Continuous integration, delivery, and deployment distinctions
+- Value-stream and delivery-performance thinking
+- Build-once, evidence, and promotion principles
+
+### Reference System After This Module
+
+- The team has a shared delivery and improvement model
+- Release evidence and promotion expectations are explicit
+- No reproducible application artifact exists yet
+
 ## 2. From ad hoc automation to DevOps
+
+> **CORE CONCEPT**
 
 Task automation often begins with a Python script, an API integration, or an Ansible playbook created to meet an immediate operational need. This approach can be effective at small scale, but weaknesses emerge when the solution must be reviewed by a team, reproduced in a clean environment, released safely, diagnosed consistently, and supported independently of its original author.
 
@@ -39,6 +62,8 @@ Network delivery has several characteristics that affect the implementation:
 NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts, configuration diffs, post-change operational validation, and tested recovery.
 
 ## 3. CALMS applied to software delivery
+
+> **CORE CONCEPT**
 
 CALMS assesses DevOps as an operating model rather than a collection of tools. It represents **Culture, Automation, Lean, Measurement, and Sharing**. The dimensions work together: automation without ownership can accelerate a poor process, while collaboration without repeatable execution remains dependent on individuals.
 
@@ -115,6 +140,8 @@ DevOps is easier to understand when it is compared with the delivery models it r
 Automation improves consistency, but DevOps connects automation to collaboration, governance, and operational truth.
 
 ## 5. Complete DevOps lifecycle
+
+> **CORE CONCEPT**
 
 The DevOps lifecycle connects an idea to an operating service and returns operational knowledge to the next decision. Deployment is therefore not the end: software must be operated, observed, improved, secured, and eventually retired.
 
@@ -238,6 +265,8 @@ The code change may be small; the lifecycle makes it safe for a team to deliver 
 
 ## 6. A practical software delivery architecture
 
+> **ADVANCED / REFERENCE**
+
 The following responsibilities appear in most mature delivery systems, although the products and team boundaries vary.
 
 The reference architecture makes the most important trust transition visible: unprivileged validation produces an identified artifact before an approved protected runner receives management access.
@@ -263,6 +292,10 @@ Module 1 assigns infrastructure ownership and lifecycle controls. Module 3 appli
 
 ## 7. Continuous integration, delivery, and deployment
 
+> **CORE CONCEPT**
+
+This section defines the three practices and their decision boundaries. Module 4 implements them through GitLab jobs, runners, artifacts, environments, rules, and protected deployment.
+
 These terms describe different levels of automation.
 
 **Continuous integration** means developers merge small changes frequently and automated checks validate the combined code. The goal is to find integration problems while the relevant change remains small and understandable.
@@ -274,6 +307,8 @@ These terms describe different levels of automation.
 The course begins with continuous integration, adds automated deployment to a training environment, and may finish with a controlled Kubernetes platform exercise. Production deployment remains a design decision rather than an assumption.
 
 ## 8. Value stream and constraints
+
+> **CORE CONCEPT**
 
 A value stream describes the work from request to operational outcome. Useful questions include:
 
@@ -310,6 +345,8 @@ DORA measures require careful interpretation in a network context:
 The team should also measure pipeline feedback time, percentage of changes with complete evidence, drift age, policy failure reasons, and automation job reliability. Do not compare teams without accounting for network scope, risk, and change type.
 
 ## 9. Applying DevOps controls to existing network intent
+
+> **LAB REQUIRED**
 
 DEVASC/DEVCOR-level knowledge of structured data, APIs, and network intent is assumed. The DevOps concern is how an existing intent contract becomes a controlled pipeline input. Depending on the application, YAML might describe interface addressing, a service, routing policy, compliance rules, or validation expectations. A JSON Schema or Python model validates structure and types before a build or deployment job receives privileged access.
 
@@ -394,8 +431,10 @@ Use these questions to test whether you can connect DevOps principles to enginee
 
 DevOps changes the way a team makes and proves a change; it is not a synonym for scripting or CI software. CALMS provides a balanced way to examine that change: Culture creates shared responsibility, Automation makes the safe path repeatable, Lean improves flow, Measurement tests whether the system is improving, and Sharing makes knowledge reusable. The lifecycle connects those principles to concrete controls from planning through operation and retirement.
 
-**What the learner now has:** a lifecycle model based on CALMS, flow, feedback, evidence, measured outcomes, immutable promotion, and shared responsibility.
+**What the learner now has:** a lifecycle model based on CALMS, flow, feedback, evidence, measurement, promotion, and shared responsibility.
 
-The model now requires an artifact that can move through this lifecycle without changing identity between environments. Source alone is insufficient if every engineer or runner reconstructs the runtime differently.
+**What is still missing:** an artifact that can move through the lifecycle without changing identity between environments. Source alone is insufficient if every engineer or execution host reconstructs the runtime differently.
 
 **What the next module adds:** Module 3 turns reproducibility from a principle into an application runtime and packaging architecture using containers, secure images, multitier services, and Kubernetes. Continue to [Packaging and Operating Applications](module-03-packaging-applications.md).
+
+The DevOps model requires an artifact whose identity does not change between environments.

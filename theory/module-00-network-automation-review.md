@@ -8,6 +8,23 @@ Learners are expected to recognize Python, Ansible, Git, structured data, APIs, 
 
 The material follows automation from input to outcome. Intent and inventory become structured data; Python or Ansible applies logic; an interface changes or queries a target; validation compares intended, configured, and operational state; and telemetry records what happened.
 
+### Reference System Before This Module
+
+- Existing networking and programming knowledge
+- Access to the supplied Python and Ansible automation
+
+### What This Module Adds
+
+- A shared model of intent, inventory, structured data, execution, validation, and evidence
+- Clear testing and target-safety boundaries
+- A review of individually operated automation limitations
+
+### Reference System After This Module
+
+- The network outcome can be automated and verified
+- Inputs, targets, state, and evidence are understood
+- The automation still depends on individually managed execution
+
 ## 2. Learning objectives
 
 After completing this review, learners should be able to:
@@ -24,6 +41,8 @@ After completing this review, learners should be able to:
 - Explain why successful command execution is not the same as a verified network outcome.
 
 ## 3. Network automation as a software system
+
+> **CORE CONCEPT**
 
 Network automation is sometimes introduced as a faster way to execute commands. That description is incomplete. A useful automation solution is a software system that interprets intent, obtains trusted data, communicates with external systems, changes or observes state, handles failure, and produces evidence.
 
@@ -47,6 +66,8 @@ A typical solution contains several responsibilities. The transport is only one 
 The implementation may be a small command-line program or a multitier service. The responsibilities still exist. When they are hidden inside one script, they become harder to test and govern independently.
 
 ## 4. Core review: foundation knowledge
+
+> **CORE CONCEPT**
 
 Reliable delivery depends on several disciplines working together. Networking knowledge defines the intended behavior, programming and data models express it, and version control preserves both the implementation and the decisions behind it.
 
@@ -100,6 +121,8 @@ Learners should recall the usual roles:
 Data should be normalized before it reaches templates or API clients. Addresses, prefixes, interface names, booleans, enumerated values, and identifiers should have one internal representation. This prevents each downstream component from interpreting the same input differently.
 
 #### 4.3.1 One inventory represented in YAML, JSON, XML, and Python
+
+> **ADVANCED / REFERENCE**
 
 The examples below describe the same two devices. Seeing the equivalent structures helps when an application reads one format, uses Python dictionaries internally, and sends another format to an API.
 
@@ -195,6 +218,8 @@ inventory = {
 ```
 
 #### 4.3.2 Parsing and normalizing the formats
+
+> **ADVANCED / REFERENCE**
 
 Python's standard library handles JSON and XML. YAML normally uses PyYAML. `yaml.safe_load()` is important because the general loader can construct unsafe Python objects from untrusted YAML.
 
@@ -292,6 +317,8 @@ It should not contain live credentials, private keys, tokens, uncontrolled state
 Git provides useful history only when changes are committed with meaningful context, reviewed where appropriate, and tied to the inputs and results of an automation run.
 
 ## 5. Optional refresher and reference: automation interfaces
+
+> **ADVANCED / REFERENCE**
 
 The available interfaces overlap, but they expose different control and failure semantics. The following visual provides a quick comparison before the detailed review.
 
@@ -571,6 +598,8 @@ Telemetry is most useful when network observations can be correlated with collec
 
 ## 6. Core review: Ansible, orchestration, and tool ownership
 
+> **LAB REQUIRED**
+
 Ansible provides inventories, variables, collections, modules, roles, handlers, conditions, and playbooks for describing ordered work across targets. Agentless operation is particularly familiar in network environments, although module behavior and platform support still depend on collection versions and device capabilities.
 
 Learners should recall these principles:
@@ -645,6 +674,8 @@ The `network_service` role would contain platform-aware, preferably idempotent r
 
 ## 7. Source of truth, intent, and state
 
+> **CORE CONCEPT**
+
 A source of truth is the authoritative record for a defined class of data. It may contain device identity, site membership, addressing, connections, services, or policy. Authority must be explicit. If a spreadsheet, controller, inventory file, and live device can all overwrite the same value, the organization has several competing sources rather than one source of truth.
 
 <p align="center">
@@ -663,6 +694,8 @@ Configuration can match intent while operation remains unhealthy. Operational st
 
 ## 8. Safety and reliability fundamentals
 
+> **CORE CONCEPT**
+
 Network automation can apply the same error consistently across many targets, so scale increases both value and risk. The following controls should already be familiar:
 
 - Validate input before opening a privileged connection.
@@ -680,6 +713,8 @@ Network automation can apply the same error consistently across many targets, so
 Concurrency is not merely a performance setting. Fifty simultaneous sessions may overload a management plane, controller, authentication service, or WAN link. Operations touching the same device or shared service may require locking even when the worker platform can execute them in parallel.
 
 ## 9. Testing network automation
+
+> **LAB REQUIRED**
 
 Tests should be selected according to the boundary they can prove:
 
@@ -731,4 +766,10 @@ Learners should be able to answer these questions:
 
 Network automation combines Python, structured data, Git, CLI and API interfaces, models, Ansible, telemetry, authentication, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries, while Ansible supplies reusable inventory, templating, orchestration, and network modules. Reliable automation depends on validated inputs, explicit targets, bounded operations, secure credentials, deterministic processing, structured evidence, and verification of actual network behavior.
 
-The learner now has a refreshed model of automation inputs, interfaces, data formats, execution behavior, state, testing, telemetry, and operational safety, with protocol and Python examples available for reference.
+**What the learner now has:** a refreshed model of automation inputs, execution, state, validation, and operational evidence.
+
+**What is still missing:** a repeatable, governed environment in which the automation can be recreated and operated by a team.
+
+**What the next module adds:** explicit ownership and lifecycle control for the supporting environment.
+
+The automation logic works. The delivery system does not yet exist.

@@ -8,7 +8,28 @@ This module covers Terraform, Ansible, ownership boundaries, protected state, dr
 
 Module 0 reviewed the automation foundations used to describe intent, call APIs, configure systems, and verify operational state. Module 1 applies those capabilities to repeatable infrastructure lifecycle and on-demand environments. Terraform, Ansible, and Python receive explicit ownership boundaries so later delivery workflows can create, configure, test, and safely remove consistent environments.
 
+### Reference System Before This Module
+
+- Working Python and Ansible automation
+- Versioned intent, inventory, tests, and evidence
+- Known target-safety boundaries
+
+### What This Module Adds
+
+- Terraform-managed resource lifecycle
+- Ansible-managed configuration and orchestration
+- Python validation and pyATS/Genie operational verification
+- Disposable test-environment creation and cleanup
+
+### Reference System After This Module
+
+- The supporting environment can be recreated and governed
+- Tool ownership and handoffs are explicit
+- The application runtime is not yet reproducible
+
 ## 2. Three automation responsibilities
+
+> **CORE CONCEPT**
 
 The ownership flow distinguishes resource lifecycle, ordered configuration, and custom application logic before a team selects Terraform, Ansible, or Python for a task.
 
@@ -41,12 +62,10 @@ Tool choice should follow the type of resource, the available interface, and the
 - Use **Ansible** when the work is ordered, human-readable orchestration across inventories and supported network modules express the intended change. Validate module idempotence and check/diff behavior on the actual platform.
 - Write **Python** when the workflow requires custom data normalization, policy, correlation, API pagination, transaction handling, or error logic that modules do not expose. Accept that the team owns tests, retries, idempotence, packaging, and maintenance.
 - Use **pyATS/Genie** to verify operational outcomes with structured data; do not use parser success as proof that the expected state exists.
-- Use **GitLab** to orchestrate review, policy, artifacts, protected execution, and evidence. It does not replace network transaction logic.
-- Use **Docker** when a reproducible runtime solves dependency and execution consistency. It does not provide device authorization or network safety.
-- Use a **simple protected runner** when jobs are few, sequential, and do not require an always-on API or independent worker pools.
-- Use **Kubernetes** only when platform scheduling, isolation, scale, availability, and an operationally capable cluster team justify its cost.
 
 ## 3. Infrastructure as Code
+
+> **CORE CONCEPT**
 
 Infrastructure as Code records intended infrastructure in machine-readable files. It provides reviewable change history and repeatable execution. The definition may describe resources declaratively or express a procedural workflow.
 
@@ -195,6 +214,8 @@ For an illustrative automation platform:
 
 ## 11. On-demand test environments
 
+> **LAB REQUIRED**
+
 An ephemeral environment has a complete lifecycle, including evidence collection and controlled cleanup after failure.
 
 <p align="center">
@@ -217,6 +238,8 @@ An on-demand environment gives a branch or merge request an isolated place for i
 The environment should resemble the target environment in the characteristics relevant to the test. It does not need production scale for every merge request.
 
 ## 12. Network test environment options
+
+> **ADVANCED / REFERENCE**
 
 Test environments trade speed and cost against behavioral fidelity. The table compares common choices so that an engineering team can match the environment to the risk and evidence required from a test.
 
@@ -247,6 +270,10 @@ A scheduled read-only pipeline can collect modeled configuration and operational
 Compliance rules should identify ownership, severity, tolerated exceptions, and remediation path. A permanent exception belongs in reviewed policy data, not a hidden `if` statement.
 
 ## 14. Pipeline integration
+
+> **ADVANCED / REFERENCE**
+
+This section describes only the future handoff: a delivery pipeline will consume reviewed plans, environment identifiers, validation results, and cleanup evidence. Pipeline jobs, runners, rules, and promotion are implemented in Module 4.
 
 A safe infrastructure pipeline separates responsibilities:
 
@@ -302,8 +329,10 @@ Use these questions to evaluate infrastructure state, test-environment selection
 
 Infrastructure delivery introduces the first complete delivery control chain in the guide: declared intent, authoritative ownership, a proposed plan, review, controlled execution, observed state, retained evidence, and reconciliation. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, state must be protected, and cleanup must prove ownership before destroying anything.
 
-**What the learner now has:** an explicit ownership boundary among Terraform, Ansible, and Python, plus a pipeline-controlled lifecycle for disposable infrastructure, validation evidence, and cleanup.
+**What the learner now has:** repeatable infrastructure with explicit ownership among Terraform, Ansible, Python, and operational verification.
 
-IaC solves important technical problems, but a repository and an automated plan do not by themselves define team responsibility, release flow, useful measurement, or continuous improvement. Those organizational and lifecycle questions require a broader model.
+The system can now recreate its supporting environment, but it still cannot guarantee that the automation application behaves identically for every engineer and execution host. Infrastructure definitions do not lock the Python interpreter, Python packages, Ansible collections, system libraries, or application startup behavior. IaC solves environment lifecycle; it does not solve application runtime reproducibility.
 
-**What the next module adds:** Module 2 introduces the DevOps operating model that governs how infrastructure and application changes move through shared ownership, flow, feedback, measurement, and continuous improvement. Continue to [Introducing the DevOps Model](module-02-devops-model.md).
+**What is still missing:** a reproducible application runtime and a shared model for ownership, release flow, measurement, and improvement.
+
+**What the next module adds:** Module 2 introduces the DevOps operating model; Module 3 then makes the application runtime reproducible. Continue to [Introducing the DevOps Model](module-02-devops-model.md).

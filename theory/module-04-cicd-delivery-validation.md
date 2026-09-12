@@ -8,11 +8,50 @@ The pipeline must do more than run commands after a commit. It must convert revi
 
 Module 4 connects these foundations to GitLab jobs, runner trust zones, automated tests, release gates, pre-deployment checks, controlled rollout, post-deployment evidence, rollback, and remediation.
 
+Before automation, the delivery sequence depends on an engineer remembering every step:
+
+1. Change the source.
+2. Run static and unit tests.
+3. Build the image from the correct inputs.
+4. Scan and identify the image.
+5. Publish the digest.
+6. Update the Compose or Kubernetes definition.
+7. Deploy to the intended environment.
+8. Check application readiness.
+9. Execute the approved automation operation.
+10. Verify the network outcome and preserve evidence.
+
+Omitting or reordering one step can invalidate the release. CI/CD is introduced here as **automation of the software delivery process**: the manual procedure becomes executable, versioned policy that provides the same feedback and evidence for every proposed change.
+
+### Reference System Before This Module
+
+- Reproducible infrastructure and an identified application image
+- Compose and Kubernetes runtime definitions
+- Explicit service-health contracts
+- Manually coordinated delivery steps
+
+### What This Module Adds
+
+- GitLab jobs, stages, runners, rules, artifacts, and environments
+- Automated test layers and immutable image promotion
+- Protected execution, network prechecks, postchecks, and evidence
+- Recovery decisions for failed, partial, and unknown outcomes
+
+### Reference System After This Module
+
+- Software delivery is executable, reviewable policy
+- Platform releases and network changes use separate authorization paths
+- Immediate validation exists; enduring trust and operational explanation remain incomplete
+
 ## 2. CI/CD delivery flow
+
+> **CORE CONCEPT**
 
 ### 2.1 Software delivery pipeline
 
 A pipeline does not treat a successful command or API response as final proof. Build completion proves that an artifact was created; deployment completion proves that a platform accepted a request. Health and acceptance checks must still prove that users or downstream systems receive the intended outcome. For a network automation application, that may include an existing read-only network test.
+
+The conceptual flow is source → review → validate → test → build → scan → publish → deploy → validate → observe. GitLab implements that flow with merge requests, pipelines, jobs, runners, artifacts, rules, dependencies, environments, and approvals; those product objects are introduced only after the delivery responsibilities are clear.
 
 ### 2.2 Pipeline objectives
 
@@ -291,6 +330,8 @@ Jobs should return a nonzero status on failure and preserve relevant evidence. S
 
 ### 2.14 Illustrative `.gitlab-ci.yml`
 
+> **LAB REQUIRED**
+
 The pipeline below demonstrates how the validation layers can be ordered and how artifacts can pass evidence between jobs. It is deliberately illustrative: runners, credentials, approval rules, and deployment commands must be adapted to the target environment.
 
 ```yaml
@@ -450,11 +491,57 @@ A gate is useful only when its failure has a defined meaning and response. The t
 | Post-check | Prove configuration and service outcome | Device accepts commands but route or path is absent | Roll back or remediate according to evidence |
 | Telemetry observation | Detect delayed or collateral degradation | Packet loss rises after immediate checks pass | Halt promotion and invoke recovery policy |
 
+### 2.17 Kubernetes delivery integration
+
+A Kubernetes delivery pipeline can:
+
+1. Validate manifests and policy.
+2. Build and scan the image once.
+3. Record and sign the digest.
+4. Deploy to a test namespace.
+5. Wait for rollout readiness with a timeout.
+6. Run functional tests.
+7. Collect resource state, events, logs, and test reports.
+8. Promote the same digest through a controlled change.
+9. Observe release health.
+10. Remove the temporary namespace.
+
+Avoid mutable image tags and broad cluster-admin credentials. Give the deployment identity access only to the required namespace and resource types.
+
+> **VERIFICATION**
+> Confirm both platform state and service outcome. A successful Kubernetes rollout does not prove that a worker can process an approved job safely or that the resulting network state meets its acceptance criteria.
+
+#### 2.17.1 Platform pipeline and network change pipeline
+
+> **CORE CONCEPT**
+>
+> **SIGNATURE COURSE DISTINCTION:** Platform pipeline and network-change pipeline
+
+The pipelines meet at a versioned automation platform but have different triggers and outcomes.
+
+<p align="center">
+  <img src="assets/course-figures/platform-vs-network-pipeline.png" alt="Separation between the platform delivery pipeline and network job pipeline" width="860" />
+</p>
+
+Deploying a new version of the automation application must **not** automatically authorize a network change.
+
+Keep two concerns distinguishable:
+
+- The platform pipeline tests and deploys the automation API, worker, validation service, and collectors.
+- A network job pipeline submits reviewed change input to an approved platform version and evaluates network evidence.
+
+The platform pipeline deploys software. The network-change workflow uses that software under a separate approval and evidence model.
+
+Updating the worker image and changing network state in the same uncontrolled step makes troubleshooting difficult. Record both the platform image digest and the change-input commit in every job.
+
+
 ## 3. Deployment validation and recovery
+
+> **CORE CONCEPT**
 
 ### 3.1 Three forms of state in an automation application
 
-The automation application is assumed to know how to collect and interpret these states. This course uses them as deployment acceptance evidence and concentrates on when the pipeline collects them, how it evaluates them, and which result permits promotion or triggers recovery.
+As introduced in Module 0, intended, configured, and operational state answer different questions. Here they become deployment-acceptance evidence: the pipeline determines when to collect them, how to evaluate them, and which result permits promotion or triggers recovery.
 
 The loop below shows why stored configuration is an intermediate result. Operational observations must be compared with the original intent.
 
@@ -482,7 +569,7 @@ An `UNKNOWN/PARTIAL` state is important. A timeout after sending configuration d
 
 ### 3.3 Evidence chain
 
-A release should accumulate evidence as it moves through the pipeline:
+Module 2 introduced evidence as a condition of promotion. Module 4 implements that principle by accumulating evidence as a release moves through the pipeline:
 
 The evidence chain begins with source review and continues through static checks, unit tests, image inspection, integration tests, the infrastructure plan, pre-deployment checks, deployment, acceptance tests, and operational observation.
 
@@ -519,6 +606,8 @@ Infrastructure definitions need their own controls:
 The plan is evidence, not approval by itself. Reviewers must understand the target and the meaning of the proposed actions.
 
 ### 3.6 Pre-deployment health checks
+
+> **LAB REQUIRED**
 
 Before a release changes an environment, verify that the environment is safe to change. Useful checks include:
 
@@ -621,6 +710,8 @@ Blast radius is multidimensional. Count devices, but also identify routing domai
 Stop conditions must be machine-readable where possible: identity mismatch, unhealthy baseline, unexpected diff, excessive target count, lost management access, convergence timeout, new critical logs, increased packet loss, or failure of an unaffected-service check.
 
 ### 3.10 Network post-checks
+
+> **LAB REQUIRED**
 
 Post-checks should compare the new state with both intent and baseline:
 
@@ -731,7 +822,7 @@ No strategy removes risk. Database changes, external side effects, stateful prot
 
 ### 3.14 Post-deployment validation
 
-Deployment success means more than a command returning zero. Validation should proceed from cheap technical checks to meaningful service behavior:
+The validation layers introduced in Section 2.5 now run against the deployed release. They proceed from cheap technical checks to meaningful service behavior:
 
 1. Confirm the expected artifact identity.
 2. Confirm processes or workloads are ready.
@@ -774,7 +865,7 @@ Assume the new API container starts and its liveness probe passes, but workers f
 
 ### 3.18 Rollback and remediation
 
-Recovery begins with causality and reversibility, not with an automatic rollback command.
+The failure categories and `UNKNOWN/PARTIAL` state introduced earlier determine whether recovery can use rollback, forward remediation, or investigation. Recovery begins with causality and reversibility, not with an automatic rollback command.
 
 <p align="center">
   <img src="assets/course-figures/rollback-decision.png" alt="Decision tree for investigation, rollback, or forward remediation" width="860" />
@@ -831,5 +922,9 @@ Use these questions to assess whether you can connect an approved artifact to co
 ## 5. Summary
 
 CI/CD converts delivery policy into an executable and reviewable workflow. Fast source checks, layered tests, protected runners, immutable artifacts, environment approvals, scoped credentials, pre-checks, controlled deployment, post-checks, and retained evidence work together. Pipeline success is not the final objective; the release is complete only when the deployed service produces the expected operational outcome and recovery remains possible. The remaining question is whether every privileged boundary is adequately protected and whether the team can understand behavior after immediate pipeline evidence expires.
+
+**What the learner now has:** a controlled delivery system that builds once, promotes by digest, separates software deployment from network-change authorization, and verifies operational outcomes.
+
+**What is still missing:** continuous assurance that identities, trust boundaries, telemetry, and retained evidence remain dependable after deployment.
 
 **What the next module adds:** Module 5 applies security and observability across the complete delivery and operating system. Continue to [Security and Observability](module-05-security-observability.md).

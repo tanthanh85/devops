@@ -6,7 +6,29 @@ Module 2 established that a release should promote one identified artifact throu
 
 Module 1 established repeatable infrastructure lifecycle and Module 2 introduced the DevOps delivery model. Module 3 applies those foundations to the application runtime: first defining the container boundary, then producing a secure image, composing a multitier service, and finally evaluating Kubernetes for clustered operation. The same identified artifact moves through every stage; only configuration, identity, scale, and platform controls change.
 
+### Reference System Before This Module
+
+- Existing Python and Ansible automation
+- Infrastructure-controlled test environment
+- Git-based source and intent
+- Shared DevOps lifecycle and promotion model
+
+### What This Module Adds
+
+- A reproducible, identified container image
+- External configuration, secrets, storage, and runtime contracts
+- Docker Compose services and verifiable readiness
+- A Kubernetes deployment option when orchestration is justified
+
+### Reference System After This Module
+
+- The application can be deployed consistently by digest
+- Multitier responsibilities and health contracts are explicit
+- Build, test, deployment, and verification remain manually coordinated
+
 ## 2. Container runtime fundamentals
+
+> **CORE CONCEPT**
 
 ### 2.1 The application consistency problem
 
@@ -237,6 +259,8 @@ Useful commands include `docker build`, `docker image inspect`, `docker history`
 
 #### 2.18.1 Practical run pattern
 
+> **LAB REQUIRED**
+
 This example keeps configuration outside the image, mounts it read-only, limits resources, removes unnecessary Linux capabilities, and gives generated evidence a dedicated writable location:
 
 ```bash
@@ -252,6 +276,8 @@ docker run --rm --name automation-check \
 This is a pattern, not a command to copy unchanged into production. The environment file must contain no long-lived device password, the digest must resolve in the chosen registry, and the application must support a read-only root filesystem. Because `--rm` deletes the stopped container, durable logs and reports must reach the evidence volume or a collector before exit.
 
 ## 3. Secure image packaging
+
+> **CORE CONCEPT**
 
 ### 3.1 Application image contents
 
@@ -377,6 +403,8 @@ Traceability should answer:
 
 ### 3.11 Testing an image
 
+> **LAB REQUIRED**
+
 Testing should cover more than successful process startup. A build workflow can perform:
 
 - Dockerfile linting
@@ -407,11 +435,15 @@ Separating a validation image from a deployment image can reduce capability. The
 
 ### 3.12 Image signing and provenance
 
+> **ADVANCED / REFERENCE**
+
 Signing allows a consumer to verify who approved an image. Build provenance records information about how the artifact was produced. These controls are most useful when the deployment platform enforces them. A signature stored but never verified provides limited protection.
 
-The pipeline should promote an already tested image digest. Rebuilding from the same source for production creates a different artifact and breaks the evidence chain.
+The delivery process should retain and promote an already tested image digest. Rebuilding from the same source for another environment creates a different artifact and breaks the evidence chain.
 
-### 3.13 Secure build pipeline
+### 3.13 Image supply-chain evidence
+
+> **ADVANCED / REFERENCE**
 
 Each output has a purpose. The SBOM inventories components. The vulnerability scan compares those components with known findings. A signature binds an identity to the digest. Provenance describes how the build occurred. None of these controls substitutes for the others.
 
@@ -424,6 +456,8 @@ The supply chain below shows that evidence is attached to the immutable digest b
 Secrets may be exposed temporarily through a supported build-secret mechanism when private dependencies require them, but they must not enter the build context, layer history, final image, or provenance output.
 
 ### 3.14 Compromised dependency scenario
+
+> **ADVANCED / REFERENCE**
 
 Assume a new parsing package executes unexpected code during installation. If the build job can reach the management network or access deployment variables, the dependency can steal credentials before an image is created.
 
@@ -457,6 +491,8 @@ These controls do not guarantee that the application behaves correctly. They est
 
 ### 3.16 Example network automation packaging pattern
 
+> **LAB REQUIRED**
+
 The following Dockerfile brings the preceding controls together in a small packaging pattern. Read it as an example of deliberate build decisions—base image, dependency installation, ownership, and runtime identity—not as a production template that can be copied without review.
 
 ```dockerfile
@@ -488,6 +524,10 @@ This example illustrates separation of build and runtime stages, dependency cach
 Suppose a merge request changes only `requirements.txt`. Source tests pass, but the lock file now pulls a new transitive SSH library. The reviewer should ask three separate questions: did application behavior change, did the runtime inventory change, and does the new component alter the security boundary? A defensible pipeline rebuilds from a clean context, compares the SBOM with the previous release, runs connection and parser fixtures, scans the resulting digest, and records an approved exception if a finding cannot yet be fixed. Reusing an old scan report would miss the exact risk introduced by the dependency-only change.
 
 ## 4. Multitier application deployment
+
+> **CORE CONCEPT**
+
+One container solves runtime reproducibility for one process. It does not define the relationships among an API, worker, queue, database, telemetry collector, and dashboard. The next engineering requirement is to describe those cooperating processes as one application while preserving separate responsibilities, failure boundaries, networks, and state.
 
 ### 4.1 Multitier service architecture
 
@@ -568,6 +608,8 @@ A Compose file defines a related application stack. Main elements include:
 Compose is useful for development, integration testing, demonstrations, and smaller deployments. Kubernetes provides a broader orchestration model for clustered operation.
 
 #### 4.4.1 Illustrative Compose structure
+
+> **LAB REQUIRED**
 
 The following Compose definition shows how the application tiers can be declared as one system while retaining separate runtime responsibilities. The values are intentionally minimal so that the service relationships remain visible.
 
@@ -745,6 +787,10 @@ An HTTP 200 response from the API proves only that the request-facing process ca
 
 ## 5. Kubernetes orchestration and multidata-center operation
 
+> **CORE CONCEPT**
+
+Compose can describe and operate the complete application on a small platform. It does not by itself provide a multi-node scheduler, automatic workload replacement across nodes, standardized rolling updates, cluster-wide resource placement, or a broad policy API. When scale, availability, scheduling, and platform-governance requirements justify that operational cost, the team can introduce Kubernetes. A protected runner or Compose deployment remains valid when those requirements do not exist.
+
 ### 5.1 Platform architecture
 
 The platform view identifies which Kubernetes workloads need ordinary service connectivity and which worker path requires tightly controlled access to managed infrastructure.
@@ -808,6 +854,8 @@ The comparison separates three legitimate operating models so that Kubernetes is
 Kubernetes solves automation-platform scheduling and lifecycle problems. It does not validate network intent, discover the correct device, constrain a routing-domain blast radius, or prove forwarding health.
 
 ### 5.4 Kubernetes worker-to-device security
+
+> **ADVANCED / REFERENCE**
 
 The security path shows the controls required between a validated queue item and an explicitly authorized device when a worker executes inside a cluster.
 
@@ -916,6 +964,8 @@ Probe timing and thresholds should reflect application behavior. A liveness prob
 
 #### 5.10.1 Compact deployment example
 
+> **LAB REQUIRED**
+
 This fragment shows the controls that reviewers should look for rather than a complete production manifest:
 
 ```yaml
@@ -972,6 +1022,8 @@ Kubernetes can pause, resume, and undo Deployment revisions, but rollback only c
 
 ### 5.13 Advanced deployment patterns
 
+> **ADVANCED / REFERENCE**
+
 Deployment patterns control how a new version is introduced and how risk is distributed during the transition. The appropriate pattern depends on capacity, compatibility, observability, and the speed at which traffic can be redirected or a release reversed.
 
 #### 5.13.1 Blue-green
@@ -988,44 +1040,9 @@ GitOps uses a repository as the reviewed desired state and a cluster-side reconc
 
 GitOps still requires repository security, reconciliation policy, secret handling, health assessment, and recovery design.
 
-### 5.14 CI/CD integration
+### 5.14 Kubernetes networking
 
-A Kubernetes delivery pipeline can:
-
-1. Validate manifests and policy.
-2. Build and scan the image once.
-3. Record and sign the digest.
-4. Deploy to a test namespace.
-5. Wait for rollout readiness with a timeout.
-6. Run functional tests.
-7. Collect resource state, events, logs, and test reports.
-8. Promote the same digest through a controlled change.
-9. Observe release health.
-10. Remove the temporary namespace.
-
-Avoid mutable image tags and broad cluster-admin credentials. Give the deployment identity access only to the required namespace and resource types.
-
-> **VERIFICATION**
-> Confirm both platform state and service outcome. A successful Kubernetes rollout does not prove that a worker can process an approved job safely or that the resulting network state meets its acceptance criteria.
-
-#### 5.14.1 Platform pipeline and network change pipeline
-
-The pipelines meet at a versioned automation platform but have different triggers and outcomes.
-
-<p align="center">
-  <img src="assets/course-figures/platform-vs-network-pipeline.png" alt="Separation between the platform delivery pipeline and network job pipeline" width="860" />
-</p>
-
-Deploying application code must not implicitly authorize a network operation.
-
-Keep two concerns distinguishable:
-
-- The platform pipeline tests and deploys the automation API, worker, validation service, and collectors.
-- A network job pipeline submits reviewed change input to an approved platform version and evaluates network evidence.
-
-Updating the worker image and changing network state in the same uncontrolled step makes troubleshooting difficult. Record both the platform image digest and the change-input commit in every job.
-
-### 5.15 Kubernetes networking
+> **ADVANCED / REFERENCE**
 
 Pods receive routable cluster addresses according to the cluster network implementation. Services provide stable virtual access. NetworkPolicy can restrict permitted connections when the cluster network plugin enforces it.
 
@@ -1041,19 +1058,21 @@ For the network automation platform, allow:
 
 Deny API and dashboard Pods from direct device-management access. Kubernetes NetworkPolicy applies only when the cluster network implementation enforces it and does not replace external firewalls.
 
-### 5.16 RBAC and service accounts
+### 5.15 RBAC and service accounts
+
+> **ADVANCED / REFERENCE**
 
 Use separate service accounts for API, worker, validation, and telemetry components. The worker may need permission to read a narrow secret reference or create a job artifact. It should not list every Secret in the namespace or modify cluster-wide resources.
 
 GitLab's deployment identity should update only the course namespace and approved object kinds. Human administrators retain a separate break-glass path with strong audit.
 
-### 5.17 Configuration and secrets
+### 5.16 Configuration and secrets
 
 Configuration changes can update mounted files or environment inputs differently. Applications may need restart or dynamic reload. Record which behavior the application supports.
 
 Secrets should not appear in manifests committed to the repository. Options include an external secret operator, encrypted secret workflow, CSI integration, or pipeline-controlled injection. Each option has its own trust boundary.
 
-### 5.18 Monitoring and logging
+### 5.17 Monitoring and logging
 
 Kubernetes operational visibility includes:
 
@@ -1072,7 +1091,9 @@ An alert should focus on sustained impact or loss of safety margin. A single Pod
 
 Network automation dashboards should also show queue delay, worker concurrency, per-device lock contention, API and NETCONF latency, job failure category, rollback state, and the network signals developed in Module 5. Correlate Pod rollout events with changes in automation job behavior.
 
-### 5.19 Troubleshooting workflow
+### 5.18 Troubleshooting workflow
+
+> **ADVANCED / REFERENCE**
 
 Use a consistent sequence:
 
@@ -1086,7 +1107,9 @@ Use a consistent sequence:
 
 Useful commands include `kubectl get`, `kubectl describe`, `kubectl logs`, `kubectl events`, `kubectl rollout status`, `kubectl rollout history`, and `kubectl exec` when policy allows it.
 
-### 5.20 Multiple data-center deployments
+### 5.19 Multiple data-center deployments
+
+> **ADVANCED / REFERENCE**
 
 Kubernetes clusters normally form separate failure and administration domains. A multicluster design must address traffic steering, identity, policy consistency, data replication, configuration promotion, observability, and recovery.
 
@@ -1145,4 +1168,12 @@ A container establishes a repeatable process and dependency boundary. A controll
 
 Across every platform, the engineering invariants remain the same: build once, promote by digest, keep configuration and secrets outside the image, separate application traffic from privileged target access, verify readiness at the service boundary, constrain concurrency and blast radius, correlate execution with operational evidence, and recover from observed state rather than assuming a retry is safe. Module 1 supplies the environment; Module 2 supplies the delivery principles; Module 3 now supplies the deployable artifact and runtime contracts.
 
-**What the next module adds:** Module 4 connects the application artifact and controlled infrastructure to source review, automated qualification, immutable evidence, protected deployment, and recovery. Continue to [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md).
+Two workflows must remain separate as the course continues. The **platform pipeline** will build, test, and deploy the automation software. The **network-change workflow** will use an approved platform version to validate intent, obtain approval, execute a bounded network operation, and retain evidence. Deploying a new application version must not automatically authorize a network change.
+
+Executing all of these controls manually creates a new problem. Engineers must remember the correct build inputs, run tests in the correct order, preserve the digest, apply environment policy, wait for readiness, collect evidence, and make the same promotion decision every time. As the number of services and environments grows, a written checklist cannot provide consistent execution or rapid feedback. That unresolved delivery problem establishes the requirement for CI/CD.
+
+**What the learner now has:** an identified application artifact and a deployable runtime platform.
+
+**What is still missing:** a repeatable delivery process that coordinates qualification, promotion, deployment, validation, and recovery.
+
+**What the next module adds:** Module 4 turns those manual steps into executable delivery policy while keeping software deployment separate from authorization of a network change. Continue to [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md).

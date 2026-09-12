@@ -19,34 +19,26 @@ DevOps closes that gap by applying practices that software teams have refined ov
 
 ## 3. Course outcome
 
-Learners take an existing Python application and progressively turn it into a controlled software delivery solution. The supplied application happens to perform network automation, allowing learners to reuse their domain knowledge without spending the course rebuilding the automation logic. One evolving repository is used throughout the five days. Learners containerize the application, deploy supporting services, build a GitLab pipeline, automate tests and releases, provision test infrastructure, add monitoring and logging, secure the workflow, and evaluate Kubernetes deployment.
+Learners begin with an existing Python network automation application, allowing them to reuse their domain knowledge without rebuilding its core logic. They first express supporting infrastructure and test environments as controlled code. They then examine the delivery model needed to move beyond individual execution, package the application as a reproducible image, deploy its services with Docker, and extend the same application to Kubernetes where orchestration is justified. Only after the artifact and runtime behavior are understood do learners automate build, testing, promotion, deployment, and recovery through GitLab CI/CD. Security and observability are then applied across the pipeline and operating platform.
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
-Each module resolves a problem exposed by the preceding one. The automation review identifies uncontrolled state and individual execution. Infrastructure as Code establishes declared ownership and repeatable environments. The DevOps model generalizes those controls into shared flow and feedback. Application packaging creates the identified artifact and runtime contracts needed by that model. CI/CD turns the contracts into an executable promotion and validation policy. Security and observability protect the resulting system and return operational evidence to the next planning decision.
+Each module resolves a problem exposed by the preceding one. The automation review establishes how code, data, interfaces, and validation produce a network outcome. Infrastructure as Code makes the supporting environment declarative and repeatable. The DevOps model explains why technical automation also needs shared ownership, controlled flow, feedback, and measurement. Application packaging creates the identified artifact and runtime contracts required for reliable Docker and Kubernetes deployment. The number of manual build, test, promotion, and verification steps then establishes the need for CI/CD. Security and observability protect that automated delivery system and return trustworthy operational evidence to the next decision.
 
-## 4. Course reference scenario
+<p align="center">
+  <img src="assets/course-figures/course-engineering-journey.png" alt="Course engineering progression from network automation through Infrastructure as Code, packaging, container platforms, CI/CD, security, observability, and improvement" width="860" />
+</p>
 
-The course follows a network engineering team as it turns an existing Python automation utility into an operated software service. Reviewed intent enters through GitLab. An unprivileged validation runner checks schema and policy, runs tests, renders a candidate, builds and scans an image, and records its digest. After approval, a protected worker obtains a short-lived credential, reaches only the named targets, performs pre-checks, executes the approved change, verifies operational state, and retains evidence. Telemetry then informs promotion, recovery, and subsequent improvement.
+The technologies are therefore not independent destinations. Each one adds a control that the previous form of the system could not provide.
 
-The reference change is deliberately small enough to understand while still exposing realistic delivery risks:
+This is not a Terraform, Docker, Kubernetes, or GitLab product course. It is a course about engineering a dependable DevOps delivery system around network automation. Every technology appears because it solves one limitation, leaves a boundary unsolved, and exposes the requirement addressed next.
 
-| Item | Reference value |
-|---|---|
-| Site | `campus-west` |
-| Primary target | `distribution-01` |
-| Peer used for validation | `routing-peer-01` |
-| Service | VLAN 120, `USERS` |
-| Gateway and prefix | `10.20.120.1/24`; `10.20.120.0/24` |
-| Routing intent | OSPF process 100, area 0 |
-| Change identifier | `CHG-2026-0042` |
-| Delivery components | GitLab, validation runner, registry, automation API, queue, worker, job database, protected runner, telemetry collector, and dashboard |
+<p align="center">
+  <img src="assets/course-figures/course-maturity-evolution.png" alt="Maturity layers added around working Python and Ansible automation" width="860" />
+</p>
 
-Addresses in `192.0.2.0/24`, `198.51.100.0/24`, and `203.0.113.0/24` are documentation addresses. Names such as `registry.example`, `lab-nos`, and `vendor.collection.network_os`, synthetic XML namespaces beginning with `urn:example:`, and digest text such as `APPROVED_DIGEST` are placeholders. They show structure and control flow; learners must replace them with values supported by their own registry, software version, provider, collection, platform, and data model.
 
-Not every example represents this change. A section that uses another identifier or topology states that it is an independent example. This allows the guide to demonstrate additional failure modes without implying that every technology must be applied to one network service.
-
-## 5. Five-day progression and time distribution
+## 4. Five-day progression and time distribution
 
 The course allocates approximately 20 hours to theory and 20 hours to cumulative lab work. Module 0 is a prerequisite review and transition into the main course; it can be assigned as pre-reading or taught selectively at the start of Day 1. Installation occupies the first lab block.
 
@@ -59,6 +51,8 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 | 5 | Security and observability | Trust boundaries and short-lived identity applied; application, delivery, platform, and network signals correlated for detection, response, and improvement | 4 h | 4 h |
 
 The repository grows with the system. Day 1 establishes application source, tests, and infrastructure definitions; Day 2 adds delivery controls and container packaging; Day 3 adds Compose, optional Kubernetes definitions, and on-demand environment integration; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
+
+The practical work keeps two workflows distinct. The platform pipeline builds, tests, identifies, and deploys the automation application. The network-change workflow uses an approved platform version to process reviewed intent, perform prechecks, obtain authorization, execute a bounded operation, validate the outcome, and preserve evidence. Deploying software never grants automatic permission to change the network; the cumulative lab and final exercise must demonstrate both paths separately.
 
 ```text
 network-devops/
@@ -78,20 +72,20 @@ network-devops/
 └── README.md
 ```
 
-## 6. Modules
+## 5. Modules
 
 The modules follow the requested learning sequence: review the automation foundation, establish Infrastructure as Code, introduce the DevOps model, package and operate the application, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
 
 | Module | Subject | Central engineering question |
 |---|---|---|
-| 0 | [Network Automation Review and the Path to DevOps](module-00-network-automation-review.md) | Which automation foundations do learners already have, and how does DevOps turn them into a dependable team delivery system? |
-| 1 | [Infrastructure as Code and On-Demand Environments](module-01-infrastructure-as-code.md) | How do Terraform, Ansible, Python, and pipelines create and govern controlled infrastructure? |
-| 2 | [Introducing the DevOps Model](module-02-devops-model.md) | How do DevOps philosophy, flow, feedback, measurement, and shared ownership improve software delivery? |
-| 3 | [Packaging and Operating Applications](module-03-packaging-applications.md) | How is one application packaged, composed into a service, and operated with Docker, Compose, and Kubernetes? |
-| 4 | [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md) | How does GitLab CI convert source into a tested artifact, deploy it safely, verify the outcome, and support recovery? |
-| 5 | [Security and Observability](module-05-security-observability.md) | How are delivery boundaries protected and correlated evidence used to operate and improve the system? |
+| 0 | [Network Automation Review](module-00-network-automation-review.md) | Can we automate and verify the network outcome? |
+| 1 | [Infrastructure as Code and On-Demand Environments](module-01-infrastructure-as-code.md) | Can we recreate and govern the environment? |
+| 2 | [Introducing the DevOps Model](module-02-devops-model.md) | Can a team own, deliver, measure, and improve the system? |
+| 3 | [Packaging and Operating Applications](module-03-packaging-applications.md) | Can we reproduce and operate the application runtime? |
+| 4 | [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md) | Can we automate the delivery process safely? |
+| 5 | [Security and Observability](module-05-security-observability.md) | Can we trust the system and explain what happened? |
 
-## 7. Learning outcomes
+## 6. Learning outcomes
 
 After completing the guide and labs, learners should be able to:
 
@@ -108,3 +102,18 @@ After completing the guide and labs, learners should be able to:
 - Explain how telemetry, health monitoring, and controlled chaos experiments improve stability and reliability.
 - Secure repositories, pipelines, runners, images, credentials, infrastructure access, and retained evidence.
 - Compare modern application, microservices, public/private cloud, and multicloud deployment architectures.
+
+## 7. Instructor delivery map
+
+The classifications inside each module identify the normal live path, practical prerequisites, and optional study-guide depth. The estimated times below total approximately 20 classroom theory hours; demonstrations and cumulative lab work use the remaining 20 hours.
+
+| Module | Estimated theory | Core diagrams to present | Reference diagrams that may be skipped live |
+|---|---:|---|---|
+| 0 | 2 h | Automation system; three forms of network state | Structured-data normalization; interface selection; telemetry flow |
+| 1 | 3 h | Tool ownership; Terraform–Ansible handoff; environment lifecycle | Terraform lifecycle; drift reconciliation |
+| 2 | 3 h | CALMS; lifecycle; evidence chain; value stream | Delivery-model comparison; feedback speeds; delivery architecture |
+| 3 | 4.5 h | Docker architecture; image/container lifecycle; Compose services; Kubernetes suitability; probes | Image layers; supply chain; failure boundaries; cluster architecture; platform comparison |
+| 4 | 4.5 h | Pipeline gates; runner trust; platform vs network pipeline; change state; recovery decision | Artifact/cache; blast radius; deployment-strategy map |
+| 5 | 3 h | Trust boundaries; observability architecture; change-aware feedback | Security lifecycle; incident response; signal categories; detailed correlation model |
+
+Instructors can assign **ADVANCED / REFERENCE** sections as preparation or follow-up without breaking the cumulative engineering story. **LAB REQUIRED** sections should be completed before learners begin the associated practical stage.
