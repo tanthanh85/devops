@@ -50,13 +50,13 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 | Day | Theory aligned to the DEVOPS outline | Reference system at the end of the day | Theory | Lab |
 |---|---|---|---:|---:|
-| 1 | Network automation review, DevOps model, containers, and Docker tooling | Installed environment; supplied Python source and tests in Git; first reproducible container runtime | 4 h | 4 h |
-| 2 | Secure image packaging, container networking, and multitier applications | Locked, non-root image plus API, queue, worker, job database, and service health in Compose | 4 h | 4 h |
-| 3 | CI/CD, DevOps flow, build validation, and improved deployment | GitLab pipeline that tests once, records an immutable digest, controls protected execution, and retains pre-check, deployment, post-check, and recovery evidence | 4 h | 4 h |
-| 4 | Infrastructure DevOps, on-demand test environments, monitoring, and visibility | Disposable test environment with explicit Terraform-to-Ansible ownership, plus correlated logs, metrics, deployment events, and network telemetry | 4 h | 4 h |
-| 5 | Secure workflows, multicloud and application architectures, Kubernetes, and Kubernetes visibility | Trust boundaries and short-lived identity applied; application evaluated or deployed on Kubernetes; platform release kept separate from network-job execution | 4 h | 4 h |
+| 1 | Network automation review and the DevOps model | Installed environment; supplied automation application reviewed as a software product; delivery risks and lifecycle controls identified | 4 h | 4 h |
+| 2 | Application packaging, Docker, Compose, and Kubernetes | Locked non-root image; multitier service deployed with explicit networks, health contracts, state, and an orchestration decision | 4 h | 4 h |
+| 3 | Infrastructure as Code and on-demand environments | Disposable environment with explicit Terraform, Ansible, and Python ownership, protected state, validation, and cleanup | 4 h | 4 h |
+| 4 | CI/CD, automated qualification, deployment validation, and recovery | GitLab pipeline that builds once, promotes by digest, controls protected execution, verifies operational outcomes, and retains evidence | 4 h | 4 h |
+| 5 | Security and observability | Trust boundaries and short-lived identity applied; application, delivery, platform, and network signals correlated for detection, response, and improvement | 4 h | 4 h |
 
-The repository grows with the system. Day 1 introduces application source, tests, and container files; Day 2 adds Compose definitions; Day 3 adds CI/CD and evidence paths; Day 4 adds infrastructure and observability definitions; and Day 5 adds security policy and, where justified, Kubernetes manifests. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
+The repository grows with the system. Day 1 establishes application source and tests; Day 2 adds container, Compose, and optional Kubernetes definitions; Day 3 adds infrastructure definitions and environment lifecycle; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
 
 ```text
 network-devops/
@@ -78,21 +78,16 @@ network-devops/
 
 ## 6. Modules
 
-The modules follow the path of a software delivery system: establish the automation foundation, package and integrate the application, control its release, and then operate it securely at scale. The table summarizes the engineering focus of each stage.
+The modules follow the requested learning sequence: review the automation foundation, introduce the DevOps model, package and operate the application, define infrastructure as code, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
 
 | Module | Subject | Central engineering question |
 |---|---|---|
 | 0 | [Network Automation Review and the Path to DevOps](module-00-network-automation-review.md) | Which automation foundations do learners already have, and how does DevOps turn them into a dependable team delivery system? |
 | 1 | [Introducing the DevOps Model](module-01-devops-model.md) | How do DevOps philosophy, flow, feedback, measurement, and shared ownership improve software delivery? |
-| 2 | [Introducing Containers](module-02-containers.md) | How do containers create a consistent runtime and isolation boundary? |
-| 3 | [Packaging an Application Using Docker](module-03-secure-images.md) | How is an existing Python application packaged into a secure, reproducible image? |
-| 4 | [Deploying a Multitier Application](module-04-multitier-compose.md) | How do API, worker, queue, data, and monitoring services communicate and recover? |
-| 5 | [Introducing CI/CD and Building the DevOps Flow](module-05-cicd.md) | How does GitLab CI convert a source change into tested, traceable artifacts? |
-| 6 | [Validating the Build and Improving the Deployment Flow](module-06-validation-deployment.md) | How do automated health checks, deployment strategies, validation, and recovery improve releases? |
-| 7 | [Extending DevOps to Infrastructure and On-Demand Testing](module-07-infrastructure-devops.md) | How do Terraform, Ansible, and pipelines create controlled test infrastructure? |
-| 8 | [Monitoring DevOps and Engineering Visibility and Stability](module-08-observability.md) | How do logs, metrics, telemetry, alerts, and chaos experiments improve reliability? |
-| 9 | [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md) | How are secrets, pipelines, application architecture, and public/private cloud placement secured? |
-| 10 | [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md) | How are applications deployed, updated, secured, and observed with Kubernetes? |
+| 2 | [Packaging and Operating Applications](module-02-packaging-applications.md) | How is one application packaged, composed into a service, and operated with Docker, Compose, and Kubernetes? |
+| 3 | [Infrastructure as Code and On-Demand Environments](module-03-infrastructure-as-code.md) | How do Terraform, Ansible, Python, and pipelines create and govern controlled infrastructure? |
+| 4 | [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md) | How does GitLab CI convert source into a tested artifact, deploy it safely, verify the outcome, and support recovery? |
+| 5 | [Security and Observability](module-05-security-observability.md) | How are delivery boundaries protected and correlated evidence used to operate and improve the system? |
 
 ## 7. Learning outcomes
 
@@ -103,12 +98,11 @@ After completing the guide and labs, learners should be able to:
 - Explain container architecture and use Docker tooling.
 - Package an existing Python application into a secure container image.
 - Use container networking and Compose to deploy a multitier application.
+- Explain Kubernetes building blocks, APIs, manifests, deployment automation, multidata-center considerations, monitoring, and logging.
+- Apply DevOps principles to infrastructure and create on-demand test environments with Terraform and Ansible.
 - Explain CI/CD concepts and implement a GitLab pipeline that builds, tests, and deploys applications.
 - Automate build and deployment validation and improve the deployment flow with health checks, controlled promotion, and recovery.
-- Apply DevOps principles to infrastructure and create on-demand test environments with Terraform and Ansible.
 - Implement metric and log collection, dashboards, analysis, alerts, and application instrumentation.
 - Explain how telemetry, health monitoring, and controlled chaos experiments improve stability and reliability.
 - Secure repositories, pipelines, runners, images, credentials, infrastructure access, and retained evidence.
 - Compare modern application, microservices, public/private cloud, and multicloud deployment architectures.
-- Explain Kubernetes building blocks, use its APIs and manifests to deploy an application, and implement an automated deployment pipeline.
-- Explain multidata-center Kubernetes design and Kubernetes monitoring, logging, and visibility.

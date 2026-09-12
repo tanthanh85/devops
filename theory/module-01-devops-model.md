@@ -257,7 +257,7 @@ Operational evidence returns to the engineer and repository; it is not an isolat
 - Post-checks and telemetry produce evidence about configuration, protocol, forwarding, and platform health.
 - The final decision promotes the result, stops further rollout, rolls back safely, or initiates forward remediation.
 
-Modules 2–4 expand the runtime and service-platform blocks. Modules 5–6 expand pipeline gates, protected execution, and recovery. Module 7 assigns tool ownership. Module 8 builds the feedback path. Module 9 secures every boundary. Module 10 evaluates one optional platform implementation.
+Module 2 applies reproducibility to container packaging, multitier services, and Kubernetes. Module 3 assigns infrastructure ownership and lifecycle controls. Module 4 implements CI/CD, protected execution, validation, and recovery. Module 5 secures every boundary and builds the operational feedback path.
 
 ## 7. Continuous integration, delivery, and deployment
 
@@ -371,7 +371,7 @@ Schema success does not grant authorization, policy success does not prove corre
 
 ## 10. Where implementation depth belongs
 
-Module 1 establishes the delivery model and the questions that each control must answer. Later chapters own the implementation detail: Modules 2–4 cover runtime and service architecture; Module 5 covers GitLab jobs, runners, artifacts, and promotion; Module 6 covers mutable network state, blast radius, convergence, and recovery; Module 7 covers infrastructure lifecycle and drift; Module 8 covers operational feedback; and Module 9 covers trust boundaries and credentials. This separation prevents the lifecycle overview from duplicating the engineering guidance where learners apply it.
+Module 1 establishes the delivery model and the questions that each control must answer. Later chapters own the implementation detail: Module 2 covers containers, image construction, multitier services, and Kubernetes orchestration; Module 3 covers infrastructure lifecycle, state, drift, and tool ownership; Module 4 covers GitLab jobs, runners, artifacts, promotion, mutable state, blast radius, convergence, and recovery; and Module 5 covers trust boundaries, credentials, operational feedback, and stability. This separation prevents the lifecycle overview from duplicating the engineering guidance where learners apply it.
 
 ## 11. Knowledge check
 
@@ -394,4 +394,4 @@ DevOps changes the way a team makes and proves a change; it is not a synonym for
 
 **What the learner now has:** a lifecycle model based on CALMS, flow, feedback, evidence, measured outcomes, immutable promotion, and shared responsibility.
 
-**What the next module adds:** Module 2 turns reproducibility from a principle into a runtime boundary by packaging the application and its dependencies with containers. Continue to [Introducing Containers](module-02-containers.md).
+**What the next module adds:** Module 2 turns reproducibility from a principle into an application runtime and packaging architecture using containers, secure images, multitier services, and Kubernetes. Continue to [Packaging and Operating Applications](module-02-packaging-applications.md).

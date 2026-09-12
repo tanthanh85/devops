@@ -1,10 +1,10 @@
-# Module 7: Extending DevOps to Infrastructure and On-Demand Testing
+# Module 3: Infrastructure as Code and On-Demand Environments
 
 ## 1. Purpose
 
 Application delivery depends on compute, networking, storage, test platforms, configuration, and access. This module extends version control, review, testing, automation, and evidence to infrastructure. It covers Infrastructure as Code, Terraform, Ansible, ownership boundaries, state, drift, on-demand test environments, pipeline integration, validation, and cleanup.
 
-Module 6 defined the evidence required before and after deployment. Module 7 makes the environment that produces that evidence repeatable. Terraform, Ansible, and Python receive explicit ownership boundaries so the pipeline can create, configure, test, and safely remove an isolated environment. Module 8 will use the resulting application and environment to build operational feedback.
+Modules 1 and 2 established DevOps lifecycle controls and a reproducible application architecture. Module 3 applies those practices to the infrastructure on which applications and tests depend. Terraform, Ansible, and Python receive explicit ownership boundaries so the delivery workflow can create, configure, test, and safely remove consistent environments.
 
 ## 2. Three automation responsibilities
 
@@ -93,6 +93,12 @@ Terraform outputs can generate a sanitized inventory input, but credentials shou
 
 ## 6. Terraform lifecycle
 
+Terraform uses a repeating desired-state lifecycle.
+
+<p align="center">
+  <img src="assets/course-figures/terraform-lifecycle.png" alt="Terraform desired-state lifecycle from authoring through planning, application, and drift detection" width="860" />
+</p>
+
 The normal lifecycle includes:
 
 1. `terraform fmt` for consistent format
@@ -172,6 +178,10 @@ Keep validation separate from rendering. Ansible should fail before device acces
 ## 10. Provisioning and configuration boundary
 
 Terraform normally owns lifecycle-oriented infrastructure resources. Ansible normally owns configuration within reachable hosts or devices. The exact boundary depends on provider quality and team design.
+
+<p align="center">
+  <img src="assets/course-figures/terraform-ansible-handoff.png" alt="Ownership and data handoff between Terraform provisioning and Ansible configuration" width="860" />
+</p>
 
 For an illustrative automation platform:
 
@@ -292,4 +302,4 @@ Infrastructure delivery needs the same review and evidence discipline as applica
 
 **What the learner now has:** an explicit ownership boundary among Terraform, Ansible, and Python, plus a pipeline-controlled lifecycle for disposable infrastructure, validation evidence, and cleanup.
 
-**What the next module adds:** Module 8 adds evidence about application, delivery, and infrastructure behavior over time. Continue to [Monitoring DevOps and Engineering Visibility and Stability](module-08-observability.md).
+**What the next module adds:** Module 4 connects the application artifact and controlled infrastructure to source review, automated qualification, immutable evidence, protected deployment, and recovery. Continue to [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md).
