@@ -4,7 +4,7 @@
 
 DevOps is a way of organizing software and infrastructure delivery so that small changes move through a controlled, repeatable feedback loop. It combines shared responsibility, version control, automation, testing, operational evidence, and continuous improvement. A team has adopted DevOps only when these practices change how it delivers and operates a system. Installing a pipeline product alone does not achieve that result.
 
-This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation is simply the familiar workload used in selected examples.
+This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation provides the primary engineering workload through which the practices are applied throughout the course.
 
 [Module 0](module-00-network-automation-review.md) reviewed how the supplied application turns intent and inventory into controlled network operations. Module 1 changes the point of view: the subject is now how a team develops, tests, releases, operates, and improves that application. The delivery model established here supplies the reasoning used by every later module.
 
@@ -293,13 +293,7 @@ If a new commit, artifact, target, or configuration appears after approval, the 
 
 The lifecycle contains several feedback loops:
 
-The diagram orders feedback by typical response time. Faster is not always more important: production and architecture feedback answer questions that a unit test cannot reproduce.
-
-<p align="center">
-  <img src="assets/diagrams/devops-feedback-speeds.svg" alt="DevOps feedback loops from developer checks to long-term architecture learning" width="640" />
-</p>
-
-Each loop should have an owner and a path back into source, tests, policy, documentation, or design.
+Feedback is ordered below by typical response time. Faster is not always more important: production and architecture feedback answer questions that a unit test cannot reproduce. Each loop should have an owner and a path back into source, tests, policy, documentation, or design.
 
 - **Seconds to minutes:** formatter, linter, schema validation, and unit tests guide the developer.
 - **Minutes to hours:** integration, security, packaging, and system tests guide merge and release decisions.
@@ -330,6 +324,9 @@ The Python change may be small. The complete lifecycle is what makes it safe for
 The following responsibilities appear in most mature delivery systems, although the products and team boundaries vary.
 
 The reference architecture makes the most important trust transition visible: unprivileged validation produces an identified artifact before an approved protected runner receives management access.
+
+> **DESIGN INSIGHT**
+> A runner is not safe merely because the CI platform labels it protected. Its effective trust boundary is determined by which jobs it accepts, which identities it can obtain, and which endpoints it can reach.
 
 <p align="center">
   <img src="assets/diagrams/course-reference-architecture.svg" alt="Course reference architecture from engineer and Git through separated runners to operational feedback" width="640" />
@@ -476,4 +473,6 @@ Use these questions to test whether you can connect DevOps principles to enginee
 
 DevOps changes the way a team makes and proves a change; it is not a synonym for scripting or CI software. CALMS provides a balanced way to examine that change: Culture creates shared responsibility, Automation makes the safe path repeatable, Lean improves flow, Measurement tests whether the system is improving, and Sharing makes knowledge reusable. The rest of the course applies these ideas to the delivery of an existing Python automation application.
 
-Module 2 turns reproducibility from a principle into a runtime boundary by packaging the application and its dependencies with containers. Continue to [Introducing Containers](module-02-containers.md).
+**What the learner now has:** a lifecycle model based on CALMS, flow, feedback, evidence, measured outcomes, immutable promotion, and shared responsibility.
+
+**What the next module adds:** Module 2 turns reproducibility from a principle into a runtime boundary by packaging the application and its dependencies with containers. Continue to [Introducing Containers](module-02-containers.md).

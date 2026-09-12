@@ -8,6 +8,8 @@ Modules 1–9 progressively created the delivery model, image, multitier service
 
 ## 2. Platform architecture
 
+The platform view identifies which Kubernetes workloads need ordinary service connectivity and which worker path requires tightly controlled access to managed infrastructure.
+
 <p align="center">
   <img src="assets/diagrams/kubernetes-automation-platform.svg" alt="Kubernetes-hosted network automation platform and restricted management paths" width="640" />
 </p>
@@ -15,6 +17,8 @@ Modules 1–9 progressively created the delivery model, image, multitier service
 Only job workers need network-device access. API, dashboard, and general validation Pods should not share that route by default. Kubernetes NetworkPolicy, external firewalls, worker placement, and service-account policy work together to enforce the design.
 
 ## 3. Should the team use Kubernetes?
+
+The decision flow tests whether orchestration capabilities solve an actual operating requirement or merely add a larger platform and security burden.
 
 <p align="center">
   <img src="assets/diagrams/kubernetes-suitability.svg" alt="Decision flow for choosing Kubernetes, Compose, or a protected runner for network automation" width="640" />
@@ -45,6 +49,8 @@ The course uses Minikube to teach the model. It does not claim that the producti
 
 ## 4. Three valid platform architectures
 
+The comparison separates three legitimate operating models so that Kubernetes is evaluated against simpler alternatives rather than assumed to be the target state.
+
 <p align="center">
   <img src="assets/diagrams/automation-platform-options.svg" alt="Comparison of a protected runner, Docker Compose platform, and Kubernetes automation platform" width="640" />
 </p>
@@ -63,6 +69,8 @@ The course uses Minikube to teach the model. It does not claim that the producti
 Kubernetes solves automation-platform scheduling and lifecycle problems. It does not validate network intent, discover the correct device, constrain a routing-domain blast radius, or prove forwarding health.
 
 ## 5. Kubernetes worker-to-device security
+
+The security path shows the controls required between a validated queue item and an explicitly authorized device when a worker executes inside a cluster.
 
 <p align="center">
   <img src="assets/diagrams/kubernetes-worker-device-security.svg" alt="Kubernetes security controls from validated queue input through an isolated worker to explicitly authorized devices" width="640" />
@@ -246,6 +254,9 @@ A Kubernetes delivery pipeline can:
 
 Avoid mutable image tags and broad cluster-admin credentials. Give the deployment identity access only to the required namespace and resource types.
 
+> **VERIFICATION**
+> Confirm both platform state and service outcome. A successful Kubernetes rollout does not prove that a worker can process an approved job safely or that the resulting network state meets its acceptance criteria.
+
 ### 15.1 Platform pipeline and network change pipeline
 
 The pipelines meet at a versioned automation platform but have different triggers and outcomes.
@@ -348,4 +359,6 @@ Use these questions to assess whether you can relate Kubernetes reconciliation, 
 
 Kubernetes provides reconciliation, scheduling, and rollout machinery; it does not make an application reliable by itself. Safe delivery still requires an immutable image, compatible data changes, meaningful probes, least-privilege identities, enforced network policy, bounded worker concurrency, and evidence from the rollout. A team should choose Kubernetes only when these platform capabilities repay its additional operating and security burden.
 
-This completes the course progression: a familiar automation script has become a reviewed, reproducible, secure, observable, and supportable software product. Return to the [course overview](README.md) to review the learning outcomes and five-day path.
+**What the learner now has:** an end-to-end DevOps design that can package, test, release, deploy, observe, secure, recover, and improve the automation application, with Kubernetes used only when its benefits justify its additional control surface.
+
+**What follows:** the completed repository and retained evidence support operational handover, future releases, and continued improvement through the same lifecycle. Return to the [course overview](README.md) to review the learning outcomes and five-day path.

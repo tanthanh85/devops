@@ -56,15 +56,17 @@ GitLab combines source control, review, pipeline execution, and evidence managem
 | Rule | Condition that prevents change jobs on untrusted branches |
 | Manual approval | Deliberate promotion decision after diff and evidence review |
 
+### 4.2 From issue to verified merge
+
+A pipeline begins before `.gitlab-ci.yml` is evaluated. A work item or change record states the problem, scope, owner, risk, and acceptance criteria. A feature branch isolates the proposed source change. The merge request then becomes the review boundary that joins discussion, source difference, pipeline results, policy, and approval.
+
+For the reference scenario, the merge request should let a reviewer answer five questions without reconstructing the author's workstation: What network outcome is requested? Which intent and application files changed? Which target and maximum scope are authorized? What candidate configuration and test evidence were produced? What conditions would stop or reverse deployment?
+
+Approval applies to the reviewed commit and evidence. A new commit invalidates conclusions tied to the previous revision and should rerun required checks. Merging records integration into the protected branch; it does not itself authorize a live network change unless the environment policy explicitly defines that behavior.
+
 ## 5. Pipeline design
 
-The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate.
-
-<p align="center">
-  <img src="assets/diagrams/network-aware-cicd.svg" alt="Network-aware CI/CD pipeline separated into general and protected execution" width="640" />
-</p>
-
-The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner.
+The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate. The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner. The compact reference architecture in Module 1 shows this separation.
 
 A typical stage sequence is validation, testing, build, inspection, integration, deployment, and verification.
 
@@ -146,20 +148,62 @@ A cache accelerates work by reusing dependency downloads or build intermediates.
 
 ## 9. Runner design
 
+GitLab coordinates pipelines, but it does not execute the shell commands in a job. That work occurs on runner infrastructure. Runner design therefore determines the operating system, tools, network paths, credentials, isolation, capacity, and residual state available to repository-controlled code.
+
+This distinction matters in network automation. A validation job may need source code and a Python environment, while a deployment job may need a route to a management network and authority to request a short-lived device credential. Assigning both jobs to the same broadly trusted runner collapses two different security boundaries.
+
+### 9.1 Runner terminology and job flow
+
+Several related components are often called a *runner*, but they have different responsibilities:
+
+- **GitLab instance:** creates the pipeline, schedules jobs, issues job-scoped credentials, receives logs, and records status and artifacts.
+- **Runner configuration:** the logical GitLab resource that defines scope, tags, protection, and other scheduling attributes.
+- **Runner manager:** the installed GitLab Runner process that reads `config.toml`, requests work, prepares execution, and reports results.
+- **Executor:** the mechanism used to run a job, such as Shell, Docker, Kubernetes, or a supported autoscaling executor.
+- **Job environment:** the actual shell, container, Pod, or machine in which the job commands execute.
+
+The runner manager authenticates to GitLab with a runner authentication token. After GitLab assigns a job, the runner uses job-scoped information to fetch the required source and artifacts, invokes the executor, streams output, and returns status and artifacts. The runner authentication token identifies the runner configuration; it is not a device credential and should never be passed into the automation application as one.
+
+Current GitLab releases use the runner creation workflow and runner authentication tokens. Legacy registration tokens are deprecated and may be disabled. Installation procedures must therefore be checked against the deployed GitLab and GitLab Runner versions rather than copied from an older example.
+
+### 9.2 Scope, tags, and job selection
+
+A project runner is available to assigned projects, a group runner to projects within its group hierarchy, and an instance runner more broadly across the GitLab instance. Wider scope improves reuse and capacity sharing but increases the number of repositories whose jobs may reach the runner. A privileged or management-connected runner should consequently have the narrowest practical scope.
+
+Tags match jobs to runners with required capabilities. For example, `linux-container` may select an ordinary validation environment and `protected-network-runner` may select a restricted deployment environment. Tags describe scheduling capability; they are not an authorization control by themselves. Protection settings, branch and environment rules, repository permissions, runner scope, identity policy, and network enforcement must agree.
+
+### 9.3 Executor tradeoffs
+
+Executor choice changes the isolation and reproducibility of the job environment. It does not change the trust of the pipeline source or automatically restrict network reachability.
+
+| Executor | Useful characteristic | Important limitation | Appropriate course role |
+|---|---|---|---|
+| Shell | Direct access to host tools and network | Jobs share the host and can leave files or alter installed state | Small, tightly controlled deployment runner where host ownership is explicit |
+| Docker | Reproducible job image and disposable container filesystem | Host kernel is shared; Docker socket or privileged mode can expose host control | General lint, unit-test, render, and packaging jobs |
+| Kubernetes | Ephemeral Pods, scheduling, quotas, and scalable capacity | Adds cluster RBAC, admission, CNI, image, namespace, and node trust | Shared validation capacity when an established cluster platform exists |
+| Autoscaling machine or instance | Clean machine boundary and elastic capacity | Startup time, image maintenance, cloud identity, and cost require control | Bursty builds or stronger per-job isolation |
+
+The Shell executor is not inherently wrong, and the Docker executor is not inherently safe. A dedicated, patched Shell runner with a narrow network path can be more defensible for a protected deployment than a container runner that mounts the Docker socket and accepts untrusted projects.
+
+### 9.4 General and protected runners
+
+The runner model identifies where repository-controlled commands execute and why general validation and management-plane deployment require different trust levels.
+
 <p align="center">
   <img src="assets/diagrams/runner-trust-model.svg" alt="Separation of the general validation runner from the protected network runner and management zone" width="640" />
 </p>
 
-A runner executes repository-controlled commands, so its trust boundary matters. A runner with access to the Docker daemon, internal network, deployment credentials, or host filesystem can affect more than one job.
-
-Use dedicated or protected runners for sensitive deployment work. Avoid allowing untrusted branches to use privileged runners. Keep the runner patched and limit its credentials and network access.
-
-The reference architecture uses at least two trust levels:
+As shown in Module 1, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.
 
 - A general validation runner has Internet or registry access but no production device route or deployment secret.
 - A protected network runner reaches the management network and runs only protected-branch or approved-environment jobs.
 
-If Docker builds require a privileged mechanism, isolate that builder from the network runner. Mounting `/var/run/docker.sock` gives a job control over the Docker host and is equivalent to a powerful host capability.
+The protected runner should accept only explicitly tagged jobs from approved refs or environments, verify the artifact digest and target context, request a scoped identity just in time, and write evidence to an independently protected destination. Its firewall path should reach only required management endpoints. Runner concurrency must also respect device and routing-domain locks; compute capacity is not permission to increase network blast radius.
+
+If Docker builds require a privileged mechanism, isolate that builder from the network runner. Mounting `/var/run/docker.sock` gives a job powerful control over the Docker host. A job that can control the host can inspect other containers, mounts, credentials, and network paths, so container boundaries no longer provide meaningful protection.
+
+> **VERIFICATION**
+> Submit an untrusted-branch job with the protected runner's tag and confirm that it remains unscheduled. Then verify from the runner host and job environment that the general runner has no management route and that the protected runner can reach only the approved endpoints. A green pipeline is not evidence that runner isolation works; the denied paths must also be tested.
 
 ## 10. Variables and secrets
 
@@ -187,7 +231,27 @@ Promotion policy may require successful checks, peer approval, change-window con
 
 ## 13. Pipeline efficiency
 
-Improve feedback time by:
+Pipeline optimization should shorten the time to trustworthy feedback, not merely reduce elapsed minutes. A fast pipeline that omits a required control or tests a different artifact is inefficient because it creates rework and operational risk.
+
+### 13.1 Dependency graphs and safe concurrency
+
+Stages provide an understandable broad order, while `needs` expresses the jobs and artifacts required by a particular consumer. This forms a directed acyclic graph: a job can start when its declared predecessors complete instead of waiting for unrelated work in an earlier stage.
+
+Linting, schema validation, secret detection, and independent unit-test groups can often run concurrently. Rendering must wait for validated intent; deployment must wait for the approved artifact and pre-check evidence. Network jobs that affect the same device or routing domain remain serialized even when their software tests can run in parallel.
+
+### 13.2 Reuse and maintainability
+
+Repeated YAML eventually diverges. Small local patterns can use hidden jobs and `extends`; shared organizational policy can use controlled `include` files or CI/CD components where supported. YAML anchors operate within YAML processing and are useful for limited repetition, but excessive indirection makes a pipeline harder to review.
+
+Reusable definitions must be versioned. Referencing a mutable shared template allows pipeline behavior to change without a commit in the consuming repository. Pin an approved version or commit, define ownership, test compatibility, and provide a deliberate update path. Parent-child pipelines can separate components in a large repository, but they also require clear artifact, variable, status, and cancellation behavior across the boundary.
+
+### 13.3 Purpose-built job images
+
+A job image should contain the toolchain required for one related class of work, with versions controlled and the image identified by digest. Installing Python, Ansible collections, scanners, and operating-system packages at the start of every job increases time and allows dependency resolution to change between runs.
+
+The validation image should include only offline validation tools and trusted certificate material. It should not contain environment-specific inventory or credentials. A separate deployment image can include approved network clients while remaining unavailable to untrusted runners. Both images require patching, scanning, provenance, and an owner; a purpose-built image becomes technical debt if nobody maintains it.
+
+Practical improvements include:
 
 - Running independent jobs concurrently
 - Reusing safe dependency caches
@@ -218,7 +282,7 @@ Jobs should return a nonzero status on failure and preserve relevant evidence. S
 The pipeline below demonstrates how the validation layers can be ordered and how artifacts can pass evidence between jobs. It is deliberately illustrative: runners, credentials, approval rules, and deployment commands must be adapted to the target environment.
 
 ```yaml
-stages: [validate, render, test, build, precheck, deploy, postcheck, observe]
+stages: [validate, render, test, build, precheck, deploy, postcheck]
 
 default:
   image: registry.example/network-devops/validator@sha256:VALIDATOR_DIGEST
@@ -228,7 +292,7 @@ default:
 
 variables:
   INTENT_FILE: examples/service-intent.yml
-  TARGET_LIMIT: lab-edge-01
+  TARGET_LIMIT: distribution-01
   TARGET_PLATFORM: lab-nos
   EVIDENCE_DIR: evidence-output
 
@@ -260,10 +324,31 @@ offline_tests:
     reports:
       junit: evidence-output/junit.xml
 
+build_automation_image:
+  stage: build
+  needs: [offline_tests]
+  script:
+    - ./ci/build-image --commit "$CI_COMMIT_SHA" --metadata evidence-output/image.json
+    - ./ci/create-sbom --metadata evidence-output/image.json --output evidence-output/sbom.cdx.json
+    - ./ci/scan-image --metadata evidence-output/image.json --report evidence-output/image-scan.json
+    - ./ci/export-digest --metadata evidence-output/image.json --dotenv evidence-output/image.env
+  artifacts:
+    paths:
+      - evidence-output/image.json
+      - evidence-output/sbom.cdx.json
+      - evidence-output/image-scan.json
+    reports:
+      dotenv: evidence-output/image.env
+
 network_precheck:
   stage: precheck
+  needs:
+    - job: render_network_config
+      artifacts: true
+    - job: build_automation_image
+      artifacts: true
   tags: [protected-network-runner]
-  resource_group: lab-edge-01
+  resource_group: distribution-01
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   script:
@@ -275,20 +360,25 @@ network_precheck:
 deploy_lab_target:
   stage: deploy
   tags: [protected-network-runner]
-  resource_group: lab-edge-01
+  resource_group: distribution-01
   environment:
-    name: lab/edge-01
+    name: lab/distribution-01
   when: manual
   allow_failure: false
-  needs: [network_precheck]
+  needs:
+    - job: network_precheck
+      artifacts: true
+    - job: build_automation_image
+      artifacts: true
   script:
+    - test -n "$AUTOMATION_IMAGE_DIGEST"
     - python -m automation.python.verify_target --inventory lab --limit "$TARGET_LIMIT"
-    - python -m automation.python.deploy --approved-diff evidence-output/precheck/diff.json
+    - python -m automation.python.deploy --image-digest "$AUTOMATION_IMAGE_DIGEST" --approved-diff evidence-output/precheck/diff.json
 
 network_postcheck:
   stage: postcheck
   tags: [protected-network-runner]
-  resource_group: lab-edge-01
+  resource_group: distribution-01
   needs: [deploy_lab_target]
   script:
     - pyats run job validation/pyats/service_validation_job.py --testbed-file inventory/lab.yml
@@ -297,7 +387,7 @@ network_postcheck:
     paths: [evidence-output/postcheck/, archive/]
 ```
 
-This is a teaching example. GitLab syntax and feature availability depend on the deployed GitLab version and tier. Validate it against the target instance.
+This is a teaching example. Commands under `./ci/` are repository-owned wrappers, not GitLab or industry-standard commands; each must fail nonzero on policy violation and produce the named evidence. `export-digest` writes `AUTOMATION_IMAGE_DIGEST` to the dotenv report after the image has been pushed and its registry digest resolved. GitLab syntax and feature availability depend on the deployed GitLab version and tier. Validate the pipeline against the target instance.
 
 ## 16. Explanation of the pipeline blocks
 
@@ -310,6 +400,8 @@ Each block in the example has a distinct control purpose. Together they make the
 - `artifacts.when: always` preserves failure evidence as well as successful output.
 - `needs` allows a job to start only after its required evidence exists.
 - `offline_tests` exercises code, fixtures, and playbook syntax without device credentials.
+- `build_automation_image` creates the image once, resolves its registry digest, and retains the SBOM and scan reports with the build metadata.
+- The dotenv report passes the resolved digest as data; deployment rejects an empty digest and does not resolve a mutable tag again.
 - `tags` routes sensitive jobs to the protected network runner.
 - `resource_group` prevents concurrent changes to the same target scope.
 - `rules` excludes feature branches from live-device work.
@@ -355,9 +447,14 @@ Use these questions to test your understanding of pipeline structure, evidence f
 3. Why should the pipeline build a release artifact only once?
 4. Which checks should run before an expensive test environment is created?
 5. Why is a masked variable insufficient protection against a malicious job?
+6. How do runner scope, tags, protection, executor, and network policy control different parts of job execution?
+7. When does `needs` improve feedback time, and why must network-change concurrency still be controlled separately?
+8. What risk is introduced when a pipeline includes a mutable shared template?
 
 ## 19. Summary
 
 A useful pipeline is an executable release policy with an audit trail. Its green status means something only when jobs test the same immutable artifact, privileged work is isolated, failures preserve evidence, and approval is bound to the reviewed commit, target, and digest. Speed comes from early feedback and safe concurrency—not from removing the controls that make promotion credible.
 
-The next module moves beyond pipeline completion to state, convergence, acceptance, and recovery. Continue to [Validating the Build and Improving the Deployment Flow](module-06-validation-deployment.md).
+**What the learner now has:** a pipeline that validates reviewed source, builds once, preserves evidence, promotes by digest, and isolates privileged work on a protected runner.
+
+**What the next module adds:** Module 6 moves beyond pipeline completion to state, convergence, acceptance, and recovery. Continue to [Validating the Build and Improving the Deployment Flow](module-06-validation-deployment.md).

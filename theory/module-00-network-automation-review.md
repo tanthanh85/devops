@@ -26,15 +26,7 @@ After completing this review, learners should be able to:
 
 Network automation is sometimes introduced as a faster way to execute commands. That description is incomplete. A useful automation solution is a software system that interprets intent, obtains trusted data, communicates with external systems, changes or observes state, handles failure, and produces evidence.
 
-A typical solution contains several responsibilities:
-
-The following flow is worth reading from left to right because it separates the decisions made before privileged execution from the verification performed afterward.
-
-<p align="center">
-  <img src="assets/diagrams/network-automation-system.svg" alt="Network automation system from intent through validation, execution, verification, and evidence" width="640" />
-</p>
-
-The transport is only one stage. Inventory, validation, policy, verification, and evidence determine whether the software can be trusted as an operational system.
+A typical solution contains several responsibilities. The transport is only one stage; inventory, validation, policy, verification, and evidence determine whether the software can be trusted as an operational system.
 
 | Responsibility | Typical implementation | Engineering question |
 |---|---|---|
@@ -49,7 +41,7 @@ The transport is only one stage. Inventory, validation, policy, verification, an
 
 The implementation may be a small command-line program or a multitier service. The responsibilities still exist. When they are hidden inside one script, they become harder to test and govern independently.
 
-## 4. Foundation knowledge to recall
+## 4. Core review: foundation knowledge
 
 Reliable delivery depends on several disciplines working together. Networking knowledge defines the intended behavior, programming and data models express it, and version control preserves both the implementation and the decisions behind it.
 
@@ -273,6 +265,10 @@ All three loaders return the same internal shape, and normalization establishes 
 
 Git stores versions of source code and supporting definitions. Learners should be able to create a branch, inspect a diff, stage deliberate changes, commit them with a useful message, resolve straightforward conflicts, and participate in review.
 
+Four states are especially important when diagnosing a delivery problem. The working tree contains current local files; the index contains the exact changes selected for the next commit; a commit is an immutable snapshot with parent history and author metadata; and a remote-tracking reference records the last fetched view of a remote branch. `git status` and `git diff` answer different questions depending on which two states are compared. A clean working tree proves only that local files match the checked-out commit; it does not prove that the branch contains the latest reviewed change or that the commit was released.
+
+Branches isolate proposed work, tags can identify release points, and merge requests add review and automated evidence around integration. For an automation repository, the review unit should be small enough that another engineer can understand the intent, generated difference, test effect, and recovery consequence. Generated configuration may be retained as pipeline evidence, but reviewed intent and source remain authoritative.
+
 A network automation repository can contain:
 
 - Python source and tests
@@ -286,7 +282,7 @@ It should not contain live credentials, private keys, tokens, uncontrolled state
 
 Git alone is not DevOps. It becomes part of DevOps when small changes are reviewed, automatically validated, connected to an identifiable artifact, and promoted through a controlled workflow.
 
-## 5. Interfaces used by network automation
+## 5. Optional refresher and reference: automation interfaces
 
 An automation application reaches infrastructure through an interface with its own data model, failure modes, and security properties. Choosing an interface therefore affects not only how code is written, but also how safely the resulting change can be validated and repeated.
 
@@ -296,7 +292,7 @@ SSH CLI automation remains useful when a required function lacks a suitable stru
 
 CLI output is intended primarily for people and may vary by platform, release, privilege, width, localization, or command form. Structured parsing with TextFSM or Genie is preferable to fragile `split()` logic, but the parser and its expected data shape still require tests. Configuration workflows also need target verification, configuration preview, timeouts, failure classification, post-checks, and a recovery plan.
 
-#### 5.1.1 Netmiko review
+#### 5.1.1 Reference example: Netmiko
 
 Netmiko provides network-device connection handling on top of SSH. This read-only example takes credentials from the environment, uses explicit timeouts, requests structured output when a supported TextFSM template is available, and closes the session through a context manager:
 
@@ -337,7 +333,7 @@ Reliable API clients address more than the successful `200` path. They use TLS v
 
 Retry behavior deserves particular care. A read request may be safe to retry after a transient connection failure. Repeating a create or change request after an uncertain timeout can duplicate work. The client may first need to query a request identifier or rediscover actual state.
 
-#### 5.2.1 `requests` review
+#### 5.2.1 Reference example: `requests`
 
 The `requests` library provides a direct and readable HTTP client. A `Session` reuses connections and common headers. Timeouts and TLS verification must be explicit; `verify=False` is not an acceptable production shortcut.
 
@@ -395,7 +391,7 @@ A model-driven workflow should discover capabilities, identify the correct schem
 
 Model-driven does not mean risk-free. The application still needs authorization, target control, transaction handling, diff or preview, post-change validation, and evidence.
 
-#### 5.3.1 `ncclient` review
+#### 5.3.1 Reference example: `ncclient`
 
 `ncclient` is a Python NETCONF client. The example performs a read with a subtree filter and parses the returned XML. Namespace values and model paths are illustrative and must be discovered from the target's advertised capabilities.
 
@@ -554,7 +550,7 @@ Counter interpretation requires more than storing values. Octet and packet count
 
 Telemetry becomes part of DevOps when it closes the release feedback loop. Deployment events should annotate dashboards, and application logs should carry the same release, pipeline, and change identifiers used in retained evidence. This allows the team to distinguish a software regression, a collector failure, and a genuine network-state change.
 
-## 6. Ansible and orchestration review
+## 6. Core review: Ansible, orchestration, and tool ownership
 
 Ansible provides inventories, variables, collections, modules, roles, handlers, conditions, and playbooks for describing ordered work across targets. Agentless operation is particularly familiar in network environments, although module behavior and platform support still depend on collection versions and device capabilities.
 
@@ -701,13 +697,7 @@ Tests become more expensive and realistic toward the bottom of the table. A soun
 
 ## 10. Where ad hoc automation reaches its limit
 
-The transition below groups the capabilities added around an existing script. Application logic remains useful; each step removes a different dependency on the original author's workstation or memory.
-
-<p align="center">
-  <img src="assets/diagrams/automation-to-devops-product.svg" alt="Evolution from a local automation script to an observable team-operated product" width="640" />
-</p>
-
-Containerization alone is not the destination. The result becomes a product when a team can review, release, operate, diagnose, and improve it through a documented delivery system.
+The capabilities added around an existing script remove different dependencies on the original author's workstation or memory. Containerization alone is not the destination. The result becomes a product when a team can review, release, operate, diagnose, and improve it through a documented delivery system.
 
 An individual automation script can be technically correct and still be difficult to operate safely as team software. Common symptoms include:
 
@@ -801,4 +791,6 @@ Before continuing to Module 1, learners should be able to answer these questions
 
 CCNA-level network automation provides the technical foundation: Python, structured data, Git, CLI and API interfaces, models, Ansible, infrastructure tooling, telemetry, security, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries; Ansible, Terraform, Puppet, and Chef address different aspects of orchestration and infrastructure lifecycle. Those skills answer how to build and automate a task. DevOps addresses the broader question of how a team develops, tests, packages, releases, observes, secures, and improves the automation as software.
 
-Module 1 begins that transition with the DevOps operating model and CALMS: Culture, Automation, Lean, Measurement, and Sharing.
+**What the learner now has:** a refreshed model of automation inputs, interfaces, state, tool ownership, testing, and operational safety, with detailed protocol and Python examples available as optional reference.
+
+**What the next module adds:** Module 1 introduces the DevOps operating model and CALMS: Culture, Automation, Lean, Measurement, and Sharing.

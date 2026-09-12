@@ -103,11 +103,15 @@ Do not copy SSH private keys, NETCONF usernames, RESTCONF passwords, controller 
 
 ## 11. Image metadata and traceability
 
+The evidence-lineage view asks whether an operator can trace a deployed runtime and its results back to the exact source, dependencies, build, tests, and approved digest.
+
 <p align="center">
   <img src="assets/diagrams/image-evidence-lineage.svg" alt="Evidence lineage from source and dependencies to the deployed automation image and post-change results" width="640" />
 </p>
 
 OCI labels can record the source repository, source revision, version, description, authorship, and license. The pipeline should apply a tag derived from the release version or commit and record the resulting digest.
+
+This is the build-and-artifact portion of the course reference architecture introduced in Module 1. The protected worker should receive the resulting digest and evidence; it should not rebuild the application inside the management trust zone.
 
 Traceability should answer:
 
@@ -174,6 +178,10 @@ Build isolation therefore matters as much as runtime hardening. The untrusted de
 
 A registry should enforce authentication, encrypted transport, access control, immutability where appropriate, scanning, and retention policy. Developer accounts may push to development repositories, while production promotion should use a controlled service identity.
 
+A registry is not the same as a pipeline artifact store. The registry distributes versioned packages or OCI images to later environments; pipeline artifacts retain job outputs such as test reports, rendered candidates, SBOMs, and deployment evidence. An image digest belongs in both records so that a reviewer can connect the distributable runtime with the evidence that qualified it.
+
+Promotion should normally copy or authorize the existing digest rather than rebuild it. Repository paths and tags can express release channels, but access policy must prevent an unreviewed job from overwriting or relabeling a production identity. Pull permissions should also be narrower than they first appear: a runner that can read every private image may expose embedded intellectual property or vulnerable historical releases even when it cannot push.
+
 Retention must balance storage cost, investigation needs, and rollback. Removing every previous image immediately can make recovery impossible.
 
 ### 16.1 Packaging failure patterns
@@ -238,4 +246,6 @@ Use these questions to evaluate whether an image build is reproducible, traceabl
 
 An image is trustworthy only when its contents, build process, test evidence, and identity can be traced together. A small image is useful, but reproducibility, patchability, non-root execution, secret discipline, dependency control, SBOM comparison, and digest-based promotion matter more than size alone.
 
-With an immutable application artifact available, the course can examine service dependencies and runtime failure boundaries. Continue to [Deploying a Multitier Application](module-04-multitier-compose.md).
+**What the learner now has:** a reproducible image with locked dependencies, a non-root runtime, build evidence, supply-chain checks, and a digest suitable for controlled promotion.
+
+**What the next module adds:** Module 4 introduces the API, queue, worker, persistence, service networking, readiness, and runtime failure boundaries. Continue to [Deploying a Multitier Application](module-04-multitier-compose.md).

@@ -8,6 +8,8 @@ Module 6 defined the evidence required before and after deployment. Module 7 mak
 
 ## 2. Three automation responsibilities
 
+The ownership flow distinguishes resource lifecycle, ordered configuration, and custom application logic before a team selects Terraform, Ansible, or Python for a task.
+
 <p align="center">
   <img src="assets/diagrams/iac-tool-ownership.svg" alt="Tool ownership decision flow for Terraform, Ansible, and Python" width="640" />
 </p>
@@ -114,6 +116,8 @@ Before an unusual recovery or import action, inspect the configuration, state, a
 
 ## 8. Drift
 
+The reconciliation flow asks who owns a changed attribute and whether the correct response is acceptance, controlled correction, or escalation rather than automatic overwrite.
+
 <p align="center">
   <img src="assets/diagrams/drift-reconciliation.svg" alt="Drift collection, classification, ownership resolution, and controlled reconciliation" width="640" />
 </p>
@@ -148,7 +152,7 @@ all:
   children:
     lab_routers:
       hosts:
-        lab-edge-01:
+        distribution-01:
           ansible_host: 192.0.2.11
           role_id: edge
           intended_state: examples/compliance-intent.yml
@@ -163,7 +167,7 @@ Do not store the password in this file. The playbook receives a protected runtim
 
 A playbook connects targets and ordered outcomes. A role packages reusable tasks, handlers, templates, defaults, and tests. A Jinja2 template converts normalized intent into platform configuration.
 
-Keep validation separate from rendering. Ansible should fail before device access when an intended object or prefix violates policy. Use `serial` or explicit batching for a controlled rollout. Use `--limit lab-edge-01` or an equivalent pipeline constraint and display the selected hosts before change.
+Keep validation separate from rendering. Ansible should fail before device access when an intended object or prefix violates policy. Use `serial` or explicit batching for a controlled rollout. Use `--limit distribution-01` or an equivalent pipeline constraint and display the selected hosts before change.
 
 ## 10. Provisioning and configuration boundary
 
@@ -240,13 +244,7 @@ Cleanup should run when tests fail, but it must target only the environment crea
 
 ### 14.1 Practical ownership boundary: Terraform hands off to Ansible
 
-The handoff is a machine-readable inventory artifact, making the ownership boundary visible.
-
-<p align="center">
-  <img src="assets/diagrams/terraform-ansible-handoff.svg" alt="Handoff from Terraform through Ansible to validation and cleanup" width="640" />
-</p>
-
-Consider an on-demand test environment. Terraform creates the isolated network, compute instances, security rules, and DNS records, then exports a machine-readable inventory. Ansible consumes that inventory to install the container runtime, configure trust anchors, and start the application. Terraform should not run a long sequence of remote shell provisioners, and Ansible should not create cloud networks through ad hoc tasks. The handoff artifact makes ownership visible and lets the pipeline prove that configuration targeted only resources created by that run.
+The handoff is a machine-readable inventory artifact, making the ownership boundary visible. Consider an on-demand test environment. Terraform creates the isolated network, compute instances, security rules, and DNS records, then exports a machine-readable inventory. Ansible consumes that inventory to install the container runtime, configure trust anchors, and start the application. Terraform should not run a long sequence of remote shell provisioners, and Ansible should not create cloud networks through ad hoc tasks. The handoff artifact lets the pipeline prove that configuration targeted only resources created by that run.
 
 Before `apply`, a policy job can reject a plan that creates a public address or opens a management port to `0.0.0.0/0`. Before cleanup, the job compares the recorded environment identifier and ownership tags with current state. A missing or mismatched tag is a stop condition, not a reason to broaden the destroy command.
 
@@ -292,4 +290,6 @@ Use these questions to evaluate infrastructure state, test-environment selection
 
 Infrastructure delivery needs the same review and evidence discipline as application delivery, but state and ownership make mistakes harder to reverse. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, plans must be reviewed as proposed changes, state must be protected, and cleanup must prove ownership before destroying anything.
 
-Repeatable infrastructure supplies a test target; the next requirement is evidence about behavior over time. Continue to [Monitoring DevOps and Engineering Visibility and Stability](module-08-observability.md).
+**What the learner now has:** an explicit ownership boundary among Terraform, Ansible, and Python, plus a pipeline-controlled lifecycle for disposable infrastructure, validation evidence, and cleanup.
+
+**What the next module adds:** Module 8 adds evidence about application, delivery, and infrastructure behavior over time. Continue to [Monitoring DevOps and Engineering Visibility and Stability](module-08-observability.md).

@@ -58,13 +58,13 @@ A container remains a process on the host. If it receives excessive privileges o
 
 ## 7. Docker architecture
 
+The Docker architecture diagram answers a practical control question: which component receives the engineer's command, which component holds host-level authority, and where image distribution, runtime isolation, networking, and storage enter the path?
+
 <p align="center">
   <img src="assets/diagrams/docker-architecture.svg" alt="Docker client, Engine API, daemon, BuildKit, container runtime, registry, networks, and storage" width="640" />
 </p>
 
-The Docker client sends API requests to the Docker daemon. The daemon manages images, networks, volumes, and containers. A registry stores and distributes images.
-
-The Docker client sends requests to the daemon. The daemon coordinates the container runtime and manages local images, networks, volumes, and registry interactions.
+The Docker client sends API requests to the daemon. The daemon coordinates the container runtime; manages images, networks, volumes, and containers; and communicates with registries that store and distribute images.
 
 Important objects include:
 
@@ -86,9 +86,14 @@ Joining a container to both planes creates a security boundary. The public API s
 
 An image reference commonly contains a registry, repository, and tag. Tags such as `latest` are mutable labels and do not guarantee identical content over time. A digest identifies image content cryptographically.
 
+> **WHY THIS MATTERS TO A NETWORK ENGINEER**
+> The image digest identifies the exact Python runtime, client libraries, parsers, and Ansible content that executed a network job. Without it, operational evidence cannot prove which automation behavior produced a change.
+
 Development workflows may use readable version tags. Promotion and controlled deployment should preserve the immutable digest or another verifiable identity. The application version, source commit, and image identity should remain traceable to one another.
 
 ## 9. Image layers and cache
+
+The image lifecycle distinguishes reusable build content from a disposable container instance and its writable runtime layer.
 
 <p align="center">
   <img src="assets/diagrams/docker-image-container-lifecycle.svg" alt="Lifecycle from Docker build inputs through immutable image layers and a disposable runtime container" width="640" />
@@ -119,6 +124,8 @@ Volumes offer Docker-managed storage and portability across container recreation
 Applications should state clearly which data is persistent, which is cache, and which can disappear safely.
 
 ## 13. Container networking
+
+The following boundary view explains why application-service connectivity and privileged management connectivity should not be treated as one undifferentiated container network.
 
 <p align="center">
   <img src="assets/diagrams/container-network-planes.svg" alt="Separation of the application service network from the protected device-management network" width="640" />
@@ -248,4 +255,6 @@ Use these questions to verify that you can distinguish image, container, host, a
 
 Containers remove a major source of delivery drift by packaging the application and its runtime dependencies together. They do not remove host-kernel, routing, DNS, certificate, storage, or identity dependencies. A production-ready container is replaceable, runs with limited privilege, receives configuration at runtime, and leaves durable evidence outside its writable layer.
 
-The next step is to encode these decisions in a Dockerfile and connect the image to supply-chain evidence. Continue to [Packaging an Application Using Docker](module-03-secure-images.md).
+**What the learner now has:** a clear container boundary, an understanding of image identity and lifecycle, and a model that separates application traffic from protected management access.
+
+**What the next module adds:** Module 3 encodes these decisions in a Dockerfile and connects the image to supply-chain evidence. Continue to [Packaging an Application Using Docker](module-03-secure-images.md).

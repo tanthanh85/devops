@@ -10,6 +10,8 @@ Module 8 showed how identities and correlation data connect an operational event
 
 The architecture separates repository-controlled validation from privileged deployment and preserves an independent audit path.
 
+This view extends the Module 1 reference architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
+
 <p align="center">
   <img src="assets/diagrams/netdevops-trust-boundaries.svg" alt="NetDevOps trust boundaries through protected execution and independent audit" width="640" />
 </p>
@@ -60,13 +62,7 @@ Security design begins by identifying what must be protected and how it could be
 
 ## 5. Secrets management
 
-Short-lived credentials have a lifecycle tied to workload identity and job scope.
-
-<p align="center">
-  <img src="assets/diagrams/credential-lifecycle.svg" alt="Credential lifecycle from identity through authorization, audit, and revocation" width="640" />
-</p>
-
-A secret is sensitive information used to authenticate or protect another asset. Examples include passwords, API tokens, private keys, signing keys, and database credentials.
+Short-lived credentials have a lifecycle tied to workload identity and job scope: establish identity, authorize a specific purpose, issue the credential, use and audit it, and then revoke or allow it to expire. A secret is sensitive information used to authenticate or protect another asset. Examples include passwords, API tokens, private keys, signing keys, and database credentials.
 
 Good secret handling includes:
 
@@ -138,15 +134,30 @@ The protected runner should:
 
 Runner registration and authentication tokens are sensitive. Rotating device credentials does not repair a runner that remains compromised.
 
+### 6.3 Security tests and their boundaries
+
+Security testing is a set of complementary controls rather than one scanner. Each control inspects a different representation of the system and therefore misses different problems.
+
+| Control | Primary question | Useful network-automation target | Important limitation |
+|---|---|---|---|
+| Static application security testing | Does source contain a recognizable insecure code pattern? | Python API, worker, validation and credential-handling code | Cannot prove runtime exploitability or correct authorization design |
+| Dependency scanning | Do declared third-party components match known vulnerabilities? | Python packages and Ansible collections where supported | Findings depend on accurate inventory and vulnerability data |
+| Secret detection | Does repository content resemble a credential or private key? | Source, history, examples, playbooks, and pipeline files | A miss does not prove that no secret exists; a hit still requires revocation analysis |
+| Container scanning | Do operating-system packages and other supported image contents contain known findings or policy violations? | Validation and deployment images | Coverage varies by scanner and image contents; it does not assess the host, runner, runtime identity, or management firewall |
+| Infrastructure-as-Code scanning | Does a declarative resource violate a known security rule? | Terraform, Compose, and Kubernetes definitions | Cannot prove that deployed state matches the reviewed definition |
+| Dynamic application security testing | Does a running HTTP service expose detectable behavior? | Automation API in an isolated environment | Requires a safe target and does not examine device protocols or internal code paths |
+| License policy | Are component licenses compatible with distribution policy? | Packaged libraries and container contents | Legal interpretation and exceptions still require organizational review |
+
+Run inexpensive source and dependency controls early, then apply runtime tests to an isolated deployed service. A finding must retain scanner version, rule, affected component, evidence, severity, exploit context, and artifact digest. Otherwise a later reviewer cannot determine whether a rebuilt image still contains the same problem.
+
+Security results need a triage workflow. Confirm the component is present and reachable, determine whether the vulnerable path is used, assign an owner and deadline, and choose remediation, compensating control, or a time-limited accepted exception. Suppression without a reason and expiry date converts a visible risk into invisible debt.
+
+> **KEY POINT**
+> Passing every configured scanner does not establish that a release is secure. Scanners find selected known patterns; architecture review, least privilege, endpoint verification, runtime evidence, and incident readiness address risks outside those patterns.
+
 ## 7. Compromised-runner scenario
 
-Contain access before rebuilding the execution environment.
-
-<p align="center">
-  <img src="assets/diagrams/compromised-runner-response.svg" alt="Containment and recovery flow for a compromised runner" width="640" />
-</p>
-
-The affected period remains untrusted until job history and managed state are independently verified.
+Contain access before rebuilding the execution environment. The affected period remains untrusted until job history and managed state are independently verified.
 
 Assume an attacker gains code execution on the protected GitLab runner. The incident review must answer:
 
@@ -283,9 +294,13 @@ Use these questions to test whether you can apply least privilege, secret protec
 3. What costs accompany a microservices architecture?
 4. Which factors influence workload placement across private and public environments?
 5. Why should the team document tool ownership of infrastructure settings?
+6. Why do SAST, dependency scanning, container scanning, and DAST provide different evidence?
+7. Which information must accompany a temporary vulnerability exception?
 
 ## 19. Summary
 
 Security depends on an unbroken chain of controls across source, build, artifact, identity, runner, runtime, and evidence. Short-lived credentials and segmentation reduce impact, while protected reviews and signed digests preserve intent and artifact identity. Microservices and multicloud are architectural choices, not maturity badges; adopt them only when their isolation, ownership, placement, or resilience benefits justify the additional failure modes.
 
-The final module applies the complete delivery, observability, and security model to Kubernetes while keeping platform releases separate from network jobs. Continue to [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md).
+**What the learner now has:** a threat-informed delivery design with protected source and runners, controlled credentials, verified endpoints, constrained reachability, independent evidence, and documented architecture decisions.
+
+**What the next module adds:** Module 10 evaluates Kubernetes as the application platform while keeping platform releases separate from network jobs. Continue to [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md).

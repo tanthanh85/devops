@@ -191,7 +191,7 @@ Some checks need a convergence window. Poll with a bounded timeout and preserve 
 
 pyATS provides a test framework, while Genie parsers convert supported device output into structured data. A testbed file defines devices and connection details, with secrets supplied externally.
 
-Illustrative test logic:
+Illustrative test logic follows. Parser commands and supported structured output depend on the target network OS, pyATS/Genie release, and installed parser packages.
 
 ```python
 from pyats import aetest
@@ -199,7 +199,7 @@ from pyats import aetest
 class CommonSetup(aetest.CommonSetup):
     @aetest.subsection
     def connect(self, testbed):
-        device = testbed.devices["lab-edge-01"]
+        device = testbed.devices["distribution-01"]
         device.connect(log_stdout=False)
         self.parent.parameters["device"] = device
 
@@ -212,26 +212,25 @@ class VerifyRouting(aetest.Testcase):
 
     @aetest.test
     def branch_prefix_present(self, device):
-        routes = device.parse("show ip route 192.0.2.0 255.255.255.0")
-        assert_expected_ospf_route(routes, "192.0.2.0/24")
+        routes = device.parse("show ip route 10.20.120.0 255.255.255.0")
+        assert_expected_ospf_route(routes, "10.20.120.0/24")
 ```
 
 Production code needs robust structured traversal, explicit expected neighbor identity, meaningful failure evidence, and parser-error handling. Tests should distinguish unavailable parser support from an absent network state.
 
 ## 13. Applied failure scenario: configuration accepted, routing service fails
 
-<p align="center">
-  <img src="assets/diagrams/ospf-failure-response.svg" alt="Decision flow after a device accepts configuration but OSPF or reachability validation fails" width="640" />
-</p>
-
-In this routing-failure example, the pipeline successfully applies an authorized lab interface and routing change. The device returns no configuration error, but post-checks show:
+In the course reference scenario, the pipeline successfully creates VLAN 120 and its gateway on `distribution-01` and applies the approved OSPF intent. The device returns no configuration error, but post-checks show:
 
 ```text
-Loopback20              192.0.2.1      YES manual up   up
-OSPF neighbor 10.0.1.1                EXSTART/BDR
-Expected route 192.0.2.0/24            absent
-Ping from test peer to 192.0.2.1        failed
+Vlan120                 10.20.120.1    YES manual up   up
+Required OSPF neighbor                 EXSTART/BDR
+Expected route 10.20.120.0/24          absent on routing-peer-01
+Reachability to 10.20.120.1            failed from routing-peer-01
 ```
+
+> **FAILURE SCENARIO**
+> A timeout after a configuration request creates an uncertain outcome: the device may have changed even though the client received no success response. The workflow must rediscover configured and operational state before retrying, rolling back, or declaring failure.
 
 The pipeline must fail the release and stop promotion. Possible causes include MTU mismatch, authentication mismatch, network type mismatch, access policy, or an unrelated peer condition. Removing the newly advertised lab prefix may not fix an existing peer problem. The correct response is evidence-driven:
 
@@ -364,4 +363,6 @@ Use these questions to assess whether you can connect an approved artifact to co
 
 Deployment succeeds only when the intended service works, not when a tool reports that an update was accepted. The pipeline must connect source, artifact, target, rollout, and operational evidence; distinguish retryable failures from uncertain or partial changes; and choose rollback only when data and infrastructure remain compatible with the previous release.
 
-The validation model now needs disposable, reproducible infrastructure on which expensive tests can run safely. Continue to [Extending DevOps to Infrastructure and On-Demand Testing](module-07-infrastructure-devops.md).
+**What the learner now has:** a deployment flow that connects approved intent to target identity, a pre-change baseline, transaction behavior, post-change service evidence, and a defensible recovery decision.
+
+**What the next module adds:** Module 7 adds disposable, reproducible infrastructure on which expensive tests can run safely. Continue to [Extending DevOps to Infrastructure and On-Demand Testing](module-07-infrastructure-devops.md).

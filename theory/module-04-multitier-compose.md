@@ -8,6 +8,8 @@ Module 3 produced a secure image. Module 4 asks what happens when that image mus
 
 ## 2. Multitier service architecture
 
+The architecture separates request handling from privileged execution so that only the worker crosses into the management network and every job retains durable state and evidence.
+
 <p align="center">
   <img src="assets/diagrams/compose-automation-services.svg" alt="Docker Compose architecture for the network automation API, worker, supporting services, and network targets" width="640" />
 </p>
@@ -45,7 +47,7 @@ A worker and its callers need an explicit agreement about the data exchanged bet
 
 ```json
 {
-  "change_id": "CHG-2026-0120",
+  "change_id": "CHG-2026-0042",
   "commit_sha": "0123456789abcdef",
   "intent_path": "requests/compliance-intent.yml",
   "inventory": "lab",
@@ -106,6 +108,11 @@ services:
     image: redis:7-alpine
     networks: [services]
     volumes: [queue-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   job-db:
     image: postgres:17-alpine
@@ -176,6 +183,9 @@ In a production automation platform, the entry layer can terminate TLS and enfor
 
 A worker processes network jobs. High concurrency can overwhelm device management planes or create conflicting changes. Use per-device locking and a low default concurrency. Jobs that touch the same routing domain may need a broader lock or ordered plan.
 
+> **OPERATIONAL CONSIDERATION**
+> Increasing worker replicas also increases potential device concurrency. Application scaling and network blast radius therefore require separate limits; queue depth alone is not a safe scaling signal.
+
 The worker verifies the commit and image digest associated with the job, retrieves scoped credentials only when needed, and discards them after use. Queue redelivery requires idempotent design or a guard that prevents a partially completed deployment from running twice.
 
 ## 12. Mock and real targets
@@ -185,6 +195,8 @@ Compose can provide a mock REST API or recorded-response service for offline pip
 The course progresses from mock validation to an authorized virtual or sandbox device. The pipeline labels evidence with the target type so reviewers do not confuse simulated success with real operational validation.
 
 ## 13. Health model
+
+The readiness chain shows why a healthy API process does not prove that a queued network job can pass through every dependency and complete successfully.
 
 <p align="center">
   <img src="assets/diagrams/service-readiness-chain.svg" alt="Readiness and failure behavior across the automation service dependency chain" width="640" />
@@ -252,4 +264,6 @@ Use these questions to confirm that you can reason about service discovery, stat
 
 A multitier service is easier to secure and scale only when its contracts are explicit. Compose makes those contracts inspectable: service names, networks, storage, configuration, health, and startup dependencies. The operator still has to reason across boundaries—especially queue redelivery, database migrations, worker reachability, and the difference between a live process and a completed job.
 
-The stack can now be started consistently, but its build and deployment still need automated policy and promotion. Continue to [Introducing CI/CD and Building the DevOps Flow](module-05-cicd.md).
+**What the learner now has:** a Compose-based API, queue, worker, database, and health model with explicit contracts, protected reachability, durable job state, and bounded concurrency.
+
+**What the next module adds:** Module 5 adds merge-request validation, automated tests, immutable artifacts, runner separation, approval, and traceable promotion. Continue to [Introducing CI/CD and Building the DevOps Flow](module-05-cicd.md).

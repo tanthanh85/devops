@@ -23,19 +23,60 @@ Learners take an existing Python application and progressively turn it into a co
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
-## 4. Five-day distribution
+## 4. Course reference scenario
+
+The course follows a network engineering team as it turns an existing Python automation utility into an operated software service. Reviewed intent enters through GitLab. An unprivileged validation runner checks schema and policy, runs tests, renders a candidate, builds and scans an image, and records its digest. After approval, a protected worker obtains a short-lived credential, reaches only the named targets, performs pre-checks, executes the approved change, verifies operational state, and retains evidence. Telemetry then informs promotion, recovery, and subsequent improvement.
+
+The reference change is deliberately small enough to understand while still exposing realistic delivery risks:
+
+| Item | Reference value |
+|---|---|
+| Site | `campus-west` |
+| Primary target | `distribution-01` |
+| Peer used for validation | `routing-peer-01` |
+| Service | VLAN 120, `USERS` |
+| Gateway and prefix | `10.20.120.1/24`; `10.20.120.0/24` |
+| Routing intent | OSPF process 100, area 0 |
+| Change identifier | `CHG-2026-0042` |
+| Delivery components | GitLab, validation runner, registry, automation API, queue, worker, job database, protected runner, telemetry collector, and dashboard |
+
+Addresses in `192.0.2.0/24`, `198.51.100.0/24`, and `203.0.113.0/24` are documentation addresses. Names such as `registry.example`, `lab-nos`, and `vendor.collection.network_os`, synthetic XML namespaces beginning with `urn:example:`, and digest text such as `APPROVED_DIGEST` are placeholders. They show structure and control flow; learners must replace them with values supported by their own registry, software version, provider, collection, platform, and data model.
+
+Not every example represents this change. A section that uses another identifier or topology states that it is an independent example. This allows the guide to demonstrate additional failure modes without implying that every technology must be applied to one network service.
+
+## 5. Five-day progression and time distribution
 
 The course allocates approximately 20 hours to theory and 20 hours to cumulative lab work. Module 0 is a prerequisite review and transition into the main course; it can be assigned as pre-reading or taught selectively at the start of Day 1. Installation occupies the first lab block.
 
-| Day | Theory aligned to the DEVOPS outline | Evolving lab capability | Theory | Lab |
+| Day | Theory aligned to the DEVOPS outline | Reference system at the end of the day | Theory | Lab |
 |---|---|---|---:|---:|
-| 1 | Network automation review, DevOps model, containers, and Docker tooling | Install the lab environment; inspect the supplied application; package and run its first container | 4 h | 4 h |
-| 2 | Secure image packaging, container networking, and multitier applications | Build the application image; deploy API, worker, data, and supporting services with Compose | 4 h | 4 h |
-| 3 | CI/CD, DevOps flow, build validation, and improved deployment | Implement GitLab CI; automate build, test, deployment, health checks, and recovery evidence | 4 h | 4 h |
-| 4 | Infrastructure DevOps, on-demand test environments, monitoring, and visibility | Provision an isolated test environment; integrate Ansible/Terraform; add logs, metrics, dashboards, and alerts | 4 h | 4 h |
-| 5 | Secure workflows, multicloud and application architectures, Kubernetes, and Kubernetes visibility | Secure the pipeline; compare deployment architectures; deploy and monitor the application on Kubernetes when justified | 4 h | 4 h |
+| 1 | Network automation review, DevOps model, containers, and Docker tooling | Installed environment; supplied Python source and tests in Git; first reproducible container runtime | 4 h | 4 h |
+| 2 | Secure image packaging, container networking, and multitier applications | Locked, non-root image plus API, queue, worker, job database, and service health in Compose | 4 h | 4 h |
+| 3 | CI/CD, DevOps flow, build validation, and improved deployment | GitLab pipeline that tests once, records an immutable digest, controls protected execution, and retains pre-check, deployment, post-check, and recovery evidence | 4 h | 4 h |
+| 4 | Infrastructure DevOps, on-demand test environments, monitoring, and visibility | Disposable test environment with explicit Terraform-to-Ansible ownership, plus correlated logs, metrics, deployment events, and network telemetry | 4 h | 4 h |
+| 5 | Secure workflows, multicloud and application architectures, Kubernetes, and Kubernetes visibility | Trust boundaries and short-lived identity applied; application evaluated or deployed on Kubernetes; platform release kept separate from network-job execution | 4 h | 4 h |
 
-## 5. Modules
+The repository grows with the system. Day 1 introduces application source, tests, and container files; Day 2 adds Compose definitions; Day 3 adds CI/CD and evidence paths; Day 4 adds infrastructure and observability definitions; and Day 5 adds security policy and, where justified, Kubernetes manifests. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
+
+```text
+network-devops/
+├── automation/          # supplied Python and Ansible behavior
+├── intended-state/      # schemas and safe examples
+├── inventory/           # environment-specific target data
+├── templates/           # deterministic rendering
+├── tests/               # unit, fixture, integration, and pyATS tests
+├── docker/              # image construction
+├── compose/             # local multitier deployment
+├── terraform/           # disposable environment resources
+├── observability/       # collectors, dashboards, and alert rules
+├── policy/              # delivery and network guardrails
+├── kubernetes/          # optional orchestrated deployment
+├── docs/                # operation and recovery decisions
+├── .gitlab-ci.yml
+└── README.md
+```
+
+## 6. Modules
 
 The modules follow the path of a software delivery system: establish the automation foundation, package and integrate the application, control its release, and then operate it securely at scale. The table summarizes the engineering focus of each stage.
 
@@ -53,7 +94,7 @@ The modules follow the path of a software delivery system: establish the automat
 | 9 | [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md) | How are secrets, pipelines, application architecture, and public/private cloud placement secured? |
 | 10 | [Kubernetes Deployment, Multidata Center Integration, and Monitoring](module-10-kubernetes.md) | How are applications deployed, updated, secured, and observed with Kubernetes? |
 
-## 6. Learning outcomes
+## 7. Learning outcomes
 
 After completing the guide and labs, learners should be able to:
 

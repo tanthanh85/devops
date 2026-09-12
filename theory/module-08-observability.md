@@ -24,7 +24,7 @@ Telemetry is the data. Monitoring evaluates selected signals. Observability is a
 
 ## 3. Feedback architecture requirements
 
-Device signals, application signals, and deployment events need a common correlation path.
+Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 1 reference architecture rather than creating a separate monitoring destination.
 
 <p align="center">
   <img src="assets/diagrams/observability-architecture.svg" alt="Observability architecture joining network, application, and pipeline signals" width="640" />
@@ -68,9 +68,7 @@ Deployment, configuration, scaling, and infrastructure events add essential cont
 
 ## 6. Network data collection methods
 
-<p align="center">
-  <img src="assets/diagrams/network-telemetry-methods.svg" alt="Selection and normalization of syslog, SNMP, model-driven telemetry, APIs, and OpenTelemetry" width="640" />
-</p>
+No collection method supplies every signal. The following sections distinguish event streams, counters, polled state, modeled subscriptions, and application instrumentation so that each is used for evidence it can actually provide.
 
 ### 6.1 Syslog
 
@@ -190,7 +188,7 @@ Alerting on symptoms such as sustained user-facing failures is often more action
 Example routing alert:
 
 ```text
-Condition: required routing neighbor for lab-edge-01 is not healthy for 5 minutes
+Condition: required routing neighbor for distribution-01 is not healthy for 5 minutes
 AND service reachability probe fails
 Severity: high
 Context: device, neighbor, last known state, change ID, latest deployment
@@ -222,13 +220,7 @@ For the automation platform, instrument request and job count, queue delay, devi
 
 ## 15. Change correlation
 
-An investigation follows the release through device events and telemetry using shared identifiers.
-
-<p align="center">
-  <img src="assets/diagrams/change-correlation-timeline.svg" alt="Timeline from commit through deployment, telemetry, and investigation" width="640" />
-</p>
-
-Correlation narrows the search; it does not by itself prove causality.
+An investigation follows the release through device events and telemetry using shared identifiers. Correlation narrows the search; it does not by itself prove causality.
 
 Correlation turns separate data into a delivery feedback loop:
 
@@ -307,4 +299,6 @@ Use these questions to verify that you can turn operational signals into service
 
 Observability is useful when an operator can move from a symptom to the affected release, dependency, and change without guessing. Metrics show patterns, logs explain individual events, traces connect service calls, and deployment annotations supply change context. Good alerts describe sustained impact and a response; good resilience tests verify a stated hypothesis within an explicit safety boundary.
 
-Operational visibility reveals how the system behaves; the next module protects who may change it and which components must be trusted. Continue to [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md).
+**What the learner now has:** correlated application, pipeline, and network signals; service objectives; actionable alerts; and an evidence path from release to operational behavior.
+
+**What the next module adds:** Module 9 protects who may change the system and identifies which components and boundaries must be trusted. Continue to [Securing DevOps Workflows and Examining Deployment Architectures](module-09-security-architecture.md).
