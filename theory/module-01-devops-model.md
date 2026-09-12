@@ -110,68 +110,35 @@ Automation improves consistency, but DevOps connects automation to collaboration
 
 ## 5. Complete DevOps lifecycle
 
-The DevOps lifecycle connects an idea to an operating service and then returns production knowledge to the next decision. It is often drawn as a loop because deployment is not the end of the work. Software must be observed, supported, improved, patched, and eventually retired.
+The DevOps lifecycle connects an idea to an operating service and returns operational knowledge to the next decision. Deployment is therefore not the end: software must be operated, observed, improved, secured, and eventually retired.
 
 <p align="center">
   <img src="assets/diagrams/devops-lifecycle-loop.svg" alt="Compact DevOps lifecycle from planning through operation and learning" width="640" />
 </p>
 
-Organizations use different labels, but a complete lifecycle normally includes:
-
 **Plan → Design → Develop → Integrate → Build → Test → Release → Deploy → Operate → Observe → Learn**
 
-The stages are logical responsibilities, not necessarily separate departments or long sequential phases. A small team may perform several stages in one workflow. Mature teams also move left and right through the lifecycle continuously: an operational finding may create a new test, a security finding may change design, and a failed build may send a developer directly back to the affected code.
+These are logical responsibilities, not separate departments or a rigid sequence. Teams move between them continuously: a runtime failure may create a test, a security finding may change the design, and a build failure returns directly to development.
 
 ### 5.1 Plan: define the problem and expected outcome
 
-Planning establishes why a change is needed, who benefits, what is in scope, and how success will be judged. Useful inputs include a user story, defect, security finding, operational problem, compliance requirement, or improvement experiment.
-
-A plan should identify both functional and nonfunctional expectations. “Add an endpoint that returns device inventory” is functional. “Return 95 percent of requests within 500 milliseconds, require an authorized role, and retain an audit record” describes quality and operating constraints.
-
-Good planning produces testable acceptance criteria, ownership, risk, priority, and an initial recovery expectation. It avoids prescribing unnecessary implementation detail before the team has examined the design.
-
-For the supplied automation application, a requirement might be to run validation jobs without depending on an engineer's workstation. The DevOps outcome is broader than making the Python function work: another engineer must be able to review, build, deploy, observe, and support it through a controlled process.
+Planning defines the problem, scope, owner, risk, and measurable outcome. It includes functional behavior and operating constraints such as performance, authorization, evidence, and recovery. For the supplied application, success is not merely that a Python function works; another engineer must be able to review, release, observe, and support it through a controlled process.
 
 ### 5.2 Design: decide how the change fits the system
 
-Design translates requirements into components, interfaces, data flow, trust boundaries, failure behavior, and deployment assumptions. Decisions at this stage affect testability and operability later.
-
-The team considers questions such as:
-
-- Which component owns the data or state transition?
-- Is the work synchronous, asynchronous, or scheduled?
-- What happens when a dependency is slow or unavailable?
-- Which credentials and network paths are required?
-- Which parts can be tested without external systems?
-- Does the change remain compatible with the previous release during rollout?
-- How will an operator know that the new behavior is healthy?
-- Can the previous version be restored safely if data has changed?
-
-Important choices belong in a short architecture decision record. The purpose is not to predict every detail. It is to preserve the assumptions and trade-offs that reviewers and future maintainers will need.
+Design translates the requirement into components, interfaces, state ownership, trust boundaries, failure behavior, and deployment assumptions. The team decides how dependencies fail, which credentials and paths are required, what can be tested offline, how health is proven, and whether versions can overlap or be restored safely. Important assumptions and trade-offs belong in a short architecture decision record.
 
 ### 5.3 Develop: implement a small, reviewable change
 
-Development takes place in version control, normally on a short-lived branch. The change should be coherent and small enough for a reviewer to understand. Source code, tests, dependency declarations, configuration contracts, documentation, and infrastructure definitions should change together when they represent one behavior.
-
-Developers run fast checks locally, but local success is only preliminary evidence. The shared pipeline must reproduce validation in a controlled environment. Secrets and environment-specific values remain outside the commit.
-
-Code quality at this stage includes more than formatting. The implementation should expose clear boundaries, return meaningful errors, use timeouts, avoid unsafe defaults, and produce the context needed for diagnosis. Tests should cover failure paths as well as the expected path.
+Development occurs in version control on a small, reviewable branch. Code, tests, dependency declarations, contracts, and documentation change together when they describe one behavior. Local checks provide early feedback, but the shared pipeline must reproduce them. Secrets remain outside the commit, and implementation quality includes explicit errors, timeouts, safe defaults, and testable boundaries.
 
 ### 5.4 Integrate: combine work and obtain early feedback
 
-Continuous integration validates every proposed change against the shared codebase. A merge-request pipeline commonly performs formatting, static analysis, type checks, schema checks, unit tests, dependency checks, secret detection, and selected integration tests.
-
-The cheapest and fastest checks should run early. There is no value in provisioning a test environment for source that does not parse. Independent checks can run concurrently, while jobs that consume a generated artifact must declare that dependency explicitly.
-
-Peer review and automated validation answer different questions. Automation detects known, executable conditions consistently. A reviewer evaluates intent, design, maintainability, risk, missing assumptions, and whether the tests prove the right behavior. A green pipeline does not make human judgment unnecessary.
+Integration validates a proposed change against shared source. Fast checks run first, independent checks run concurrently, and expensive environments are created only after basic validation succeeds. Automation evaluates repeatable conditions; reviewers assess intent, design, risk, maintainability, and whether the tests prove the right outcome. Both are required.
 
 ### 5.5 Build: create an identifiable artifact
 
-The build converts reviewed source into something that can be promoted, such as a container image, package, binary, or deployment bundle. A defensible build starts from declared inputs in a controlled environment and produces an immutable artifact.
-
-The pipeline records at least the source commit, build job, dependency set, version, and artifact digest. Security controls may add an SBOM, vulnerability results, provenance, and a signature. These records establish artifact lineage: the team can determine exactly which source and process produced the bytes being deployed.
-
-The artifact should be built once. Rebuilding separately for test and production creates two artifacts even when both use the same tag. The production artifact would then lack the evidence collected from the tested one.
+The build converts reviewed source and declared dependencies into an immutable artifact. The record connects its digest to the commit, build, dependencies, tests, SBOM, scan results, provenance, and signature where required. Build once and promote the same digest; rebuilding for production creates a different artifact without the evidence collected from the tested one.
 
 ### 5.6 Test: build confidence at several boundaries
 
@@ -187,55 +154,35 @@ No single test proves a release. A practical test strategy layers evidence:
 | System tests | Does the assembled application perform its important workflows? | On-demand test environment |
 | Acceptance tests | Does the release satisfy the user or operational outcome? | Representative environment |
 
-Tests should be reliable enough that the team trusts failures. A flaky test increases delay and eventually teaches engineers to ignore the pipeline. Test data and mocks must also be maintained; a mock that always returns an ideal response can conceal incorrect production assumptions.
+No single test proves a release. Use the least expensive layer that can provide the required evidence, then advance toward representative environments. Flaky tests and unrealistic mocks weaken trust and must be treated as defects.
 
 ### 5.7 Release: make a version eligible for deployment
 
-A release is a versioned artifact accompanied by enough evidence to support a promotion decision. Releasing and deploying are not identical. A team can publish version `2.4.0` to a registry without immediately running it in production.
-
-Release controls may verify the artifact digest, test results, vulnerability policy, change record, approval, release notes, compatibility, and recovery plan. The decision must be bound to the exact artifact. Approving a tag such as `latest` is ambiguous because its target can change after review.
-
-Continuous delivery means that a valid release is always deployable through a controlled decision. Continuous deployment goes further and automatically deploys every qualifying release. The required confidence and recovery capability are higher for continuous deployment.
+A release is a versioned artifact plus the evidence needed for promotion: digest, tests, vulnerability policy, compatibility, approval, and recovery plan. Release and deployment are different; an artifact can be eligible without running in production. Continuous delivery keeps a validated release deployable, whereas continuous deployment automatically promotes every qualifying release and therefore requires stronger confidence and recovery.
 
 ### 5.8 Deploy: change the target environment safely
 
-Deployment places the released artifact and configuration into an environment. The workflow first verifies the target, current health, required capacity, configuration, credentials, and artifact identity. It then uses an appropriate strategy, such as recreate, rolling, blue-green, or canary.
-
-Deployment success means that the platform accepted the requested change. It does not yet prove that the application is usable. A container may start while its database migration is incompatible; a Kubernetes Deployment may become available while a background worker cannot process jobs.
-
-The deployment should therefore have bounded timeouts, visible progress, stop conditions, and a defined response to uncertain outcomes. A timeout after a change request is not automatically safe to retry. The workflow may need to rediscover actual state first.
+Deployment verifies the artifact, target, baseline health, capacity, configuration, and credentials before changing an environment through an appropriate strategy. Platform acceptance does not prove service success. Use bounded timeouts, stop conditions, post-checks, and explicit handling for uncertain outcomes; after a timed-out change request, rediscover actual state before retrying.
 
 ### 5.9 Operate: keep the service dependable
 
-Operation includes availability, capacity, backup, patching, incident response, credential rotation, dependency maintenance, support, and recovery. Operational ownership begins during design, not after deployment.
-
-Runbooks should explain common symptoms, diagnostic evidence, safe actions, escalation, and recovery. Service-level indicators and objectives define which behavior matters. Routine work should be automated when the process is understood, frequent, and measurable.
-
-For an automation service, operation also includes queue health, worker concurrency, external API limits, credential availability, evidence retention, and protection against two workers acting on the same target simultaneously.
+Operation covers availability, capacity, backup, patching, incident response, credential rotation, dependency maintenance, and recovery. Runbooks define symptoms, evidence, safe actions, and escalation. For an automation service, operators also manage queue health, worker concurrency, API limits, credentials, evidence retention, and per-target locking.
 
 ### 5.10 Observe: compare actual behavior with expectations
 
-Observability combines metrics, logs, traces, health checks, events, and release context. These signals should identify the application version, environment, and relevant request or job so an operator can connect a symptom to a release.
-
-Immediate post-deployment checks provide fast feedback, while an observation window can expose delayed failure, resource leakage, increasing queue delay, or a dependency problem. Alerts should represent actionable impact or loss of safety margin rather than every isolated error.
-
-An application health endpoint proves only the behavior it actually checks. Liveness may confirm that a process is running; readiness may confirm that it can accept work; an acceptance test may prove that a complete user-visible transaction succeeds. These signals should not be treated as interchangeable.
+Observation combines metrics, logs, traces, health checks, events, and release context. Signals must identify the version, environment, and request or job. Immediate checks reveal obvious failure; an observation window reveals delayed degradation. Liveness, readiness, and end-to-end acceptance prove different conditions and must not be treated as interchangeable.
 
 ### 5.11 Learn and improve: close the loop
 
-Delivery and operational evidence should change future work. A failed release may reveal a missing test, an unclear interface, a fragile dependency, an unsafe retry, a capacity assumption, or an approval gap. The improvement belongs in the delivery system: add the test, update the runbook, change the design, strengthen policy, or remove the repeated manual step.
-
-Incident reviews should examine contributing conditions and control failures rather than search for one person to blame. Useful findings have owners and measurable follow-up. If the same class of incident recurs, the organization collected information but did not complete the learning loop.
+Operational evidence should change future work. A failure may reveal a missing test, unsafe retry, fragile dependency, capacity assumption, or approval gap. Add the resulting improvement to code, tests, policy, design, or runbooks. Findings need owners and measurable follow-up; collecting incident information without changing the system does not complete the learning loop.
 
 ### 5.12 Retire: remove software and access deliberately
 
-Retirement is often omitted from lifecycle diagrams, but abandoned software creates security and operational risk. Retirement includes stopping traffic and scheduled jobs, exporting or deleting data according to policy, revoking credentials, removing infrastructure, updating dependencies and documentation, preserving required audit evidence, and confirming that no consumer still relies on the service.
-
-Infrastructure cleanup must prove ownership before deletion. A broad cleanup command is not an acceptable substitute for a recorded environment identifier and reviewed destruction plan.
+Retirement stops traffic and scheduled work, handles data according to policy, revokes credentials, removes owned infrastructure, updates documentation, and preserves required evidence. Before deletion, confirm that no consumer remains and prove ownership of every targeted resource.
 
 ### 5.13 Gates, evidence, and promotion
 
-A gate is a decision point supported by evidence. It should answer a specific question rather than exist as an unexplained approval step.
+A gate is a decision supported by evidence, not an unexplained approval step.
 
 <p align="center">
   <img src="assets/diagrams/devops-evidence-chain.svg" alt="Evidence chain from requirement and commit to controlled deployment and runtime evidence" width="640" />
@@ -251,41 +198,33 @@ A gate is a decision point supported by evidence. It should answer a specific qu
 | Completion | Has the intended outcome been achieved? | Deployment record, acceptance result, observation evidence |
 | Recovery | Is rollback safe, or is forward remediation required? | Actual state, data compatibility, failure classification |
 
-Evidence must remain connected across stages. A reviewer should be able to follow one chain:
-
 **requirement → source change → commit → pipeline → test results → artifact digest → approval → deployment → runtime evidence**
 
-If a new commit, artifact, target, or configuration appears after approval, the earlier decision may no longer apply. Promotion should stop or require renewed validation.
+Evidence must remain connected along this chain. A new commit, artifact, target, or configuration can invalidate an earlier approval and require renewed validation.
 
 ### 5.14 Feedback loops at different speeds
 
-The lifecycle contains several feedback loops:
-
-Feedback is ordered below by typical response time. Faster is not always more important: production and architecture feedback answer questions that a unit test cannot reproduce. Each loop should have an owner and a path back into source, tests, policy, documentation, or design.
+Feedback arrives at different speeds, and each loop needs an owner and a path back into source, tests, policy, documentation, or design:
 
 - **Seconds to minutes:** formatter, linter, schema validation, and unit tests guide the developer.
 - **Minutes to hours:** integration, security, packaging, and system tests guide merge and release decisions.
 - **Hours to days:** deployment and runtime signals reveal behavior under representative or real workloads.
 - **Weeks to months:** delivery measures, incident patterns, dependency health, capacity, and architecture reviews guide investment.
 
-Fast feedback reduces the cost of correction, but slower feedback remains essential because a test environment cannot reproduce every production condition. The objective is not to force every signal into one pipeline. It is to connect signals to ownership and ensure that important findings return to planning and development.
+Fast feedback reduces correction cost, but slower operational feedback remains essential because tests cannot reproduce every production condition.
 
 ### 5.15 Applied example: from commit to operating automation service
 
-Suppose a developer improves the error classification in a Python automation worker.
+Suppose a developer improves error classification in the Python worker:
 
-1. The requirement defines which errors are retryable, permanent, or uncertain and how each appears to an operator.
-2. The developer changes the classifier, adds unit tests, and updates the operating note on uncertain completion.
-3. The merge-request pipeline runs static checks, unit tests, API fixtures, and secret detection.
-4. The build creates one non-root container image, generates an SBOM, scans it, and records its digest.
-5. An integration environment starts the API, queue, database, and worker. Tests inject a timeout and confirm that the job becomes `unknown` rather than being repeated automatically.
-6. Reviewers approve the exact commit and digest after examining the behavior and evidence.
-7. A rolling deployment introduces the image while the previous version remains available.
-8. Readiness and a representative job validate the service. Metrics compare queue delay, failure categories, and worker errors with the previous release.
-9. If uncertain jobs increase, rollout stops. The team restores the compatible earlier image or applies forward remediation according to actual state.
-10. The incident or release finding becomes a regression test and an updated runbook entry.
+1. Planning defines retryable, permanent, and uncertain outcomes; design specifies safe retry behavior.
+2. Development changes the classifier, tests, and operating guidance in one reviewed branch.
+3. CI runs static, unit, fixture, and security checks; the build produces one scanned image and records its digest.
+4. Integration tests inject a timeout and confirm that uncertain work is not repeated automatically.
+5. Reviewers approve the commit, digest, and evidence; deployment introduces that digest and verifies readiness and a representative job.
+6. If uncertain jobs increase, rollout stops and the team recovers according to actual state. The finding becomes a regression test and runbook improvement.
 
-The Python change may be small. The complete lifecycle is what makes it safe for a team to deliver and support repeatedly.
+The code change may be small; the lifecycle makes it safe for a team to deliver and support repeatedly.
 
 ## 6. A practical software delivery architecture
 
