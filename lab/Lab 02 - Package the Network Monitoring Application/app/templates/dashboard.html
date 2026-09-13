@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Network Resource Monitor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Network Resource Monitor</h1><p>{{ router }}{% if mock %} · demonstration data{% endif %}</p></header>
+  <main>
+    <section class="card"><h2>CPU utilization</h2><strong id="cpu-value">--%</strong><canvas id="cpu"></canvas></section>
+    <section class="card"><h2>Memory utilization</h2><strong id="memory-value">--%</strong><canvas id="memory"></canvas></section>
+  </main>
+  <p id="status">Waiting for the first sample…</p>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

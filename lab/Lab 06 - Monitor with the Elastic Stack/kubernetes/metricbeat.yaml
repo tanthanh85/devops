@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: metricbeat, namespace: network-devops}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: network-devops-metricbeat}
+rules:
+  - apiGroups: [""]
+    resources: [nodes, namespaces, events, pods, services]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets, daemonsets]
+    verbs: [get, list, watch]
+  - nonResourceURLs: [/metrics]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: network-devops-metricbeat}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: network-devops-metricbeat}
+subjects:
+  - {kind: ServiceAccount, name: metricbeat, namespace: network-devops}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: metricbeat-config, namespace: network-devops}
+data:
+  metricbeat.yml: |
+    metricbeat.modules:
+      - module: kubernetes
+        metricsets: [node, system, pod, container, volume]
+        period: 15s
+        host: ${NODE_NAME}
+        hosts: ["https://${NODE_NAME}:10250"]
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        ssl.verification_mode: none
+    processors:
+      - add_kubernetes_metadata: {}
+    output.logstash:
+      hosts: ["${LOGSTASH_HOST}"]
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: {name: metricbeat, namespace: network-devops}
+spec:
+  selector: {matchLabels: {app: metricbeat, role: node}}
+  template:
+    metadata: {labels: {app: metricbeat, role: node}}
+    spec:
+      serviceAccountName: metricbeat
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: metricbeat
+          image: docker.elastic.co/beats/metricbeat:9.2.3
+          args: ["-e", "-c", "/etc/metricbeat.yml"]
+          env:
+            - {name: NODE_NAME, valueFrom: {fieldRef: {fieldPath: spec.nodeName}}}
+            - {name: LOGSTASH_HOST, valueFrom: {configMapKeyRef: {name: observability-endpoints, key: LOGSTASH_HOST}}}
+          securityContext: {runAsUser: 0, readOnlyRootFilesystem: true}
+          volumeMounts:
+            - {name: config, mountPath: /etc/metricbeat.yml, subPath: metricbeat.yml, readOnly: true}
+            - {name: data, mountPath: /usr/share/metricbeat/data}
+          resources:
+            requests: {cpu: 60m, memory: 120Mi}
+            limits: {cpu: 300m, memory: 300Mi}
+      volumes:
+        - {name: config, configMap: {name: metricbeat-config}}
+        - {name: data, emptyDir: {}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: kube-state-metrics, namespace: network-devops}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: network-devops-kube-state-metrics}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: view}
+subjects:
+  - {kind: ServiceAccount, name: kube-state-metrics, namespace: network-devops}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: kube-state-metrics, namespace: network-devops}
+spec:
+  selector: {app: kube-state-metrics}
+  ports:
+    - {name: metrics, port: 8080, targetPort: metrics}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: kube-state-metrics, namespace: network-devops}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: kube-state-metrics}}
+  template:
+    metadata: {labels: {app: kube-state-metrics}}
+    spec:
+      serviceAccountName: kube-state-metrics
+      containers:
+        - name: kube-state-metrics
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
+          ports: [{name: metrics, containerPort: 8080}]
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 256Mi}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: metricbeat-state-config, namespace: network-devops}
+data:
+  metricbeat.yml: |
+    metricbeat.modules:
+      - module: kubernetes
+        metricsets: [state_node, state_pod, state_container, state_deployment, state_replicaset, state_service]
+        period: 15s
+        hosts: ["kube-state-metrics:8080"]
+    output.logstash:
+      hosts: ["${LOGSTASH_HOST}"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: metricbeat-state, namespace: network-devops}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: metricbeat, role: state}}
+  template:
+    metadata: {labels: {app: metricbeat, role: state}}
+    spec:
+      serviceAccountName: metricbeat
+      containers:
+        - name: metricbeat
+          image: docker.elastic.co/beats/metricbeat:9.2.3
+          args: ["-e", "-c", "/etc/metricbeat.yml"]
+          env:
+            - {name: LOGSTASH_HOST, valueFrom: {configMapKeyRef: {name: observability-endpoints, key: LOGSTASH_HOST}}}
+          volumeMounts:
+            - {name: config, mountPath: /etc/metricbeat.yml, subPath: metricbeat.yml, readOnly: true}
+            - {name: data, mountPath: /usr/share/metricbeat/data}
+          resources:
+            requests: {cpu: 40m, memory: 100Mi}
+            limits: {cpu: 250m, memory: 256Mi}
+      volumes:
+        - {name: config, configMap: {name: metricbeat-state-config}}
+        - {name: data, emptyDir: {}}

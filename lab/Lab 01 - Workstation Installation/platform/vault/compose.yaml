@@ -1,0 +1,10 @@
+services:
+  vault:
+    image: hashicorp/vault:${VAULT_VERSION:?Set VAULT_VERSION in .env}
+    container_name: course-vault
+    restart: unless-stopped
+    cap_add: [IPC_LOCK]
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:-dev-only-token}
+    command: server -dev -dev-listen-address=0.0.0.0:8200
+    ports: ["127.0.0.1:8200:8200"]

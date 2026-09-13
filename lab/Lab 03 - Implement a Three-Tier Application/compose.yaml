@@ -1,0 +1,64 @@
+services:
+  db:
+    image: ${MYSQL_IMAGE:?Set MYSQL_IMAGE}
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes: ["mysql_data:/var/lib/mysql"]
+    networks: [data]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    image: network-monitor-app:lab03
+    restart: unless-stopped
+    env_file: [.env]
+    depends_on:
+      db: {condition: service_healthy}
+    volumes: ["./certificates:/certificates:ro"]
+    networks: [frontend, data, management]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    image: network-monitor-web:lab03
+    restart: unless-stopped
+    depends_on:
+      app: {condition: service_healthy}
+    ports: ["127.0.0.1:8088:8080"]
+    networks: [frontend]
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,size=32m
+      - /var/run:rw,noexec,nosuid,size=8m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  frontend:
+  data: {internal: true}
+  management:
+
+volumes:
+  mysql_data:

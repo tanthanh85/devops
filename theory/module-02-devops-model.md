@@ -33,7 +33,6 @@ The central question is practical: **How do we turn useful network automation in
 
 ## 2. From ad hoc automation to DevOps
 
-> **CORE CONCEPT**
 
 Task automation often begins with a Python script, an API integration, or an Ansible playbook created to meet an immediate operational need. This approach can be effective at small scale, but weaknesses emerge when the solution must be reviewed by a team, reproduced in a clean environment, released safely, diagnosed consistently, and supported independently of its original author.
 
@@ -63,7 +62,6 @@ NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts,
 
 ## 3. CALMS applied to software delivery
 
-> **CORE CONCEPT**
 
 CALMS assesses DevOps as an operating model rather than a collection of tools. It represents **Culture, Automation, Lean, Measurement, and Sharing**. The dimensions work together: automation without ownership can accelerate a poor process, while collaboration without repeatable execution remains dependent on individuals.
 
@@ -141,7 +139,6 @@ Automation improves consistency, but DevOps connects automation to collaboration
 
 ## 5. Complete DevOps lifecycle
 
-> **CORE CONCEPT**
 
 The DevOps lifecycle connects an idea to an operating service and returns operational knowledge to the next decision. Deployment is therefore not the end: software must be operated, observed, improved, secured, and eventually retired.
 
@@ -265,7 +262,6 @@ The code change may be small; the lifecycle makes it safe for a team to deliver 
 
 ## 6. A practical software delivery architecture
 
-> **ADVANCED / REFERENCE**
 
 The following responsibilities appear in most mature delivery systems, although the products and team boundaries vary.
 
@@ -292,7 +288,6 @@ Module 1 assigns infrastructure ownership and lifecycle controls. Module 3 appli
 
 ## 7. Continuous integration, delivery, and deployment
 
-> **CORE CONCEPT**
 
 This section defines the three practices and their decision boundaries. Module 4 implements them through GitLab jobs, runners, artifacts, environments, rules, and protected deployment.
 
@@ -306,9 +301,12 @@ These terms describe different levels of automation.
 
 The course begins with continuous integration, adds automated deployment to a training environment, and may finish with a controlled Kubernetes platform exercise. Production deployment remains a design decision rather than an assumption.
 
+One repository may support several delivery purposes without forcing them into one execution path. A software-release pipeline answers whether an application version can be built, secured, and deployed. An infrastructure pipeline creates or changes resources. A network-change pipeline evaluates intent, proves the change on a representative target, and controls production promotion. A scheduled assurance pipeline detects drift or expiring dependencies without deploying anything.
+
+These pipelines may share code, images, policies, runners, and evidence services, but they should not share an ambiguous trigger. Each pipeline needs a defined initiating event, input contract, privilege level, target type, acceptance criteria, and completion condition. Separation by purpose reduces accidental coupling: releasing an application does not silently authorize a network change, and changing network intent does not rebuild an unrelated platform.
+
 ## 8. Value stream and constraints
 
-> **CORE CONCEPT**
 
 A value stream describes the work from request to operational outcome. Useful questions include:
 
@@ -346,7 +344,6 @@ The team should also measure pipeline feedback time, percentage of changes with 
 
 ## 9. Applying DevOps controls to existing network intent
 
-> **LAB REQUIRED**
 
 DEVASC/DEVCOR-level knowledge of structured data, APIs, and network intent is assumed. The DevOps concern is how an existing intent contract becomes a controlled pipeline input. Depending on the application, YAML might describe interface addressing, a service, routing policy, compliance rules, or validation expectations. A JSON Schema or Python model validates structure and types before a build or deployment job receives privileged access.
 

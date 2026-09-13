@@ -1,0 +1,234 @@
+.network_change_rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $PIPELINE_PURPOSE == "network_change" && $NETBOX_IP_ID =~ /^[1-9][0-9]*$/'
+    - when: never
+
+.audit_variables:
+  variables:
+    VAULT_AUTH_METHOD: "approle"
+    INTENT_FILE: "$CI_PROJECT_DIR/intent.json"
+    TF_ROOT: "$CI_PROJECT_DIR/terraform/cml-test"
+    PYTHONPATH: "$CI_PROJECT_DIR/automation:$CI_PROJECT_DIR/ci"
+
+resolve-network-intent:
+  extends: [.network_change_rules, .audit_variables]
+  stage: verify
+  image: python:3.12-slim
+  before_script:
+    - python -m pip install --disable-pip-version-check hvac==2.3.0 requests==2.32.5
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task resolve_netbox_intent python automation/resolve_intent.py
+    - audit_task validate_intent_schema python -c 'import json,re; d=json.load(open("intent.json")); assert re.fullmatch(r"Loopback[0-9]{1,4}",d["interface"]); assert d["fingerprint"]'
+  artifacts:
+    access: developer
+    paths: [intent.json]
+    expire_in: 1 day
+
+validate-network-delivery-source:
+  extends: [.network_change_rules, .audit_variables]
+  stage: verify
+  image: python:3.12-slim
+  before_script:
+    - python -m pip install --disable-pip-version-check PyYAML==6.0.2
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task compile_python python -m compileall -q automation ansible ci
+    - audit_task validate_yaml python -c 'import glob,yaml; [list(yaml.safe_load_all(open(f))) for f in glob.glob("ansible/*.yml")+glob.glob("kubernetes/*.yaml")]'
+    - audit_task detect_known_secret_formats sh -c '! git grep -nE "BEGIN (RSA |OPENSSH )?PRIVATE KEY|glpat-[A-Za-z0-9_-]{20,}" -- terraform ansible automation ci'
+
+build-network-delivery-images:
+  extends: [.network_change_rules, .audit_variables]
+  stage: package-test
+  image: docker:27-cli
+  needs: [validate-network-delivery-source]
+  before_script:
+    - apk add --no-cache python3
+    - . ci/audit-job.sh
+    - audit_job_start
+    - audit_task registry_login sh -c 'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"'
+  script:
+    - export ANSIBLE_IMAGE="$CI_REGISTRY_IMAGE/loopback-ansible:$CI_COMMIT_SHA"
+    - export PYATS_IMAGE="$CI_REGISTRY_IMAGE/loopback-pyats:$CI_COMMIT_SHA"
+    - export TERRAFORM_IMAGE="$CI_REGISTRY_IMAGE/cml-terraform:$CI_COMMIT_SHA"
+    - audit_task build_ansible_image docker build --pull -t "$ANSIBLE_IMAGE" -f automation/Dockerfile.ansible .
+    - audit_task build_pyats_image docker build --pull -t "$PYATS_IMAGE" -f automation/Dockerfile.pyats .
+    - audit_task build_terraform_image docker build --pull -t "$TERRAFORM_IMAGE" -f automation/Dockerfile.terraform .
+    - audit_task push_ansible_image docker push "$ANSIBLE_IMAGE"
+    - audit_task push_pyats_image docker push "$PYATS_IMAGE"
+    - audit_task push_terraform_image docker push "$TERRAFORM_IMAGE"
+    - audit_task record_image_digests sh -c 'docker image inspect "$ANSIBLE_IMAGE" "$PYATS_IMAGE" "$TERRAFORM_IMAGE" --format "{{json .RepoDigests}}" > image-digests.jsonl'
+    - python3 ci/audit.py emit --action image_evidence_recorded --outcome success --message "Immutable image digests recorded" --fields-json "{\"artifact.path\":\"image-digests.jsonl\"}"
+  after_script:
+    - docker logout "$CI_REGISTRY" || true
+  artifacts:
+    access: developer
+    paths: [image-digests.jsonl]
+    expire_in: 14 days
+
+create-cml-test-environment:
+  extends: [.network_change_rules, .audit_variables]
+  stage: deploy
+  image: "$CI_REGISTRY_IMAGE/cml-terraform:$CI_COMMIT_SHA"
+  needs:
+    - resolve-network-intent
+    - build-network-delivery-images
+  resource_group: "cml-test-$CI_PROJECT_ID"
+  before_script:
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task render_cml_inputs python3 ci/render-cml-inputs.py
+    - audit_task terraform_format terraform -chdir="$TF_ROOT" fmt -check
+    - audit_task terraform_init sh ci/terraform-init.sh
+    - audit_task terraform_validate terraform -chdir="$TF_ROOT" validate
+    - audit_task terraform_plan terraform -chdir="$TF_ROOT" plan -input=false -out=plan.tfplan
+    - audit_task fingerprint_terraform_plan sh -c 'terraform -chdir="$TF_ROOT" show -json plan.tfplan | sha256sum > terraform-plan.sha256'
+    - audit_task terraform_apply terraform -chdir="$TF_ROOT" apply -input=false -auto-approve plan.tfplan
+    - audit_task record_cml_outputs sh -c 'terraform -chdir="$TF_ROOT" output -json > cml-outputs.json'
+    - python3 ci/audit.py emit --action cml_test_environment_created --outcome success --message "CML C8000V test environment created" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"network.device.address":d["router_management_ip"]["value"],"cml.lifecycle.booted":d["lifecycle_booted"]["value"]}))')"
+    - audit_task remove_sensitive_working_files rm -f "$TF_ROOT/pipeline.auto.tfvars.json" "$TF_ROOT/plan.tfplan"
+  artifacts:
+    access: developer
+    paths:
+      - terraform/cml-test/.terraform.lock.hcl
+      - cml-outputs.json
+      - terraform-plan.sha256
+      - intent.json
+    expire_in: 1 day
+
+wait-for-test-router:
+  extends: [.network_change_rules, .audit_variables]
+  stage: deploy
+  image: "$CI_REGISTRY_IMAGE/cml-terraform:$CI_COMMIT_SHA"
+  needs: [create-cml-test-environment]
+  before_script:
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - export TEST_IP="$(python3 -c 'import json;print(json.load(open("cml-outputs.json"))["router_management_ip"]["value"])')"
+    - audit_task wait_for_ssh sh -c 'for n in $(seq 1 60); do nc -z "$TEST_IP" 22 && exit 0; sleep 10; done; exit 1'
+    - mkdir -p evidence
+    - audit_task capture_test_host_key sh -c 'ssh-keyscan -T 10 -H "$TEST_IP" > evidence/known_hosts'
+  artifacts:
+    access: developer
+    paths: [intent.json, cml-outputs.json, evidence/known_hosts, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 1 day
+
+deploy-loopback-to-test:
+  extends: [.network_change_rules, .audit_variables]
+  stage: deploy
+  image: "$CI_REGISTRY_IMAGE/loopback-ansible:$CI_COMMIT_SHA"
+  needs: [wait-for-test-router, build-network-delivery-images]
+  variables: {TARGET_ENVIRONMENT: "test"}
+  before_script:
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task ansible_test_deployment ansible-playbook -i ansible/inventory_from_vault.py ansible/deploy_loopback.yml
+  artifacts:
+    access: developer
+    paths: [intent.json, evidence/known_hosts, cml-outputs.json, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 1 day
+
+verify-loopback-on-test:
+  extends: [.network_change_rules, .audit_variables]
+  stage: acceptance
+  image: "$CI_REGISTRY_IMAGE/loopback-pyats:$CI_COMMIT_SHA"
+  needs: [deploy-loopback-to-test, build-network-delivery-images]
+  variables: {TARGET_ENVIRONMENT: "test"}
+  before_script:
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task pyats_test_validation sh -c 'python automation/verify_loopback.py | tee pyats-test.jsonl'
+    - python ci/audit.py emit --action test_quality_gate --outcome success --message "Test router matches frozen intent" --fields-json '{"quality_gate.name":"test-before-production","quality_gate.status":"passed"}'
+  artifacts:
+    access: developer
+    paths: [intent.json, pyats-test.jsonl, cml-outputs.json, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 14 days
+
+approve-production:
+  extends: [.network_change_rules, .audit_variables]
+  stage: acceptance
+  image: python:3.12-slim
+  needs: [destroy-cml-test-environment]
+  when: manual
+  allow_failure: false
+  environment:
+    name: course/production-network
+    action: prepare
+  script:
+    - . ci/audit-job.sh
+    - audit_job_start
+    - python ci/audit.py emit --action production_approval --outcome success --message "Protected operator approved production promotion" --fields-json '{"approval.type":"manual","quality_gate.status":"approved"}'
+  artifacts:
+    access: developer
+    paths: [intent.json, cml-outputs.json, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 1 day
+
+deploy-loopback-to-production:
+  extends: [.network_change_rules, .audit_variables]
+  stage: acceptance
+  image: "$CI_REGISTRY_IMAGE/loopback-ansible:$CI_COMMIT_SHA"
+  needs: [approve-production, build-network-delivery-images]
+  variables: {TARGET_ENVIRONMENT: "production"}
+  environment: {name: "course/production-network"}
+  resource_group: production-network-change
+  before_script:
+    - . ci/audit-job.sh
+    - audit_job_start
+  script:
+    - audit_task ansible_production_deployment ansible-playbook -i ansible/inventory_from_vault.py ansible/deploy_loopback.yml
+  artifacts:
+    access: developer
+    paths: [intent.json, evidence/known_hosts, cml-outputs.json, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 1 day
+
+verify-loopback-on-production:
+  extends: [.network_change_rules, .audit_variables]
+  stage: acceptance
+  image: "$CI_REGISTRY_IMAGE/loopback-pyats:$CI_COMMIT_SHA"
+  needs: [deploy-loopback-to-production, build-network-delivery-images]
+  variables: {TARGET_ENVIRONMENT: "production"}
+  resource_group: production-network-change
+  script:
+    - . ci/audit-job.sh
+    - audit_job_start
+    - audit_task pyats_production_validation sh -c 'python automation/verify_loopback.py | tee pyats-production.jsonl'
+    - python ci/audit.py emit --action production_quality_gate --outcome success --message "Production router matches frozen intent" --fields-json '{"quality_gate.name":"production-acceptance","quality_gate.status":"passed"}'
+  artifacts:
+    access: developer
+    paths: [intent.json, pyats-production.jsonl, cml-outputs.json, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 14 days
+
+destroy-cml-test-environment:
+  extends: [.network_change_rules, .audit_variables]
+  stage: acceptance
+  image: "$CI_REGISTRY_IMAGE/cml-terraform:$CI_COMMIT_SHA"
+  needs:
+    - job: create-cml-test-environment
+      artifacts: true
+    - job: deploy-loopback-to-test
+      artifacts: false
+    - job: verify-loopback-on-test
+      artifacts: false
+  when: always
+  allow_failure: false
+  interruptible: false
+  resource_group: "cml-test-$CI_PROJECT_ID"
+  script:
+    - . ci/audit-job.sh
+    - audit_job_start
+    - audit_task render_cml_inputs python3 ci/render-cml-inputs.py
+    - audit_task terraform_init sh ci/terraform-init.sh
+    - audit_task terraform_destroy terraform -chdir="$TF_ROOT" destroy -input=false -auto-approve
+    - audit_task verify_empty_terraform_state sh -c 'test -z "$(terraform -chdir="$TF_ROOT" state list)"'
+    - python3 ci/audit.py emit --action cml_test_environment_deleted --outcome success --message "On-demand CML lab and C8000V deleted after testing" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"resource.lifecycle":"deleted"}))')"
+    - audit_task remove_sensitive_working_files rm -f "$TF_ROOT/pipeline.auto.tfvars.json"
+  artifacts:
+    access: developer
+    paths: [intent.json, cml-outputs.json, terraform-plan.sha256, terraform/cml-test/.terraform.lock.hcl]
+    expire_in: 1 day

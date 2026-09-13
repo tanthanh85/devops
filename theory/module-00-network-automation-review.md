@@ -42,7 +42,6 @@ After completing this review, learners should be able to:
 
 ## 3. Network automation as a software system
 
-> **CORE CONCEPT**
 
 Network automation is sometimes introduced as a faster way to execute commands. That description is incomplete. A useful automation solution is a software system that interprets intent, obtains trusted data, communicates with external systems, changes or observes state, handles failure, and produces evidence.
 
@@ -67,7 +66,6 @@ The implementation may be a small command-line program or a multitier service. T
 
 ## 4. Core review: foundation knowledge
 
-> **CORE CONCEPT**
 
 Reliable delivery depends on several disciplines working together. Networking knowledge defines the intended behavior, programming and data models express it, and version control preserves both the implementation and the decisions behind it.
 
@@ -122,7 +120,6 @@ Data should be normalized before it reaches templates or API clients. Addresses,
 
 #### 4.3.1 One inventory represented in YAML, JSON, XML, and Python
 
-> **ADVANCED / REFERENCE**
 
 The examples below describe the same two devices. Seeing the equivalent structures helps when an application reads one format, uses Python dictionaries internally, and sends another format to an API.
 
@@ -219,85 +216,50 @@ inventory = {
 
 #### 4.3.2 Parsing and normalizing the formats
 
-> **ADVANCED / REFERENCE**
-
-Python's standard library handles JSON and XML. YAML normally uses PyYAML. `yaml.safe_load()` is important because the general loader can construct unsafe Python objects from untrusted YAML.
+Python uses a different parser for each external representation:
 
 ```python
-from __future__ import annotations
-
-import ipaddress
-import json
-from pathlib import Path
-import xml.etree.ElementTree as ET
-
+import json, xml.etree.ElementTree as ET
 import yaml
 
-
-def load_yaml(path: Path) -> dict:
-    with path.open(encoding="utf-8") as stream:
-        data = yaml.safe_load(stream)
-    if not isinstance(data, dict):
-        raise ValueError("YAML root must be a mapping")
-    return data
-
-
-def load_json(path: Path) -> dict:
-    with path.open(encoding="utf-8") as stream:
-        data = json.load(stream)
-    if not isinstance(data, dict):
-        raise ValueError("JSON root must be an object")
-    return data
-
-
-def load_xml(path: Path) -> dict:
-    root = ET.parse(path).getroot()
-    if root.tag != "inventory":
-        raise ValueError("XML root must be <inventory>")
-
-    return {
-        "site": root.attrib["site"],
-        "devices": [
-            {
-                "name": node.findtext("name", "").strip(),
-                "address": node.findtext("address", "").strip(),
-                "platform": node.findtext("platform", "").strip(),
-                "enabled": node.attrib.get("enabled", "false").lower() == "true",
-                "tags": [tag.text.strip() for tag in node.findall("./tags/tag") if tag.text],
-            }
-            for node in root.findall("device")
-        ],
-    }
-
-
-def normalize_inventory(raw: dict) -> dict:
-    site = str(raw.get("site", "")).strip().lower()
-    if not site:
-        raise ValueError("site is required")
-
-    devices = []
-    for item in raw.get("devices", []):
-        name = str(item.get("name", "")).strip().lower()
-        if not name:
-            raise ValueError("every device requires a name")
-        address = str(ipaddress.ip_address(item["address"]))
-        devices.append(
-            {
-                "name": name,
-                "address": address,
-                "platform": str(item["platform"]).strip().lower(),
-                "enabled": bool(item.get("enabled", False)),
-                "tags": sorted({str(tag).strip().lower() for tag in item.get("tags", [])}),
-            }
-        )
-    return {"site": site, "devices": devices}
+yaml_data = yaml.safe_load(yaml_text)
+json_data = json.loads(json_text)
+xml_root = ET.fromstring(xml_text)
 ```
 
-All three loaders return the same internal shape, and normalization establishes canonical values. A production application should add schema validation, reject unexpected fields when appropriate, use a hardened XML parser for untrusted XML, and test missing, duplicated, malformed, and boundary values.
+Parsing only creates language objects. The application should then validate the expected schema and normalize values into one internal dictionary—for example, lowercase site names, canonical IP addresses, explicit booleans, and a consistent device-list structure. Use `yaml.safe_load()` for reviewed YAML and a hardened XML parser when XML is untrusted. Tests should cover missing fields, unexpected fields, invalid addresses, duplicates, and boundary values.
 
 ### 4.4 Git records source and decisions
 
 Git stores versions of source code and supporting definitions. Learners should be able to create a branch, inspect a diff, stage deliberate changes, commit them with a useful message, resolve straightforward conflicts, and participate in review.
+
+A basic local workflow uses a small set of commands:
+
+```bash
+git clone <repository-url>
+git status
+git switch -c feature/short-description
+git diff
+git add <file>
+git diff --staged
+git commit -m "Describe the reason for the change"
+git fetch origin
+git push -u origin feature/short-description
+```
+
+`git status` shows the current branch and file states. `git diff` reviews unstaged work; `git diff --staged` reviews exactly what the next commit will contain. `git add` selects changes for that commit, and `git commit` records the staged snapshot locally. `git fetch` updates knowledge of the remote without modifying the working branch. `git push` publishes the feature branch for review.
+
+Useful inspection and correction commands include:
+
+```bash
+git log --oneline --graph --decorate -10
+git show <commit>
+git restore <file>             # discard an unstaged local edit
+git restore --staged <file>    # unstage without deleting the edit
+git branch --show-current
+```
+
+Before restoring or discarding anything, inspect `git status` and `git diff`. Pulling, rebasing, merging, resolving conflicts, or rewriting published history should follow the team's collaboration policy.
 
 Four states are especially important when diagnosing a delivery problem. The working tree contains current local files; the index contains the exact changes selected for the next commit; a commit is an immutable snapshot with parent history and author metadata; and a remote-tracking reference records the last fetched view of a remote branch. `git status` and `git diff` answer different questions depending on which two states are compared. A clean working tree proves only that local files match the checked-out commit; it does not prove that the branch contains the latest reviewed change or that the commit was released.
 
@@ -318,7 +280,6 @@ Git provides useful history only when changes are committed with meaningful cont
 
 ## 5. Optional refresher and reference: automation interfaces
 
-> **ADVANCED / REFERENCE**
 
 The available interfaces overlap, but they expose different control and failure semantics. The following visual provides a quick comparison before the detailed review.
 
@@ -334,38 +295,18 @@ SSH CLI automation remains useful when a required function lacks a suitable stru
 
 CLI output is intended primarily for people and may vary by platform, release, privilege, width, localization, or command form. Structured parsing with TextFSM or Genie is preferable to fragile `split()` logic, but the parser and its expected data shape still require tests. Configuration workflows also need target verification, configuration preview, timeouts, failure classification, post-checks, and a recovery plan.
 
-#### 5.1.1 Reference example: Netmiko
+#### 5.1.1 Short Netmiko example
 
-Netmiko provides network-device connection handling on top of SSH. This read-only example takes credentials from the environment, uses explicit timeouts, requests structured output when a supported TextFSM template is available, and closes the session through a context manager:
+A short read-only call is sufficient for this review:
 
 ```python
-import os
+from netmiko import ConnectHandler
 
-from netmiko import ConnectHandler, NetmikoAuthenticationException, NetmikoTimeoutException
-
-
-device = {
-    "device_type": os.environ["DEVICE_TYPE"],
-    "host": os.environ["DEVICE_HOST"],
-    "username": os.environ["DEVICE_USERNAME"],
-    "password": os.environ["DEVICE_PASSWORD"],
-    "conn_timeout": 10,
-    "read_timeout_override": 30,
-}
-
-try:
-    with ConnectHandler(**device) as connection:
-        facts = connection.send_command("show interfaces", use_textfsm=True)
-        if not isinstance(facts, list):
-            raise RuntimeError("Structured parser did not return the expected list")
-        print(f"Collected {len(facts)} interface records")
-except NetmikoAuthenticationException as exc:
-    raise SystemExit("Authentication failed; do not retry with the same credential") from exc
-except NetmikoTimeoutException as exc:
-    raise SystemExit("Connection timed out; verify reachability and target identity") from exc
+with ConnectHandler(**device) as connection:
+    output = connection.send_command("show interfaces", use_textfsm=True)
 ```
 
-The command and `device_type` are platform-dependent. Tests should use sanitized command-output fixtures instead of requiring a live device for every commit. Production logs must not print the connection dictionary because it contains a password.
+The device dictionary, command, parser availability, and returned data are platform-dependent. Production code still needs credentials from a protected source, explicit timeouts, authentication and transport error handling, target verification, and tests built from sanitized output fixtures.
 
 ### 5.2 REST APIs
 
@@ -375,55 +316,17 @@ Reliable API clients address more than the successful `200` path. They use TLS v
 
 Retry behavior deserves particular care. A read request may be safe to retry after a transient connection failure. Repeating a create or change request after an uncertain timeout can duplicate work. The client may first need to query a request identifier or rediscover actual state.
 
-#### 5.2.1 Reference example: `requests`
-
-The `requests` library provides a direct and readable HTTP client. A `Session` reuses connections and common headers. Timeouts and TLS verification must be explicit; `verify=False` is not an acceptable production shortcut.
+#### 5.2.1 Short `requests` example
 
 ```python
-import os
-
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
-
-def build_session() -> requests.Session:
-    retry = Retry(
-        total=3,
-        backoff_factor=0.5,
-        status_forcelist=(429, 502, 503, 504),
-        allowed_methods=frozenset({"GET", "HEAD"}),
-        respect_retry_after_header=True,
-    )
-    session = requests.Session()
-    session.headers.update(
-        {
-            "Accept": "application/json",
-            "Authorization": f"Bearer {os.environ['API_TOKEN']}",
-        }
-    )
-    session.mount("https://", HTTPAdapter(max_retries=retry))
-    return session
-
-
-def get_devices(base_url: str, ca_bundle: str) -> list[dict]:
-    with build_session() as session:
-        response = session.get(
-            f"{base_url.rstrip('/')}/devices",
-            params={"site": "campus-west", "limit": 100},
-            timeout=(5, 20),
-            verify=ca_bundle,
-        )
-        response.raise_for_status()
-        if "application/json" not in response.headers.get("Content-Type", ""):
-            raise ValueError("API returned an unexpected media type")
-        payload = response.json()
-        if not isinstance(payload.get("items"), list):
-            raise ValueError("Response is missing the items list")
-        return payload["items"]
+response = requests.get(url, headers=headers, timeout=(5, 20), verify=ca_bundle)
+response.raise_for_status()
+data = response.json()
 ```
 
-The retry policy deliberately covers only safe read methods. Retrying `POST` or `PATCH` requires an application-specific idempotency key or a reliable way to discover the result of the earlier request.
+The client should verify TLS identity, check the returned media type and schema, handle pagination and rate limits, and classify failures. Automatic retry is normally safer for reads than for a change request whose earlier outcome is uncertain.
 
 ### 5.3 NETCONF, RESTCONF, and YANG
 
@@ -433,51 +336,16 @@ A model-driven workflow should discover capabilities, identify the correct schem
 
 Model-driven does not mean risk-free. The application still needs authorization, target control, transaction handling, diff or preview, post-change validation, and evidence.
 
-#### 5.3.1 Reference example: `ncclient`
-
-`ncclient` is a Python NETCONF client. The example performs a read with a subtree filter and parses the returned XML. Namespace values and model paths are illustrative and must be discovered from the target's advertised capabilities.
+#### 5.3.1 Short `ncclient` example
 
 ```python
-import os
-import xml.etree.ElementTree as ET
-
 from ncclient import manager
-from ncclient.operations import RPCError
 
-
-FILTER = """
-<interfaces-state xmlns="urn:example:interfaces">
-  <interface>
-    <name/>
-    <oper-status/>
-  </interface>
-</interfaces-state>
-"""
-
-try:
-    with manager.connect(
-        host=os.environ["NETCONF_HOST"],
-        port=830,
-        username=os.environ["NETCONF_USERNAME"],
-        password=os.environ["NETCONF_PASSWORD"],
-        hostkey_verify=True,
-        known_hosts=os.environ["SSH_KNOWN_HOSTS"],
-        timeout=20,
-    ) as session:
-        reply = session.get(filter=("subtree", FILTER))
-        root = ET.fromstring(reply.data_xml)
-        ns = {"if": "urn:example:interfaces"}
-        states = {
-            node.findtext("if:name", namespaces=ns):
-            node.findtext("if:oper-status", namespaces=ns)
-            for node in root.findall(".//if:interface", ns)
-        }
-        print(states)
-except RPCError as exc:
-    raise SystemExit(f"NETCONF operation rejected: {exc.tag}: {exc.message}") from exc
+with manager.connect(**connection_parameters) as session:
+    reply = session.get(filter=("subtree", subtree_filter))
 ```
 
-Configuration code must additionally consider datastore selection, locking, validation, confirmed commit, capability support, error options, and recovery. A successful `<ok/>` confirms protocol acceptance, not the final operational result.
+Connection parameters must enable host-key verification and define a timeout. Model namespaces, filters, datastore behavior, locking, confirmed commit, and error handling depend on the target's advertised capabilities. A successful RPC confirms protocol acceptance, not the final network outcome.
 
 ### 5.4 Controllers and platform APIs
 
@@ -495,42 +363,9 @@ Before integrating with a controller, determine:
 
 ### 5.5 Flask as an automation service interface
 
-Flask can expose existing Python logic through an HTTP API. It does not supply production authentication, authorization, rate limiting, durable jobs, TLS termination, or observability automatically; those controls must be designed around it.
+Flask can place an HTTP interface around existing Python logic. A small service may expose a liveness endpoint and accept a validated job request, but Flask does not automatically provide production authentication, authorization, rate limiting, durable job processing, TLS termination, or observability.
 
-```python
-from uuid import uuid4
-
-from flask import Flask, jsonify, request
-
-app = Flask(__name__)
-
-
-@app.get("/health/live")
-def live():
-    return {"status": "alive"}, 200
-
-
-@app.post("/api/v1/validation-jobs")
-def create_validation_job():
-    if not request.is_json:
-        return {"error": "Content-Type must be application/json"}, 415
-
-    body = request.get_json()
-    if not isinstance(body, dict):
-        return {"error": "Request body must be a JSON object"}, 400
-    allowed = {"site", "operation"}
-    if set(body) - allowed:
-        return {"error": "Request contains unsupported fields"}, 400
-    if body.get("operation") not in {"collect", "validate"}:
-        return {"error": "Unsupported operation"}, 422
-
-    # A production service would authorize the site, then place a validated
-    # request on a durable queue instead of doing slow work in this process.
-    job_id = str(uuid4())
-    return jsonify({"job_id": job_id, "status": "accepted"}), 202
-```
-
-The `202` response states that a job was accepted, not completed. A complete contract would provide a job-status URL, authentication and authorization, request-size limits, correlation IDs, structured logs, an OpenAPI description, and tests for invalid and unauthorized requests. Run Flask behind a production WSGI server or an appropriate platform runtime rather than using its development server for production.
+A production design should define request schemas, reject unsupported fields, authorize the requested target and operation, return a correlation or job identifier, move slow work to a durable worker, and provide a status resource. Run the application behind an appropriate production server rather than Flask's development server.
 
 ### 5.6 Model-driven telemetry review
 
@@ -558,39 +393,7 @@ Model-driven telemetry and OpenTelemetry solve related but different problems. M
 
 The collector is not merely a forwarding process. It must authenticate endpoints, validate certificates, negotiate supported encodings, track subscription state, add stable device and site metadata, normalize timestamps and units, manage backpressure, expose its own health, and prevent unbounded label cardinality.
 
-This small Python example shows the processing expected after a telemetry client has decoded a message. Actual gNMI client libraries produce different response objects, so the transport adapter should convert them into this internal dictionary before business logic runs.
-
-```python
-from datetime import datetime, timezone
-
-
-def normalize_interface_counter(update: dict, inventory: dict) -> dict:
-    required = {"device", "path", "timestamp_ns", "value"}
-    missing = required - update.keys()
-    if missing:
-        raise ValueError(f"Telemetry update is missing: {sorted(missing)}")
-
-    device = inventory.get(update["device"])
-    if device is None:
-        raise ValueError("Telemetry came from an unknown device")
-    if not update["path"].endswith("/state/counters/in-octets"):
-        raise ValueError("Unexpected telemetry path")
-
-    return {
-        "measurement": "interface_octets",
-        "timestamp": datetime.fromtimestamp(
-            update["timestamp_ns"] / 1_000_000_000,
-            tz=timezone.utc,
-        ).isoformat(),
-        "labels": {
-            "device": update["device"],
-            "site": device["site"],
-            "interface": update.get("interface", "unknown"),
-            "direction": "in",
-        },
-        "value": int(update["value"]),
-    }
-```
+After decoding a telemetry message, the collector should validate required fields, reject unknown devices or paths, normalize timestamps and units, and add stable site and interface metadata. Keep transport-specific response objects behind an adapter so that collection code and business rules can be tested independently.
 
 Counter interpretation requires more than storing values. Octet and packet counters normally increase monotonically and may reset after reboot or process restart. A collector calculates rates from successive samples only when timestamps are ordered and the counter has not reset or wrapped. Missing updates, duplicated timestamps, clock error, subscription loss, and collector backlog must be visible; otherwise a flat graph can be mistaken for a healthy interface when data collection has actually failed.
 
@@ -598,7 +401,6 @@ Telemetry is most useful when network observations can be correlated with collec
 
 ## 6. Core review: Ansible, orchestration, and tool ownership
 
-> **LAB REQUIRED**
 
 Ansible provides inventories, variables, collections, modules, roles, handlers, conditions, and playbooks for describing ordered work across targets. Agentless operation is particularly familiar in network environments, although module behavior and platform support still depend on collection versions and device capabilities.
 
@@ -674,9 +476,27 @@ The `network_service` role would contain platform-aware, preferably idempotent r
 
 ## 7. Source of truth, intent, and state
 
-> **CORE CONCEPT**
 
 A source of truth is the authoritative record for a defined class of data. It may contain device identity, site membership, addressing, connections, services, or policy. Authority must be explicit. If a spreadsheet, controller, inventory file, and live device can all overwrite the same value, the organization has several competing sources rather than one source of truth.
+
+NetBox is a common example of a network source of truth. It models objects such as sites, devices, platforms, interfaces, prefixes, IP addresses, connections, tenants, and services through related records rather than unrelated inventory variables. Its value is not that it automatically makes every record correct. Its value is that ownership, validation, relationships, and API access can be defined around one authoritative model.
+
+A useful source of truth has several properties:
+
+- **Defined authority:** the team knows which data NetBox owns and which data belongs to another system.
+- **Stable identity:** devices and interfaces have durable identifiers rather than being inferred from display text.
+- **Validated relationships:** an address is associated with the interface and device that use it.
+- **Controlled mutation:** permissions and workflow determine who or what may change intent.
+- **Machine-readable access:** applications retrieve the same records through an API instead of maintaining private copies.
+- **Change visibility:** object history shows when intent changed and by whom.
+
+NetBox should not become a password database or an unfiltered copy of live configuration. Device credentials belong in a secrets system. Operational facts belong in telemetry or device-state collection. The source of truth records what the organization intends and the metadata required to resolve the correct target.
+
+### 7.1 Intent events and downstream consumers
+
+An authoritative object change can be more useful than a scheduled poll. An event can tell a downstream consumer that a completed piece of intent is ready for evaluation. For example, an address assignment becomes meaningful only when the address, interface, and device relationship is complete. Emitting an event at that boundary avoids consumers guessing whether several partially edited records form one request.
+
+The event is a notification, not unquestioned authority to make a change. A consumer should retrieve the current object through the authenticated API, validate its type and relationships, record an immutable fingerprint, and reject stale, incomplete, duplicated, or out-of-scope events. This preserves the source of truth as the origin of intent while allowing each consumer to apply its own authorization and safety policy.
 
 <p align="center">
   <img src="assets/course-figures/module-00-three-states.png" alt="Intended, configured, and operational state shown as three distinct views" width="860" />
@@ -694,7 +514,6 @@ Configuration can match intent while operation remains unhealthy. Operational st
 
 ## 8. Safety and reliability fundamentals
 
-> **CORE CONCEPT**
 
 Network automation can apply the same error consistently across many targets, so scale increases both value and risk. The following controls should already be familiar:
 
@@ -714,7 +533,6 @@ Concurrency is not merely a performance setting. Fifty simultaneous sessions may
 
 ## 9. Testing network automation
 
-> **LAB REQUIRED**
 
 Tests should be selected according to the boundary they can prove:
 
@@ -764,7 +582,7 @@ Learners should be able to answer these questions:
 
 ## 12. Summary
 
-Network automation combines Python, structured data, Git, CLI and API interfaces, models, Ansible, telemetry, authentication, and operational verification. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries, while Ansible supplies reusable inventory, templating, orchestration, and network modules. Reliable automation depends on validated inputs, explicit targets, bounded operations, secure credentials, deterministic processing, structured evidence, and verification of actual network behavior.
+Network automation combines Python, structured data, Git, CLI and API interfaces, models, Ansible, telemetry, authentication, and operational verification. NetBox can provide authoritative, related intent and inventory without becoming a credential or telemetry store. Netmiko, `ncclient`, `requests`, and Flask address different application boundaries, while Ansible supplies reusable inventory, templating, orchestration, and network modules. Reliable automation depends on validated inputs, explicit targets, bounded operations, secure credentials, deterministic processing, structured evidence, and verification of actual network behavior.
 
 **What the learner now has:** a refreshed model of automation inputs, execution, state, validation, and operational evidence.
 

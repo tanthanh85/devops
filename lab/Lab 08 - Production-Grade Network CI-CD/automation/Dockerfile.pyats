@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+WORKDIR /automation
+RUN groupadd --system automation && useradd --system --gid automation automation
+COPY automation/requirements-pyats.txt requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
+COPY --chown=automation:automation automation/common.py automation/verify_loopback.py ./
+COPY --chown=automation:automation ci/audit.py ./audit.py
+USER automation
+CMD ["python", "verify_loopback.py"]

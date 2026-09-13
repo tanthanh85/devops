@@ -1,0 +1,7 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: network-monitor-app:lab08
+

@@ -1,0 +1,5 @@
+genie==26.8
+hvac==2.3.0
+pyats==26.8
+requests==2.32.5
+

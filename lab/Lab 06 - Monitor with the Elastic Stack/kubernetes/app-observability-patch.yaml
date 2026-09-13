@@ -1,0 +1,15 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: network-monitor-app:lab06
+          env:
+            - name: POD_NAME
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - name: POD_IP
+              valueFrom: {fieldRef: {fieldPath: status.podIP}}
+            - name: NODE_NAME
+              valueFrom: {fieldRef: {fieldPath: spec.nodeName}}
+            - {name: LOG_LEVEL, value: INFO}
+

@@ -1,0 +1,12 @@
+services:
+  runner:
+    image: ${GITLAB_RUNNER_IMAGE:?Set GITLAB_RUNNER_IMAGE in .env}
+    container_name: course-gitlab-runner
+    restart: unless-stopped
+    volumes:
+      - runner_config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  runner_config:
+    name: gitlab-runner-config

@@ -29,7 +29,6 @@ Module 0 reviewed the automation foundations used to describe intent, call APIs,
 
 ## 2. Three automation responsibilities
 
-> **CORE CONCEPT**
 
 The ownership flow distinguishes resource lifecycle, ordered configuration, and custom application logic before a team selects Terraform, Ansible, or Python for a task.
 
@@ -65,7 +64,6 @@ Tool choice should follow the type of resource, the available interface, and the
 
 ## 3. Infrastructure as Code
 
-> **CORE CONCEPT**
 
 Infrastructure as Code records intended infrastructure in machine-readable files. It provides reviewable change history and repeatable execution. The definition may describe resources declaratively or express a procedural workflow.
 
@@ -214,7 +212,6 @@ For an illustrative automation platform:
 
 ## 11. On-demand test environments
 
-> **LAB REQUIRED**
 
 An ephemeral environment has a complete lifecycle, including evidence collection and controlled cleanup after failure.
 
@@ -239,7 +236,6 @@ The environment should resemble the target environment in the characteristics re
 
 ## 12. Network test environment options
 
-> **ADVANCED / REFERENCE**
 
 Test environments trade speed and cost against behavioral fidelity. The table compares common choices so that an engineering team can match the environment to the risk and evidence required from a test.
 
@@ -253,6 +249,26 @@ Test environments trade speed and cost against behavioral fidelity. The table co
 | Physical lab | Real interfaces and platform behavior | Cost, contention, reset, and blast radius | Advanced instructor-controlled validation |
 
 The course must remain usable without production access. Offline checks and mocks run for every learner. Real-device jobs use an authorized sandbox, virtual lab, or instructor-provided environment.
+
+### 12.1 Cisco Modeling Labs as an on-demand test target
+
+Cisco Modeling Labs (CML) can provide a controlled topology running virtual network operating systems. Through its API and an appropriate Terraform provider, a delivery system can create a lab only when a realistic integration test is required. The environment can exercise SSH behavior, network modules, configuration semantics, parsers, and operational verification that a mock service cannot reproduce.
+
+An on-demand CML design must define the lab and node definition, approved image, management connectivity, isolated addressing, external-connector policy, bootstrap configuration, platform capacity, unique owner, maximum lifetime, and deterministic deletion. CML API access is privileged, virtual router images remain licensed assets, and an external connector may join an ephemeral topology to a real management network. Provider compatibility, certificate validation, address allocation, and concurrency therefore belong to platform policy.
+
+### 12.2 The create–configure–verify–destroy contract
+
+Ephemeral test infrastructure has a stronger contract than “create when needed”:
+
+1. **Create:** Terraform creates only resources carrying the execution's identity.
+2. **Bootstrap:** the platform makes the target reachable through an approved management path.
+3. **Configure:** Ansible applies configuration inside the resource without owning its lifecycle.
+4. **Verify:** an independent test observes configured and operational state.
+5. **Preserve evidence:** the system records what was created, changed, and observed.
+6. **Destroy:** Terraform deletes its resources even when configuration or verification fails.
+7. **Confirm cleanup:** the workflow verifies that state contains no remaining owned resources.
+
+Cleanup is a release gate, not housekeeping. An environment that cannot be deleted consumes licenses and compute, creates address conflicts, and may retain credentials or unintended management reachability. Production promotion should not depend on an environment that the platform has failed to control.
 
 ## 13. Network drift and compliance
 
@@ -271,7 +287,6 @@ Compliance rules should identify ownership, severity, tolerated exceptions, and 
 
 ## 14. Pipeline integration
 
-> **ADVANCED / REFERENCE**
 
 This section describes only the future handoff: a delivery pipeline will consume reviewed plans, environment identifiers, validation results, and cleanup evidence. Pipeline jobs, runners, rules, and promotion are implemented in Module 4.
 
@@ -327,7 +342,7 @@ Use these questions to evaluate infrastructure state, test-environment selection
 
 ## 19. Summary
 
-Infrastructure delivery introduces the first complete delivery control chain in the guide: declared intent, authoritative ownership, a proposed plan, review, controlled execution, observed state, retained evidence, and reconciliation. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. Their handoff must be explicit, state must be protected, and cleanup must prove ownership before destroying anything.
+Infrastructure delivery introduces the first complete delivery control chain in the guide: declared intent, authoritative ownership, a proposed plan, review, controlled execution, observed state, retained evidence, and reconciliation. Terraform is strongest at resource lifecycle; Ansible is strongest at configuration and orchestration. CML can supply a realistic on-demand network environment when mocks are insufficient. The handoff between tools must be explicit, state must be protected, and cleanup must prove ownership and completion before later promotion.
 
 **What the learner now has:** repeatable infrastructure with explicit ownership among Terraform, Ansible, Python, and operational verification.
 

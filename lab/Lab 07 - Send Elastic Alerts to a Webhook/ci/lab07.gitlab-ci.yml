@@ -1,0 +1,32 @@
+test-alert-receiver:
+  stage: verify
+  image: python:3.12-slim
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  script:
+    - python -m pip install --disable-pip-version-check -r webhook-receiver/requirements.txt pytest==8.4.2
+    - cd webhook-receiver
+    - python -m pytest -q --junitxml=../test-results/webhook.xml
+  artifacts:
+    when: always
+    reports: {junit: test-results/webhook.xml}
+    expire_in: 7 days
+
+deploy-alert-receiver:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:1.31
+    entrypoint: [""]
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - test -n "$KUBE_CONFIG"
+    - test -n "$WEBHOOK_TOKEN"
+    - export KUBECONFIG="$KUBE_CONFIG"
+  script:
+    - bash scripts/deploy-webhook.sh
+    - kubectl -n network-devops set image deployment/alert-webhook receiver="$CI_REGISTRY_IMAGE/alert-webhook:$CI_COMMIT_SHA"
+    - kubectl -n network-devops rollout status deployment/alert-webhook --timeout=120s

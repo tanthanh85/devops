@@ -1,0 +1,109 @@
+stages:
+  - verify
+  - package-test
+  - deploy
+  - acceptance
+
+default:
+  tags: [docker, validation]
+  interruptible: true
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  E2E_IMAGE: "network-monitor-e2e:$CI_COMMIT_SHA"
+  KUBE_NAMESPACE: "network-devops"
+
+unit-test:
+  stage: verify
+  image: python:3.12-slim
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  cache:
+    key: python-dependencies
+    paths: [.cache/pip]
+  script:
+    - python -m pip install --disable-pip-version-check -r requirements.txt -r requirements-dev.txt
+    - python -m pytest -q --junitxml=test-results/unit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: test-results/unit.xml
+    expire_in: 7 days
+
+build-e2e-image:
+  stage: package-test
+  image: docker:27-cli
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  script:
+    - docker version
+    - docker build --pull -t "$E2E_IMAGE" ci/e2e
+    - docker image inspect "$E2E_IMAGE" --format 'Image={{.Id}} User={{.Config.User}}'
+
+deploy-minikube:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:1.31
+    entrypoint: [""]
+  environment:
+    name: course/minikube
+  resource_group: course-minikube
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - test -n "${KUBE_CONFIG:-}"
+    - export KUBECONFIG="$KUBE_CONFIG"
+    - kubectl config current-context
+    - kubectl get nodes
+  script:
+    - kubectl -n "$KUBE_NAMESPACE" get secret network-monitor-secrets
+    - kubectl -n "$KUBE_NAMESPACE" get pod -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | grep -F 'network-monitor-app:lab04'
+    - kubectl -n "$KUBE_NAMESPACE" get pod -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | grep -F 'network-monitor-web:lab04'
+    - kubectl apply -f kubernetes/namespace.yaml
+    - kubectl apply -f kubernetes/configmap.yaml
+    - kubectl apply -f kubernetes/mysql.yaml
+    - kubectl apply -f kubernetes/app.yaml
+    - kubectl apply -f kubernetes/web.yaml
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/mysql --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
+    - bash scripts/provision-test-user.sh
+    - mkdir -p evidence/lab05
+    - kubectl -n "$KUBE_NAMESPACE" get deployment,pod,service,pvc -o wide > evidence/lab05/resources.txt
+    - kubectl -n "$KUBE_NAMESPACE" get endpointslice -l kubernetes.io/service-name=network-monitor-web > evidence/lab05/web-endpoints.txt
+  artifacts:
+    when: always
+    paths: [evidence/lab05/]
+    expire_in: 7 days
+
+browser-acceptance:
+  stage: acceptance
+  image:
+    name: "$E2E_IMAGE"
+    pull_policy: if-not-present
+  environment:
+    name: course/minikube
+  resource_group: course-minikube
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - test -n "${KUBE_CONFIG:-}"
+    - test -n "${E2E_USERNAME:-}"
+    - test -n "${E2E_PASSWORD:-}"
+    - export KUBECONFIG="$KUBE_CONFIG"
+  script:
+    - kubectl -n "$KUBE_NAMESPACE" port-forward service/network-monitor-web 18088:8080 > port-forward.log 2>&1 &
+    - export PORT_FORWARD_PID=$!
+    - trap 'kill "$PORT_FORWARD_PID" 2>/dev/null || true' EXIT
+    - for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:18088/health && break; sleep 2; done
+    - curl --fail --silent http://127.0.0.1:18088/health
+    - TEST_BASE_URL=http://127.0.0.1:18088 /tests/node_modules/.bin/playwright test ci/e2e/tests/monitoring.spec.js --reporter=html
+  artifacts:
+    when: always
+    paths:
+      - test-results/
+      - playwright-report/
+      - port-forward.log
+    expire_in: 7 days

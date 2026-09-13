@@ -1,0 +1,40 @@
+build-observability-images:
+  stage: package-test
+  image: docker:27-cli
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHA" -f app/Dockerfile .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA" lab04-web
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/synthetic:$CI_COMMIT_SHA" synthetic
+    - docker push "$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/synthetic:$CI_COMMIT_SHA"
+    - docker logout "$CI_REGISTRY"
+
+deploy-observability:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:1.31
+    entrypoint: [""]
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - test -n "$KUBE_CONFIG"
+    - test -n "$LOGSTASH_HOST"
+    - test -n "$E2E_USERNAME"
+    - test -n "$E2E_PASSWORD"
+    - export KUBECONFIG="$KUBE_CONFIG"
+  script:
+    - kubectl -n network-devops patch deployment network-monitor-app --type=strategic --patch-file kubernetes/app-observability-patch.yaml
+    - kubectl -n network-devops set image deployment/network-monitor-app app="$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHA"
+    - kubectl -n network-devops set image deployment/network-monitor-web web="$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"
+    - bash scripts/deploy-observability.sh
+    - kubectl -n network-devops set image cronjob/network-monitor-synthetic synthetic-monitor="$CI_REGISTRY_IMAGE/synthetic:$CI_COMMIT_SHA"
+    - kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+    - kubectl -n network-devops rollout status deployment/network-monitor-web --timeout=180s
+    - kubectl -n network-devops create job --from=cronjob/network-monitor-synthetic "synthetic-$CI_PIPELINE_ID"
+    - kubectl -n network-devops wait --for=condition=complete "job/synthetic-$CI_PIPELINE_ID" --timeout=120s

@@ -1,0 +1,35 @@
+---
+- name: Deploy the frozen NetBox loopback intent
+  hosts: target
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: Validate the approved target and intent
+      ansible.builtin.assert:
+        that:
+          - automation_enabled | bool
+          - loopback_name is match('^Loopback[0-9]{1,4}$')
+          - loopback_ip is ansible.utils.ipv4
+          - target_environment in ['test', 'production']
+        fail_msg: The target or loopback intent is outside the approved policy.
+
+    - name: Configure the intended loopback
+      cisco.ios.ios_config:
+        parents: "interface {{ loopback_name }}"
+        lines:
+          - "description Managed by GitLab pipeline {{ lookup('env', 'CI_PIPELINE_ID') }}"
+          - "ip address {{ loopback_ip }} {{ loopback_netmask }}"
+          - no shutdown
+        match: line
+        save_when: changed
+      register: deployment
+      no_log: false
+
+    - name: Record the idempotent deployment result
+      ansible.builtin.debug:
+        msg:
+          environment: "{{ target_environment }}"
+          device: "{{ inventory_hostname }}"
+          interface: "{{ loopback_name }}"
+          address: "{{ loopback_address }}"
+          changed: "{{ deployment.changed }}"

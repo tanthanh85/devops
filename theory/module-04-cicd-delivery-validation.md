@@ -45,7 +45,6 @@ Omitting or reordering one step can invalidate the release. CI/CD is introduced 
 
 ## 2. CI/CD delivery flow
 
-> **CORE CONCEPT**
 
 ### 2.1 Software delivery pipeline
 
@@ -106,6 +105,12 @@ A pipeline begins before `.gitlab-ci.yml` is evaluated. A work item or change re
 For the reference scenario, the merge request should let a reviewer answer five questions without reconstructing the author's workstation: What network outcome is requested? Which intent and application files changed? Which target and maximum scope are authorized? What candidate configuration and test evidence were produced? What conditions would stop or reverse deployment?
 
 Approval applies to the reviewed commit and evidence. A new commit invalidates conclusions tied to the previous revision and should rerun required checks. Merging records integration into the protected branch; it does not itself authorize a live network change unless the environment policy explicitly defines that behavior.
+
+#### 2.3.3 Source-of-truth-triggered delivery
+
+Repository activity is not the only meaningful pipeline trigger. When a source-of-truth object reaches a complete and valid state, its event can initiate a workflow whose purpose is to reconcile that intent. This is appropriate when the authoritative business event is an inventory or service-model change rather than a new application commit.
+
+The webhook should carry a small reference such as an object identifier, not a password, full configuration, or trusted deployment payload. The first job retrieves the current object from the source-of-truth API and validates its type, relationships, scope, status, freshness, and automation eligibility. The result is serialized as a frozen intent artifact with a fingerprint. Test and production consume that same artifact; re-reading mutable intent immediately before production could deploy a different change from the one that passed testing.
 
 ### 2.4 Pipeline design
 
@@ -274,6 +279,20 @@ Different events need different work:
 
 Rules should be understandable and tested. A critical security job that silently disappears due to a complex rule creates a dangerous gap.
 
+#### 2.10.1 One pipeline purpose per execution path
+
+A practical repository often contains more than one workflow. Treat each as a product interface with its own trigger, input contract, privileges, target, acceptance criteria, and completion condition.
+
+| Pipeline purpose | Typical trigger | Privileged outcome | Required evidence |
+|---|---|---|---|
+| Application delivery | Merge request, protected branch, or release tag | Deploy an identified application image | Tests, digest, rollout and service health |
+| Infrastructure lifecycle | Reviewed definition or downstream request | Create, update, or destroy resources | Plan, state identity, outputs, drift and cleanup |
+| Network intent delivery | Source-of-truth event or approved request | Change authorized network state | Frozen intent, test, approval and production verification |
+| Assurance and drift | Schedule or operational event | Usually read-only; may open remediation | Observed state, difference, severity and owner |
+| Security maintenance | Dependency or policy event | Rebuild, rotate, quarantine, or revoke | Finding, decision, replacement and closure |
+
+A trigger variable can select an explicitly named workflow, but the pipeline must validate both event source and input. Unrelated jobs should be absent rather than receive unnecessary secrets and then harmlessly skip their commands.
+
 ### 2.11 Environments and promotion
 
 GitLab environments record deployments to targets such as review, test, staging, and production. A review environment can give each merge request an isolated endpoint. A stop job removes it when no longer needed.
@@ -330,7 +349,6 @@ Jobs should return a nonzero status on failure and preserve relevant evidence. S
 
 ### 2.14 Illustrative `.gitlab-ci.yml`
 
-> **LAB REQUIRED**
 
 The pipeline below demonstrates how the validation layers can be ordered and how artifacts can pass evidence between jobs. It is deliberately illustrative: runners, credentials, approval rules, and deployment commands must be adapted to the target environment.
 
@@ -513,9 +531,6 @@ Avoid mutable image tags and broad cluster-admin credentials. Give the deploymen
 
 #### 2.17.1 Platform pipeline and network change pipeline
 
-> **CORE CONCEPT**
->
-> **SIGNATURE COURSE DISTINCTION:** Platform pipeline and network-change pipeline
 
 The pipelines meet at a versioned automation platform but have different triggers and outcomes.
 
@@ -534,10 +549,31 @@ The platform pipeline deploys software. The network-change workflow uses that so
 
 Updating the worker image and changing network state in the same uncontrolled step makes troubleshooting difficult. Record both the platform image digest and the change-input commit in every job.
 
+#### 2.17.2 Test-before-production network promotion
+
+A high-confidence network-change workflow promotes evidence as well as intent:
+
+```text
+authoritative intent
+    → policy and schema validation
+    → on-demand representative environment
+    → configuration deployment
+    → independent operational verification
+    → test-environment deletion
+    → protected production approval
+    → production deployment
+    → independent production verification
+```
+
+A virtual C8000V in CML can provide realistic IOS XE configuration and protocol behavior, while it may not reproduce physical forwarding hardware, production scale, exact licenses, external dependencies, or timing. The validation report must state what the environment proves and what remains outside its scope.
+
+Terraform owns the CML lab, virtual router, links, lifecycle, and deletion. Ansible owns configuration inside the reachable router. pyATS or another independent validator owns acceptance evidence. Keeping these responsibilities separate preserves useful ownership and failure boundaries.
+
+The production gate requires the frozen intent fingerprint, source commit, deployment-image digest, test identity, test result, cleanup result, production identity, and approver to agree. A failed test blocks production. Failed cleanup also blocks production because it shows that the resource lifecycle is not under control.
+
 
 ## 3. Deployment validation and recovery
 
-> **CORE CONCEPT**
 
 ### 3.1 Three forms of state in an automation application
 
@@ -607,7 +643,6 @@ The plan is evidence, not approval by itself. Reviewers must understand the targ
 
 ### 3.6 Pre-deployment health checks
 
-> **LAB REQUIRED**
 
 Before a release changes an environment, verify that the environment is safe to change. Useful checks include:
 
@@ -711,7 +746,6 @@ Stop conditions must be machine-readable where possible: identity mismatch, unhe
 
 ### 3.10 Network post-checks
 
-> **LAB REQUIRED**
 
 Post-checks should compare the new state with both intent and baseline:
 
@@ -921,7 +955,7 @@ Use these questions to assess whether you can connect an approved artifact to co
 
 ## 5. Summary
 
-CI/CD converts delivery policy into an executable and reviewable workflow. Fast source checks, layered tests, protected runners, immutable artifacts, environment approvals, scoped credentials, pre-checks, controlled deployment, post-checks, and retained evidence work together. Pipeline success is not the final objective; the release is complete only when the deployed service produces the expected operational outcome and recovery remains possible. The remaining question is whether every privileged boundary is adequately protected and whether the team can understand behavior after immediate pipeline evidence expires.
+CI/CD converts delivery policy into executable, purpose-specific workflows. Repository and source-of-truth events enter through different contracts; frozen intent, immutable artifacts, disposable test environments, independent validation, cleanup, and protected promotion build evidence before privileged production work. Terraform owns resource lifecycle, Ansible owns configuration, and operational tests determine whether the outcome matches intent. Pipeline success is not the final objective; delivery is complete only when the service works, evidence is retained, and temporary resources have been removed.
 
 **What the learner now has:** a controlled delivery system that builds once, promotes by digest, separates software deployment from network-change authorization, and verifies operational outcomes.
 

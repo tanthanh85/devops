@@ -19,7 +19,7 @@ DevOps closes that gap by applying practices that software teams have refined ov
 
 ## 3. Course outcome
 
-Learners begin with an existing Python network automation application, allowing them to reuse their domain knowledge without rebuilding its core logic. They first express supporting infrastructure and test environments as controlled code. They then examine the delivery model needed to move beyond individual execution, package the application as a reproducible image, deploy its services with Docker, and extend the same application to Kubernetes where orchestration is justified. Only after the artifact and runtime behavior are understood do learners automate build, testing, promotion, deployment, and recovery through GitLab CI/CD. Security and observability are then applied across the pipeline and operating platform.
+Learners begin with an existing Python network automation application, allowing them to reuse their domain knowledge without rebuilding its core logic. They establish authoritative intent and inventory, express supporting infrastructure and on-demand test environments as controlled code, and assign clear ownership to Terraform and Ansible. They then examine the delivery model needed to move beyond individual execution, package applications and job toolchains as reproducible images, and operate services through Docker and Kubernetes where orchestration is justified. Only after artifact and runtime behavior are understood do learners automate event-driven testing, promotion, deployment, recovery, and cleanup through purpose-specific GitLab pipelines. Vault, security controls, and correlated observability apply across the complete system.
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
@@ -58,7 +58,7 @@ The practical work keeps two workflows distinct. The platform pipeline builds, t
 network-devops/
 ├── automation/          # supplied Python and Ansible behavior
 ├── intended-state/      # schemas and safe examples
-├── inventory/           # environment-specific target data
+├── source-of-truth/     # authoritative intent contracts and integration definitions
 ├── templates/           # deterministic rendering
 ├── tests/               # unit, fixture, integration, and pyATS tests
 ├── docker/              # image construction
@@ -105,7 +105,7 @@ After completing the guide and labs, learners should be able to:
 
 ## 7. Instructor delivery map
 
-The classifications inside each module identify the normal live path, practical prerequisites, and optional study-guide depth. The estimated times below total approximately 20 classroom theory hours; demonstrations and cumulative lab work use the remaining 20 hours.
+The delivery map identifies the normal live path and the visuals that can be reserved for self-study. The estimated times below total approximately 20 classroom theory hours; demonstrations and cumulative lab work use the remaining 20 hours.
 
 | Module | Estimated theory | Core diagrams to present | Reference diagrams that may be skipped live |
 |---|---:|---|---|
@@ -116,4 +116,4 @@ The classifications inside each module identify the normal live path, practical 
 | 4 | 4.5 h | Pipeline gates; runner trust; platform vs network pipeline; change state; recovery decision | Artifact/cache; blast radius; deployment-strategy map |
 | 5 | 3 h | Trust boundaries; observability architecture; change-aware feedback | Security lifecycle; incident response; signal categories; detailed correlation model |
 
-Instructors can assign **ADVANCED / REFERENCE** sections as preparation or follow-up without breaking the cumulative engineering story. **LAB REQUIRED** sections should be completed before learners begin the associated practical stage.
+Instructors can reserve the reference diagrams and deeper implementation sections for preparation or follow-up without breaking the cumulative engineering story.

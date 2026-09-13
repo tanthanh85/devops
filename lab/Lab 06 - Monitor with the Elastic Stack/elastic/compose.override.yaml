@@ -1,0 +1,7 @@
+services:
+  logstash:
+    ports:
+      - "${ELASTIC_INGEST_HOST:-127.0.0.1}:5044:5044"
+    volumes:
+      - ./pipeline:/usr/share/logstash/pipeline:ro
+

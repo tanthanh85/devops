@@ -1,0 +1,9 @@
+:root { font-family: Inter, system-ui, sans-serif; color: #14345b; background: #f4f7fb; }
+body { margin: 0; }
+header { padding: 2rem 5vw; color: white; background: linear-gradient(110deg,#082d57,#168bc1); }
+header h1 { margin: 0 0 .35rem; }
+main { display: grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 1.5rem; padding: 2rem 5vw; }
+.card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 8px 28px #1232; }
+.card strong { font-size: 2rem; }
+canvas { display: block; width: 100%; height: 180px; margin-top: 1rem; }
+#status { margin: 0 5vw 2rem; color: #52677f; }

@@ -1,0 +1,17 @@
+filebeat.inputs:
+  - type: filestream
+    id: netbox-docker-logs
+    paths: [/var/lib/docker/containers/*/*.log]
+    parsers:
+      - container: {stream: all, format: docker}
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+  - drop_event:
+      when.not.regexp:
+        container.labels.com_docker_compose_project: ".*netbox.*"
+  - add_fields:
+      target: event
+      fields: {dataset: netbox.container}
+output.logstash:
+  hosts: ["${LOGSTASH_HOST}"]

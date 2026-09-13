@@ -28,7 +28,6 @@ Module 1 established repeatable infrastructure lifecycle and Module 2 introduced
 
 ## 2. Container runtime fundamentals
 
-> **CORE CONCEPT**
 
 ### 2.1 The application consistency problem
 
@@ -259,7 +258,6 @@ Useful commands include `docker build`, `docker image inspect`, `docker history`
 
 #### 2.18.1 Practical run pattern
 
-> **LAB REQUIRED**
 
 This example keeps configuration outside the image, mounts it read-only, limits resources, removes unnecessary Linux capabilities, and gives generated evidence a dedicated writable location:
 
@@ -277,7 +275,6 @@ This is a pattern, not a command to copy unchanged into production. The environm
 
 ## 3. Secure image packaging
 
-> **CORE CONCEPT**
 
 ### 3.1 Application image contents
 
@@ -296,6 +293,10 @@ The image should contain only the runtime components required by the application
 | CA certificates and SSH known-hosts tooling | Endpoint identity validation |
 
 Tool selection should remain narrow. Installing every vendor collection and parser increases build time, image size, vulnerabilities, and dependency conflicts.
+
+Complex delivery systems benefit from several purpose-built images rather than one oversized automation toolbox. A Terraform image can contain the CLI, approved providers, certificate trust, and state-backend client required for resource lifecycle. An Ansible image can contain `ansible-core`, explicitly versioned network collections, inventory logic, and SSH trust tools. A pyATS image can contain the parsers and acceptance code required for independent verification. Keeping them separate limits dependency conflicts and makes the image digest evidence of the exact capability that executed a job.
+
+Environment data remains outside these images. The same Ansible image should be able to operate against an authorized test or production target selected at runtime, while the same pyATS image evaluates the same frozen intent independently. Credentials are obtained only after the container starts and must not be retained in a layer or published artifact.
 
 ### 3.2 Dockerfile responsibilities
 
@@ -403,7 +404,6 @@ Traceability should answer:
 
 ### 3.11 Testing an image
 
-> **LAB REQUIRED**
 
 Testing should cover more than successful process startup. A build workflow can perform:
 
@@ -435,7 +435,6 @@ Separating a validation image from a deployment image can reduce capability. The
 
 ### 3.12 Image signing and provenance
 
-> **ADVANCED / REFERENCE**
 
 Signing allows a consumer to verify who approved an image. Build provenance records information about how the artifact was produced. These controls are most useful when the deployment platform enforces them. A signature stored but never verified provides limited protection.
 
@@ -443,7 +442,6 @@ The delivery process should retain and promote an already tested image digest. R
 
 ### 3.13 Image supply-chain evidence
 
-> **ADVANCED / REFERENCE**
 
 Each output has a purpose. The SBOM inventories components. The vulnerability scan compares those components with known findings. A signature binds an identity to the digest. Provenance describes how the build occurred. None of these controls substitutes for the others.
 
@@ -457,7 +455,6 @@ Secrets may be exposed temporarily through a supported build-secret mechanism wh
 
 ### 3.14 Compromised dependency scenario
 
-> **ADVANCED / REFERENCE**
 
 Assume a new parsing package executes unexpected code during installation. If the build job can reach the management network or access deployment variables, the dependency can steal credentials before an image is created.
 
@@ -491,7 +488,6 @@ These controls do not guarantee that the application behaves correctly. They est
 
 ### 3.16 Example network automation packaging pattern
 
-> **LAB REQUIRED**
 
 The following Dockerfile brings the preceding controls together in a small packaging pattern. Read it as an example of deliberate build decisions—base image, dependency installation, ownership, and runtime identity—not as a production template that can be copied without review.
 
@@ -525,7 +521,6 @@ Suppose a merge request changes only `requirements.txt`. Source tests pass, but 
 
 ## 4. Multitier application deployment
 
-> **CORE CONCEPT**
 
 One container solves runtime reproducibility for one process. It does not define the relationships among an API, worker, queue, database, telemetry collector, and dashboard. The next engineering requirement is to describe those cooperating processes as one application while preserving separate responsibilities, failure boundaries, networks, and state.
 
@@ -609,7 +604,6 @@ Compose is useful for development, integration testing, demonstrations, and smal
 
 #### 4.4.1 Illustrative Compose structure
 
-> **LAB REQUIRED**
 
 The following Compose definition shows how the application tiers can be declared as one system while retaining separate runtime responsibilities. The values are intentionally minimal so that the service relationships remain visible.
 
@@ -787,7 +781,6 @@ An HTTP 200 response from the API proves only that the request-facing process ca
 
 ## 5. Kubernetes orchestration and multidata-center operation
 
-> **CORE CONCEPT**
 
 Compose can describe and operate the complete application on a small platform. It does not by itself provide a multi-node scheduler, automatic workload replacement across nodes, standardized rolling updates, cluster-wide resource placement, or a broad policy API. When scale, availability, scheduling, and platform-governance requirements justify that operational cost, the team can introduce Kubernetes. A protected runner or Compose deployment remains valid when those requirements do not exist.
 
@@ -855,7 +848,6 @@ Kubernetes solves automation-platform scheduling and lifecycle problems. It does
 
 ### 5.4 Kubernetes worker-to-device security
 
-> **ADVANCED / REFERENCE**
 
 The security path shows the controls required between a validated queue item and an explicitly authorized device when a worker executes inside a cluster.
 
@@ -964,7 +956,6 @@ Probe timing and thresholds should reflect application behavior. A liveness prob
 
 #### 5.10.1 Compact deployment example
 
-> **LAB REQUIRED**
 
 This fragment shows the controls that reviewers should look for rather than a complete production manifest:
 
@@ -1022,7 +1013,6 @@ Kubernetes can pause, resume, and undo Deployment revisions, but rollback only c
 
 ### 5.13 Advanced deployment patterns
 
-> **ADVANCED / REFERENCE**
 
 Deployment patterns control how a new version is introduced and how risk is distributed during the transition. The appropriate pattern depends on capacity, compatibility, observability, and the speed at which traffic can be redirected or a release reversed.
 
@@ -1042,7 +1032,6 @@ GitOps still requires repository security, reconciliation policy, secret handlin
 
 ### 5.14 Kubernetes networking
 
-> **ADVANCED / REFERENCE**
 
 Pods receive routable cluster addresses according to the cluster network implementation. Services provide stable virtual access. NetworkPolicy can restrict permitted connections when the cluster network plugin enforces it.
 
@@ -1060,7 +1049,6 @@ Deny API and dashboard Pods from direct device-management access. Kubernetes Net
 
 ### 5.15 RBAC and service accounts
 
-> **ADVANCED / REFERENCE**
 
 Use separate service accounts for API, worker, validation, and telemetry components. The worker may need permission to read a narrow secret reference or create a job artifact. It should not list every Secret in the namespace or modify cluster-wide resources.
 
@@ -1093,7 +1081,6 @@ Network automation dashboards should also show queue delay, worker concurrency, 
 
 ### 5.18 Troubleshooting workflow
 
-> **ADVANCED / REFERENCE**
 
 Use a consistent sequence:
 
@@ -1109,7 +1096,6 @@ Useful commands include `kubectl get`, `kubectl describe`, `kubectl logs`, `kube
 
 ### 5.19 Multiple data-center deployments
 
-> **ADVANCED / REFERENCE**
 
 Kubernetes clusters normally form separate failure and administration domains. A multicluster design must address traffic steering, identity, policy consistency, data replication, configuration promotion, observability, and recovery.
 

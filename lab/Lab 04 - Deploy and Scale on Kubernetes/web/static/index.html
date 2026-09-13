@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Network Monitor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div><h1>Network Monitoring Platform</h1><p>Kubernetes deployment</p></div>
+    <aside id="instance"><b>Web instance</b><span>Loading…</span></aside>
+  </header>
+  <main>
+    <section id="setup" class="card" hidden>
+      <h2>Create the first administrator</h2>
+      <form id="setup-form"><input name="username" placeholder="Username" required><input name="password" type="password" placeholder="Password (12+ characters)" required><button>Create administrator</button></form>
+    </section>
+    <section id="login" class="card" hidden>
+      <h2>Sign in</h2>
+      <form id="login-form"><input name="username" required><input name="password" type="password" required><button>Sign in</button></form>
+    </section>
+    <section id="application" hidden>
+      <button id="logout">Sign out</button>
+      <div class="grid">
+        <section class="card"><h2>Vault router inventory</h2><p>Router connection information and credentials are administered in Vault.</p><button id="refresh-routers">Refresh inventory</button><ul id="routers"></ul></section>
+        <section class="card"><h2>Resource monitoring</h2><select id="router-select"></select><button id="collect">Collect</button><p id="values">Select a router.</p><canvas id="chart"></canvas></section>
+      </div>
+    </section>
+    <p id="message"></p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

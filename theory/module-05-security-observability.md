@@ -35,7 +35,6 @@ The automated system creates two critical questions:
 
 ## 2. Security across the delivery system
 
-> **CORE CONCEPT**
 
 ### 2.1 DevOps trust boundaries
 
@@ -113,6 +112,10 @@ Good secret handling includes:
 
 Vault can issue or store training credentials, while GitLab protected variables can supply selected jobs. Kubernetes Secrets provide an API object and distribution mechanism, but their confidentiality depends on cluster encryption, RBAC, node security, and application handling.
 
+Vault is most valuable when the workload proves its identity and receives only the material required for its current purpose. A validation job should not obtain a production device password. An infrastructure job may need a CML API token but no production route. A production deployment job may need one device credential but no authority to administer Vault.
+
+A mature design separates secret paths and policies for source-of-truth access, test-platform lifecycle, ephemeral test devices, production devices, registry and signing operations, and audit delivery. Prefer workload identity or GitLab OIDC-to-Vault authentication over reusable bootstrap credentials. Where AppRole is necessary, limit SecretID lifetime and uses, issue a narrowly scoped token, and keep token lifetime shorter than the job. Vault audit logs record access decisions, never returned values.
+
 #### 2.4.1 Network credential types
 
 Automation workflows may require several forms of authentication material, each with different storage, rotation, and exposure risks. Common examples include:
@@ -132,7 +135,6 @@ Prefer a dedicated automation identity with command authorization or API permiss
 
 ### 2.5 Pipeline security
 
-> **CORE CONCEPT**
 
 The runner trust zones introduced in Module 4 are now evaluated as security boundaries rather than repeated as pipeline mechanics.
 
@@ -257,7 +259,6 @@ The Kubernetes deployment worker should use a service account with only the requ
 
 ### 2.10 Advanced architecture reference
 
-> **ADVANCED / REFERENCE**
 
 Sections 2.10–2.16 are optional architecture reference material. They may be skipped during the main classroom path, which continues at Section 3 with observability.
 
@@ -342,7 +343,6 @@ This design also narrows incident response. If the general runner is compromised
 
 ## 3. Observability and stability engineering
 
-> **CORE CONCEPT**
 
 ### 3.1 Monitoring, observability, and telemetry
 
@@ -410,7 +410,6 @@ Deployment, configuration, scaling, and infrastructure events add essential cont
 
 ### 3.5 Network data collection methods
 
-> **LAB REQUIRED**
 
 No collection method supplies every signal. The following sections distinguish event streams, counters, polled state, modeled subscriptions, and application instrumentation so that each is used for evidence it can actually provide.
 
@@ -564,11 +563,6 @@ For the automation platform, instrument request and job count, queue delay, devi
 
 ### 3.14 Change-aware observability and correlation
 
-> **CORE CONCEPT**
->
-> **SIGNATURE COURSE DISTINCTION:** Change-aware observability
->
-> **LAB REQUIRED**
 
 An investigation follows commit SHA → pipeline ID → image digest → deployment event → automation job → change ID → target device → protocol or forwarding behavior → telemetry → alert → investigation → feedback. Correlation narrows the search; it does not by itself prove causality. The objective is not merely to detect that a routing neighbor or application process is unhealthy. It is to determine whether behavior changed during or after a particular software release or approved network operation, and to assemble enough evidence to evaluate that relationship.
 
@@ -598,7 +592,25 @@ A useful correlation view should let an engineer answer, without manually joinin
 
 Join records with shared identifiers: `commit`, `pipeline`, `digest`, `change_id`, `target`, `environment`, and `timestamp`. These values belong in event, log, trace, and evidence records; only bounded dimensions should become metric labels. Credentials, full command output, and unbounded request strings are never metric labels.
 
-#### 3.14.1 Practical incident trace
+#### 3.14.1 Pipeline audit events
+
+Console logs help diagnosis but are weak as the only audit record. They are formatted for humans, vary by tool, may be truncated, and often require broad CI-platform access. A structured audit event should be sent at job start and completion and at each privileged or decision-bearing task.
+
+| Context | Useful audit fields |
+|---|---|
+| Source | Project, ref, commit, pipeline source, intent identifier and fingerprint |
+| Actor | Trigger identity, job identity, runner identity and production approver |
+| Execution | Pipeline, job, stage, action, timestamps, duration and exit status |
+| Artifact | Image, immutable digest, provenance reference and plan fingerprint |
+| Environment | Test or production, resource owner, environment identifier and cleanup status |
+| Target | Device identity, endpoint, interface, requested prefix and authorized scope |
+| Result | Changed status, assertion, observed state, outcome and sanitized error category |
+
+Audit every material transition: intent resolution, policy decision, resource plan, resource creation, endpoint readiness, configuration task, validation assertion, environment deletion, approval, production change, and final verification. A shared schema allows one timeline to join Terraform, Ansible, pyATS, GitLab, Vault, NetBox, Kubernetes, and application events.
+
+More detail does not justify secret collection. Never forward tokens, passwords, authorization headers, private keys, Vault responses, complete configurations, unrestricted environment dumps, or raw command output without classification and filtering. The audit path should fail visibly; loss of required evidence can be a release-blocking condition for privileged work.
+
+#### 3.14.2 Practical incident trace
 
 At 10:04 a deployment finishes, at 10:05 queue delay rises, and at 10:06 the first job times out. CPU and memory are normal. A structured worker log shows `dependency=job-db`, `error=connection_pool_exhausted`, together with the image digest and pipeline ID. The team can now separate an application-release problem from device reachability. The alert should point to the correlated timeline and runbook; it should not page merely because one request was slow.
 
@@ -669,7 +681,7 @@ Use these questions to verify that you can turn operational signals into service
 
 ## 5. Summary
 
-Security and observability form the operating control plane of DevOps. Protected source, verified dependencies, identified artifacts, isolated runners, short-lived credentials, restricted network paths, runtime hardening, and independent audit reduce the opportunity and impact of misuse. Correlated metrics, logs, traces, events, deployment records, and network telemetry reveal whether those controls and the delivered service behave as intended. Together they close the loop opened in Module 0: automation begins with declared intent, moves through controlled infrastructure and software delivery, and returns operational evidence that informs the next change.
+Security and observability form the operating control plane of DevOps. Vault policies separate source-of-truth, test-platform, test-device, production, registry, and audit privileges. Protected source, identified artifacts, isolated runners, short-lived credentials, restricted paths, runtime hardening, and independent audit reduce misuse. Structured events join NetBox intent, GitLab execution, Terraform resources, Ansible tasks, validation, approval, production outcome, and cleanup into one defensible timeline. Together they return trustworthy operational evidence to the next controlled decision.
 
 **What the learner now has:** a production-style delivery system with protected trust boundaries and change-aware operational evidence.
 
