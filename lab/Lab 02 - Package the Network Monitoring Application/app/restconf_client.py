@@ -19,7 +19,7 @@ class RestconfClient:
                 headers={"Accept": "application/yang-data+json"},
                 auth=(self.settings.username, self.settings.password),
                 timeout=(5, 15),
-                verify=self.settings.verify,
+                verify=False,
             )
             response.raise_for_status()
             return response.json()

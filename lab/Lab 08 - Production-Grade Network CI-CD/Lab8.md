@@ -276,15 +276,26 @@ An authorized learner or instructor selects **Play** on `approve-production`. Gi
 
 After production verification succeeds, confirm the interface through an approved read-only method and review its Elastic events.
 
-## 12. Confirm cleanup and evidence
+## 12. Confirm cleanup
 
 The cleanup job uses the learner-and-pipeline-specific protected GitLab Terraform state and runs after the test path finishes, including when Ansible deployment or pyATS verification fails. It is non-interruptible, calls `terraform destroy`, checks that its state tracks no remaining CML resources, and emits an explicit deletion event. It never searches for or deletes CML objects by a broad name pattern. Cleanup failure blocks the production approval job. Confirm in CML that only your pipeline's lab and C8000V are gone.
 
-A defensible record should answer who initiated and approved the change, what intent and commit defined it, what images executed it, what test environment was created, what changed in each environment, what proved the outcome, when each task ran, and whether cleanup completed.
+Confirm that the pipeline reports successful cleanup and that no learner-owned CML resource remains.
 
 ## 13. Controlled failure exercise
 
 Repeat with an instructor-rejected address or temporarily unreachable test router. Verify that test fails closed, production approval is unavailable, no production deployment runs, the failure is auditable, and cleanup still removes the CML lab. Do not manufacture a failure against production.
+
+## 14. Commit and push the work
+
+```bash
+git status
+git diff
+git add .gitlab-ci.yml ci automation ansible app terraform
+git diff --staged
+git commit -m "Add comprehensive network delivery pipeline"
+git push -u origin feature/lab08-comprehensive-delivery
+```
 
 ## Verification checklist
 

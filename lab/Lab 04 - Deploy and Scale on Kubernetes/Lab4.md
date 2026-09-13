@@ -6,7 +6,7 @@
 
 Lab 3 separated the monitoring application into web, application, and database tiers. In this lab, you will deploy those tiers to Minikube, place all router connection information and login credentials in HashiCorp Vault, and scale the stateless web tier from one Pod to three.
 
-The monitoring application no longer creates, changes, or deletes router inventory. Vault is the authoritative store for each router's name, address, RESTCONF port, username, password, CA reference, and enabled state. The web interface provides a read-only view of that inventory and retrieves CPU and memory data only after the application authenticates to Vault with its Kubernetes workload identity.
+The monitoring application no longer creates, changes, or deletes router inventory. Vault is the authoritative store for each router's name, address, RESTCONF port, username, password, and enabled state. The web interface provides a read-only view of that inventory and retrieves CPU and memory data only after the application authenticates to Vault with its Kubernetes workload identity.
 
 ## Objectives
 
@@ -152,8 +152,7 @@ ROUTER_PORT=${ROUTER_PORT:-443}
 read -rp "Router login username: " ROUTER_USERNAME
 read -rsp "Router login password: " ROUTER_PASSWORD
 echo
-read -rp "CA bundle filename, or leave empty: " ROUTER_CA_BUNDLE
-export ROUTER_NAME ROUTER_HOST ROUTER_PORT ROUTER_USERNAME ROUTER_PASSWORD ROUTER_CA_BUNDLE
+export ROUTER_NAME ROUTER_HOST ROUTER_PORT ROUTER_USERNAME ROUTER_PASSWORD
 bash scripts/store-router-record.sh
 unset ROUTER_USERNAME ROUTER_PASSWORD
 ```
@@ -166,7 +165,6 @@ The resulting path is `secret/data/network/routers/<router-name>`. Its data cont
   "port": 443,
   "username": "monitoring-user",
   "password": "stored-only-in-vault",
-  "ca_bundle_name": "router-ca.pem",
   "enabled": true
 }
 ```
@@ -243,19 +241,16 @@ Temporarily change the application Vault role to an unknown value and request me
 
 Then update the router password in Vault and on the authorized router. The next request should use the new value without changing an application image, Deployment, database record, or web configuration.
 
-## Part 12: Commit evidence
+## Part 12: Commit and push the work
 
 ```bash
-mkdir -p evidence/lab04
-kubectl -n network-devops get deployment,pod,service,pvc -o wide > evidence/lab04/resources.txt
-kubectl -n network-devops get endpointslice > evidence/lab04/endpoints.txt
-git add app web tests requirements*.txt kubernetes scripts evidence/lab04
+git status
+git diff
+git add app web tests requirements*.txt kubernetes scripts
 git diff --staged
 git commit -m "Deploy Kubernetes application with Vault inventory"
 git push -u origin feature/lab04-kubernetes-vault
 ```
-
-Evidence must not contain Vault data, tokens, router credentials, Kubernetes Secret values, cookies, or sensitive router output.
 
 ## Completion criteria
 
@@ -275,7 +270,7 @@ Retain the cluster for Lab 5. Scale the web tier to one and clear local shell va
 
 ```bash
 kubectl -n network-devops scale deployment/network-monitor-web --replicas=1
-unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT ROUTER_CA_BUNDLE
+unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT
 minikube stop --profile network-devops
 ```
 

@@ -44,9 +44,8 @@ The application performs read-only operations. IOS XE software versions can expo
 - The instructor-provided `network-monitor` starter application.
 - An instructor-provided IOS XE router or authorized sandbox with RESTCONF enabled.
 - Management reachability to the router.
-- The router's trusted CA certificate when required.
 
-Never use a production router unless the instructor has explicitly authorized it. Do not commit credentials, `.env` files, router certificates containing private keys, or captured operational data.
+Never use a production router unless the instructor has explicitly authorized it. Do not commit credentials, `.env` files, or captured operational data.
 
 ## Supplied project structure
 
@@ -63,8 +62,6 @@ network-devops/
 │       ├── app.js
 │       └── style.css
 ├── tests/
-├── certificates/
-│   └── .gitkeep
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -185,7 +182,7 @@ docker exec course-gitlab-runner gitlab-runner list
 docker exec course-gitlab-runner gitlab-runner verify
 ```
 
-Do not store the runner token in the project, a screenshot, or an evidence file.
+Do not store the runner token in the project or a screenshot.
 
 Copy `.env.example` to `.env`, restrict it, and insert only the credentials and endpoint supplied for the lab:
 
@@ -201,15 +198,39 @@ ROUTER_HOST=<assigned-management-address>
 ROUTER_PORT=443
 ROUTER_USERNAME=<assigned-username>
 ROUTER_PASSWORD=<assigned-password>
-RESTCONF_VERIFY=true
-RESTCONF_CA_BUNDLE=/absolute/path/to/router-ca.pem
+RESTCONF_VERIFY=false
 MOCK_MODE=false
 FLASK_SECRET_KEY=<generated-local-value>
 ```
 
-Replace every value enclosed in angle brackets. `ROUTER_HOST` must contain the assigned router's resolvable hostname or management IP address, and `MOCK_MODE` must remain `false` when collecting live data. The application now rejects the documentation address `192.0.2.10` in live mode instead of presenting it as the active router.
+Replace every value enclosed in angle brackets. `ROUTER_HOST` must contain the assigned router's resolvable hostname or management IP address, and `MOCK_MODE` must remain `false` when collecting live data. RESTCONF certificate verification remains disabled throughout this course because the instructor-provided lab routers use laboratory certificates.
 
-Keep TLS verification enabled. If the router uses a private CA, point the application at the correct CA certificate. Do not use `verify=False` to conceal a certificate or hostname problem.
+### Understand `MOCK_MODE`
+
+`MOCK_MODE` selects the source of the CPU and memory values displayed by the application:
+
+| Setting | Application behavior | Intended use |
+|---|---|---|
+| `MOCK_MODE=true` | Generates changing demonstration values locally and does not send RESTCONF requests to the router | Brief user-interface checks when the assigned router is unavailable |
+| `MOCK_MODE=false` | Connects to `ROUTER_HOST` and retrieves current CPU and memory information through RESTCONF | Required setting for the Lab 2 verification and container build |
+
+When mock mode is enabled, the dashboard displays **demonstration data** beside the target name. These values do not prove router reachability, authentication, RESTCONF operation, or correct response parsing.
+
+Learners may briefly observe mock mode before testing the live workflow:
+
+```bash
+sed -i 's/^MOCK_MODE=.*/MOCK_MODE=true/' .env
+flask --app app.app run --host 127.0.0.1 --port 8000
+```
+
+Open the dashboard and confirm that **demonstration data** appears. Stop Flask with `Ctrl+C`, restore live mode, and verify the setting:
+
+```bash
+sed -i 's/^MOCK_MODE=.*/MOCK_MODE=false/' .env
+grep '^MOCK_MODE=' .env
+```
+
+The expected output is `MOCK_MODE=false`. Configuration is read when the application process starts, so restart Flask or recreate the container after changing this value. Do not continue to the live application verification or Docker build while mock mode is enabled.
 
 Confirm that `.env` is ignored:
 
@@ -226,7 +247,7 @@ from app.config import Settings
 settings = Settings()
 print(f"Router: {settings.router_host}:{settings.router_port}")
 print(f"Mock mode: {settings.mock_mode}")
-print(f"TLS verification: {settings.verify}")
+print(f"RESTCONF certificate verification: {settings.verify_tls}")
 PY
 ```
 
@@ -249,20 +270,19 @@ Use the command in the supplied README if it differs. Open `http://127.0.0.1:800
 5. A refresh produces later timestamps rather than duplicate hard-coded data.
 6. No password, token, or authorization header appears in the page, browser console, or Flask log.
 
-Use the browser developer tools to inspect the chart-data request. Record its URL, HTTP status, returned content type, sample timestamp, and top-level JSON keys. Do not record live credentials or complete device output.
+Use the browser developer tools to inspect the chart-data request. Identify its URL, HTTP status, returned content type, sample timestamp, and top-level JSON keys. Do not expose live credentials or complete device output.
 
 Stop Flask with `Ctrl+C`.
 
 ### Failure checkpoint
 
-Do not begin the Docker build if the native application fails. Containerization does not repair an incorrect RESTCONF path, unavailable router, invalid credential, certificate failure, or application defect.
+Do not begin the Docker build if the native application fails. Containerization does not repair an incorrect RESTCONF path, unavailable router, invalid credential, or application defect.
 
 Classify the failure:
 
 | Symptom | Likely boundary to inspect |
 |---|---|
 | DNS or connection timeout | Routing, VPN, firewall, address, or port |
-| TLS verification failure | Certificate trust, hostname, validity, or CA bundle |
 | `401` or `403` | Authentication or authorization |
 | `404` | RESTCONF resource path or model availability |
 | `406` or `415` | `Accept` or `Content-Type` header |
@@ -289,9 +309,7 @@ Explain the supplied patterns before continuing:
 | `.env` | Prevent local runtime configuration and credentials from entering the build context |
 | `.venv` | Exclude the workstation-specific Python environment |
 | `__pycache__/` and `*.py[cod]` | Exclude generated Python bytecode |
-| `tests/` and `evidence/` | Keep non-runtime test and evidence files out of the image |
-| `certificates/*` | Exclude locally supplied certificate material |
-| `!certificates/.gitkeep` | Re-include only the placeholder that preserves the empty directory |
+| `tests/` | Keep non-runtime test files out of the image |
 
 Inspect the candidate context:
 
@@ -300,7 +318,7 @@ git status --short
 find . -maxdepth 3 -type f | sort
 ```
 
-Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, test caches, and certificates are excluded.
+Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, and test files are excluded.
 
 ## Part 6: Inspect and explain the Dockerfile
 
@@ -347,22 +365,12 @@ docker image inspect network-monitor:lab02 \
 docker history --no-trunc network-monitor:lab02
 ```
 
-If pip reports `No matching distribution found for Flask==3.1.2`, the learner has an older copy of the supplied dependency file. Confirm that the current file contains `Flask==3.0.3`, then rebuild without the failed build cache:
-
-```bash
-grep -n '^Flask==' requirements.txt
-docker build --pull --no-cache -t network-monitor:lab02 .
-```
-
-If resolution still fails, identify the Python package index or approved mirror available to the workstation and report the missing package to the instructor. Do not remove the version pin merely to make the build pass.
-
 The first build retrieves a base image and installs dependencies. A later source-only change should reuse the dependency layer. Review `docker history` for unexpected commands or values. Secret values must not appear in any layer.
 
 Record the immutable local image identifier:
 
 ```bash
-docker image inspect network-monitor:lab02 --format '{{.Id}}' \
-  | tee evidence/lab02-image-id.txt
+docker image inspect network-monitor:lab02 --format '{{.Id}}'
 ```
 
 An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
@@ -392,7 +400,9 @@ docker inspect network-monitor --format '{{json .State.Health}}' | jq
 curl -fsS http://127.0.0.1:8000/health | jq
 ```
 
-Open the dashboard and verify both charts again. If the host can reach the router through a VPN but the bridged container cannot, inspect the route and DNS behavior with the instructor. Use host networking only when the lab platform requires it and only on Linux:
+Open the dashboard and verify both charts again. Confirm that the header shows the assigned router and does not contain **demonstration data**. If it does, set `MOCK_MODE=false` in `.env`, remove the container, and repeat the `docker run` command so the new process receives the corrected value.
+
+If the host can reach the router through a VPN but the bridged container cannot, inspect the route and DNS behavior with the instructor. Use host networking only when the lab platform requires it and only on Linux:
 
 ```bash
 docker rm -f network-monitor
@@ -402,7 +412,7 @@ docker run -d --name network-monitor --network host --env-file .env \
   network-monitor:lab02
 ```
 
-With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Record which network mode was required and why.
+With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Explain which network mode was required and why.
 
 ## Part 9: Inspect and explain the running container
 
@@ -496,36 +506,27 @@ docker run -d --name network-monitor --env-file .env \
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
 
-## Part 11: Preserve evidence and commit the work
+## Part 11: Commit and push the work
 
 ```bash
-mkdir -p evidence
-docker image inspect network-monitor:lab02.1 \
-  --format 'Image={{.Id}} Created={{.Created}} User={{.Config.User}}' \
-  > evidence/lab02-final-image.txt
-docker inspect network-monitor \
-  --format 'Container={{.Id}} Image={{.Image}} Status={{.State.Status}} Health={{.State.Health.Status}}' \
-  > evidence/lab02-runtime.txt
 git status --ignored
 git diff
-git add Dockerfile .dockerignore requirements.txt app tests evidence
+git add Dockerfile .dockerignore requirements.txt app tests
 git diff --staged
 git commit -m "Package network monitoring application"
 git push -u origin feature/lab02-container-package
 ```
 
-Before committing, inspect every evidence file for addresses, credentials, tokens, certificates, and sensitive router data.
-
 ## Completion criteria
 
-- The supplied Flask application passes tests and displays live CPU and memory data before packaging.
+- The supplied Flask application is verified locally and displays live CPU and memory data before packaging.
 - The Docker build context excludes secrets and workstation-only files.
 - The Dockerfile installs pinned dependencies and runs as a non-root user.
 - `network-monitor:lab02.1` builds successfully.
 - The container becomes healthy and both charts display router observations.
 - The learner can explain image, container, writable layer, published port, network mode, health state, logs, and resource output.
 - Stop, start, restart, remove, recreate, rebuild, and replacement operations have been demonstrated.
-- No secret appears in Git, image history, evidence, or application logs.
+- No secret appears in Git, image history, or application logs.
 
 ## Cleanup
 

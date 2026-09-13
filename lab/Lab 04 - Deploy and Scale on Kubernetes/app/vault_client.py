@@ -14,7 +14,6 @@ class RouterRecord:
     port: int
     username: str
     password: str
-    ca_bundle_name: str | None
     enabled: bool
 
 
@@ -53,7 +52,6 @@ def read_router(router_name: str) -> RouterRecord:
         raise ValueError("Vault router record contains an invalid port")
     return RouterRecord(router_name, str(values["host"]).strip(), port,
                         str(values["username"]), str(values["password"]),
-                        str(values.get("ca_bundle_name") or "") or None,
                         bool(values.get("enabled", True)))
 
 
@@ -67,6 +65,6 @@ def list_routers() -> list[dict]:
             continue
         router = read_router(name)
         items.append({"name": router.name, "host": router.host, "port": router.port,
-                      "ca_bundle_name": router.ca_bundle_name, "enabled": router.enabled,
+                      "enabled": router.enabled,
                       "credential_source": "vault"})
     return items

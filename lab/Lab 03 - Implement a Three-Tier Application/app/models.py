@@ -27,6 +27,5 @@ class Router(db.Model):
     port = db.Column(db.Integer, nullable=False, default=443)
     username = db.Column(db.String(128), nullable=False)
     password_ciphertext = db.Column(db.Text, nullable=False)
-    ca_bundle_name = db.Column(db.String(255), nullable=True)
     enabled = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))

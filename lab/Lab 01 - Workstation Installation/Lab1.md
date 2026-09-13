@@ -17,7 +17,7 @@ The instructions target a dedicated Ubuntu LTS workstation. Complete the lab onl
 - Install and start a local GitLab Runner for registration in Lab 2.
 - Start an Elastic Stack laboratory environment for log collection and visualization.
 - Start HashiCorp Vault in development mode for later secrets exercises.
-- Record installed versions and demonstrate safe platform start, stop, and cleanup operations.
+- Demonstrate safe platform start, stop, and cleanup operations.
 
 ## Workstation architecture
 
@@ -326,28 +326,6 @@ docker stop course-vault
 docker start course-vault
 ```
 
-## Part 11: Capture the workstation baseline
-
-```bash
-mkdir -p ~/course-evidence
-{
-  date -Is
-  python3 --version
-  code --version | head -1
-  git --version
-  ansible --version | head -1
-  docker --version
-  docker compose version
-  kubectl version --client
-  minikube version
-  docker exec course-gitlab-runner gitlab-runner --version | head -1
-} | tee ~/course-evidence/lab01-versions.txt
-docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}' \
-  | tee ~/course-evidence/lab01-containers.txt
-```
-
-Review the evidence files before committing them. They must contain versions and state only—never passwords, runner tokens, Vault tokens, sandbox credentials, or application secrets.
-
 ## Platform lifecycle summary
 
 | Platform | Start | Stop without deleting data |
@@ -370,7 +348,6 @@ Review the evidence files before committing them. They must contain versions and
 - The local runner container starts and reports its version; project registration occurs in Lab 2.
 - Elasticsearch, Logstash, and Kibana start, and Elasticsearch answers its local health request.
 - Vault's health endpoint responds, and the learner can explain why development mode is unsafe.
-- Version evidence contains no secret values.
 
 ## Cleanup
 
