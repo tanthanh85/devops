@@ -20,7 +20,7 @@ resolve-network-intent:
     - audit_job_start
   script:
     - audit_task resolve_netbox_intent python automation/resolve_intent.py
-    - audit_task validate_intent_schema python -c 'import json,re; d=json.load(open("intent.json")); assert re.fullmatch(r"Loopback[0-9]{1,4}",d["interface"]); assert d["fingerprint"]'
+    - audit_task validate_intent_schema python -c 'import json,re; d=json.load(open("intent.json")); assert re.fullmatch(r"L(?:0[1-9]|1[0-9]|20)",d["learner_id"]); assert d["interface"] == "Loopback"+str(1000+int(d["learner_id"][1:])); assert d["fingerprint"]'
   artifacts:
     access: developer
     paths: [intent.json]
@@ -88,7 +88,7 @@ create-cml-test-environment:
     - audit_task fingerprint_terraform_plan sh -c 'terraform -chdir="$TF_ROOT" show -json plan.tfplan | sha256sum > terraform-plan.sha256'
     - audit_task terraform_apply terraform -chdir="$TF_ROOT" apply -input=false -auto-approve plan.tfplan
     - audit_task record_cml_outputs sh -c 'terraform -chdir="$TF_ROOT" output -json > cml-outputs.json'
-    - python3 ci/audit.py emit --action cml_test_environment_created --outcome success --message "CML C8000V test environment created" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"network.device.address":d["router_management_ip"]["value"],"cml.lifecycle.booted":d["lifecycle_booted"]["value"]}))')"
+    - python3 ci/audit.py emit --action cml_test_environment_created --outcome success --message "CML C8000V test environment created" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"course.learner.id":d["learner_id"]["value"],"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"network.device.address":d["router_management_ip"]["value"],"cml.lifecycle.booted":d["lifecycle_booted"]["value"]}))')"
     - audit_task remove_sensitive_working_files rm -f "$TF_ROOT/pipeline.auto.tfvars.json" "$TF_ROOT/plan.tfplan"
   artifacts:
     access: developer
@@ -226,7 +226,7 @@ destroy-cml-test-environment:
     - audit_task terraform_init sh ci/terraform-init.sh
     - audit_task terraform_destroy terraform -chdir="$TF_ROOT" destroy -input=false -auto-approve
     - audit_task verify_empty_terraform_state sh -c 'test -z "$(terraform -chdir="$TF_ROOT" state list)"'
-    - python3 ci/audit.py emit --action cml_test_environment_deleted --outcome success --message "On-demand CML lab and C8000V deleted after testing" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"resource.lifecycle":"deleted"}))')"
+    - python3 ci/audit.py emit --action cml_test_environment_deleted --outcome success --message "On-demand CML lab and C8000V deleted after testing" --fields-json "$(python3 -c 'import json;d=json.load(open("cml-outputs.json"));print(json.dumps({"course.learner.id":d["learner_id"]["value"],"cml.lab.id":d["lab_id"]["value"],"cml.node.id":d["router_node_id"]["value"],"resource.lifecycle":"deleted"}))')"
     - audit_task remove_sensitive_working_files rm -f "$TF_ROOT/pipeline.auto.tfvars.json"
   artifacts:
     access: developer

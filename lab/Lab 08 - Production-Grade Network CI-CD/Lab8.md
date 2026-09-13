@@ -4,7 +4,7 @@
 
 **8 hours**
 
-The final lab brings the course components together in a controlled network delivery workflow. NetBox records the intended loopback interface. Its webhook starts a dedicated GitLab pipeline, but the requested change is not sent directly to production. Terraform creates an isolated Cisco C8000V test router on demand on an instructor-provided Cisco Modeling Labs (CML) system. Ansible applies the intended loopback, and pyATS independently verifies its address and operational state. The pipeline then destroys the temporary CML lab and router immediately after the test gate finishes. Only a successful test and successful cleanup permit a reviewed production promotion. Ansible and pyATS then repeat the change and verification against the production router.
+The final lab brings the course components together in a controlled network delivery workflow. NetBox records the intended loopback interface. Its webhook starts a dedicated GitLab pipeline, but the requested change is not sent directly to production. Terraform creates an isolated Cisco C8000V test router on demand on an instructor-provided Cisco Modeling Labs (CML) system. Ansible applies the intended loopback, and pyATS independently verifies its address and operational state. The pipeline then destroys the temporary CML lab and router immediately after the test gate finishes. Only a successful test and successful cleanup permit a reviewed production promotion. Ansible and pyATS then repeat the change and verification against the production router. Because the production router and CML system are shared by 20 learners, every change is bound to an instructor-assigned learner namespace.
 
 Every pipeline job produces two forms of evidence: the immutable GitLab job log and structured audit events in Elasticsearch. Audit records identify the intent, actor, source commit, pipeline, job, target environment, target device, image digest, action, outcome, duration, and error category without recording passwords or tokens.
 
@@ -103,6 +103,21 @@ The instructor supplies a CML 2.9 or later system that the private GitLab runner
 - The CML API certificate is trusted by the runner, or the instructor has explicitly approved lab-only certificate verification settings.
 - Each learner or group has a restricted CML token and an isolated address allocation.
 
+### 2.1 Allocate learner namespaces before class
+
+The instructor assigns immutable identifiers `L01` through `L20`. The identifier is an ownership boundary, not a value learners choose for each run. Prepare this allocation before learners can trigger pipelines:
+
+| Learner | Production interface | CML management address | NetBox ownership field | CML/Vault namespace |
+|---|---|---|---|---|
+| `L01` | `Loopback1001` | First reserved test address | `course_learner_id=L01` | `network/test/c8000v/L01` |
+| `L02` | `Loopback1002` | Second reserved test address | `course_learner_id=L02` | `network/test/c8000v/L02` |
+| … | … | … | … | … |
+| `L20` | `Loopback1020` | Twentieth reserved test address | `course_learner_id=L20` | `network/test/c8000v/L20` |
+
+Reserve 20 distinct management addresses with DHCP exclusions or static reservations. Never give two learner records the same address. In NetBox, create the text custom field `course_learner_id` for interfaces, restrict its choices to `L01`–`L20`, and let the instructor pre-create the 20 loopback interfaces. Give learners permission to assign an address only within their allocated interface and prefix pool; do not give them permission to rename or delete other learners' interfaces.
+
+The resolver rejects an event unless the ownership field and interface number agree. For example, `L07` can operate only on `Loopback1007`. NetBox also prevents duplicate IP assignments. These controls stop a learner from selecting another learner's interface merely by altering webhook variables.
+
 The provider is currently beta and provider/CML compatibility matters. The supplied configuration pins `CiscoDevNet/cml2` to the instructor-tested version range. Run `terraform init -upgrade` only when intentionally testing an upgrade.
 
 ## 3. Store integrations and targets in Vault
@@ -113,11 +128,11 @@ Keep the following records in Vault. Do not place their values in Git, NetBox cu
 |---|---|---|
 | `secret/integrations/netbox` | `url`, `token`, `verify_tls` | Resolve the NetBox IP-address event |
 | `secret/integrations/cml` | `address`, `token`, `skip_verify`, `external_connector`, `node_definition`, `image_definition` | Create the test lab |
-| `secret/network/test/c8000v` | `management_ip`, `prefix_length`, `gateway`, `username`, `password` | Bootstrap and access the ephemeral router |
+| `secret/network/test/c8000v/<L01-L20>` | `management_ip`, `prefix_length`, `gateway`, `username`, `password`, `owner` | Bootstrap the learner's ephemeral router with its reserved address |
 | `secret/network/routers/<NetBox device>` | `host`, `port`, `username`, `password`, `ssh_host_key`, `platform`, `enabled` | Access the authorized production router and pin its SSH identity |
 | `secret/integrations/elastic-audit` | `url`, `api_key`, `verify_tls` | Send structured audit events |
 
-The test password is still sensitive even though the router is temporary. Use a per-class or per-pipeline credential, rotate it, and never reuse a production password.
+The test password is still sensitive even though the router is temporary. Use a per-learner credential, rotate it, and never reuse a production password. Run `store-cml-and-audit-integrations.sh` once per allocation with `LEARNER_ID` and that learner's reserved `TEST_ROUTER_IP` set.
 
 Run the supplied policy helper after the records have been created:
 
@@ -131,7 +146,7 @@ For GitLab Docker-runner jobs, configure a narrowly scoped Vault authentication 
 
 ## 4. Model loopback intent in NetBox
 
-Create or confirm the production device, its primary management IP, and a loopback interface. Assign the requested IPv4 prefix to the loopback. The IP-address object must be assigned to the interface; this completed association is what the webhook reports.
+Use the shared production device and the instructor-created loopback assigned to you. Confirm that its `course_learner_id` matches your identifier before assigning a prefix. Do not create an arbitrary loopback number. The IP-address object must be assigned to the interface; this completed association is what the webhook reports.
 
 NetBox stores intent, not device credentials and not deployment status. The application’s **Loopbacks** page remains read-only and displays the intended device, interface, address, and prefix.
 
@@ -145,7 +160,7 @@ docker build -t network-monitor-web:lab08 lab04-web
 
 ## 5. Review the Terraform test environment
 
-`terraform/cml-test/main.tf` creates a uniquely named lab, an instructor-selected external connector, an unmanaged switch, and one C8000V with a bootstrap configuration. The lifecycle resource starts the topology after its nodes and links exist. Terraform outputs the test management address and CML object IDs needed for audit and cleanup.
+`terraform/cml-test/main.tf` creates a uniquely named lab, an instructor-selected external connector, an unmanaged switch, and one C8000V with a bootstrap configuration. Lab and node names contain both the learner identifier and pipeline ID. Ownership tags and notes carry the same values. The pipeline uses a state name containing the learner and pipeline identifiers, so one cleanup job can destroy only the CML objects recorded in its own state. The lifecycle resource starts the topology after its nodes and links exist. Terraform outputs the test management address and CML object IDs needed for audit and cleanup.
 
 ```bash
 terraform -chdir=terraform/cml-test fmt -check
@@ -218,7 +233,7 @@ The jobs execute in this order:
 10. Apply the identical intent to production with Ansible.
 11. Verify production with pyATS.
 
-`needs` relationships enforce the chain. `resource_group: production-network-change` serializes production changes. Configure `course/production-network` as a protected environment with required approvers.
+`needs` relationships enforce the chain. `resource_group: production-network-change` serializes all changes to the shared production router. Configure `course/production-network` as a protected environment with required approvers. An instructor must reject a second active pipeline for the same learner until the first pipeline has completed CML cleanup; two simultaneous routers cannot use the same learner-reserved management address.
 
 ## 9. Configure the NetBox trigger
 
@@ -238,14 +253,14 @@ Create an Event Rule for **IPAM > IP address**, event **Object created**, using 
 
 ## 10. Execute the test deployment
 
-Create a loopback interface in NetBox and assign a new IPv4 prefix. Follow the triggered pipeline, but do not approve production yet. Confirm this evidence sequence:
+Assign a new IPv4 prefix to your instructor-created loopback interface in NetBox. Follow the triggered pipeline, but do not approve production yet. Confirm this evidence sequence:
 
 ```text
 intent -> validation -> images -> Terraform plan/apply -> CML ready
 -> Ansible test change -> pyATS test pass
 ```
 
-In CML, confirm a uniquely named lab and C8000V exist. In Kibana, filter:
+In CML, confirm the lab, router label, tags, and notes contain your learner identifier and the current pipeline ID. Do not open, stop, or delete a lab owned by another identifier. In Kibana, filter:
 
 ```text
 event.dataset : "network_cicd.audit" and ci.pipeline.id : "<pipeline-id>"
@@ -263,7 +278,7 @@ After production verification succeeds, confirm the interface through an approve
 
 ## 12. Confirm cleanup and evidence
 
-The cleanup job uses the protected GitLab Terraform state and runs after the test path finishes, including when Ansible deployment or pyATS verification fails. It is non-interruptible, calls `terraform destroy`, checks that Terraform tracks no remaining CML resources, and emits an explicit deletion event. Cleanup failure blocks the production approval job. Confirm in CML that both the pipeline lab and C8000V are gone.
+The cleanup job uses the learner-and-pipeline-specific protected GitLab Terraform state and runs after the test path finishes, including when Ansible deployment or pyATS verification fails. It is non-interruptible, calls `terraform destroy`, checks that its state tracks no remaining CML resources, and emits an explicit deletion event. It never searches for or deletes CML objects by a broad name pattern. Cleanup failure blocks the production approval job. Confirm in CML that only your pipeline's lab and C8000V are gone.
 
 A defensible record should answer who initiated and approved the change, what intent and commit defined it, what images executed it, what test environment was created, what changed in each environment, what proved the outcome, when each task ran, and whether cleanup completed.
 
@@ -276,6 +291,9 @@ Repeat with an instructor-rejected address or temporarily unreachable test route
 - [ ] NetBox is authoritative for loopback intent.
 - [ ] CML, router, NetBox, and Elastic data are read from Vault.
 - [ ] Terraform creates a uniquely named C8000V test lab.
+- [ ] The learner ID maps to exactly one loopback and one reserved CML address.
+- [ ] CML lab names, node names, tags, state, and audit events identify the owner and pipeline.
+- [ ] A learner cannot target another learner's loopback by changing trigger variables.
 - [ ] Ansible performs the test and production deployments.
 - [ ] pyATS verifies test before production is actionable.
 - [ ] Production requires protected manual approval.

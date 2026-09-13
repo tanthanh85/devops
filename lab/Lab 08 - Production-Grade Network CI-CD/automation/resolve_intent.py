@@ -16,11 +16,18 @@ if not assigned.get("url"):
 interface = netbox_request(api_path(assigned["url"]))
 if not re.fullmatch(r"Loopback[0-9]{1,4}", str(interface.get("name", "")), re.I):
     raise ValueError("Only Loopback0 through Loopback9999 are allowed")
+learner_id = str((interface.get("custom_fields") or {}).get("course_learner_id", "")).upper()
+if not re.fullmatch(r"L(?:0[1-9]|1[0-9]|20)", learner_id):
+    raise ValueError("NetBox interface must have course_learner_id L01 through L20")
+expected_interface = f"Loopback{1000 + int(learner_id[1:])}"
+if interface["name"].lower() != expected_interface.lower():
+    raise ValueError(f"{learner_id} may manage only {expected_interface}")
 device = netbox_request(api_path((interface.get("device") or {})["url"]))
 intent = {
     "schema_version": 1,
     "netbox_ip_id": int(ip_id),
     "device": device["name"],
+    "learner_id": learner_id,
     "interface": interface["name"],
     "address": address["address"],
 }

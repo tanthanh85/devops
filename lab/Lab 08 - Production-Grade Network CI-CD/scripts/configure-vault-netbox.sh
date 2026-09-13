@@ -10,7 +10,7 @@ path "secret/data/integrations/netbox" { capabilities = ["read"] }'
 printf '%s\n' "$app_policy" | kubectl -n "$namespace" exec -i deployment/vault -- env VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN="$VAULT_BOOTSTRAP_TOKEN" vault policy write network-monitor - >/dev/null
 
 automation_policy='path "secret/data/network/routers/*" { capabilities = ["read"] }
-path "secret/data/network/test/c8000v" { capabilities = ["read"] }
+path "secret/data/network/test/c8000v/*" { capabilities = ["read"] }
 path "secret/data/integrations/netbox" { capabilities = ["read"] }
 path "secret/data/integrations/cml" { capabilities = ["read"] }
 path "secret/data/integrations/elastic-audit" { capabilities = ["read"] }'

@@ -1,7 +1,7 @@
 locals {
-  lab_name = "netdevops-test-${var.pipeline_id}"
+  lab_name  = "netdevops-${lower(var.learner_id)}-test-${var.pipeline_id}"
   bootstrap = <<-IOS
-    hostname TEST-C8000V-${var.pipeline_id}
+    hostname TEST-${var.learner_id}-C8000V-${var.pipeline_id}
     no ip domain lookup
     ip domain name lab.example
     username ${var.router_username} privilege 15 secret 0 ${var.router_password}
@@ -21,8 +21,8 @@ locals {
 
 resource "cml2_lab" "test" {
   title       = local.lab_name
-  description = "Ephemeral CI test lab for GitLab pipeline ${var.pipeline_id}"
-  notes       = "Managed by Terraform. Do not edit manually."
+  description = "Ephemeral CI test lab owned by ${var.learner_id}; GitLab pipeline ${var.pipeline_id}"
+  notes       = "Owner ${var.learner_id}. Managed by Terraform state for pipeline ${var.pipeline_id}. Do not edit or delete manually."
 }
 
 resource "cml2_node" "external" {
@@ -45,15 +45,15 @@ resource "cml2_node" "switch" {
 }
 
 resource "cml2_node" "router" {
-  lab_id         = cml2_lab.test.id
-  label          = "TEST-C8000V-${var.pipeline_id}"
+  lab_id          = cml2_lab.test.id
+  label           = "TEST-${var.learner_id}-C8000V-${var.pipeline_id}"
   nodedefinition  = var.node_definition
   imagedefinition = var.image_definition
-  configuration  = local.bootstrap
-  ram            = var.router_ram_mb
-  tags           = ["router"]
-  x              = 200
-  y              = 0
+  configuration   = local.bootstrap
+  ram             = var.router_ram_mb
+  tags            = ["router", "owner-${lower(var.learner_id)}", "pipeline-${var.pipeline_id}"]
+  x               = 200
+  y               = 0
 }
 
 resource "cml2_link" "external_to_switch" {
@@ -73,11 +73,6 @@ resource "cml2_lifecycle" "test" {
   lab_id = cml2_lab.test.id
   state  = "STARTED"
   wait   = true
-  update_triggers = {
-    external = "${cml2_node.external.id}:${cml2_node.external.generation}"
-    switch   = "${cml2_node.switch.id}:${cml2_node.switch.generation}"
-    router   = "${cml2_node.router.id}:${cml2_node.router.generation}"
-  }
   depends_on = [
     cml2_link.external_to_switch,
     cml2_link.switch_to_router,

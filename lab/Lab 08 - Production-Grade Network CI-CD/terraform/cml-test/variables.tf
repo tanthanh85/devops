@@ -1,14 +1,59 @@
-variable "pipeline_id" { type = string }
-variable "cml_address" { type = string }
-variable "cml_token" { type = string; sensitive = true }
-variable "cml_skip_verify" { type = bool; default = false }
-variable "external_connector" { type = string; default = "bridge0" }
-variable "node_definition" { type = string; default = "cat8000v" }
-variable "image_definition" { type = string; default = null }
-variable "router_ip" { type = string }
-variable "router_prefix_length" { type = number }
-variable "router_gateway" { type = string }
-variable "router_username" { type = string }
+variable "pipeline_id" {
+  type = string
+}
+
+variable "learner_id" {
+  type = string
+  validation {
+    condition     = can(regex("^L(0[1-9]|1[0-9]|20)$", var.learner_id))
+    error_message = "learner_id must be L01 through L20."
+  }
+}
+
+variable "cml_address" {
+  type = string
+}
+
+variable "cml_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "cml_skip_verify" {
+  type    = bool
+  default = false
+}
+
+variable "external_connector" {
+  type    = string
+  default = "bridge0"
+}
+
+variable "node_definition" {
+  type    = string
+  default = "cat8000v"
+}
+
+variable "image_definition" {
+  type    = string
+  default = null
+}
+
+variable "router_ip" {
+  type = string
+}
+
+variable "router_prefix_length" {
+  type = number
+}
+
+variable "router_gateway" {
+  type = string
+}
+
+variable "router_username" {
+  type = string
+}
 variable "router_password" {
   type      = string
   sensitive = true

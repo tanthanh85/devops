@@ -88,16 +88,23 @@ def desired_loopback():
             "device": device_name,
             "interface": name,
             "address": str(interface_ip),
+            "learner_id": str((interface.get("custom_fields") or {}).get("course_learner_id", "")).upper(),
         }
     name = intent["interface"]
     device_name = intent["device"]
     interface_ip = ipaddress.ip_interface(intent["address"])
+    learner_id = str(intent.get("learner_id", "")).upper()
+    if not re.fullmatch(r"L(?:0[1-9]|1[0-9]|20)", learner_id):
+        raise ValueError("intent learner_id must be L01 through L20")
+    expected_interface = f"Loopback{1000 + int(learner_id[1:])}"
+    if name.lower() != expected_interface.lower():
+        raise ValueError(f"{learner_id} may manage only {expected_interface}")
     if interface_ip.version != 4:
         raise ValueError("this lab supports IPv4 loopback addresses")
     environment = os.getenv("TARGET_ENVIRONMENT", "production")
     if environment == "test":
-        credentials = vault_secret("network/test/c8000v")
-        target_name = f"TEST-C8000V-{os.getenv('CI_PIPELINE_ID', 'local')}"
+        credentials = vault_secret(f"network/test/c8000v/{learner_id}")
+        target_name = f"TEST-{learner_id}-C8000V-{os.getenv('CI_PIPELINE_ID', 'local')}"
         management_ip = credentials["management_ip"]
     elif environment == "production":
         credentials = vault_secret(f"network/routers/{device_name}")
@@ -110,6 +117,7 @@ def desired_loopback():
     return {
         "device": target_name,
         "production_device": device_name,
+        "learner_id": learner_id,
         "management_ip": management_ip,
         "port": int(credentials.get("port", 22)),
         "interface": name,

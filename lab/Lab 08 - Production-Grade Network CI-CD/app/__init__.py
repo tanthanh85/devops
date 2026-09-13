@@ -1,3 +1,7 @@
+from pkgutil import extend_path
+
+__path__ = extend_path(__path__, __name__)
+
 from flask import Flask
 
 from .config import Config
@@ -17,4 +21,3 @@ def create_app(config_object=Config):
     with app.app_context():
         db.create_all()
     return app
-
