@@ -8,23 +8,6 @@ Learners are expected to recognize Python, Ansible, Git, structured data, APIs, 
 
 The material follows automation from input to outcome. Intent and inventory become structured data; Python or Ansible applies logic; an interface changes or queries a target; validation compares intended, configured, and operational state; and telemetry records what happened.
 
-### Reference System Before This Module
-
-- Existing networking and programming knowledge
-- Access to the supplied Python and Ansible automation
-
-### What This Module Adds
-
-- A shared model of intent, inventory, structured data, execution, validation, and evidence
-- Clear testing and target-safety boundaries
-- A review of individually operated automation limitations
-
-### Reference System After This Module
-
-- The network outcome can be automated and verified
-- Inputs, targets, state, and evidence are understood
-- The automation still depends on individually managed execution
-
 ## 2. Learning objectives
 
 After completing this review, learners should be able to:

@@ -19,8 +19,8 @@
 | `diagrams/three-network-states.svg` | `../diagrams/three-network-states.mmd` | Module 4 |
 | `diagrams/network-change-state.svg` | `../diagrams/network-change-state.mmd` | Module 4 |
 | `diagrams/rollback-decision.svg` | `../diagrams/rollback-decision.mmd` | Module 4 |
-| `diagrams/terraform-ansible-handoff.svg` | `../diagrams/terraform-ansible-handoff.mmd` | Module 1 |
-| `diagrams/test-environment-lifecycle.svg` | `../diagrams/test-environment-lifecycle.mmd` | Module 1 |
+| `diagrams/terraform-ansible-handoff.svg` | `../diagrams/terraform-ansible-handoff.mmd` | Module 2 |
+| `diagrams/test-environment-lifecycle.svg` | `../diagrams/test-environment-lifecycle.mmd` | Module 2 |
 | `diagrams/monitoring-observability-telemetry.svg` | `../diagrams/monitoring-observability-telemetry.mmd` | Module 5 |
 | `diagrams/observability-architecture.svg` | `../diagrams/observability-architecture.mmd` | Module 5 |
 | `diagrams/change-correlation-timeline.svg` | `../diagrams/change-correlation-timeline.mmd` | Module 5 |
@@ -29,7 +29,7 @@
 | `diagrams/compromised-runner-response.svg` | `../diagrams/compromised-runner-response.mmd` | Module 5 |
 | `diagrams/platform-vs-network-pipeline.svg` | `../diagrams/platform-vs-network-pipeline.mmd` | Module 3 |
 | `diagrams/compose-automation-services.svg` | `../diagrams/compose-automation-services.mmd` | Module 3 |
-| `diagrams/iac-tool-ownership.svg` | `../diagrams/iac-tool-ownership.mmd` | Module 1 |
+| `diagrams/iac-tool-ownership.svg` | `../diagrams/iac-tool-ownership.mmd` | Module 2 |
 | `diagrams/kubernetes-automation-platform.svg` | `../diagrams/kubernetes-automation-platform.mmd` | Module 3 |
 | `diagrams/network-change-models.svg` | `../diagrams/network-change-models.mmd` | Module 1 |
 | `diagrams/container-network-planes.svg` | `../diagrams/container-network-planes.mmd` | Module 3 |
@@ -41,7 +41,7 @@
 | `diagrams/runner-trust-model.svg` | `../diagrams/runner-trust-model.mmd` | Module 4 |
 | `diagrams/network-change-sequence.svg` | `../diagrams/network-change-sequence.mmd` | Module 4 |
 | `diagrams/ospf-failure-response.svg` | `../diagrams/ospf-failure-response.mmd` | Module 4 |
-| `diagrams/drift-reconciliation.svg` | `../diagrams/drift-reconciliation.mmd` | Module 1 |
+| `diagrams/drift-reconciliation.svg` | `../diagrams/drift-reconciliation.mmd` | Module 2 |
 | `diagrams/network-telemetry-methods.svg` | `../diagrams/network-telemetry-methods.mmd` | Module 5 |
 | `diagrams/change-correlation-sequence.svg` | `../diagrams/change-correlation-sequence.mmd` | Module 5 |
 | `diagrams/kubernetes-suitability.svg` | `../diagrams/kubernetes-suitability.mmd` | Module 3 |

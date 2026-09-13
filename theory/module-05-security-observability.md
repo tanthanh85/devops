@@ -13,26 +13,6 @@ The automated system creates two critical questions:
 1. **Can we trust it?** Security must protect source, dependencies, artifacts, identities, runners, platforms, targets, and evidence.
 2. **Can we understand what it is doing?** Observability must connect delivery activity with application behavior and network outcomes.
 
-### Reference System Before This Module
-
-- Identified application artifacts and controlled runtime platforms
-- GitLab delivery policy with protected execution
-- Separate platform-release and network-change workflows
-- Immediate deployment and network-validation evidence
-
-### What This Module Adds
-
-- End-to-end trust-boundary and identity controls
-- Security checks across source, runners, artifacts, platforms, and management paths
-- Application, platform, and network telemetry
-- Change-aware correlation, alerting, investigation, and improvement
-
-### Reference System After This Module
-
-- The delivery system can be trusted, observed, and investigated
-- Releases and approved network changes are traceable to operational behavior
-- Operational feedback informs the next controlled improvement
-
 ## 2. Security across the delivery system
 
 
@@ -40,7 +20,7 @@ The automated system creates two critical questions:
 
 The architecture separates repository-controlled validation from privileged deployment and preserves an independent audit path.
 
-This view extends the Module 2 delivery architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
+This view extends the Module 1 delivery architecture rather than replacing it: the same validation, artifact, approval, protected execution, and evidence components are shown with their trust boundaries and permitted crossings made explicit.
 
 <p align="center">
   <img src="assets/course-figures/netdevops-trust-boundaries.png" alt="NetDevOps trust boundaries through protected execution and independent audit" width="860" />
@@ -362,7 +342,7 @@ Telemetry is the data. Monitoring evaluates selected signals. Observability is a
 
 ### 3.2 Feedback architecture requirements
 
-Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 2 delivery architecture rather than creating a separate monitoring destination.
+Device signals, application signals, and deployment events need a common correlation path. This expands the feedback path in the Module 1 delivery architecture rather than creating a separate monitoring destination.
 
 <p align="center">
   <img src="assets/course-figures/observability-architecture.png" alt="Observability architecture joining network, application, and pipeline signals" width="860" />

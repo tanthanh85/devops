@@ -1,35 +1,16 @@
-# Module 2: Introducing the DevOps Model
+# Module 1: Introducing the DevOps Model
 
 ## 1. Purpose
 
-Module 1 demonstrated a controlled technical lifecycle for infrastructure: declare intent, review a plan, apply it through an identified owner, verify actual state, and reconcile drift. DevOps expands that discipline from infrastructure tooling to the complete way a team develops and operates software and services.
+Module 0 ended with a delivery problem: useful automation may still depend on one engineer, one workstation, and manually coordinated decisions. DevOps addresses that problem by changing the complete way a team develops and operates software and services.
 
 DevOps organizes delivery so that small changes move through a controlled, repeatable feedback loop. It combines shared responsibility, version control, automation, testing, operational evidence, and continuous improvement. A team has adopted DevOps only when these practices change how it makes decisions and learns from operation. Installing a pipeline product alone does not achieve that result.
 
 This module establishes the DevOps philosophy, CALMS model, flow, feedback, measurement, shared ownership, continuous integration, continuous delivery, and continuous deployment concepts used throughout the course. These practices came from software engineering and apply to any application. Network automation provides the primary engineering workload through which the practices are applied throughout the course.
 
-The central question is practical: **How do we turn useful network automation into a dependable software system that a team can build, package, deploy, operate, secure, observe, and improve?** Module 2 supplies the operating model; later modules implement it.
+The central question is practical: **How do we turn useful network automation into a dependable software system that a team can build, package, deploy, operate, secure, observe, and improve?** Module 1 supplies the operating model; later modules implement it.
 
-[Module 0](module-00-network-automation-review.md) reviewed how the supplied application turns intent and inventory into controlled network operations, and Module 1 applied repeatability and desired-state practices to infrastructure. Module 2 now changes the point of view: the subject is how a team develops, tests, releases, operates, and improves the complete system. The delivery model established here supplies the reasoning used by every later module.
-
-### Reference System Before This Module
-
-- Verified Python and Ansible automation
-- Git-based intent and evidence
-- Reproducible, explicitly owned test infrastructure
-
-### What This Module Adds
-
-- CALMS, shared ownership, flow, feedback, and measurement
-- Continuous integration, delivery, and deployment distinctions
-- Value-stream and delivery-performance thinking
-- Build-once, evidence, and promotion principles
-
-### Reference System After This Module
-
-- The team has a shared delivery and improvement model
-- Release evidence and promotion expectations are explicit
-- No reproducible application artifact exists yet
+[Module 0](module-00-network-automation-review.md) reviewed how automation turns intent and inventory into controlled network operations. Module 1 changes the point of view: the subject is how a team develops, tests, releases, operates, and improves the complete system. The delivery model established here supplies the reasoning used by every later module.
 
 ## 2. From ad hoc automation to DevOps
 
@@ -66,7 +47,7 @@ NetDevOps therefore emphasizes scoped targets, intended state, pre-change facts,
 CALMS assesses DevOps as an operating model rather than a collection of tools. It represents **Culture, Automation, Lean, Measurement, and Sharing**. The dimensions work together: automation without ownership can accelerate a poor process, while collaboration without repeatable execution remains dependent on individuals.
 
 <p align="center">
-  <img src="assets/course-figures/module-02-calms.png" alt="Icon-led CALMS model showing Culture, Automation, Lean, Measurement, and Sharing as a continuous improvement loop" width="860" />
+  <img src="assets/course-figures/module-01-calms.png" alt="Icon-led CALMS model showing Culture, Automation, Lean, Measurement, and Sharing as a continuous improvement loop" width="860" />
 </p>
 
 | Dimension | Software-delivery interpretation | Evidence in this course |
@@ -120,7 +101,7 @@ Do not reduce the result to a maturity score. Select an observable weakness and 
 DevOps is easier to understand when it is compared with the delivery models it replaces or improves. The following comparison shows how ownership, evidence, execution, and recovery change as work moves from manual delivery through isolated automation to an engineered pipeline.
 
 <p align="center">
-  <img src="assets/course-figures/module-02-delivery-models.png" alt="Visual comparison of manual delivery, ad hoc automation, and a DevOps pipeline" width="860" />
+  <img src="assets/course-figures/module-01-delivery-models.png" alt="Visual comparison of manual delivery, ad hoc automation, and a DevOps pipeline" width="860" />
 </p>
 
 | Characteristic | Manual delivery | Ad hoc automation | DevOps pipeline |
@@ -143,7 +124,7 @@ Automation improves consistency, but DevOps connects automation to collaboration
 The DevOps lifecycle connects an idea to an operating service and returns operational knowledge to the next decision. Deployment is therefore not the end: software must be operated, observed, improved, secured, and eventually retired.
 
 <p align="center">
-  <img src="assets/course-figures/module-02-lifecycle.png" alt="Icon-led DevOps lifecycle from planning through development, qualification, release, operation, and learning" width="860" />
+  <img src="assets/course-figures/module-01-lifecycle.png" alt="Icon-led DevOps lifecycle from planning through development, qualification, release, operation, and learning" width="860" />
 </p>
 
 **Plan → Design → Develop → Integrate → Build → Test → Release → Deploy → Operate → Observe → Learn**
@@ -215,7 +196,7 @@ Retirement stops traffic and scheduled work, handles data according to policy, r
 A gate is a decision supported by evidence, not an unexplained approval step.
 
 <p align="center">
-  <img src="assets/course-figures/module-02-evidence-chain.png" alt="Evidence chain connecting requirement, commit, pipeline, artifact, deployment, and runtime evidence" width="860" />
+  <img src="assets/course-figures/module-01-evidence-chain.png" alt="Evidence chain connecting requirement, commit, pipeline, artifact, deployment, and runtime evidence" width="860" />
 </p>
 
 | Gate | Decision | Minimum useful evidence |
@@ -237,7 +218,7 @@ Evidence must remain connected along this chain. A new commit, artifact, target,
 Feedback arrives at different speeds, and each loop needs an owner and a path back into source, tests, policy, documentation, or design:
 
 <p align="center">
-  <img src="assets/course-figures/module-02-feedback-speeds.png" alt="Feedback loops grouped by seconds, minutes, hours, and weeks" width="860" />
+  <img src="assets/course-figures/module-01-feedback-speeds.png" alt="Feedback loops grouped by seconds, minutes, hours, and weeks" width="860" />
 </p>
 
 - **Seconds to minutes:** formatter, linter, schema validation, and unit tests guide the developer.
@@ -271,7 +252,7 @@ The reference architecture makes the most important trust transition visible: un
 > A runner is not safe merely because the CI platform labels it protected. Its effective trust boundary is determined by which jobs it accepts, which identities it can obtain, and which endpoints it can reach.
 
 <p align="center">
-  <img src="assets/course-figures/module-02-delivery-architecture.png" alt="Delivery architecture separating unprivileged validation from protected deployment" width="860" />
+  <img src="assets/course-figures/module-01-delivery-architecture.png" alt="Delivery architecture separating unprivileged validation from protected deployment" width="860" />
 </p>
 
 Operational evidence returns to the engineer and repository; it is not an isolated monitoring destination.
@@ -284,7 +265,7 @@ Operational evidence returns to the engineer and repository; it is not an isolat
 - Post-checks and telemetry produce evidence about configuration, protocol, forwarding, and platform health.
 - The final decision promotes the result, stops further rollout, rolls back safely, or initiates forward remediation.
 
-Module 1 assigns infrastructure ownership and lifecycle controls. Module 3 applies reproducibility to container packaging, multitier services, and Kubernetes. Module 4 implements CI/CD, protected execution, validation, and recovery. Module 5 secures every boundary and builds the operational feedback path.
+Module 2 assigns infrastructure ownership and lifecycle controls. Module 3 applies reproducibility to container packaging, multitier services, and Kubernetes. Module 4 implements CI/CD, protected execution, validation, and recovery. Module 5 secures every boundary and builds the operational feedback path.
 
 ## 7. Continuous integration, delivery, and deployment
 
@@ -311,7 +292,7 @@ These pipelines may share code, images, policies, runners, and evidence services
 A value stream describes the work from request to operational outcome. Useful questions include:
 
 <p align="center">
-  <img src="assets/course-figures/module-02-value-stream.png" alt="Value stream showing work time, waiting time, and the delivery constraint" width="860" />
+  <img src="assets/course-figures/module-01-value-stream.png" alt="Value stream showing work time, waiting time, and the delivery constraint" width="860" />
 </p>
 
 - Where does work wait?
@@ -407,7 +388,7 @@ Schema success does not grant authorization, policy success does not prove corre
 
 ## 10. Where implementation depth belongs
 
-Module 2 establishes the delivery model and the questions that each control must answer. Module 1 introduced infrastructure lifecycle, state, drift, and tool ownership before this conceptual framework; later chapters apply the model in increasing operational depth. Module 3 covers containers, image construction, multitier services, and Kubernetes orchestration; Module 4 covers GitLab jobs, runners, artifacts, promotion, mutable state, blast radius, convergence, and recovery; and Module 5 covers trust boundaries, credentials, operational feedback, and stability.
+Module 1 establishes the delivery model and the questions that each control must answer. Later chapters apply it in increasing operational depth. Module 2 introduces infrastructure lifecycle, state, drift, and tool ownership; Module 3 covers containers, image construction, multitier services, and Kubernetes orchestration; Module 4 covers GitLab jobs, runners, artifacts, promotion, mutable state, blast radius, convergence, and recovery; and Module 5 covers trust boundaries, credentials, operational feedback, and stability.
 
 ## 11. Knowledge check
 
@@ -430,8 +411,8 @@ DevOps changes the way a team makes and proves a change; it is not a synonym for
 
 **What the learner now has:** a lifecycle model based on CALMS, flow, feedback, evidence, measurement, promotion, and shared responsibility.
 
-**What is still missing:** an artifact that can move through the lifecycle without changing identity between environments. Source alone is insufficient if every engineer or execution host reconstructs the runtime differently.
+**What is still missing:** controlled ownership and lifecycle for the infrastructure and test environments through which software will move.
 
-**What the next module adds:** Module 3 turns reproducibility from a principle into an application runtime and packaging architecture using containers, secure images, multitier services, and Kubernetes. Continue to [Packaging and Operating Applications](module-03-packaging-applications.md).
+**What the next module adds:** Module 2 applies the delivery model to declarative infrastructure, tool ownership, protected state, on-demand test environments, and cleanup. Continue to [Infrastructure as Code and On-Demand Environments](module-02-infrastructure-as-code.md).
 
-The DevOps model requires an artifact whose identity does not change between environments.
+The DevOps model now requires a repeatable environment with explicit ownership and lifecycle controls.

@@ -1,31 +1,12 @@
-# Module 1: Infrastructure as Code and On-Demand Environments
+# Module 2: Infrastructure as Code and On-Demand Environments
 
 ## 1. Purpose
 
-Module 0 ended with a state-management problem: automation can change infrastructure, but repeatability depends on knowing which definition is authoritative, which tool owns each attribute, and how actual state is compared with intent. Infrastructure as Code makes that problem concrete by treating infrastructure definitions, plans, state transitions, validation, and cleanup as engineered artifacts.
+Module 1 established that dependable delivery requires shared ownership, repeatable flow, evidence, measurement, and feedback. Infrastructure as Code applies those principles to environments and resources: repeatability depends on knowing which definition is authoritative, which tool owns each attribute, and how actual state is compared with intent.
 
 This module covers Terraform, Ansible, ownership boundaries, protected state, drift, on-demand test environments, pipeline integration, validation, and cleanup. The objective is not to promote one tool. It is to establish a controlled lifecycle in which a reviewer can understand what will change, an operator can determine what changed, and the system can be recreated or removed without relying on undocumented knowledge.
 
-Module 0 reviewed the automation foundations used to describe intent, call APIs, configure systems, and verify operational state. Module 1 applies those capabilities to repeatable infrastructure lifecycle and on-demand environments. Terraform, Ansible, and Python receive explicit ownership boundaries so later delivery workflows can create, configure, test, and safely remove consistent environments.
-
-### Reference System Before This Module
-
-- Working Python and Ansible automation
-- Versioned intent, inventory, tests, and evidence
-- Known target-safety boundaries
-
-### What This Module Adds
-
-- Terraform-managed resource lifecycle
-- Ansible-managed configuration and orchestration
-- Python validation and pyATS/Genie operational verification
-- Disposable test-environment creation and cleanup
-
-### Reference System After This Module
-
-- The supporting environment can be recreated and governed
-- Tool ownership and handoffs are explicit
-- The application runtime is not yet reproducible
+Module 0 reviewed the automation foundations used to describe intent, call APIs, configure systems, and verify operational state. Module 1 supplied the DevOps operating model. Module 2 now assigns Terraform, Ansible, Python, and operational validation explicit ownership boundaries so later workflows can create, configure, test, and safely remove consistent environments.
 
 ## 2. Three automation responsibilities
 
@@ -348,6 +329,6 @@ Infrastructure delivery introduces the first complete delivery control chain in 
 
 The system can now recreate its supporting environment, but it still cannot guarantee that the automation application behaves identically for every engineer and execution host. Infrastructure definitions do not lock the Python interpreter, Python packages, Ansible collections, system libraries, or application startup behavior. IaC solves environment lifecycle; it does not solve application runtime reproducibility.
 
-**What is still missing:** a reproducible application runtime and a shared model for ownership, release flow, measurement, and improvement.
+**What is still missing:** a reproducible application runtime that can move through the established delivery model without being reconstructed differently on every execution host.
 
-**What the next module adds:** Module 2 introduces the DevOps operating model; Module 3 then makes the application runtime reproducible. Continue to [Introducing the DevOps Model](module-02-devops-model.md).
+**What the next module adds:** Module 3 makes the application runtime reproducible through container images, explicit service contracts, multitier deployment, and orchestration. Continue to [Packaging and Operating Applications](module-03-packaging-applications.md).

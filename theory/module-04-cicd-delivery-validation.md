@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-A delivery pipeline connects the components established so far. Module 1 provides controlled infrastructure and test environments. Module 2 defines flow, feedback, evidence, and promotion. Module 3 provides an identified application artifact, service contracts, and runtime health behavior. Module 4 turns those separate capabilities into one executable delivery policy.
+A delivery pipeline connects the components established so far. Module 1 defines flow, feedback, evidence, and promotion. Module 2 provides controlled infrastructure and test environments. Module 3 provides an identified application artifact, service contracts, and runtime health behavior. Module 4 turns those separate capabilities into one executable delivery policy.
 
 The pipeline must do more than run commands after a commit. It must convert reviewed source into an identified artifact, accumulate evidence, control promotion, constrain deployment, verify the resulting service, and support recovery when the outcome is uncertain. This module therefore treats CI/CD and deployment validation as one continuous control system.
 
@@ -22,26 +22,6 @@ Before automation, the delivery sequence depends on an engineer remembering ever
 10. Verify the network outcome and preserve evidence.
 
 Omitting or reordering one step can invalidate the release. CI/CD is introduced here as **automation of the software delivery process**: the manual procedure becomes executable, versioned policy that provides the same feedback and evidence for every proposed change.
-
-### Reference System Before This Module
-
-- Reproducible infrastructure and an identified application image
-- Compose and Kubernetes runtime definitions
-- Explicit service-health contracts
-- Manually coordinated delivery steps
-
-### What This Module Adds
-
-- GitLab jobs, stages, runners, rules, artifacts, and environments
-- Automated test layers and immutable image promotion
-- Protected execution, network prechecks, postchecks, and evidence
-- Recovery decisions for failed, partial, and unknown outcomes
-
-### Reference System After This Module
-
-- Software delivery is executable, reviewable policy
-- Platform releases and network changes use separate authorization paths
-- Immediate validation exists; enduring trust and operational explanation remain incomplete
 
 ## 2. CI/CD delivery flow
 
@@ -114,7 +94,7 @@ The webhook should carry a small reference such as an object identifier, not a p
 
 ### 2.4 Pipeline design
 
-The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate. The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner. The compact reference architecture in Module 2 shows this separation.
+The complete pipeline can be read as two trust zones. General jobs interpret repository content and create evidence without management access. Protected jobs receive the approved digest, target, diff, and credential only after the gate. The handoff consists of immutable artifacts and approval context, not an instruction to rebuild the application on the protected runner. The compact reference architecture in Module 1 shows this separation.
 
 <p align="center">
   <img src="assets/course-figures/pipeline-gates.png" alt="Progressive commit, qualification, release, and deployment gates" width="860" />
@@ -249,7 +229,7 @@ The runner model identifies where repository-controlled commands execute and why
   <img src="assets/course-figures/runner-trust-model.png" alt="Separation of the general validation runner from the protected network runner and management zone" width="860" />
 </p>
 
-As shown in Module 2, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.
+As shown in Module 1, the protected runner is the first pipeline execution component with management-plane reachability. Earlier jobs pass an approved artifact and evidence across that boundary; they do not inherit the same access.
 
 - A general validation runner has Internet or registry access but no production device route or deployment secret.
 - A protected network runner reaches the management network and runs only protected-branch or approved-environment jobs.
@@ -605,7 +585,7 @@ An `UNKNOWN/PARTIAL` state is important. A timeout after sending configuration d
 
 ### 3.3 Evidence chain
 
-Module 2 introduced evidence as a condition of promotion. Module 4 implements that principle by accumulating evidence as a release moves through the pipeline:
+Module 1 introduced evidence as a condition of promotion. Module 4 implements that principle by accumulating evidence as a release moves through the pipeline:
 
 The evidence chain begins with source review and continues through static checks, unit tests, image inspection, integration tests, the infrastructure plan, pre-deployment checks, deployment, acceptance tests, and operational observation.
 

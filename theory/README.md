@@ -19,15 +19,11 @@ DevOps closes that gap by applying practices that software teams have refined ov
 
 ## 3. Course outcome
 
-Learners begin with an existing Python network automation application, allowing them to reuse their domain knowledge without rebuilding its core logic. They establish authoritative intent and inventory, express supporting infrastructure and on-demand test environments as controlled code, and assign clear ownership to Terraform and Ansible. They then examine the delivery model needed to move beyond individual execution, package applications and job toolchains as reproducible images, and operate services through Docker and Kubernetes where orchestration is justified. Only after artifact and runtime behavior are understood do learners automate event-driven testing, promotion, deployment, recovery, and cleanup through purpose-specific GitLab pipelines. Vault, security controls, and correlated observability apply across the complete system.
+Learners begin with an existing Python network automation application, allowing them to reuse their domain knowledge without rebuilding its core logic. They first examine the DevOps delivery model needed to move beyond individual execution. They then establish authoritative intent and inventory, express supporting infrastructure and on-demand test environments as controlled code, and assign clear ownership to Terraform and Ansible. Applications and job toolchains become reproducible images operated through Docker and Kubernetes where orchestration is justified. Only after artifact and runtime behavior are understood do learners automate event-driven testing, promotion, deployment, recovery, and cleanup through purpose-specific GitLab pipelines. Vault, security controls, and correlated observability apply across the complete system.
 
 The application's internal network logic is treated as supplied functionality. The assessed work concerns the delivery system around the software: reproducibility, collaboration, flow, testing, artifact promotion, infrastructure, visibility, stability, and security. The same methods transfer to web services, data-processing workers, internal tools, and other Python applications.
 
-Each module resolves a problem exposed by the preceding one. The automation review establishes how code, data, interfaces, and validation produce a network outcome. Infrastructure as Code makes the supporting environment declarative and repeatable. The DevOps model explains why technical automation also needs shared ownership, controlled flow, feedback, and measurement. Application packaging creates the identified artifact and runtime contracts required for reliable Docker and Kubernetes deployment. The number of manual build, test, promotion, and verification steps then establishes the need for CI/CD. Security and observability protect that automated delivery system and return trustworthy operational evidence to the next decision.
-
-<p align="center">
-  <img src="assets/course-figures/course-engineering-journey.png" alt="Course engineering progression from network automation through Infrastructure as Code, packaging, container platforms, CI/CD, security, observability, and improvement" width="860" />
-</p>
+Each module resolves a problem exposed by the preceding one. The automation review establishes how code, data, interfaces, and validation produce a network outcome. The DevOps model explains why technical automation needs shared ownership, controlled flow, feedback, and measurement. Infrastructure as Code then makes supporting and test environments declarative and repeatable. Application packaging creates the identified artifact and runtime contracts required for reliable Docker and Kubernetes deployment. The number of manual build, test, promotion, and verification steps establishes the need for CI/CD. Security and observability protect that automated delivery system and return trustworthy operational evidence to the next decision.
 
 The technologies are therefore not independent destinations. Each one adds a control that the previous form of the system could not provide.
 
@@ -44,13 +40,13 @@ The course allocates approximately 20 hours to theory and 20 hours to cumulative
 
 | Day | Theory aligned to the DEVOPS outline | Reference system at the end of the day | Theory | Lab |
 |---|---|---|---:|---:|
-| 1 | Network automation review and Infrastructure as Code foundations | Installed environment; automation foundations refreshed; Terraform, Ansible, and Python ownership established | 4 h | 4 h |
-| 2 | DevOps model, container fundamentals, and secure image packaging | Delivery risks and lifecycle controls identified; application packaged as a locked, non-root image | 4 h | 4 h |
+| 1 | Network automation review and the DevOps model | Automation foundations refreshed; shared delivery, flow, feedback, and evidence model established | 4 h | 4 h |
+| 2 | Infrastructure as Code, container fundamentals, and secure image packaging | Terraform, Ansible, and validation ownership established; application packaged as a locked, non-root image | 4 h | 4 h |
 | 3 | Multitier application operation, Kubernetes, and on-demand environment integration | Application deployed with explicit networks, health contracts, state, and an orchestration decision in a controlled environment | 4 h | 4 h |
 | 4 | CI/CD, automated qualification, deployment validation, and recovery | GitLab pipeline that builds once, promotes by digest, controls protected execution, verifies operational outcomes, and retains evidence | 4 h | 4 h |
 | 5 | Security and observability | Trust boundaries and short-lived identity applied; application, delivery, platform, and network signals correlated for detection, response, and improvement | 4 h | 4 h |
 
-The repository grows with the system. Day 1 establishes application source, tests, and infrastructure definitions; Day 2 adds delivery controls and container packaging; Day 3 adds Compose, optional Kubernetes definitions, and on-demand environment integration; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
+The repository grows with the system. Day 1 establishes application source, tests, and the shared delivery model; Day 2 adds infrastructure definitions, ownership boundaries, and container packaging; Day 3 adds Compose, optional Kubernetes definitions, and on-demand environment integration; Day 4 adds CI/CD, deployment, and evidence paths; and Day 5 adds security policy and observability configuration. Directories are introduced when they have an owner and a working purpose rather than created empty on the first day.
 
 The practical work keeps two workflows distinct. The platform pipeline builds, tests, identifies, and deploys the automation application. The network-change workflow uses an approved platform version to process reviewed intent, perform prechecks, obtain authorization, execute a bounded operation, validate the outcome, and preserve evidence. Deploying software never grants automatic permission to change the network; the cumulative lab and final exercise must demonstrate both paths separately.
 
@@ -74,13 +70,13 @@ network-devops/
 
 ## 5. Modules
 
-The modules follow the requested learning sequence: review the automation foundation, establish Infrastructure as Code, introduce the DevOps model, package and operate the application, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
+The modules follow the learning sequence: review the automation foundation, introduce the DevOps model, establish Infrastructure as Code, package and operate the application, control delivery through CI/CD, and finish with security and observability. The table summarizes the engineering focus of each stage.
 
 | Module | Subject | Central engineering question |
 |---|---|---|
 | 0 | [Network Automation Review](module-00-network-automation-review.md) | Can we automate and verify the network outcome? |
-| 1 | [Infrastructure as Code and On-Demand Environments](module-01-infrastructure-as-code.md) | Can we recreate and govern the environment? |
-| 2 | [Introducing the DevOps Model](module-02-devops-model.md) | Can a team own, deliver, measure, and improve the system? |
+| 1 | [Introducing the DevOps Model](module-01-devops-model.md) | Can a team own, deliver, measure, and improve the system? |
+| 2 | [Infrastructure as Code and On-Demand Environments](module-02-infrastructure-as-code.md) | Can we recreate and govern the environment? |
 | 3 | [Packaging and Operating Applications](module-03-packaging-applications.md) | Can we reproduce and operate the application runtime? |
 | 4 | [Continuous Integration, Delivery, and Deployment Validation](module-04-cicd-delivery-validation.md) | Can we automate the delivery process safely? |
 | 5 | [Security and Observability](module-05-security-observability.md) | Can we trust the system and explain what happened? |
@@ -110,8 +106,8 @@ The delivery map identifies the normal live path and the visuals that can be res
 | Module | Estimated theory | Core diagrams to present | Reference diagrams that may be skipped live |
 |---|---:|---|---|
 | 0 | 2 h | Automation system; three forms of network state | Structured-data normalization; interface selection; telemetry flow |
-| 1 | 3 h | Tool ownership; Terraform–Ansible handoff; environment lifecycle | Terraform lifecycle; drift reconciliation |
-| 2 | 3 h | CALMS; lifecycle; evidence chain; value stream | Delivery-model comparison; feedback speeds; delivery architecture |
+| 1 | 3 h | CALMS; lifecycle; evidence chain; value stream | Delivery-model comparison; feedback speeds; delivery architecture |
+| 2 | 3 h | Tool ownership; Terraform–Ansible handoff; environment lifecycle | Terraform lifecycle; drift reconciliation |
 | 3 | 4.5 h | Docker architecture; image/container lifecycle; Compose services; Kubernetes suitability; probes | Image layers; supply chain; failure boundaries; cluster architecture; platform comparison |
 | 4 | 4.5 h | Pipeline gates; runner trust; platform vs network pipeline; change state; recovery decision | Artifact/cache; blast radius; deployment-strategy map |
 | 5 | 3 h | Trust boundaries; observability architecture; change-aware feedback | Security lifecycle; incident response; signal categories; detailed correlation model |

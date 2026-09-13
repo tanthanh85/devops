@@ -2,29 +2,9 @@
 
 ## 1. Purpose
 
-Module 2 established that a release should promote one identified artifact through increasingly protected environments. Module 3 defines that artifact and the runtime system around it. A container image captures code and fixed dependencies, but a dependable application also needs external configuration, secrets, storage, networking, health behavior, service contracts, and an operating platform.
+Module 1 established that a release should promote one identified artifact through increasingly protected environments, and Module 2 established repeatable infrastructure lifecycle. Module 3 defines that artifact and the runtime system around it. A container image captures code and fixed dependencies, but a dependable application also needs external configuration, secrets, storage, networking, health behavior, service contracts, and an operating platform.
 
-Module 1 established repeatable infrastructure lifecycle and Module 2 introduced the DevOps delivery model. Module 3 applies those foundations to the application runtime: first defining the container boundary, then producing a secure image, composing a multitier service, and finally evaluating Kubernetes for clustered operation. The same identified artifact moves through every stage; only configuration, identity, scale, and platform controls change.
-
-### Reference System Before This Module
-
-- Existing Python and Ansible automation
-- Infrastructure-controlled test environment
-- Git-based source and intent
-- Shared DevOps lifecycle and promotion model
-
-### What This Module Adds
-
-- A reproducible, identified container image
-- External configuration, secrets, storage, and runtime contracts
-- Docker Compose services and verifiable readiness
-- A Kubernetes deployment option when orchestration is justified
-
-### Reference System After This Module
-
-- The application can be deployed consistently by digest
-- Multitier responsibilities and health contracts are explicit
-- Build, test, deployment, and verification remain manually coordinated
+Module 1 introduced the DevOps delivery model and Module 2 established repeatable infrastructure lifecycle. Module 3 applies those foundations to the application runtime: first defining the container boundary, then producing a secure image, composing a multitier service, and finally evaluating Kubernetes for clustered operation. The same identified artifact moves through every stage; only configuration, identity, scale, and platform controls change.
 
 ## 2. Container runtime fundamentals
 
@@ -393,7 +373,7 @@ The evidence-lineage view asks whether an operator can trace a deployed runtime 
 
 OCI labels can record the source repository, source revision, version, description, authorship, and license. The pipeline should apply a tag derived from the release version or commit and record the resulting digest.
 
-This is the build-and-artifact portion of the delivery architecture introduced in Module 2. The protected worker should receive the resulting digest and evidence; it should not rebuild the application inside the management trust zone.
+This is the build-and-artifact portion of the delivery architecture introduced in Module 1. The protected worker should receive the resulting digest and evidence; it should not rebuild the application inside the management trust zone.
 
 Traceability should answer:
 
@@ -1152,7 +1132,7 @@ Use these questions to assess whether you can relate Kubernetes reconciliation, 
 
 A container establishes a repeatable process and dependency boundary. A controlled Dockerfile turns that boundary into an identifiable, testable, and defensible image. Compose demonstrates how the same image participates in a service with APIs, workers, queues, databases, networks, health contracts, and persistent state. Kubernetes extends the operating model with scheduling, reconciliation, scaling, policy, and clustered availability when those capabilities justify the additional platform responsibility.
 
-Across every platform, the engineering invariants remain the same: build once, promote by digest, keep configuration and secrets outside the image, separate application traffic from privileged target access, verify readiness at the service boundary, constrain concurrency and blast radius, correlate execution with operational evidence, and recover from observed state rather than assuming a retry is safe. Module 1 supplies the environment; Module 2 supplies the delivery principles; Module 3 now supplies the deployable artifact and runtime contracts.
+Across every platform, the engineering invariants remain the same: build once, promote by digest, keep configuration and secrets outside the image, separate application traffic from privileged target access, verify readiness at the service boundary, constrain concurrency and blast radius, correlate execution with operational evidence, and recover from observed state rather than assuming a retry is safe. Module 1 supplies the delivery principles; Module 2 supplies the environment; Module 3 now supplies the deployable artifact and runtime contracts.
 
 Two workflows must remain separate as the course continues. The **platform pipeline** will build, test, and deploy the automation software. The **network-change workflow** will use an approved platform version to validate intent, obtain approval, execute a bounded network operation, and retain evidence. Deploying a new application version must not automatically authorize a network change.
 
