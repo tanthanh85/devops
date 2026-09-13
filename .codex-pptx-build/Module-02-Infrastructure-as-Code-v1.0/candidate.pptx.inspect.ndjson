@@ -1,0 +1,338 @@
+{"kind":"deck","id":"pr/xl7hyw","name":"Deck"}
+{"kind":"layout","layoutId":"e4173ea5-56e4-4265-af29-bdf27b61ec57","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"2f1b2422-cbfc-4e2e-aced-a952098b026f","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/9pu9kz","slide":1,"title":"Module 2","textShapes":4}
+{"kind":"shape","id":"sh/ryxgfi1g","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/6xof6dkv","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/5wfydsja","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/4v6x4n2p","slide":1,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/juxgbi14","slide":1,"text":"Infrastructure as Code and On-Demand Environments","textPreview":"Infrastructure as Code and On-Demand Environments","textChars":49,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/it4f2dkj","slide":1,"text":"Provisioning, configuration, testing, and cleanup","textPreview":"Provisioning, configuration, testing, and cleanup","textChars":49,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/pszypcje","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/lkre5wzq","slide":1,"name":"","alt":"study guide cover architecture.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/9pu9kz","slide":1,"text":"Purpose: Open Module 2 and establish the subject of the deck.\n\nExplain: Infrastructure as Code and On-Demand Environments. Provisioning, configuration, testing, and cleanup.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/5k60zh","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/258j650b","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/p8zi1kjm","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/o7q18fi1","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ba103u1s","slide":2,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/a98jap07","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/xwj25kjy","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/cba1czid","slide":2,"text":"This module separates infrastructure provisioning from system configuration and shows how code can create short-lived test environments safely.","textPreview":"This module separates infrastructure provisioning from system configuration and shows how code can create short-lived test environments s...","textChars":143,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/zy1k7uho","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/yxsjep03","slide":2,"text":"Explain desired state and lifecycle management","textPreview":"Explain desired state and lifecycle management","textChars":46,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/0v2pkfmp","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/lwbqdkna","slide":2,"text":"Use Terraform state without confusing it with live truth","textPreview":"Use Terraform state without confusing it with live truth","textChars":56,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/yt07i54z","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/zu98ba5k","slide":2,"text":"Assign configuration work to Ansible","textPreview":"Assign configuration work to Ansible","textChars":36,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/8z2pozm1","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/90bqh43m","slide":2,"text":"Design create, verify, and destroy controls","textPreview":"Design create, verify, and destroy controls","textChars":43,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/5k60zh","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module separates infrastructure provisioning from system configuration and shows how code can create short-lived test environments safely.\n\nDiscuss: Explain desired state and lifecycle management Use Terraform state without confusing it with live truth Assign configuration work to Ansible Design create, verify, and destroy controls\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/29swgo","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/tgvmlsby","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/6dk3ads7","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/7etkjits","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/gjmlgna9","slide":3,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/hkvmpsbu","slide":3,"text":"Tool ownership","textPreview":"Tool ownership","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/uh43exsj","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/4nmlk7al","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/p8fmtcb6","slide":3,"text":"Terraform, Ansible, image tooling, and orchestration platforms solve different parts of the delivery problem.","textPreview":"Terraform, Ansible, image tooling, and orchestration platforms solve different parts of the delivery problem.","textChars":109,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/2hoz69cf","slide":3,"name":"","alt":"iac tool ownership.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/29swgo","slide":3,"text":"Purpose: Explain tool ownership through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Terraform, Ansible, image tooling, and orchestration platforms solve different parts of the delivery problem.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/l0y13b","slide":4,"title":"4","textShapes":21}
+{"kind":"shape","id":"sh/32lwrmh4","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/o3udkryp","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/p43etwza","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/exsvehgn","slide":4,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/fylwnmh8","slide":4,"text":"Three automation responsibilities","textPreview":"Three automation responsibilities","textChars":33,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/gzudgryt","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/103epwze","slide":4,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/69svqxgr","slide":4,"text":"Resource lifecycle","textPreview":"Resource lifecycle","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ra1cj2hc","slide":4,"text":"System behavior","textPreview":"System behavior","textChars":15,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/n6tgjqp8","slide":4,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/25kfal8n","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/p8byl07y","slide":4,"text":"Create and delete infrastructure","textPreview":"Create and delete infrastructure","textChars":32,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/o72xcvqd","slide":4,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/badgnap4","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/a9kfe5oj","slide":4,"text":"Track resource identity","textPreview":"Track resource identity","textChars":23,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/xcvypk7a","slide":4,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/cbmxgf6p","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/re9wb6p0","slide":4,"text":"Plan topology changes","textPreview":"Plan topology changes","textChars":21,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/6d0f218f","slide":4,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/u98ja983","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/vah0je98","slide":4,"text":"Expose connection outputs","textPreview":"Expose connection outputs","textChars":25,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/wvq1cjqt","slide":4,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/hwzilore","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/m5oj69sr","slide":4,"text":"Configure operating systems and devices","textPreview":"Configure operating systems and devices","textChars":39,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/76x0fe9c","slide":4,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/87618jqx","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/98fih4ri","slide":4,"text":"Apply policy and application settings","textPreview":"Apply policy and application settings","textChars":37,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/y14z2psv","slide":4,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/z2x0bu9g","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/1w3mhsby","slide":4,"text":"Verify desired behavior","textPreview":"Verify desired behavior","textChars":23,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/gvulo7ad","slide":4,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ful4f2ts","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/etc3mxs7","slide":4,"text":"Remediate controlled drift","textPreview":"Remediate controlled drift","textChars":26,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/l0y13b","slide":4,"text":"Purpose: Compare the two sides of three automation responsibilities.\n\nLeft side, Resource lifecycle: Create and delete infrastructure Track resource identity Plan topology changes Expose connection outputs\n\nRight side, System behavior: Configure operating systems and devices Apply policy and application settings Verify desired behavior Remediate controlled drift\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/0qgi76","slide":5,"title":"5","textShapes":4}
+{"kind":"shape","id":"sh/wza5wred","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/vy1o3mxs","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/axsnu1w7","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/9wj61wfm","slide":5,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/8va5sre1","slide":5,"text":"Terraform lifecycle","textPreview":"Terraform lifecycle","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/na14zmxw","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/18jmxcfq","slide":5,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/07q5o7e5","slide":5,"text":"Initialization prepares providers, planning exposes the proposed change, and apply reconciles resources with the declared configuration.","textPreview":"Initialization prepares providers, planning exposes the proposed change, and apply reconciles resources with the declared configuration.","textChars":136,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/z69c3ixg","slide":5,"name":"","alt":"terraform lifecycle.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/0qgi76","slide":5,"text":"Purpose: Explain terraform lifecycle through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Initialization prepares providers, planning exposes the proposed change, and apply reconciles resources with the declared configuration.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/ochicl","slide":6,"title":"6","textShapes":21}
+{"kind":"shape","id":"sh/svyhknmd","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/7upgrils","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/6tgzid47","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/5s7yp83m","slide":6,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/kryhg3mh","slide":6,"text":"Plan review","textPreview":"Plan review","textChars":11,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/jqpgnilw","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ipgfed4b","slide":6,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/xonyl83q","slide":6,"text":"Review the proposal","textPreview":"Review the proposal","textChars":19,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/wnexc3m5","slide":6,"text":"Review the execution context","textPreview":"Review the execution context","textChars":28,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/ilw76t4j","slide":6,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/3m5ozyl4","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/4nep83mp","slide":6,"text":"Resources created or destroyed","textPreview":"Resources created or destroyed","textChars":30,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/5on6183u","slide":6,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/uhc72t47","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/vi5ovels","slide":6,"text":"Replacement operations","textPreview":"Replacement operations","textChars":22,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/gjep4jmd","slide":6,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/hkn6xo3y","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/6tcny94b","slide":6,"text":"Address and naming conflicts","textPreview":"Address and naming conflicts","textChars":28,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/7ulorelw","slide":6,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/byh4za1o","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/ax8365k3","slide":6,"text":"Unexpected provider changes","textPreview":"Unexpected provider changes","textChars":27,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/x0jm1kju","slide":6,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/czal8f29","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/zm143u1k","slide":6,"text":"Workspace and state backend","textPreview":"Workspace and state backend","textChars":27,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/y1s3apkz","slide":6,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/lojm5kjq","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/knalcf25","slide":6,"text":"Provider identity","textPreview":"Provider identity","textChars":17,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/f6xkrqlg","slide":6,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/e5o3ylkv","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/4bm18rit","slide":6,"text":"Variable sources","textPreview":"Variable sources","textChars":16,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/5cvi1wze","slide":6,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/i94j6h0n","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/3ad0zmh8","slide":6,"text":"Approved learner resource range","textPreview":"Approved learner resource range","textChars":31,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/ochicl","slide":6,"text":"Purpose: Compare the two sides of plan review.\n\nLeft side, Review the proposal: Resources created or destroyed Replacement operations Address and naming conflicts Unexpected provider changes\n\nRight side, Review the execution context: Workspace and state backend Provider identity Variable sources Approved learner resource range\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/iw9xwm","slide":7,"title":"7","textShapes":21}
+{"kind":"shape","id":"sh/ps7u5krq","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/25gbu5sz","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/nqpc3a9k","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/03etsvat","slide":7,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/147u10re","slide":7,"text":"State and drift","textPreview":"State and drift","textChars":15,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/e1wbqls3","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/f25czq98","slide":7,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/kzit4zad","slide":7,"text":"Terraform state","textPreview":"Terraform state","textChars":15,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/l0rud4ri","slide":7,"text":"Drift","textPreview":"Drift","textChars":5,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/tkbm1g7y","slide":7,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/sjilsvqd","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ri94zqps","slide":7,"text":"Maps code to managed resources","textPreview":"Maps code to managed resources","textChars":30,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/6h03ql87","slide":7,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/5grmxg72","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/4filobqh","slide":7,"text":"Carries sensitive operational metadata","textPreview":"Carries sensitive operational metadata","textChars":38,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/je94v6pw","slide":7,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/it03m18b","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/pcvm9076","slide":7,"text":"Requires controlled storage and locking","textPreview":"Requires controlled storage and locking","textChars":39,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/ob250fql","slide":7,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/87uxs32t","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/9s3yl8je","slide":7,"text":"Supports planning and replacement decisions","textPreview":"Supports planning and replacement decisions","textChars":43,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/m5cfqdk3","slide":7,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/76lgji1o","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/k3uxo32x","slide":7,"text":"Appears when reality changes outside code","textPreview":"Appears when reality changes outside code","textChars":41,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/l43eh8ji","slide":7,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/y1cfmtkr","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/z2lwfy1c","slide":7,"text":"Can make a plan unsafe","textPreview":"Can make a plan unsafe","textChars":22,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/czaxkj21","slide":7,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/x0jedoj6","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/fu1gnel8","slide":7,"text":"Requires refresh and investigation","textPreview":"Requires refresh and investigation","textChars":34,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/e98fu94n","slide":7,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/1wjypo3e","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/0vaxwjmt","slide":7,"text":"May lead to import, reconciliation, or replacement","textPreview":"May lead to import, reconciliation, or replacement","textChars":50,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/iw9xwm","slide":7,"text":"Purpose: Compare the two sides of state and drift.\n\nLeft side, Terraform state: Maps code to managed resources Carries sensitive operational metadata Requires controlled storage and locking Supports planning and replacement decisions\n\nRight side, Drift: Appears when reality changes outside code Can make a plan unsafe Requires refresh and investigation May lead to import, reconciliation, or replacement\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/5btstp","slide":8,"title":"8","textShapes":4}
+{"kind":"shape","id":"sh/43i1kvix","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/329krq1c","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/210jil0r","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/h072pgjm","slide":8,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/gzy1gbi1","slide":8,"text":"Drift reconciliation","textPreview":"Drift reconciliation","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/fypkn61g","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/tw72lwja","slide":8,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/8by1cbip","slide":8,"text":"A drift response begins with observation and classification before the team decides whether code or infrastructure should change.","textPreview":"A drift response begins with observation and classification before the team decides whether code or infrastructure should change.","textChars":129,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/buxwjqlo","slide":8,"name":"","alt":"drift reconciliation.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/5btstp","slide":8,"text":"Purpose: Explain drift reconciliation through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A drift response begins with observation and classification before the team decides whether code or infrastructure should change.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/lui0rj","slide":9,"title":"9","textShapes":4}
+{"kind":"shape","id":"sh/kbu9cve9","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/zals3ado","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ypcra5w3","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/9gna9kvq","slide":9,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/8fu9gfu5","slide":9,"text":"Terraform and Ansible handoff","textPreview":"Terraform and Ansible handoff","textChars":29,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/7els7adk","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/pkjaxgv6","slide":9,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/oja94be1","slide":9,"text":"Provisioning creates the environment and exports connection data. Ansible consumes that output to configure and verify the systems.","textPreview":"Provisioning creates the environment and exports connection data. Ansible consumes that output to configure and verify the systems.","textChars":131,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/b6lsnu5o","slide":9,"name":"","alt":"terraform ansible handoff.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/lui0rj","slide":9,"text":"Purpose: Explain terraform and ansible handoff through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Provisioning creates the environment and exports connection data. Ansible consumes that output to configure and verify the systems.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/a8zbso","slide":10,"title":"10","textShapes":21}
+{"kind":"shape","id":"sh/jq5wzet0","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/kred8zal","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/5sne14bq","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/alcv2ps3","slide":10,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/vmlwvuto","slide":10,"text":"Handoff contract","textPreview":"Handoff contract","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/wnud4za9","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/xo3ex4bu","slide":10,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/uhgfetsn","slide":10,"text":"Terraform output","textPreview":"Terraform output","textChars":16,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/fipw7yt8","slide":10,"text":"Ansible input","textPreview":"Ansible input","textChars":13,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/ne9gby58","slide":10,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/md0z2to3","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/9gryd8ne","slide":10,"text":"Resource identifiers","textPreview":"Resource identifiers","textChars":20,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/8fih436t","slide":10,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/vitgfi5k","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ahkz6doz","slide":10,"text":"Management addresses","textPreview":"Management addresses","textChars":20,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/xkbyhsnq","slide":10,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/wj2h8n65","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/jmtgji5g","slide":10,"text":"Topology metadata","textPreview":"Topology metadata","textChars":17,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/ilkzadov","slide":10,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/uhoj2h83","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/f2xkbmpo","slide":10,"text":"Readiness status","textPreview":"Readiness status","textChars":16,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/g3614rq9","slide":10,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/h4f2dw7u","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/6d4jyh87","slide":10,"text":"Generated inventory","textPreview":"Generated inventory","textChars":19,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/7ed07mps","slide":10,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/sfm10rqd","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/tgf29c7y","slide":10,"text":"Connection variables","textPreview":"Connection variables","textChars":20,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/q98ja1ob","slide":10,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/rahkj6pw","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/14jm90re","slide":10,"text":"Configuration intent","textPreview":"Configuration intent","textChars":20,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/03a50fat","slide":10,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/z2147a98","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/e1s3y5sn","slide":10,"text":"Validation scope","textPreview":"Validation scope","textChars":16,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/a8zbso","slide":10,"text":"Purpose: Compare the two sides of handoff contract.\n\nLeft side, Terraform output: Resource identifiers Management addresses Topology metadata Readiness status\n\nRight side, Ansible input: Generated inventory Connection variables Configuration intent Validation scope\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/63ptq7","slide":11,"title":"11","textShapes":4}
+{"kind":"shape","id":"sh/ra14rypk","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/sba50jq5","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/dc3mto7q","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/edcn2t8b","slide":11,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/fel4vypw","slide":11,"text":"On-demand test environment","textPreview":"On-demand test environment","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/0fu543q1","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/uh83q98r","slide":11,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/vih4ju9c","slide":11,"text":"Temporary environments need ownership, unique naming, bounded lifetime, evidence collection, and cleanup even when tests fail.","textPreview":"Temporary environments need ownership, unique naming, bounded lifetime, evidence collection, and cleanup even when tests fail.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/0by1gjmx","slide":11,"name":"","alt":"test environment lifecycle.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/63ptq7","slide":11,"text":"Purpose: Explain on-demand test environment through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Temporary environments need ownership, unique naming, bounded lifetime, evidence collection, and cleanup even when tests fail.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/lzjo2b","slide":12,"title":"12","textShapes":4}
+{"kind":"shape","id":"sh/t0ve14zu","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/6x4vqp03","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/rydczuho","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/gn6dwji5","slide":12,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/1ofe5ozq","slide":12,"text":"Automation platform options","textPreview":"Automation platform options","textChars":27,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/el4vu90f","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/wr2dkfi1","slide":12,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/hsbutkjm","slide":12,"text":"The environment may use simulation, virtualization, containers, or physical systems depending on fidelity and cost.","textPreview":"The environment may use simulation, virtualization, containers, or physical systems depending on fidelity and cost.","textChars":115,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/2xc3m94v","slide":12,"name":"","alt":"automation platform options.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/lzjo2b","slide":12,"text":"Purpose: Explain automation platform options through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The environment may use simulation, virtualization, containers, or physical systems depending on fidelity and cost.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/lgoj7r","slide":13,"title":"13","textShapes":21}
+{"kind":"shape","id":"sh/lczu9gba","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ypoby1sz","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/zqxc76t4","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/8fqd4va1","slide":13,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/9gzudgrm","slide":13,"text":"Shared platform safeguards","textPreview":"Shared platform safeguards","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/md8b2lsv","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/7ehcbqtg","slide":13,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/ojmtsrah","slide":13,"text":"Isolation","textPreview":"Isolation","textChars":9,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/pkfu1wb2","slide":13,"text":"Cleanup","textPreview":"Cleanup","textChars":7,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/dcjm9ofi","slide":13,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/cba5g3ed","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ba147yxs","slide":13,"text":"Per-learner identifiers and namespaces","textPreview":"Per-learner identifiers and namespaces","textChars":38,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/q9snetw7","slide":13,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/lg36d8vu","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/0fa5k3e9","slide":13,"text":"Unique resource names and address ranges","textPreview":"Unique resource names and address ranges","textChars":40,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/ze14bydo","slide":13,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/ydsnitw3","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/9436h8vq","slide":13,"text":"Concurrency limits","textPreview":"Concurrency limits","textChars":18,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/83u5one5","slide":13,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/8n2pkrmh","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/tobqtw32","slide":13,"text":"Explicit ownership labels","textPreview":"Explicit ownership labels","textChars":25,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/6lk7ih4b","slide":13,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/7mtormlw","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/gb2pormt","slide":13,"text":"Destroy in an always-run stage","textPreview":"Destroy in an always-run stage","textChars":30,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/hcvqxw3y","slide":13,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/u9k7m14n","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/vat8vml8","slide":13,"text":"Use time-to-live metadata","textPreview":"Use time-to-live metadata","textChars":25,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/wfipc7m9","slide":13,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/xgr6lc3u","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/zaxsra5c","slide":13,"text":"Collect logs before deletion","textPreview":"Collect logs before deletion","textChars":28,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/e9ori5or","slide":13,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/1czatkni","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/0bqtkf6x","slide":13,"text":"Report orphaned resources","textPreview":"Report orphaned resources","textChars":25,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/lgoj7r","slide":13,"text":"Purpose: Compare the two sides of shared platform safeguards.\n\nLeft side, Isolation: Per-learner identifiers and namespaces Unique resource names and address ranges Concurrency limits Explicit ownership labels\n\nRight side, Cleanup: Destroy in an always-run stage Use time-to-live metadata Collect logs before deletion Report orphaned resources\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/rhm38g","slide":14,"title":"14","textShapes":21}
+{"kind":"shape","id":"sh/jqhsb6lk","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/krqtkb25","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/lszadg3q","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/alobehk3","slide":14,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/bmhs7mlo","slide":14,"text":"Failure and cleanup","textPreview":"Failure and cleanup","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/wnqtgr29","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/xoza9w3u","slide":14,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/uhsbqlk7","slide":14,"text":"Failure handling","textPreview":"Failure handling","textChars":16,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/vi1cjq1s","slide":14,"text":"Cleanup handling","textPreview":"Cleanup handling","textChars":16,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/3y1g32dc","slide":14,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/2xszaxwr","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/p0jy5svi","slide":14,"text":"Preserve the failed plan and logs","textPreview":"Preserve the failed plan and logs","textChars":33,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/4zahc7ex","slide":14,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/b2lg72do","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/q1szexw3","slide":14,"text":"Classify partial creation","textPreview":"Classify partial creation","textChars":25,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/do3y9cvu","slide":14,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/c3uhg7e9","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/zqlgbmdk","slide":14,"text":"Block unsafe reuse","textPreview":"Block unsafe reuse","textChars":18,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/ypczihwz","slide":14,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/algjalg7","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/vmpk3qxs","slide":14,"text":"Report the owning learner and pipeline","textPreview":"Report the owning learner and pipeline","textChars":38,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/wny1cvyd","slide":14,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/xo725gfy","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/mxwj61gb","slide":14,"text":"Run after success or failure","textPreview":"Run after success or failure","textChars":28,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/ni50z6xw","slide":14,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/8je18byh","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/9kn21gf2","slide":14,"text":"Destroy only owned resources","textPreview":"Destroy only owned resources","textChars":28,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/6d0ji5gf","slide":14,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/7e9kbax0","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/h8bmh4z2","slide":14,"text":"Confirm the environment disappeared","textPreview":"Confirm the environment disappeared","textChars":35,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/g72l8zix","slide":14,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/fmt4fuhc","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ulk36p0r","slide":14,"text":"Escalate cleanup failures","textPreview":"Escalate cleanup failures","textChars":25,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/rhm38g","slide":14,"text":"Purpose: Compare the two sides of failure and cleanup.\n\nLeft side, Failure handling: Preserve the failed plan and logs Classify partial creation Block unsafe reuse Report the owning learner and pipeline\n\nRight side, Cleanup handling: Run after success or failure Destroy only owned resources Confirm the environment disappeared Escalate cleanup failures\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/0i9pvd","slide":15,"title":"15","textShapes":8}
+{"kind":"shape","id":"sh/mdg3aps3","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9gr2l4bu","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/8filcza9","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vi9knetk","slide":15,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/uh03e9sz","slide":15,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/h4r2pobq","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/w3ilgja5","slide":15,"text":"Infrastructure code creates a controlled environment boundary, while configuration automation prepares the systems inside that boundary.","textPreview":"Infrastructure code creates a controlled environment boundary, while configuration automation prepares the systems inside that boundary.","textChars":136,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/3694retw","slide":15,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/i503i9sb","slide":15,"text":"Keep provisioning and configuration ownership clear","textPreview":"Keep provisioning and configuration ownership clear","textChars":51,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/g7ixw7u5","slide":15,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/h8rypcbq","slide":15,"text":"Treat state as protected operational data","textPreview":"Treat state as protected operational data","textChars":41,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/u50fuxcz","slide":15,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/v69gn2tk","slide":15,"text":"Review plans before applying changes","textPreview":"Review plans before applying changes","textChars":36,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/4bix0ru1","slide":15,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/5crytcbm","slide":15,"text":"Design cleanup as part of the workflow","textPreview":"Design cleanup as part of the workflow","textChars":38,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/0i9pvd","slide":15,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: Infrastructure code creates a controlled environment boundary, while configuration automation prepares the systems inside that boundary.\n\nDiscuss: Keep provisioning and configuration ownership clear Treat state as protected operational data Review plans before applying changes Design cleanup as part of the workflow\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/jpozf8","slide":16,"title":"16","textShapes":7}
+{"kind":"shape","id":"sh/1gfi5cj2","slide":16,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ed4zuxkb","slide":16,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/fed0321w","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/srmhsn2l","slide":16,"text":"Module 2","textPreview":"Module 2","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/tsvi1sj6","slide":16,"text":"Module 2 complete","textPreview":"Module 2 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/6p4zqxkf","slide":16,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/rqd0zi10","slide":16,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/4nmhon29","slide":16,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/5ovixsju","slide":16,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/t0jupsrm","slide":16,"text":"Module 2 complete","textPreview":"Module 2 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/szatwna1","slide":16,"text":"Next: Packaging and Operating Applications","textPreview":"Next: Packaging and Operating Applications","textChars":42,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/7yhcni9g","slide":16,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/6x8budsv","slide":16,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"notes","id":"nt/jpozf8","slide":16,"text":"Purpose: Close Module 2.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Packaging and Operating Applications\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

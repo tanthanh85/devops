@@ -1,0 +1,314 @@
+{"kind":"deck","id":"pr/nh5q0t","name":"Deck"}
+{"kind":"layout","layoutId":"8aeb815b-8c86-4e5a-b0f0-d85891195e4e","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"fb12f630-5394-497b-bf23-45c810d49569","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/w393ig","slide":1,"title":"Module 1","textShapes":4}
+{"kind":"shape","id":"sh/jqxs76ds","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/ipoby1c7","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/tgzadgvu","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/sfqt4bu9","slide":1,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/rehsbqdo","slide":1,"text":"Introducing the DevOps Model","textPreview":"Introducing the DevOps Model","textChars":28,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/6d8b2lc3","slide":1,"text":"People, process, technology, and evidence","textPreview":"People, process, technology, and evidence","textChars":41,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/1kjuh0vq","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/54ji10v2","slide":1,"name":"","alt":"module 01 cover.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/w393ig","slide":1,"text":"Purpose: Open Module 1 and establish the subject of the deck.\n\nExplain: Introducing the DevOps Model. People, process, technology, and evidence.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/9bo1sv","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/krmlo72t","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/zqd4f218","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/yp43mhkn","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/9gfmlwja","slide":2,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/8fm5sr2p","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/7ud4jm14","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/mt43qhkz","slide":2,"text":"This module explains how software delivery practices turn useful automation into a service that a team can review, release, and operate.","textPreview":"This module explains how software delivery practices turn useful automation into a service that a team can review, release, and operate.","textChars":136,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/hkfmpwjm","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/gj65wr21","slide":2,"text":"Use CALMS to examine delivery capability","textPreview":"Use CALMS to examine delivery capability","textChars":40,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/qtobulcj","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/ruxsnqt4","slide":2,"text":"Trace work through the complete lifecycle","textPreview":"Trace work through the complete lifecycle","textChars":41,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/sv6twvup","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/dwfap0ba","slide":2,"text":"Distinguish continuous integration, delivery, and deployment","textPreview":"Distinguish continuous integration, delivery, and deployment","textChars":60,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/exoby5cf","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/fyxsrqt0","slide":2,"text":"Identify flow constraints and useful measures","textPreview":"Identify flow constraints and useful measures","textChars":45,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/9bo1sv","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module explains how software delivery practices turn useful automation into a service that a team can review, release, and operate.\n\nDiscuss: Use CALMS to examine delivery capability Trace work through the complete lifecycle Distinguish continuous integration, delivery, and deployment Identify flow constraints and useful measures\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/tywv36","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/ri14nm5c","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/sjalgr6x","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/dkjmpwni","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/e5cni1o3","slide":3,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/f6l4r658","slide":3,"text":"Delivery models","textPreview":"Delivery models","textChars":15,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/07u5kb6t","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/up83mxoj","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/vah4f254","slide":3,"text":"Manual work, individually operated automation, and pipeline delivery differ in ownership, repeatability, validation, and evidence.","textPreview":"Manual work, individually operated automation, and pipeline delivery differ in ownership, repeatability, validation, and evidence.","textChars":130,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/076dwbed","slide":3,"name":"","alt":"module 01 delivery models.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/tywv36","slide":3,"text":"Purpose: Explain delivery models through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Manual work, individually operated automation, and pipeline delivery differ in ownership, repeatability, validation, and evidence.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/51igtc","slide":4,"title":"4","textShapes":4}
+{"kind":"shape","id":"sh/3udgfapw","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/4fmxofqh","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/pgvyhk72","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/upkfil8f","slide":4,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/vqtgbq90","slide":4,"text":"CALMS model","textPreview":"CALMS model","textChars":11,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/gr2xkvql","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/6l0fel8j","slide":4,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/7mtw7q9o","slide":4,"text":"Culture and sharing shape ownership. Automation and lean practices improve flow. Measurement shows whether the system works.","textPreview":"Culture and sharing shape ownership. Automation and lean practices improve flow. Measurement shows whether the system works.","textChars":124,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/8vqlk3q5","slide":4,"name":"","alt":"module 01 calms.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/51igtc","slide":4,"text":"Purpose: Explain calms model through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Culture and sharing shape ownership. Automation and lean practices improve flow. Measurement shows whether the system works.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/bx5tog","slide":5,"title":"5","textShapes":21}
+{"kind":"shape","id":"sh/1wzih8ra","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/et8z6tsz","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/fuh0fy94","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/sr6h43at","slide":5,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/dszidore","slide":5,"text":"CALMS assessment","textPreview":"CALMS assessment","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/qpoz2tsn","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/rqx0by98","slide":5,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/cna1gnax","slide":5,"text":"Flow and ownership","textPreview":"Flow and ownership","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/xojipsri","slide":5,"text":"Automation and evidence","textPreview":"Automation and evidence","textChars":23,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/dozmp4ze","slide":5,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/cnqlwzit","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/rmh4nuho","slide":5,"text":"Who owns the service outcome?","textPreview":"Who owns the service outcome?","textChars":29,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/ql83up03","slide":5,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/pkzmlkzi","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/4jqlsfix","slide":5,"text":"Where does work wait?","textPreview":"Where does work wait?","textChars":21,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/3ih4jahc","slide":5,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/2x83qp0r","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/9g3mxozm","slide":5,"text":"How large are typical changes?","textPreview":"How large are typical changes?","textChars":30,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/ofa54jy1","slide":5,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/8b2xgrap","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/twbypwba","slide":5,"text":"How does knowledge move between people?","textPreview":"How does knowledge move between people?","textChars":39,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/69kfehsj","slide":5,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/7atwnmt4","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/k72xc7ad","slide":5,"text":"Which decisions are repeatable?","textPreview":"Which decisions are repeatable?","textChars":31,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/l8belcby","slide":5,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/y50faxsn","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/j6twj2ts","slide":5,"text":"Which failures stop promotion?","textPreview":"Which failures stop promotion?","textChars":30,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/w3ix87ah","slide":5,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/x4rehcb2","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/zepgr2do","slide":5,"text":"What evidence supports a release?","textPreview":"What evidence supports a release?","textChars":33,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/edgfixw3","slide":5,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/10rytsvu","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/0zixkne9","slide":5,"text":"How does production feedback reach planning?","textPreview":"How does production feedback reach planning?","textChars":44,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/bx5tog","slide":5,"text":"Purpose: Compare the two sides of calms assessment.\n\nLeft side, Flow and ownership: Who owns the service outcome? Where does work wait? How large are typical changes? How does knowledge move between people?\n\nRight side, Automation and evidence: Which decisions are repeatable? Which failures stop promotion? What evidence supports a release? How does production feedback reach planning?\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/sbbsfg","slide":6,"title":"6","textShapes":4}
+{"kind":"shape","id":"sh/90ryds7y","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/mdgzidon","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/nepgbip8","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/w3ihon6p","slide":6,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/x4ryhs7a","slide":6,"text":"Complete DevOps lifecycle","textPreview":"Complete DevOps lifecycle","textChars":25,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/a10zmxoj","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/c7exc36l","slide":6,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/d87y5876","slide":6,"text":"Delivery continues after deployment. Operation, observation, learning, and retirement complete the lifecycle.","textPreview":"Delivery continues after deployment. Operation, observation, learning, and retirement complete the lifecycle.","textChars":109,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/i94nyhc7","slide":6,"name":"","alt":"module 01 lifecycle.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/sbbsfg","slide":6,"text":"Purpose: Explain complete devops lifecycle through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Delivery continues after deployment. Operation, observation, learning, and retirement complete the lifecycle.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/aqidv5","slide":7,"title":"7","textShapes":21}
+{"kind":"shape","id":"sh/ovqtkbmt","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/nuhsbq58","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/2t8ril4n","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/xkjah0na","slide":7,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/cjatovmp","slide":7,"text":"Lifecycle responsibilities","textPreview":"Lifecycle responsibilities","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/bi1sfq54","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ahsbml4z","slide":7,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/lo3al03m","slide":7,"text":"Before release","textPreview":"Before release","textChars":14,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/knatsvm1","slide":7,"text":"After release","textPreview":"After release","textChars":13,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/m18jyh03","slide":7,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/n2hkrm1o","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/83q10ri9","slide":7,"text":"Define the expected outcome","textPreview":"Define the expected outcome","textChars":27,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/94z2twju","slide":7,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/a58j210f","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/v6hkvm1k","slide":7,"text":"Design interfaces and controls","textPreview":"Design interfaces and controls","textChars":30,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/w7q14ri5","slide":7,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/x8j2xwjq","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/q9ojqx0v","slide":7,"text":"Integrate small changes","textPreview":"Integrate small changes","textChars":23,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/bax0j21g","slide":7,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/fetgryh8","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/udkzytgn","slide":7,"text":"Build and qualify an artifact","textPreview":"Build and qualify an artifact","textChars":29,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/hgbyt8ze","slide":7,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/gf2h03yt","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/7atgnyhc","slide":7,"text":"Deploy within approved scope","textPreview":"Deploy within approved scope","textChars":28,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/6p0futgr","slide":7,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/tcbypoz2","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/sb2xwjyx","slide":7,"text":"Observe service behavior","textPreview":"Observe service behavior","textChars":24,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/r6dgzihg","slide":7,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/q54z6dgv","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/8rydkfed","slide":7,"text":"Recover when outcomes differ","textPreview":"Recover when outcomes differ","textChars":28,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/9s7etkfy","slide":7,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/mpwvi5g7","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/nq5wraxs","slide":7,"text":"Retire access and obsolete versions","textPreview":"Retire access and obsolete versions","textChars":35,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/aqidv5","slide":7,"text":"Purpose: Compare the two sides of lifecycle responsibilities.\n\nLeft side, Before release: Define the expected outcome Design interfaces and controls Integrate small changes Build and qualify an artifact\n\nRight side, After release: Deploy within approved scope Observe service behavior Recover when outcomes differ Retire access and obsolete versions\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/pqfqd5","slide":8,"title":"8","textShapes":4}
+{"kind":"shape","id":"sh/54fih4re","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/i14j6983","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/j2x0fe9o","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/s761cjq5","slide":8,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/tsfilorq","slide":8,"text":"Evidence chain","textPreview":"Evidence chain","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/65oja98z","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/gvq1g3q1","slide":8,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/1wziporm","slide":8,"text":"A release decision depends on traceable evidence that connects source, build inputs, tests, approvals, deployment, and observed outcome.","textPreview":"A release decision depends on traceable evidence that connects source, build inputs, tests, approvals, deployment, and observed outcome.","textChars":136,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/u547658b","slide":8,"name":"","alt":"module 01 evidence chain.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/pqfqd5","slide":8,"text":"Purpose: Explain evidence chain through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A release decision depends on traceable evidence that connects source, build inputs, tests, approvals, deployment, and observed outcome.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/2safjx","slide":9,"title":"9","textShapes":4}
+{"kind":"shape","id":"sh/wr6pwra5","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/vqxo3m9k","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/uponuhsz","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/5gf69wrm","slide":9,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/4f6p0ba1","slide":9,"text":"Feedback speeds","textPreview":"Feedback speeds","textChars":15,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/jexo769g","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/dkz6dgri","slide":9,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/sjqp4bad","slide":9,"text":"Fast checks protect developer flow. Broader integration and operational feedback answer questions that local tests cannot.","textPreview":"Fast checks protect developer flow. Broader integration and operational feedback answer questions that local tests cannot.","textChars":122,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/r6l83mxs","slide":9,"name":"","alt":"module 01 feedback speeds.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/2safjx","slide":9,"text":"Purpose: Explain feedback speeds through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Fast checks protect developer flow. Broader integration and operational feedback answer questions that local tests cannot.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/z2q3km","slide":10,"title":"10","textShapes":4}
+{"kind":"shape","id":"sh/a18nqpsv","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/h4jmlkrm","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/w3a5sfa1","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/j614nu9s","slide":10,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/i5snups7","slide":10,"text":"Delivery architecture","textPreview":"Delivery architecture","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/5sjmp4ri","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ru14re9o","slide":10,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/6tsny9s3","slide":10,"text":"Version control, runners, registries, deployment targets, and observability systems form one delivery system with distinct trust boundaries.","textPreview":"Version control, runners, registries, deployment targets, and observability systems form one delivery system with distinct trust boundaries.","textChars":140,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/9gbypwne","slide":10,"name":"","alt":"module 01 delivery architecture.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/z2q3km","slide":10,"text":"Purpose: Explain delivery architecture through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Version control, runners, registries, deployment targets, and observability systems form one delivery system with distinct trust boundaries.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/royhvy","slide":11,"title":"11","textShapes":21}
+{"kind":"shape","id":"sh/725wvi94","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/83yx4na9","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/947yxsru","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/u5gf6xsf","slide":11,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/v6pgz290","slide":11,"text":"Release evidence","textPreview":"Release evidence","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/w7yx87al","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/h87y1sr6","slide":11,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/a9cfutsb","slide":11,"text":"Candidate identity","textPreview":"Candidate identity","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/balwnytw","slide":11,"text":"Qualification evidence","textPreview":"Qualification evidence","textChars":22,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/j2dgzul4","slide":11,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/y14f6pkj","slide":11,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/lofy143u","slide":11,"text":"Source revision","textPreview":"Source revision","textChars":15,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/k36h8z2p","slide":11,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/bydgvals","slide":11,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ax4f2pk7","slide":11,"text":"Dependency versions","textPreview":"Dependency versions","textChars":19,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/x0vyxk3y","slide":11,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/wzmx4f2d","slide":11,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/nutgralw","slide":11,"text":"Build environment","textPreview":"Build environment","textChars":17,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/2tkfy5kb","slide":11,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/q5kza5o3","slide":11,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/rqtg3a5o","slide":11,"text":"Artifact digest","textPreview":"Artifact digest","textChars":15,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/sr2hcf69","slide":11,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/dsby5knu","slide":11,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/etkze5of","slide":11,"text":"Test results","textPreview":"Test results","textChars":12,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/fut07a5k","slide":11,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/0v2hgf65","slide":11,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/1wvi9knq","slide":11,"text":"Security findings","textPreview":"Security findings","textChars":17,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/2x4zipob","slide":11,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/nyd0bu5w","slide":11,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/xsf2ho7y","slide":11,"text":"Approval record","textPreview":"Approval record","textChars":15,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/wr618jqd","slide":11,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/bqxkfeps","slide":11,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/apoj698n","slide":11,"text":"Deployment and post-check results","textPreview":"Deployment and post-check results","textChars":33,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/royhvy","slide":11,"text":"Purpose: Compare the two sides of release evidence.\n\nLeft side, Candidate identity: Source revision Dependency versions Build environment Artifact digest\n\nRight side, Qualification evidence: Test results Security findings Approval record Deployment and post-check results\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/8dbhg2","slide":12,"title":"12","textShapes":21}
+{"kind":"shape","id":"sh/vqpc76hc","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/wryt0rix","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/hs7u9wzi","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/mlwbuh0v","slide":12,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/7m5s3mh0","slide":12,"text":"CI, delivery, and deployment","textPreview":"CI, delivery, and deployment","textChars":28,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/8netwril","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/9onu5wz6","slide":12,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/6h0b6l0z","slide":12,"text":"Continuous integration","textPreview":"Continuous integration","textChars":22,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ri9cfqhk","slide":12,"text":"Release choices","textPreview":"Release choices","textChars":15,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/fmdon6ps","slide":12,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ul47u187","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/hov6pg7y","slide":12,"text":"Integrates small changes frequently","textPreview":"Integrates small changes frequently","textChars":35,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/gnmpwbqd","slide":12,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/3qdorqp4","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/2p47yl8j","slide":12,"text":"Builds and tests every candidate","textPreview":"Builds and tests every candidate","textChars":32,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/psfqtg7u","slide":12,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/4r6p0vqp","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/rex8vqp0","slide":12,"text":"Returns feedback to the author","textPreview":"Returns feedback to the author","textChars":30,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/qto72l8f","slide":12,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/m98rupsn","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/na1s3u98","slide":12,"text":"Keeps the main branch releasable","textPreview":"Keeps the main branch releasable","textChars":32,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/oba9wzat","slide":12,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/9cja54re","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/el8rqpsr","slide":12,"text":"Continuous delivery keeps approval","textPreview":"Continuous delivery keeps approval","textChars":34,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/zmhszu9c","slide":12,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/0nq9szax","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/18za1kr2","slide":12,"text":"Continuous deployment removes manual approval","textPreview":"Continuous deployment removes manual approval","textChars":45,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/yhsb29sv","slide":12,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/jilsbe9g","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/tcnu18bi","slide":12,"text":"Both require a qualified artifact","textPreview":"Both require a qualified artifact","textChars":33,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/8beds3ux","slide":12,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/7a5czits","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/69cvqdc7","slide":12,"text":"Promotion should preserve artifact identity","textPreview":"Promotion should preserve artifact identity","textChars":43,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/8dbhg2","slide":12,"text":"Purpose: Compare the two sides of ci, delivery, and deployment.\n\nLeft side, Continuous integration: Integrates small changes frequently Builds and tests every candidate Returns feedback to the author Keeps the main branch releasable\n\nRight side, Release choices: Continuous delivery keeps approval Continuous deployment removes manual approval Both require a qualified artifact Promotion should preserve artifact identity\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/58wfbj","slide":13,"title":"13","textShapes":4}
+{"kind":"shape","id":"sh/650vul4r","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/t8re503i","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/s7idwv2x","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/jipwzqlg","slide":13,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ihgvql4v","slide":13,"text":"Value stream","textPreview":"Value stream","textChars":12,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/54re1g3m","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/vepcv6l4","slide":13,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/udgvm14z","slide":13,"text":"Improvement begins by measuring where work waits, where changes fail, and where teams repeat manual decisions.","textPreview":"Improvement begins by measuring where work waits, where changes fail, and where teams repeat manual decisions.","textChars":110,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/h0ry94zi","slide":13,"name":"","alt":"module 01 value stream.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/58wfbj","slide":13,"text":"Purpose: Explain value stream through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Improvement begins by measuring where work waits, where changes fail, and where teams repeat manual decisions.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/5xqltv","slide":14,"title":"14","textShapes":21}
+{"kind":"shape","id":"sh/gfel4fup","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ve5kbat4","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/udw325cj","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/547mhkb6","slide":14,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/4jel8ful","slide":14,"text":"Delivery measures","textPreview":"Delivery measures","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/3i54fatg","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ihw365cv","slide":14,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/d87ml4bi","slide":14,"text":"Flow","textPreview":"Flow","textChars":4,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/c7ylczux","slide":14,"text":"Stability","textPreview":"Stability","textChars":9,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/ulszupsv","slide":14,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/vm103u9g","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/w7ahwza1","slide":14,"text":"Lead time for a change","textPreview":"Lead time for a change","textChars":22,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/h8ji54rm","slide":14,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/i9szy9s7","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ja107e9s","slide":14,"text":"Deployment frequency","textPreview":"Deployment frequency","textChars":20,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/4buh0jad","slide":14,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/5c3i94ri","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/yd8zm5s3","slide":14,"text":"Time waiting for approval","textPreview":"Time waiting for approval","textChars":25,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/zeh0vat8","slide":14,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/36to7ml4","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/2lkneh4j","slide":14,"text":"Time spent repeating work","textPreview":"Time spent repeating work","textChars":25,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/p8v69c3u","slide":14,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/o7m5grm9","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/fito325s","slide":14,"text":"Change failure rate","textPreview":"Change failure rate","textChars":19,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/ehknax47","slide":14,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/1kb65cny","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/gj25c7md","slide":14,"text":"Time to restore service","textPreview":"Time to restore service","textChars":23,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/zexof6lc","slide":14,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/yd47m14r","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/wjylg329","slide":14,"text":"Escaped defects","textPreview":"Escaped defects","textChars":15,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/xk72983e","slide":14,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ahg3etk3","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/vipk7ylo","slide":14,"text":"Incomplete or missing evidence","textPreview":"Incomplete or missing evidence","textChars":30,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/5xqltv","slide":14,"text":"Purpose: Compare the two sides of delivery measures.\n\nLeft side, Flow: Lead time for a change Deployment frequency Time waiting for approval Time spent repeating work\n\nRight side, Stability: Change failure rate Time to restore service Escaped defects Incomplete or missing evidence\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/uec352","slide":15,"title":"15","textShapes":8}
+{"kind":"shape","id":"sh/fmdc7uxk","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/gnmd0ze5","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/1ovu9kfq","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/6xkvu5g3","slide":15,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/rytc3ax8","slide":15,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/sj2dwfyt","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/tkbu5kfe","slide":15,"text":"DevOps treats delivery as an engineering system whose output includes working software and credible operational evidence.","textPreview":"DevOps treats delivery as an engineering system whose output includes working software and credible operational evidence.","textChars":121,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/itkbq5gr","slide":15,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/jutczaxc","slide":15,"text":"Shared ownership matters as much as automation","textPreview":"Shared ownership matters as much as automation","textChars":46,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/f61c3upk","slide":15,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/e5sbap8f","slide":15,"text":"Small batches reduce review and recovery risk","textPreview":"Small batches reduce review and recovery risk","textChars":45,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/18ju547q","slide":15,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/g7atczq5","slide":15,"text":"Pipelines should promote an identified artifact","textPreview":"Pipelines should promote an identified artifact","textChars":47,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/3alc7upw","slide":15,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/29sbep8b","slide":15,"text":"Feedback must reach the people who can act on it","textPreview":"Feedback must reach the people who can act on it","textChars":48,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/uec352","slide":15,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: DevOps treats delivery as an engineering system whose output includes working software and credible operational evidence.\n\nDiscuss: Shared ownership matters as much as automation Small batches reduce review and recovery risk Pipelines should promote an identified artifact Feedback must reach the people who can act on it\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/o3opcy","slide":16,"title":"16","textShapes":7}
+{"kind":"shape","id":"sh/1sjadkn6","slide":16,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/e58r254f","slide":16,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/f61sba50","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/s3q90vm9","slide":16,"text":"Module 1","textPreview":"Module 1","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/t4za90nu","slide":16,"text":"Module 1 complete","textPreview":"Module 1 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/618ryl4j","slide":16,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/r2h87q54","slide":16,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/kzq9wvmd","slide":16,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/50zq50ny","slide":16,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/1svahk3i","slide":16,"text":"Module 1 complete","textPreview":"Module 1 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/0rm98f2x","slide":16,"text":"Next: Infrastructure as Code and On-Demand Environments","textPreview":"Next: Infrastructure as Code and On-Demand Environments","textChars":55,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/fqdsfalc","slide":16,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/ep4r65k7","slide":16,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"notes","id":"nt/o3opcy","slide":16,"text":"Purpose: Close Module 1.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Infrastructure as Code and On-Demand Environments\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

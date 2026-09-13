@@ -1,0 +1,327 @@
+{"kind":"deck","id":"pr/c81q9w","name":"Deck"}
+{"kind":"layout","layoutId":"83feb8b8-64f7-41fc-a5e3-91fb0dde4a85","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"b320e162-31c7-4c80-9d56-137230e87a47","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/d0d10e","slide":1,"title":"Module 0","textShapes":4}
+{"kind":"shape","id":"sh/tkvuh0nm","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/8zmtof61","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/zutsbq54","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ytkbiloz","slide":1,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/lwbad0na","slide":1,"text":"Network Automation Review","textPreview":"Network Automation Review","textChars":25,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/kv2tkv6p","slide":1,"text":"Software foundations for automation applications","textPreview":"Software foundations for automation applications","textChars":48,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/bqts7q58","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/ji5cfi1o","slide":1,"name":"","alt":"module 00 cover.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/d0d10e","slide":1,"text":"Purpose: Open Module 0 and establish the subject of the deck.\n\nExplain: Network Automation Review. Software foundations for automation applications.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/xbvutm","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/m14nepgb","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/94fm94f2","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/83m5gzyh","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/zyd4juxk","slide":2,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/yx4napgf","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l0vm5kfq","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/0zm5czy5","slide":2,"text":"This module refreshes the programming, data, interface, and validation concepts used throughout the course.","textPreview":"This module refreshes the programming, data, interface, and validation concepts used throughout the course.","textChars":107,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/but4faxo","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/q9k365g3","slide":2,"text":"Recognize the parts of a network automation application","textPreview":"Recognize the parts of a network automation application","textChars":55,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/cbyd83m1","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/dc7eh83m","slide":2,"text":"Work with Python, JSON, YAML, XML, and dictionaries","textPreview":"Work with Python, JSON, YAML, XML, and dictionaries","textChars":51,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/q9gv6t4v","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/rapwfylg","slide":2,"text":"Select an appropriate management interface","textPreview":"Select an appropriate management interface","textChars":42,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/47ed4jm5","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/p8nedo3q","slide":2,"text":"Use Git to record and exchange changes","textPreview":"Use Git to record and exchange changes","textChars":38,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/xbvutm","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module refreshes the programming, data, interface, and validation concepts used throughout the course.\n\nDiscuss: Recognize the parts of a network automation application Work with Python, JSON, YAML, XML, and dictionaries Select an appropriate management interface Use Git to record and exchange changes\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/35kaf2","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/q5076h47","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/d8r6hc3y","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/c7ip87md","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/32pob25w","slide":3,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/21gn2x4b","slide":3,"text":"Automation application structure","textPreview":"Automation application structure","textChars":32,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/p4r6dcnm","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/fypo7i5k","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/udgnyx4z","slide":3,"text":"Automation becomes easier to reason about when input, transformation, transport, validation, and evidence have clear boundaries.","textPreview":"Automation becomes easier to reason about when input, transformation, transport, validation, and evidence have clear boundaries.","textChars":128,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/xg72lkny","slide":3,"name":"","alt":"module 00 automation system.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/35kaf2","slide":3,"text":"Purpose: Explain automation application structure through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Automation becomes easier to reason about when input, transformation, transport, validation, and evidence have clear boundaries.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/oic0td","slide":4,"title":"4","textShapes":21}
+{"kind":"shape","id":"sh/jqdcbap8","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/4rmd4fqt","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/5svudk7y","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/6t4v6p8j","slide":4,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/rudcfap4","slide":4,"text":"Automation responsibility boundaries","textPreview":"Automation responsibility boundaries","textChars":36,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/sv6d8fqp","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/twfuhk7a","slide":4,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/exovap8v","slide":4,"text":"Application responsibilities","textPreview":"Application responsibilities","textChars":28,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/fyxcjupg","slide":4,"text":"Operational responsibilities","textPreview":"Operational responsibilities","textChars":28,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/nq9072tg","slide":4,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/mp0jyxsv","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/9sbi9cbm","slide":4,"text":"Validate input before use","textPreview":"Validate input before use","textChars":25,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/or2107a1","slide":4,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/z2903itk","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/e10judcz","slide":4,"text":"Transform data deliberately","textPreview":"Transform data deliberately","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/14ri5sbq","slide":4,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/03i1wnu5","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/jyt0fmto","slide":4,"text":"Handle errors and timeouts","textPreview":"Handle errors and timeouts","textChars":26,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/yxkj6hs3","slide":4,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/uto3ylcb","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/vex47qdw","slide":4,"text":"Return a meaningful result","textPreview":"Return a meaningful result","textChars":26,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/gf6l0vuh","slide":4,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/hgfm9gv2","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/iho32lcn","slide":4,"text":"Control target scope","textPreview":"Control target scope","textChars":20,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/3ih4bqd8","slide":4,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/4jql4vud","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/5kzmd0vy","slide":4,"text":"Protect access credentials","textPreview":"Protect access credentials","textChars":26,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/yl43q1w3","slide":4,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/jmdkz6do","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/1gj654f6","slide":4,"text":"Observe device and service state","textPreview":"Observe device and service state","textChars":32,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/0fapwzel","slide":4,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ze1o3uxg","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/eds7upwv","slide":4,"text":"Retain evidence for investigation","textPreview":"Retain evidence for investigation","textChars":33,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/oic0td","slide":4,"text":"Purpose: Compare the two sides of automation responsibility boundaries.\n\nLeft side, Application responsibilities: Validate input before use Transform data deliberately Handle errors and timeouts Return a meaningful result\n\nRight side, Operational responsibilities: Control target scope Protect access credentials Observe device and service state Retain evidence for investigation\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/ddktey","slide":5,"title":"5","textShapes":4}
+{"kind":"shape","id":"sh/d0j6dkva","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/qxsni5wj","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ry1obad4","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/03a5oful","slide":5,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/1o36hkv6","slide":5,"text":"Structured data contracts","textPreview":"Structured data contracts","textChars":25,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/e1snmpcf","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/g7q5cveh","slide":5,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/h8zm50v2","slide":5,"text":"JSON, YAML, XML, and Python dictionaries represent the same intent in forms suited to different consumers.","textPreview":"JSON, YAML, XML, and Python dictionaries represent the same intent in forms suited to different consumers.","textChars":106,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/q1wjmdkz","slide":5,"name":"","alt":"module 00 structured data.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/ddktey","slide":5,"text":"Purpose: Explain structured data contracts through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: JSON, YAML, XML, and Python dictionaries represent the same intent in forms suited to different consumers.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/r5kq16","slide":6,"title":"6","textShapes":21}
+{"kind":"shape","id":"sh/sz6h87et","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/7yx0z2d8","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/6x4z6xwn","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/hofi5wva","slide":6,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/g361cre5","slide":6,"text":"Python review","textPreview":"Python review","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/f2x03mdk","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/u1ozahwz","slide":6,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/pszi9wvm","slide":6,"text":"Application logic","textPreview":"Application logic","textChars":17,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/4rq1gre1","slide":6,"text":"Common libraries","textPreview":"Common libraries","textChars":16,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/6xonil0r","slide":6,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/7yx4b6hw","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/8z65kbih","slide":6,"text":"Functions separate responsibilities","textPreview":"Functions separate responsibilities","textChars":35,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/t0f6dgz2","slide":6,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/u1onml0n","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/vmhofqh8","slide":6,"text":"Exceptions expose failure conditions","textPreview":"Exceptions expose failure conditions","textChars":36,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/gnq5ovit","slide":6,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/hoz6h0ze","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/a54na10j","slide":6,"text":"Logging records context and outcome","textPreview":"Logging records context and outcome","textChars":35,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/bqd43mh4","slide":6,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/za9kb2xw","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/e90jixgb","slide":6,"text":"Virtual environments isolate dependencies","textPreview":"Virtual environments isolate dependencies","textChars":41,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/1wb2dsfm","slide":6,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/0bi1kny1","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/r69k7ixk","slide":6,"text":"requests for HTTP APIs","textPreview":"requests for HTTP APIs","textChars":22,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/q50jedgz","slide":6,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/d8r29sfq","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/c7i1gny5","slide":6,"text":"ncclient for NETCONF","textPreview":"ncclient for NETCONF","textChars":20,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/b2tkjmxo","slide":6,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/a1k3qhgj","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/87eh4je1","slide":6,"text":"Netmiko for CLI automation","textPreview":"Netmiko for CLI automation","textChars":26,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/t8nyd4v6","slide":6,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/6lwz29wv","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/765gbedg","slide":6,"text":"Flask for service interfaces","textPreview":"Flask for service interfaces","textChars":28,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/r5kq16","slide":6,"text":"Purpose: Compare the two sides of python review.\n\nLeft side, Application logic: Functions separate responsibilities Exceptions expose failure conditions Logging records context and outcome Virtual environments isolate dependencies\n\nRight side, Common libraries: requests for HTTP APIs ncclient for NETCONF Netmiko for CLI automation Flask for service interfaces\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/memh8s","slide":7,"title":"7","textShapes":21}
+{"kind":"shape","id":"sh/4fex8fi9","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/3elwza1o","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/2tcv6503","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/dkne54jq","slide":7,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/cjexczi5","slide":7,"text":"API request lifecycle","textPreview":"API request lifecycle","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/ri5w3u10","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/qhwfap0f","slide":7,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/to3et0jm","slide":7,"text":"Before the request","textPreview":"Before the request","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/snad0vi1","slide":7,"text":"After the response","textPreview":"After the response","textChars":18,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/e1ofmdsf","slide":7,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/f2xgfit0","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/g36xonal","slide":7,"text":"Select the resource and method","textPreview":"Select the resource and method","textChars":30,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/14zyhsb6","slide":7,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/258fqdsb","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/36hgjitw","slide":7,"text":"Build headers and authentication","textPreview":"Build headers and authentication","textChars":32,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/o7qxsnah","slide":7,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/pszylsb2","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/qt8fuxsn","slide":7,"text":"Validate input data","textPreview":"Validate input data","textChars":19,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/buhgn2t8","slide":7,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/7y1wb2pg","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/mxsf2x8v","slide":7,"text":"Set a bounded timeout","textPreview":"Set a bounded timeout","textChars":21,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/90jedc76","slide":7,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/8zax47ql","slide":7,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/zuhw7i94","slide":7,"text":"Check the status code","textPreview":"Check the status code","textChars":21,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/y98fex8j","slide":7,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/lwje9s7a","slide":7,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/0vaxgnqp","slide":7,"text":"Parse the declared format","textPreview":"Parse the declared format","textChars":25,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/b6hw3i98","slide":7,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/q58fad8n","slide":7,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/gbmt4j6l","slide":7,"text":"Validate required fields","textPreview":"Validate required fields","textChars":24,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/1cfudo7q","slide":7,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/e94b29of","slide":7,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/fadcbep0","slide":7,"text":"Log context without secrets","textPreview":"Log context without secrets","textChars":27,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/memh8s","slide":7,"text":"Purpose: Compare the two sides of api request lifecycle.\n\nLeft side, Before the request: Select the resource and method Build headers and authentication Validate input data Set a bounded timeout\n\nRight side, After the response: Check the status code Parse the declared format Validate required fields Log context without secrets\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/3beq3e","slide":8,"title":"8","textShapes":4}
+{"kind":"shape","id":"sh/b6lkbmhg","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/c7ul4ri1","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/x8n2dwzm","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/2hc3yh0z","slide":8,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/nilk7mhk","slide":8,"text":"Interface selection","textPreview":"Interface selection","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/ojul0ri5","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/6dw3al03","slide":8,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/7e5kj6ho","slide":8,"text":"The correct interface depends on data structure, transaction support, platform capability, and the evidence the workflow must collect.","textPreview":"The correct interface depends on data structure, transaction support, platform capability, and the evidence the workflow must collect.","textChars":134,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/cr25036x","slide":8,"name":"","alt":"module 00 interface selection.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/3beq3e","slide":8,"text":"Purpose: Explain interface selection through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The correct interface depends on data structure, transaction support, platform capability, and the evidence the workflow must collect.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/hkp8hy","slide":9,"title":"9","textShapes":21}
+{"kind":"shape","id":"sh/czetsji5","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/belcze10","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/adcbq90f","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/l4nu5oj2","slide":9,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/k3edw3ih","slide":9,"text":"Ansible review","textPreview":"Ansible review","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/z25c3y1w","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/y1wbut0b","slide":9,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/987u98jy","slide":9,"text":"Core objects","textPreview":"Core objects","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/87yd03id","slide":9,"text":"Operational controls","textPreview":"Operational controls","textChars":20,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/uh07ahgn","slide":9,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/fi983mx8","slide":9,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/gjipcryd","slide":9,"text":"Inventory identifies managed targets","textPreview":"Inventory identifies managed targets","textChars":36,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/hkbq5wfy","slide":9,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/2lk7ehgj","slide":9,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/3mt87mx4","slide":9,"text":"Variables describe desired values","textPreview":"Variables describe desired values","textChars":33,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/4n2pgryp","slide":9,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/pobq9wfa","slide":9,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/ipg72xgf","slide":9,"text":"Playbooks coordinate tasks","textPreview":"Playbooks coordinate tasks","textChars":26,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/jqpov2x0","slide":9,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/nu543yds","slide":9,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/mtwnutw7","slide":9,"text":"Roles package reusable behavior","textPreview":"Roles package reusable behavior","textChars":31,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/9wnm58vi","slide":9,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/8ve5w3ed","slide":9,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/zql4zedg","slide":9,"text":"Limit the target scope","textPreview":"Limit the target scope","textChars":22,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/e5c3q9wv","slide":9,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/1s3m1ovm","slide":9,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/0ru5sje1","slide":9,"text":"Protect credentials","textPreview":"Protect credentials","textChars":19,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/jmp4bid0","slide":9,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/i1gn2dwf","slide":9,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/gv6tgbql","slide":9,"text":"Check idempotence","textPreview":"Check idempotence","textChars":17,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/hwza9g76","slide":9,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/utobe18f","slide":9,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/vuxs76p0","slide":9,"text":"Capture changed and failed results","textPreview":"Capture changed and failed results","textChars":34,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/hkp8hy","slide":9,"text":"Purpose: Compare the two sides of ansible review.\n\nLeft side, Core objects: Inventory identifies managed targets Variables describe desired values Playbooks coordinate tasks Roles package reusable behavior\n\nRight side, Operational controls: Limit the target scope Protect credentials Check idempotence Capture changed and failed results\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/o2rwol","slide":10,"title":"10","textShapes":4}
+{"kind":"shape","id":"sh/p8j690vq","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/25sny5cz","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/n61o7adk","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/cbu54fuh","slide":10,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/xc36dkbm","slide":10,"text":"Intent and state","textPreview":"Intent and state","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/a9cn25cb","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/sfq5sbux","slide":10,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/dgzm1gvi","slide":10,"text":"A safe workflow distinguishes what should exist, what the tool applied, and what the service now reports.","textPreview":"A safe workflow distinguishes what should exist, what the tool applied, and what the service now reports.","textChars":105,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/2t8f2lkr","slide":10,"name":"","alt":"module 00 three states.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/o2rwol","slide":10,"text":"Purpose: Explain intent and state through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A safe workflow distinguishes what should exist, what the tool applied, and what the service now reports.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/a89khn","slide":11,"title":"11","textShapes":4}
+{"kind":"shape","id":"sh/3uxc7e1w","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ov6dgjih","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/pwfu9oj2","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/qxovit0n","slide":11,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/byxcby1s","slide":11,"text":"Model-driven telemetry","textPreview":"Model-driven telemetry","textChars":22,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/cz6dk3id","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/y18vmt0j","slide":11,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/z2hcfy14","slide":11,"text":"Streaming telemetry delivers structured updates continuously, while polling asks for selected state at scheduled intervals.","textPreview":"Streaming telemetry delivers structured updates continuously, while polling asks for selected state at scheduled intervals.","textChars":123,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/sfm58nqd","slide":11,"name":"","alt":"module 00 telemetry flow.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/a89khn","slide":11,"text":"Purpose: Explain model-driven telemetry through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Streaming telemetry delivers structured updates continuously, while polling asks for selected state at scheduled intervals.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/nsa3u3","slide":12,"title":"12","textShapes":21}
+{"kind":"shape","id":"sh/zupsbe1s","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/0vytkj2d","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/lw7adojy","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/mxgbmtkj","slide":12,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/nypsfy14","slide":12,"text":"Git essentials","textPreview":"Git essentials","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/8zyto32p","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/90rah8ju","slide":12,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/a10bqdkf","slide":12,"text":"Local workflow","textPreview":"Local workflow","textChars":14,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/v29sjy10","slide":12,"text":"Team workflow","textPreview":"Team workflow","textChars":13,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/rmt4bytk","slide":12,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/qlkn2tsz","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/d8bmdobq","slide":12,"text":"git status and git diff","textPreview":"git status and git diff","textChars":23,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/cn254ja5","slide":12,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/3i947eto","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/2h0ny9s3","slide":12,"text":"git add and git commit","textPreview":"git add and git commit","textChars":22,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/pkbm9obe","slide":12,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/4j250ja9","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/nedojits","slide":12,"text":"git log and git show","textPreview":"git log and git show","textChars":20,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/md4nads7","slide":12,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/i9o72hcf","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/jah8b2d0","slide":12,"text":"git branch and git switch","textPreview":"git branch and git switch","textChars":25,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/kbqp47ul","slide":12,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/5czqdcv6","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/6d876hcr","slide":12,"text":"Pull before starting work","textPreview":"Pull before starting work","textChars":25,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/7yh8fmdw","slide":12,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/szq98ruh","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/t0zqhwv2","slide":12,"text":"Use a focused branch","textPreview":"Use a focused branch","textChars":20,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/mh47axc7","slide":12,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/n2x83ids","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/pw3a90fa","slide":12,"text":"Push reviewable commits","textPreview":"Push reviewable commits","textChars":23,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/4vutgvep","slide":12,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/3uls7qx4","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/2tcbelwz","slide":12,"text":"Resolve conflicts with context","textPreview":"Resolve conflicts with context","textChars":30,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/nsa3u3","slide":12,"text":"Purpose: Compare the two sides of git essentials.\n\nLeft side, Local workflow: git status and git diff git add and git commit git log and git show git branch and git switch\n\nRight side, Team workflow: Pull before starting work Use a focused branch Push reviewable commits Resolve conflicts with context\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/uy0lyn","slide":13,"title":"13","textShapes":21}
+{"kind":"shape","id":"sh/1knqxsv6","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/exwrmdwf","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/zy58vid0","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/cvepk3e9","slide":13,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/dwnqt8vu","slide":13,"text":"Testing boundaries","textPreview":"Testing boundaries","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/qtc7itw3","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/rul8rydo","slide":13,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/4rupg3ed","slide":13,"text":"Offline checks","textPreview":"Offline checks","textChars":14,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ps3qpovy","slide":13,"text":"Connected checks","textPreview":"Connected checks","textChars":16,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/x0jy5kz2","slide":13,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/wzaxwfih","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/vehw3ahw","slide":13,"text":"Data parsing and validation","textPreview":"Data parsing and validation","textChars":27,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/ad8fu50b","slide":13,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/9cze10zq","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/8bqxsvi5","slide":13,"text":"Template rendering","textPreview":"Template rendering","textChars":18,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/nahwzqhk","slide":13,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/m98fql0f","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/l8zex0zu","slide":13,"text":"Business rules","textPreview":"Business rules","textChars":14,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/076xovi9","slide":13,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/craxkvq5","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/dsjyd07q","slide":13,"text":"Error handling","textPreview":"Error handling","textChars":14,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/qpsfil8z","slide":13,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/rq1gbqpk","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/4naxgbqt","slide":13,"text":"Authentication and reachability","textPreview":"Authentication and reachability","textChars":31,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/poje9g7e","slide":13,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/2lsfel83","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/3m1w76p8","slide":13,"text":"API and device behavior","textPreview":"API and device behavior","textChars":23,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/ojuxsfqd","slide":13,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/9knylk7y","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/jq9s7ydc","slide":13,"text":"Configuration state","textPreview":"Configuration state","textChars":19,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/ip0rydwr","slide":13,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/5sra98v2","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/4ri903eh","slide":13,"text":"Service outcome","textPreview":"Service outcome","textChars":15,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/uy0lyn","slide":13,"text":"Purpose: Compare the two sides of testing boundaries.\n\nLeft side, Offline checks: Data parsing and validation Template rendering Business rules Error handling\n\nRight side, Connected checks: Authentication and reachability API and device behavior Configuration state Service outcome\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/z5q7k8","slide":14,"title":"14","textShapes":8}
+{"kind":"shape","id":"sh/ofe1sbi9","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ne50z6ho","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/2dwjq103","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/x4725gzq","slide":14,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/c3y1wbi5","slide":14,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/b25k3qhk","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/a1wjul0z","slide":14,"text":"Network automation already combines software logic, structured data, device interfaces, and operational validation.","textPreview":"Network automation already combines software logic, structured data, device interfaces, and operational validation.","textChars":115,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/t83itwzm","slide":14,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/s7u1kri1","slide":14,"text":"Treat input data as a contract","textPreview":"Treat input data as a contract","textChars":30,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/6tsbup03","slide":14,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/7u1c3uho","slide":14,"text":"Choose interfaces according to the required behavior","textPreview":"Choose interfaces according to the required behavior","textChars":52,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/8vatwzit","slide":14,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/twju54ze","slide":14,"text":"Separate intended, applied, and operational state","textPreview":"Separate intended, applied, and operational state","textChars":49,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/uxcby90z","slide":14,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/vylc7uhk","slide":14,"text":"Keep source and decisions in Git","textPreview":"Keep source and decisions in Git","textChars":32,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/z5q7k8","slide":14,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: Network automation already combines software logic, structured data, device interfaces, and operational validation.\n\nDiscuss: Treat input data as a contract Choose interfaces according to the required behavior Separate intended, applied, and operational state Keep source and decisions in Git\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/xuitnx","slide":15,"title":"15","textShapes":7}
+{"kind":"shape","id":"sh/e58jutc7","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/18z2p8bi","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/g7q1w3ux","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/r2hkjytg","slide":15,"text":"Module 0","textPreview":"Module 0","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/61ojqtcv","slide":15,"text":"Module 0 complete","textPreview":"Module 0 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/t4z2l8bm","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/s3q1s3u1","slide":15,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/by1kvitk","slide":15,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/qxs32dcf","slide":15,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/43u94j2p","slide":15,"text":"Module 0 complete","textPreview":"Module 0 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/543axoja","slide":15,"text":"Next: Introducing the DevOps Model","textPreview":"Next: Introducing the DevOps Model","textChars":34,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/i1cr29kj","slide":15,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/j2l8vel4","slide":15,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"notes","id":"nt/xuitnx","slide":15,"text":"Purpose: Close Module 0.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Introducing the DevOps Model\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

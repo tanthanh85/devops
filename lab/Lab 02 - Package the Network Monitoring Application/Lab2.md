@@ -4,12 +4,15 @@
 
 **4 hours**
 
-The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. You will first prove that the supplied application works in its Python virtual environment. You will then define its runtime in a Dockerfile, build an image, run a container, inspect the resulting runtime, and exercise the Docker lifecycle.
+The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. You will first create the Python virtual environment that will be reused throughout the course and prove that the supplied application works inside it. You will then define its runtime in a Dockerfile, build an image, run a container, inspect the resulting runtime, and exercise the Docker lifecycle.
 
 This is the first implementation stage of the cumulative application. Do not redesign the RESTCONF adapter or add new application features during this lab. The engineering question is whether the same tested application can be packaged and executed consistently.
 
 ## Objectives
 
+- Create, activate, and verify the course-wide Python virtual environment.
+- Create the private `network-devops` project on GitLab.com and clone it to the workstation.
+- Register the workstation runner with the new project.
 - Verify the supplied Flask application before packaging it.
 - Confirm the RESTCONF read paths and returned data on an authorized router.
 - Explain the Docker build context and `.dockerignore` boundary.
@@ -37,7 +40,7 @@ The application performs read-only operations. IOS XE software versions can expo
 
 - The workstation prepared in Lab 1.
 - Docker Engine and the Compose plugin running.
-- The course Python virtual environment.
+- Python, pip, and `venv` support installed in Lab 1.
 - The instructor-provided `network-monitor` starter application.
 - An instructor-provided IOS XE router or authorized sandbox with RESTCONF enabled.
 - Management reachability to the router.
@@ -70,19 +73,117 @@ network-devops/
 
 File names may differ slightly in the instructor bundle. Locate the Flask entry point, configuration loader, RESTCONF adapter, templates, static files, dependency declaration, and tests before proceeding.
 
-## Part 1: Prepare a feature branch
+## Part 1: Create and clone the course project
 
-Use the repository created in Lab 1:
+Sign in to the GitLab.com account prepared in Lab 1. Create a new project using the current GitLab interface:
+
+1. Select **Create new > New project/repository**.
+2. Select **Create blank project**.
+3. Enter `network-devops` as both the project name and project slug.
+4. Select **Private** unless the instructor specifies another visibility level.
+5. Select **Initialize repository with a README**.
+6. Select **Create project**.
+
+Copy the HTTPS clone URL displayed by GitLab, then clone the new project:
 
 ```bash
-cd ~/network-devops
+cd ~
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/network-devops.git
+cd network-devops
+git remote -v
 git status
 git pull --ff-only
 git switch -c feature/lab02-container-package
+```
+
+Authenticate through the approved browser or credential-manager flow. Never place an account password or access token in the clone URL or shell history.
+
+Copy the instructor-provided starter application into the cloned repository. Preserve the `.git` directory and do not copy any supplied credentials:
+
+```bash
+cp -R "/path/to/Lab 02 - Package the Network Monitoring Application/." \
+  ~/network-devops/
+cd ~/network-devops
+git status
+```
+
+Confirm that the expected `app`, `tests`, `requirements.txt`, and example environment files are present before continuing.
+
+## Part 2: Create the course Python virtual environment
+
+Create the environment at the root of the cloned project:
+
+```bash
+cd ~/network-devops
+python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m pip check
+which python
+python --version
 ```
+
+The path printed by `which python` must end in `network-devops/.venv/bin/python`. This is the single learner-managed Python environment for the remainder of the course. Later labs activate the same environment instead of creating separate environments in individual lab directories.
+
+Confirm that Git excludes the environment:
+
+```bash
+git check-ignore -v .venv
+```
+
+If Git does not report an ignore rule, add `.venv/` to the project `.gitignore` before continuing. Never commit the environment directory. It contains platform-specific executables and installed dependencies that must be reproduced from dependency declarations instead.
+
+In Visual Studio Code, open the command palette, select **Python: Select Interpreter**, and choose `~/network-devops/.venv/bin/python`. New integrated terminals should activate the environment automatically. If activation does not occur, run:
+
+```bash
+cd ~/network-devops
+source .venv/bin/activate
+```
+
+At the start of every later lab, activate this environment and confirm the interpreter before running Python, Ansible, or test commands:
+
+```bash
+source ~/network-devops/.venv/bin/activate
+which python
+python -m pip check
+```
+
+Use `deactivate` only when you intentionally want to leave the course environment.
+
+## Part 3: Register the project runner
+
+In the new GitLab.com `network-devops` project:
+
+1. Open **Settings > CI/CD** and expand **Runners**.
+2. Select **Create project runner**.
+3. Select Linux and add the tags `docker,validation`.
+4. Allow untagged jobs only when directed by the instructor.
+5. Create the runner and copy its authentication token beginning with `glrt-`.
+
+Register the runner container installed in Lab 1:
+
+```bash
+docker start course-gitlab-runner
+docker exec -it course-gitlab-runner gitlab-runner register
+```
+
+Use these values when prompted:
+
+- GitLab URL: `https://gitlab.com`
+- Token: the project runner authentication token
+- Description: `course-docker-runner`
+- Executor: `docker`
+- Default image: `python:3.12-slim`
+
+Verify registration and confirm that GitLab.com reports the runner as online:
+
+```bash
+docker exec course-gitlab-runner gitlab-runner list
+docker exec course-gitlab-runner gitlab-runner verify
+```
+
+Do not store the runner token in the project, a screenshot, or an evidence file.
 
 Copy `.env.example` to `.env`, restrict it, and insert only the credentials and endpoint supplied for the lab:
 
@@ -111,7 +212,7 @@ Confirm that `.env` is ignored:
 git check-ignore -v .env
 ```
 
-## Part 2: Test the supplied application before containerizing it
+## Part 4: Test the supplied application before containerizing it
 
 Run the automated tests:
 
@@ -154,7 +255,7 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 3: Define the Docker build boundary
+## Part 5: Define the Docker build boundary
 
 Create `.dockerignore` in the repository root:
 
@@ -183,7 +284,7 @@ find . -maxdepth 3 -type f | sort
 
 Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, test caches, and certificates are excluded.
 
-## Part 4: Create the Dockerfile
+## Part 6: Create the Dockerfile
 
 Create `Dockerfile` in the repository root:
 
@@ -227,7 +328,7 @@ Explain the file before building:
 | `HEALTHCHECK` | Defines process-level health evidence |
 | `CMD` | Defines the default production process |
 
-## Part 5: Build and identify the image
+## Part 7: Build and identify the image
 
 ```bash
 docker build --pull -t network-monitor:lab02 .
@@ -248,7 +349,7 @@ docker image inspect network-monitor:lab02 --format '{{.Id}}' \
 
 An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
 
-## Part 6: Run the container
+## Part 8: Run the container
 
 The container requires runtime configuration, a published local port, and a route to the assigned router. Start with Docker's default bridge network:
 
@@ -285,7 +386,7 @@ docker run -d --name network-monitor --network host --env-file .env \
 
 With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Record which network mode was required and why.
 
-## Part 7: Inspect and explain the running container
+## Part 9: Inspect and explain the running container
 
 Run each command and explain what its output proves:
 
@@ -323,7 +424,7 @@ Interpretation guide:
 
 Do not run `docker inspect` and share the unfiltered output: environment values can include secrets.
 
-## Part 8: Exercise the Docker lifecycle
+## Part 10: Exercise the Docker lifecycle
 
 ### Stop and start the same container
 
@@ -378,7 +479,7 @@ docker run -d --name network-monitor --env-file .env \
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
 
-## Part 9: Preserve evidence and commit the work
+## Part 11: Preserve evidence and commit the work
 
 ```bash
 mkdir -p evidence

@@ -1,0 +1,333 @@
+{"kind":"deck","id":"pr/e41o2d","name":"Deck"}
+{"kind":"layout","layoutId":"6a13c6e7-03b6-45fb-baef-5ab2ec01bd73","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"ea1adfcb-75fc-48ea-b3cb-3c77e80c9178","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/nllj11","slide":1,"title":"Course introduction","textShapes":4}
+{"kind":"shape","id":"sh/byxk7etg","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/qdoje9cv","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/l4z2dobi","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/03q1k3ux","slide":1,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/z2hkbytc","slide":1,"text":"Implementing DevOps Solutions and Practices using Cisco Platforms","textPreview":"Implementing DevOps Solutions and Practices using Cisco Platforms","textChars":65,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/y18jitc7","slide":1,"text":"DevOps v1.0","textPreview":"DevOps v1.0","textChars":11,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/98j2h8bu","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/dgnq5ony","slide":1,"name":"","alt":"study guide cover architecture.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/nllj11","slide":1,"text":"Purpose: Open Course introduction and establish the subject of the deck.\n\nExplain: Implementing DevOps Solutions and Practices using Cisco Platforms. DevOps v1.0.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/fb708g","slide":2,"title":"2","textShapes":7}
+{"kind":"shape","id":"sh/wjap4vid","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/vi18vqhs","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ahs72l07","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/583q10zu","slide":2,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/k7up8vi9","slide":2,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/j618zqho","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/i5s76l03","slide":2,"text":"A five-day course for engineers who want to deliver automation applications through disciplined software practices.","textPreview":"A five-day course for engineers who want to deliver automation applications through disciplined software practices.","textChars":115,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/tc3q50zq","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/sbupcfi5","slide":2,"text":"40 hours combining explanation, demonstration, and guided practice","textPreview":"40 hours combining explanation, demonstration, and guided practice","textChars":66,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/u9g7etwz","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/vaponydk","slide":2,"text":"Knowledge equivalent to DEVASC and DEVCOR","textPreview":"Knowledge equivalent to DEVASC and DEVCOR","textChars":41,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/gvypg3e5","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/hw76povq","slide":2,"text":"One application evolves as the delivery platform becomes more capable","textPreview":"One application evolves as the delivery platform becomes more capable","textChars":69,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"notes","id":"nt/fb708g","slide":2,"text":"Purpose: Establish the scope of Course introduction.\n\nExplain: A five-day course for engineers who want to deliver automation applications through disciplined software practices.\n\nDiscuss: 40 hours combining explanation, demonstration, and guided practice Knowledge equivalent to DEVASC and DEVCOR One application evolves as the delivery platform becomes more capable\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/ye9a6t","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/87q10fud","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/n6hk7ats","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/m58jy5c7","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/lkf250bm","slide":3,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/0j61wvu1","slide":3,"text":"Course journey","textPreview":"Course journey","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/zixk3qtg","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/dgf210bq","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/cf61svu5","slide":3,"text":"The course follows the engineering decisions required to move an automation application into dependable operation.","textPreview":"The course follows the engineering decisions required to move an automation application into dependable operation.","textChars":114,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/re9ozq1g","slide":3,"name":"","alt":"course engineering journey.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/ye9a6t","slide":3,"text":"Purpose: Explain course journey through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The course follows the engineering decisions required to move an automation application into dependable operation.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/2znm4m","slide":4,"title":"4","textShapes":21}
+{"kind":"shape","id":"sh/c7ip4zix","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/b698vu1c","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/q5072pkr","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/lwbq1oje","slide":4,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/0b29sjit","slide":4,"text":"Five-day learning sequence","textPreview":"Five-day learning sequence","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/za98ze18","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/y90rq903","slide":4,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/90bq5ojq","slide":4,"text":"Days 1 and 2","textPreview":"Days 1 and 2","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/8z29wji5","slide":4,"text":"Days 3 to 5","textPreview":"Days 3 to 5","textChars":11,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/m9crax03","slide":4,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/nalsj2ho","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/obu9c7i9","slide":4,"text":"Automation knowledge review","textPreview":"Automation knowledge review","textChars":27,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/9c3alszu","slide":4,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/adcrex0f","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/belsn2hk","slide":4,"text":"DevOps model and CALMS","textPreview":"DevOps model and CALMS","textChars":22,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/wfutg7i5","slide":4,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/x03apczq","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/qh8r2d0v","slide":4,"text":"Delivery lifecycle and evidence","textPreview":"Delivery lifecycle and evidence","textChars":31,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/ri1sbihg","slide":4,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/vmxo3ex8","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/ulo7a9gn","slide":4,"text":"Infrastructure ownership boundaries","textPreview":"Infrastructure ownership boundaries","textChars":35,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/hof654fe","slide":4,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/gn6pcjyt","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/7ixozuxc","slide":4,"text":"Docker, Compose, and Kubernetes","textPreview":"Docker, Compose, and Kubernetes","textChars":31,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/6h476pgr","slide":4,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/tkf614f2","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/8j6p8zyh","slide":4,"text":"GitLab pipeline design","textPreview":"GitLab pipeline design","textChars":22,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/reh8byxg","slide":4,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/qd87itgv","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/oz2lcved","slide":4,"text":"Deployment validation and recovery","textPreview":"Deployment validation and recovery","textChars":34,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/90bm50vy","slide":4,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/mx03alw7","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ny943qxs","slide":4,"text":"Security and operational feedback","textPreview":"Security and operational feedback","textChars":33,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/2znm4m","slide":4,"text":"Purpose: Compare the two sides of five-day learning sequence.\n\nLeft side, Days 1 and 2: Automation knowledge review DevOps model and CALMS Delivery lifecycle and evidence Infrastructure ownership boundaries\n\nRight side, Days 3 to 5: Docker, Compose, and Kubernetes GitLab pipeline design Deployment validation and recovery Security and operational feedback\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/wf7bj2","slide":5,"title":"5","textShapes":21}
+{"kind":"shape","id":"sh/61o32h4v","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/t4fmxc36","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/s36l47ml","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/jed4r2l4","slide":5,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/id43yx4j","slide":5,"text":"Starting knowledge","textPreview":"Starting knowledge","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/5gfmtc3a","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/4fml07mp","slide":5,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/3ah43ml8","slide":5,"text":"Expected foundation","textPreview":"Expected foundation","textChars":19,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/2983a143","slide":5,"text":"Course emphasis","textPreview":"Course emphasis","textChars":15,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/8765kvyx","slide":5,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/98f6d0fi","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/m5onilgr","slide":5,"text":"Python scripting and virtual environments","textPreview":"Python scripting and virtual environments","textChars":41,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/76xobqxc","slide":5,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/k3m5gvy1","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/l4f690f6","slide":5,"text":"REST APIs and structured data","textPreview":"REST APIs and structured data","textChars":29,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/y14nelgv","slide":5,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/z2do7qxg","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/cfm5cbyp","slide":5,"text":"Ansible and network automation workflows","textPreview":"Ansible and network automation workflows","textChars":40,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/xgv65gfa","slide":5,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/dwnm9cry","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/cvel07qd","slide":5,"text":"Git fundamentals and Linux command line","textPreview":"Git fundamentals and Linux command line","textChars":39,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/ru547298","slide":5,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/q9w3yx8n","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/p8nm5sr2","slide":5,"text":"Team delivery practices","textPreview":"Team delivery practices","textChars":23,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/47ulwnqh","slide":5,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/36lk329w","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/25c3ax8b","slide":5,"text":"Repeatable infrastructure and runtime environments","textPreview":"Repeatable infrastructure and runtime environments","textChars":50,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/947mhw76","slide":5,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/o3yl8rql","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/69sj2to3","slide":5,"text":"Controlled build, test, release, and deployment","textPreview":"Controlled build, test, release, and deployment","textChars":47,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/7a10bypo","slide":5,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/8ba14369","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/tcjido7u","slide":5,"text":"Security evidence and operational feedback","textPreview":"Security evidence and operational feedback","textChars":42,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/wf7bj2","slide":5,"text":"Purpose: Compare the two sides of starting knowledge.\n\nLeft side, Expected foundation: Python scripting and virtual environments REST APIs and structured data Ansible and network automation workflows Git fundamentals and Linux command line\n\nRight side, Course emphasis: Team delivery practices Repeatable infrastructure and runtime environments Controlled build, test, release, and deployment Security evidence and operational feedback\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/scuhlg","slide":6,"title":"6","textShapes":21}
+{"kind":"shape","id":"sh/cb2lo7id","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/ratkf2hs","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/q9k3mx07","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/10vmlczu","slide":6,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/0z2ls7i9","slide":6,"text":"Learning expectations","textPreview":"Learning expectations","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/zet4j2ho","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/edk3qx03","slide":6,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/94vmpwzq","slide":6,"text":"During class","textPreview":"During class","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/o3mlwril","slide":6,"text":"Working approach","textPreview":"Working approach","textChars":16,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/ylkfu58r","slide":6,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/zmtg3a9w","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/kn2hwvqh","slide":6,"text":"Participate in technical discussions","textPreview":"Participate in technical discussions","textChars":36,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/lovy50r2","slide":6,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/mp4zy58n","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/7qdg7a98","slide":6,"text":"Use the assigned learner identity and resource range","textPreview":"Use the assigned learner identity and resource range","textChars":52,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/8rmh0fqt","slide":6,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/9svy9kre","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/2t0fml8j","slide":6,"text":"Keep evidence from tests and deployments","textPreview":"Keep evidence from tests and deployments","textChars":40,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/nu9gvq94","slide":6,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/rypc3mpw","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/qxwvuhob","slide":6,"text":"Ask questions when observed behavior differs from intent","textPreview":"Ask questions when observed behavior differs from intent","textChars":56,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/d07epc7m","slide":6,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/szydw761","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/3a5cz2pk","slide":6,"text":"Read the task before changing the environment","textPreview":"Read the task before changing the environment","textChars":45,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/i9wvqx8z","slide":6,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/5wnu1c7q","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/4veds765","slide":6,"text":"Validate each boundary before continuing","textPreview":"Validate each boundary before continuing","textChars":40,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/nq9wv6po","slide":6,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/250v21oj","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/kba9w36l","slide":6,"text":"Record assumptions and results","textPreview":"Record assumptions and results","textChars":30,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/lcjapon6","slide":6,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/y9srutov","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/za1sny5g","slide":6,"text":"Restore shared resources after use","textPreview":"Restore shared resources after use","textChars":34,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/scuhlg","slide":6,"text":"Purpose: Compare the two sides of learning expectations.\n\nLeft side, During class: Participate in technical discussions Use the assigned learner identity and resource range Keep evidence from tests and deployments Ask questions when observed behavior differs from intent\n\nRight side, Working approach: Read the task before changing the environment Validate each boundary before continuing Record assumptions and results Restore shared resources after use\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/c7qquk","slide":7,"title":"7","textShapes":8}
+{"kind":"shape","id":"sh/epkjq1kj","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1sb21gja","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/gr21sb2p","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/r290vmls","slide":7,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/610jm1kn","slide":7,"text":"Knowledge gained","textPreview":"Knowledge gained","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/tobixwjy","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/s321or2d","slide":7,"text":"By the end of the course, learners can explain and apply the complete delivery path for a containerized automation service.","textPreview":"By the end of the course, learners can explain and apply the complete delivery path for a containerized automation service.","textChars":123,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/jy90rmlw","slide":7,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/ix0jihkb","slide":7,"text":"Select ownership boundaries for Terraform, Ansible, Docker, and Kubernetes","textPreview":"Select ownership boundaries for Terraform, Ansible, Docker, and Kubernetes","textChars":74,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/8by5g3y5","slide":7,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/tc7m98za","slide":7,"text":"Design GitLab pipelines with meaningful validation and promotion gates","textPreview":"Design GitLab pipelines with meaningful validation and promotion gates","textChars":70,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/69g3etgz","slide":7,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/7ap47yhk","slide":7,"text":"Protect credentials and runner trust boundaries","textPreview":"Protect credentials and runner trust boundaries","textChars":47,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/knelc3yt","slide":7,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/l8nm58ze","slide":7,"text":"Use logs, metrics, dashboards, and alerts to evaluate service behavior","textPreview":"Use logs, metrics, dashboards, and alerts to evaluate service behavior","textChars":70,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/c7qquk","slide":7,"text":"Purpose: Establish the scope of Knowledge gained.\n\nExplain: By the end of the course, learners can explain and apply the complete delivery path for a containerized automation service.\n\nDiscuss: Select ownership boundaries for Terraform, Ansible, Docker, and Kubernetes Design GitLab pipelines with meaningful validation and promotion gates Protect credentials and runner trust boundaries Use logs, metrics, dashboards, and alerts to evaluate service behavior\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/kbdcwx","slide":8,"title":"8","textShapes":21}
+{"kind":"shape","id":"sh/fi1kvy14","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/gjal4329","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/1kj2x8ju","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/6ts3ytk7","slide":8,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ru1kry1s","slide":8,"text":"Course application","textPreview":"Course application","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/sval032d","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/twj2t8jy","slide":8,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/apc3axkr","slide":8,"text":"Application capabilities","textPreview":"Application capabilities","textChars":24,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/bql43i1c","slide":8,"text":"Delivery capabilities","textPreview":"Delivery capabilities","textChars":21,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/j6hgjutk","slide":8,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/i58fapcz","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/58jylkbq","slide":8,"text":"Collect operational data through APIs","textPreview":"Collect operational data through APIs","textChars":37,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/k7axczu5","slide":8,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/7a1gnutw","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/69sfepcb","slide":8,"text":"Present service information through a web interface","textPreview":"Present service information through a web interface","textChars":51,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/tcjyp4bm","slide":8,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/sbahgzu1","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/felgrets","slide":8,"text":"Persist application data","textPreview":"Persist application data","textChars":24,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/udszi9c7","slide":8,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/q9wjqdwf","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/ba50jid0","slide":8,"text":"Run consistently across environments","textPreview":"Run consistently across environments","textChars":36,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/cve1s3el","slide":8,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/dwnil8v6","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/25cjmtwj","slide":8,"text":"Provision an isolated test environment","textPreview":"Provision an isolated test environment","textChars":38,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/3650fyd4","slide":8,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/47e1o3e9","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/p8nih8vu","slide":8,"text":"Package and scan release artifacts","textPreview":"Package and scan release artifacts","textChars":34,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/m1gjyxcn","slide":8,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/n2pkr2d8","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/xwrmhwfa","slide":8,"text":"Promote through protected pipelines","textPreview":"Promote through protected pipelines","textChars":35,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/wviloryp","slide":8,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/vu94fmx4","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/at03mhgz","slide":8,"text":"Correlate deployment and runtime evidence","textPreview":"Correlate deployment and runtime evidence","textChars":41,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/kbdcwx","slide":8,"text":"Purpose: Compare the two sides of course application.\n\nLeft side, Application capabilities: Collect operational data through APIs Present service information through a web interface Persist application data Run consistently across environments\n\nRight side, Delivery capabilities: Provision an isolated test environment Package and scan release artifacts Promote through protected pipelines Correlate deployment and runtime evidence\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/wnchmw","slide":9,"title":"9","textShapes":21}
+{"kind":"shape","id":"sh/0n6xojql","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/zmxwvep0","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/elofm98f","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/9cze1o72","slide":9,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ob6xs3qx","slide":9,"text":"Instructor introduction","textPreview":"Instructor introduction","textChars":23,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/nqxwzypc","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/mpofqt8r","slide":9,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/pgvep47y","slide":9,"text":"Professional background","textPreview":"Professional background","textChars":23,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/4vmdgzqd","slide":9,"text":"Teaching approach","textPreview":"Teaching approach","textChars":17,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/uts7ilcb","slide":9,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/vu1orqtw","slide":9,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/wvapkvuh","slide":9,"text":"Current role and technical focus","textPreview":"Current role and technical focus","textChars":32,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/hgj6t0b2","slide":9,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ihs7m5cn","slide":9,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ji1ovat8","slide":9,"text":"Relevant automation and delivery experience","textPreview":"Relevant automation and delivery experience","textChars":43,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/4japofud","slide":9,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/5k3qxkby","slide":9,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/6lc7q5cj","slide":9,"text":"Platforms and tools used in production","textPreview":"Platforms and tools used in production","textChars":38,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/rml8zat4","slide":9,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/3qlona9c","slide":9,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/2pcnepsr","slide":9,"text":"What you want learners to take from the course","textPreview":"What you want learners to take from the course","textChars":46,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/psn6pkri","slide":9,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/ore5gfax","slide":9,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/fmloja90","slide":9,"text":"Explain the engineering decision first","textPreview":"Explain the engineering decision first","textChars":38,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/elcna5sv","slide":9,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/1o36lkr6","slide":9,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/gnu5cfal","slide":9,"text":"Demonstrate the observable result","textPreview":"Demonstrate the observable result","textChars":33,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/ri1ofq94","slide":9,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/6hsn65sj","slide":9,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/wnqlgrqh","slide":9,"text":"Connect failures to design choices","textPreview":"Connect failures to design choices","textChars":34,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/hoz29w72","slide":9,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/u183e18b","slide":9,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/v2hk7mpw","slide":9,"text":"Leave time for questions and comparison","textPreview":"Leave time for questions and comparison","textChars":39,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/wnchmw","slide":9,"text":"Purpose: Compare the two sides of instructor introduction.\n\nLeft side, Professional background: Current role and technical focus Relevant automation and delivery experience Platforms and tools used in production What you want learners to take from the course\n\nRight side, Teaching approach: Explain the engineering decision first Demonstrate the observable result Connect failures to design choices Leave time for questions and comparison\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/7a0a84","slide":10,"title":"10","textShapes":21}
+{"kind":"shape","id":"sh/byp0z6lc","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/czyh8bmx","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/x07i1g3i","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/29wz214v","slide":10,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/3ap0v6l0","slide":10,"text":"Learner introductions","textPreview":"Learner introductions","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/obyh4bml","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/pc7ixg36","slide":10,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/e5wzy14j","slide":10,"text":"Please share","textPreview":"Please share","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/f65grml4","slide":10,"text":"Listen for","textPreview":"Listen for","textChars":10,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/zq1g7m9g","slide":10,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ypszehsv","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ls3y9wrm","slide":10,"text":"Name and current role","textPreview":"Name and current role","textChars":21,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/kruhgra1","slide":10,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/7ulgb69s","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/mtczi1s7","slide":10,"text":"Automation tools you use today","textPreview":"Automation tools you use today","textChars":30,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/9w3ydwri","slide":10,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/8vuhkbax","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/3yhgz2t8","slide":10,"text":"Experience with containers or CI/CD","textPreview":"Experience with containers or CI/CD","textChars":35,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/2x8f6xsn","slide":10,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/6dgje5cb","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/repk7atw","slide":10,"text":"One delivery problem you want to solve","textPreview":"One delivery problem you want to solve","textChars":38,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/sfy1gfuh","slide":10,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/tg729kb2","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/ipwja5cf","slide":10,"text":"Common platforms and constraints","textPreview":"Common platforms and constraints","textChars":32,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/jqp03at0","slide":10,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/4by1cfu5","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/5c7250bq","slide":10,"text":"Shared operational risks","textPreview":"Shared operational risks","textChars":24,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/ulwj6lc3","slide":10,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/vm50zqto","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/xcve1szi","slide":10,"text":"Different levels of software experience","textPreview":"Different levels of software experience","textChars":39,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/crmdsnix","slide":10,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/bqdwzihc","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/ap4vqd0r","slide":10,"text":"Opportunities for peer learning","textPreview":"Opportunities for peer learning","textChars":31,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/7a0a84","slide":10,"text":"Purpose: Compare the two sides of learner introductions.\n\nLeft side, Please share: Name and current role Automation tools you use today Experience with containers or CI/CD One delivery problem you want to solve\n\nRight side, Listen for: Common platforms and constraints Shared operational risks Different levels of software experience Opportunities for peer learning\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/3fzjqm","slide":11,"title":"11","textShapes":8}
+{"kind":"shape","id":"sh/zqtg7y94","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/0r2hg3qp","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/lsby98ra","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/q10fat8n","slide":11,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/b29g3y98","slide":11,"text":"Course agreements","textPreview":"Course agreements","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/c3ixc3qt","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/d4by58ry","slide":11,"text":"A shared environment works when every learner treats identity, scope, and cleanup as part of the engineering task.","textPreview":"A shared environment works when every learner treats identity, scope, and cleanup as part of the engineering task.","textChars":114,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/ux4zmx8r","slide":11,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/vydgf29c","slide":11,"text":"Use only your assigned namespace, ports, and identifiers","textPreview":"Use only your assigned namespace, ports, and identifiers","textChars":56,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/3a9wnq9o","slide":11,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/2p0vu5s3","slide":11,"text":"Never place credentials in source control or terminal history","textPreview":"Never place credentials in source control or terminal history","textChars":61,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/pcrep0re","slide":11,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/4bidwva9","slide":11,"text":"Stop when a validation gate fails","textPreview":"Stop when a validation gate fails","textChars":33,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/retwra9k","slide":11,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/qdkvy5sz","slide":11,"text":"Preserve logs and pipeline evidence for review","textPreview":"Preserve logs and pipeline evidence for review","textChars":46,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/3fzjqm","slide":11,"text":"Purpose: Establish the scope of Course agreements.\n\nExplain: A shared environment works when every learner treats identity, scope, and cleanup as part of the engineering task.\n\nDiscuss: Use only your assigned namespace, ports, and identifiers Never place credentials in source control or terminal history Stop when a validation gate fails Preserve logs and pipeline evidence for review\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/gcjfcf","slide":12,"title":"12","textShapes":21}
+{"kind":"shape","id":"sh/fu1wrm1k","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/0vaxkri5","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/1wjetwjq","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/mxsfm10b","slide":12,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ny1wv61w","slide":12,"text":"Evidence of learning","textPreview":"Evidence of learning","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/ozuxobi1","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/903exgzm","slide":12,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/alcfq107","slide":12,"text":"Technical evidence","textPreview":"Technical evidence","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/bmlwz6hs","slide":12,"text":"Engineering judgement","textPreview":"Engineering judgement","textChars":21,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/bydsr25o","slide":12,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ax4rixo3","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/xkfatcne","slide":12,"text":"Working source and configuration","textPreview":"Working source and configuration","textChars":32,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/wj69k769","slide":12,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/nudsni5c","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/mt4redor","slide":12,"text":"Successful automated checks","textPreview":"Successful automated checks","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/9wvapsni","slide":12,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/ovm9gn6x","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/7qxszm5w","slide":12,"text":"Identified container images","textPreview":"Identified container images","textChars":27,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/6porqhob","slide":12,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/ilsvil8j","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/3m1crqp4","slide":12,"text":"Deployment and runtime records","textPreview":"Deployment and runtime records","textChars":30,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/4nadkvq9","slide":12,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/58jutg7u","slide":12,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/q9svml8f","slide":12,"text":"Explain tool ownership","textPreview":"Explain tool ownership","textChars":22,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/ralcvqp0","slide":12,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/sbudovql","slide":12,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/dc3ux076","slide":12,"text":"Interpret failed validation","textPreview":"Interpret failed validation","textChars":27,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/6d8ba18b","slide":12,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/7ehcj6pw","slide":12,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/9k765ovq","slide":12,"text":"Select a safe recovery action","textPreview":"Select a safe recovery action","textChars":29,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/8jypc3e5","slide":12,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/nipo3ydk","slide":12,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/mhg7atwz","slide":12,"text":"Connect symptoms to recent change","textPreview":"Connect symptoms to recent change","textChars":33,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/gcjfcf","slide":12,"text":"Purpose: Compare the two sides of evidence of learning.\n\nLeft side, Technical evidence: Working source and configuration Successful automated checks Identified container images Deployment and runtime records\n\nRight side, Engineering judgement: Explain tool ownership Interpret failed validation Select a safe recovery action Connect symptoms to recent change\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/lwy6fz","slide":13,"title":"13","textShapes":7}
+{"kind":"shape","id":"sh/c3qd4jix","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/b2hwvehs","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/qh8v2907","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/pgzet4zm","slide":13,"text":"Course introduction","textPreview":"Course introduction","textChars":19,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ofqd0zi1","slide":13,"text":"Course orientation complete","textPreview":"Course orientation complete","textChars":27,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/3ehwruhg","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/2d8vyp0v","slide":13,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/1czepkza","slide":13,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/gb6dwfi5","slide":13,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/y58j658n","slide":13,"text":"Course orientation complete","textPreview":"Course orientation complete","textChars":27,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/z6h0zaps","slide":13,"text":"Next: Network Automation Review","textPreview":"Next: Network Automation Review","textChars":31,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/07q18fqd","slide":13,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/l8zi1k7y","slide":13,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"notes","id":"nt/lwy6fz","slide":13,"text":"Purpose: Close Course introduction.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Network Automation Review\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

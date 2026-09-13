@@ -1,0 +1,395 @@
+{"kind":"deck","id":"pr/gjxkh6","name":"Deck"}
+{"kind":"layout","layoutId":"ce310719-d232-4470-8415-7237df156952","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"f3b28a58-86c3-41d8-ba9f-47fac91055d8","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/z0brmz","slide":1,"title":"Module 5","textShapes":4}
+{"kind":"shape","id":"sh/uxszy94b","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/vi1gre5w","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/8vqhwzml","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/9wjyp4n6","slide":1,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/mt8fu94f","slide":1,"text":"Security and Observability","textPreview":"Security and Observability","textChars":26,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/7uhgne50","slide":1,"text":"Trust boundaries, secrets, telemetry, and operational feedback","textPreview":"Trust boundaries, secrets, telemetry, and operational feedback","textChars":62,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/sruh83mp","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/gn2xo7qx","slide":1,"name":"","alt":"study guide cover architecture.png","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/z0brmz","slide":1,"text":"Purpose: Open Module 5 and establish the subject of the deck.\n\nExplain: Security and Observability. Trust boundaries, secrets, telemetry, and operational feedback.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/5k64jn","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/4jmxc7u1","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/jidgj2tg","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ix4faxcv","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/tovypcbi","slide":2,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/snmxgrud","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/rmdgnmts","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/6l4fehc7","slide":2,"text":"This module protects the delivery system and makes its behavior visible enough to investigate change, performance, and failure.","textPreview":"This module protects the delivery system and makes its behavior visible enough to investigate change, performance, and failure.","textChars":127,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/9sbydsbe","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/8r2x4nut","slide":2,"text":"Map trust boundaries across source, runners, registries, and targets","textPreview":"Map trust boundaries across source, runners, registries, and targets","textChars":68,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/u5grad4b","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/f6983ylw","slide":2,"text":"Retrieve secrets at runtime with bounded identity","textPreview":"Retrieve secrets at runtime with bounded identity","textChars":49,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/g7i9c3mh","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/h8rq5832","slide":2,"text":"Collect logs and metrics with useful context","textPreview":"Collect logs and metrics with useful context","textChars":44,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/290red47","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/3a987ils","slide":2,"text":"Build alerts and dashboards that support action","textPreview":"Build alerts and dashboards that support action","textChars":47,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/5k64jn","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module protects the delivery system and makes its behavior visible enough to investigate change, performance, and failure.\n\nDiscuss: Map trust boundaries across source, runners, registries, and targets Retrieve secrets at runtime with bounded identity Collect logs and metrics with useful context Build alerts and dashboards that support action\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/qel4gk","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/uts7i58f","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/hwj6t0rq","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/wvapkvq5","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/7qhonq9o","slide":3,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/mp8nel83","slide":3,"text":"Delivery trust boundaries","textPreview":"Delivery trust boundaries","textChars":25,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/9sj6p0ru","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/rmlozu9s","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/6lc7qp8n","slide":3,"text":"Every boundary changes the identity, permissions, data exposure, or network reach available to the delivery workload.","textPreview":"Every boundary changes the identity, permissions, data exposure, or network reach available to the delivery workload.","textChars":117,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/xwjetkbe","slide":3,"name":"","alt":"netdevops trust boundaries.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/qel4gk","slide":3,"text":"Purpose: Explain delivery trust boundaries through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Every boundary changes the identity, permissions, data exposure, or network reach available to the delivery workload.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/chxuxj","slide":4,"title":"4","textShapes":21}
+{"kind":"shape","id":"sh/onq54vuh","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/nmhovqdw","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ml8n2lcb","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/1kz6tgvq","slide":4,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/0jq50bu5","slide":4,"text":"Threat model questions","textPreview":"Threat model questions","textChars":22,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/zih4rqd0","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ex8nylcf","slide":4,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/lg365kva","slide":4,"text":"Assets and actors","textPreview":"Assets and actors","textChars":17,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/kfu5cfup","slide":4,"text":"Controls and response","textPreview":"Controls and response","textChars":21,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/69kza1w3","slide":4,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/7atgj6do","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/8b2hcbe9","slide":4,"text":"Which source and artifacts require integrity?","textPreview":"Which source and artifacts require integrity?","textChars":45,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/tcbylgvu","slide":4,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/y50f61w7","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/j69gf6ds","slide":4,"text":"Who can approve or trigger deployment?","textPreview":"Who can approve or trigger deployment?","textChars":38,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/k72h8bex","slide":4,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/l8byhwvi","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/i14zilwb","slide":4,"text":"Which identities can reach managed targets?","textPreview":"Which identities can reach managed targets?","textChars":43,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/32dgrqdw","slide":4,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/fm5wjit8","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/elwvadcn","slide":4,"text":"Where can secrets or evidence leak?","textPreview":"Where can secrets or evidence leak?","textChars":35,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/1o7elsbe","slide":4,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/0nedcnut","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/napwn2tk","slide":4,"text":"How is identity verified?","textPreview":"How is identity verified?","textChars":25,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/m9gvexcz","slide":4,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/9c7epcba","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/obydg7up","slide":4,"text":"Where is scope enforced?","textPreview":"Where is scope enforced?","textChars":24,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/bepwr2tg","slide":4,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/adgvixcv","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/8jid87q9","slide":4,"text":"Which events require alerting?","textPreview":"Which events require alerting?","textChars":30,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/tkruhcru","slide":4,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/6h0v6hs3","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/7i9cf29o","slide":4,"text":"How are credentials revoked?","textPreview":"How are credentials revoked?","textChars":28,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/chxuxj","slide":4,"text":"Purpose: Compare the two sides of threat model questions.\n\nLeft side, Assets and actors: Which source and artifacts require integrity? Who can approve or trigger deployment? Which identities can reach managed targets? Where can secrets or evidence leak?\n\nRight side, Controls and response: How is identity verified? Where is scope enforced? Which events require alerting? How are credentials revoked?\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/msi8pc","slide":5,"title":"5","textShapes":4}
+{"kind":"shape","id":"sh/itc3qlw7","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/5gnml0fy","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/kfu5sved","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vql4fqxw","slide":5,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/apc3mlwb","slide":5,"text":"Security throughout delivery","textPreview":"Security throughout delivery","textChars":28,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/xs3mhgfm","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/nm14b6xk","slide":5,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/mls3i1gz","slide":5,"text":"Source controls, dependency checks, artifact integrity, protected deployment, and runtime monitoring address different attack paths.","textPreview":"Source controls, dependency checks, artifact integrity, protected deployment, and runtime monitoring address different attack paths.","textChars":132,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/xczap8ve","slide":5,"name":"","alt":"security through delivery.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/msi8pc","slide":5,"text":"Purpose: Explain security throughout delivery through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Source controls, dependency checks, artifact integrity, protected deployment, and runtime monitoring address different attack paths.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/vmauaj","slide":6,"title":"6","textShapes":21}
+{"kind":"shape","id":"sh/itwj6h87","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/pw721c7y","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/4vy187qd","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vq50v29w","slide":6,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/upwj2x8b","slide":6,"text":"Vault access pattern","textPreview":"Vault access pattern","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/hsn2xc7m","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/gre147q1","slide":6,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/7250ri9k","slide":6,"text":"Authentication","textPreview":"Authentication","textChars":14,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/61cjyx8z","slide":6,"text":"Secret use","textPreview":"Secret use","textChars":10,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/kzu9wnep","slide":6,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/lk3qpsva","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/yxcrudwz","slide":6,"text":"Pipeline proves workload identity","textPreview":"Pipeline proves workload identity","textChars":33,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/jyl8nidk","slide":6,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/wvups3et","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/xw3ql8ve","slide":6,"text":"Vault evaluates policy","textPreview":"Vault evaluates policy","textChars":22,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/ats7qdwn","slide":6,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/bu18jid8","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/gre947ex","slide":6,"text":"A short-lived token scopes access","textPreview":"A short-lived token scopes access","textChars":33,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/hsnqxcvi","slide":6,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/p8jqhcnm","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/o7a98761","slide":6,"text":"Audit records identify the request","textPreview":"Audit records identify the request","textChars":34,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/3618f25w","slide":6,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/25s76xob","slide":6,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/1kjqdsnq","slide":6,"text":"Job retrieves only required values","textPreview":"Job retrieves only required values","textChars":34,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/gjap4n65","slide":6,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/fi18bi5k","slide":6,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/eh872xoz","slide":6,"text":"Values remain masked from output","textPreview":"Values remain masked from output","textChars":32,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/tgzq9sne","slide":6,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/sfqp0n69","slide":6,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/ilonat4r","slide":6,"text":"Credentials live only for the task","textPreview":"Credentials live only for the task","textChars":34,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/jmxojylc","slide":6,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/kn65cjmx","slide":6,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/5of6lo3i","slide":6,"text":"Revocation closes the session","textPreview":"Revocation closes the session","textChars":29,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/vmauaj","slide":6,"text":"Purpose: Compare the two sides of vault access pattern.\n\nLeft side, Authentication: Pipeline proves workload identity Vault evaluates policy A short-lived token scopes access Audit records identify the request\n\nRight side, Secret use: Job retrieves only required values Values remain masked from output Credentials live only for the task Revocation closes the session\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/k9z7lm","slide":7,"title":"7","textShapes":4}
+{"kind":"shape","id":"sh/yxgr25wj","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/l07ad0fa","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/kzy94fep","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/729sfaxg","slide":7,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/m10r65wv","slide":7,"text":"Runner compromise response","textPreview":"Runner compromise response","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/9orahkf6","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/vq9sjuxc","slide":7,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/up0rapwr","slide":7,"text":"Containment should revoke credentials, isolate the runner, preserve evidence, evaluate affected artifacts, and restore from a trusted baseline.","textPreview":"Containment should revoke credentials, isolate the runner, preserve evidence, evaluate affected artifacts, and restore from a trusted bas...","textChars":143,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/x0f25ofm","slide":7,"name":"","alt":"compromised runner response.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/k9z7lm","slide":7,"text":"Purpose: Explain runner compromise response through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Containment should revoke credentials, isolate the runner, preserve evidence, evaluate affected artifacts, and restore from a trusted baseline.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/82u4a6","slide":8,"title":"8","textShapes":4}
+{"kind":"shape","id":"sh/m1o7qdcn","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/94z6l8ve","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/836psnut","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/zyxofydc","slide":8,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/yxo7mtcr","slide":8,"text":"Monitoring and observability","textPreview":"Monitoring and observability","textChars":28,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l0f6h8vi","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/budobyd0","slide":8,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/a94nitcv","slide":8,"text":"Telemetry provides raw signals. Monitoring evaluates known conditions. Observability supports investigation when the failure mode was not predicted.","textPreview":"Telemetry provides raw signals. Monitoring evaluates known conditions. Observability supports investigation when the failure mode was not...","textChars":148,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/lg7mt8rm","slide":8,"name":"","alt":"monitoring observability telemetry.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/82u4a6","slide":8,"text":"Purpose: Explain monitoring and observability through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Telemetry provides raw signals. Monitoring evaluates known conditions. Observability supports investigation when the failure mode was not predicted.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/iwpsnm","slide":9,"title":"9","textShapes":4}
+{"kind":"shape","id":"sh/exo3ydkb","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/10zm9s3m","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0zql0n21","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/rax43ilk","slide":9,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/q9o3ud4z","slide":9,"text":"Observability architecture","textPreview":"Observability architecture","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/dwfm583q","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/v614f2lo","slide":9,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/a58n6xkj","slide":9,"text":"Applications, containers, Kubernetes, delivery jobs, and managed systems should send correlated events to a common analysis path.","textPreview":"Applications, containers, Kubernetes, delivery jobs, and managed systems should send correlated events to a common analysis path.","textChars":129,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/1gradsv6","slide":9,"name":"","alt":"observability architecture.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/iwpsnm","slide":9,"text":"Purpose: Explain observability architecture through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Applications, containers, Kubernetes, delivery jobs, and managed systems should send correlated events to a common analysis path.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/mvborm","slide":10,"title":"10","textShapes":21}
+{"kind":"shape","id":"sh/x0r2hcfy","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/adgj6xgn","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/by9kf2xs","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/k3i1c7ep","slide":10,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/54r2lcfa","slide":10,"text":"Elastic data flow","textPreview":"Elastic data flow","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/y10jaxwj","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/j29kj2x4","slide":10,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/07y10ny5","slide":10,"text":"Collection","textPreview":"Collection","textChars":10,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/187i9sfq","slide":10,"text":"Use","textPreview":"Use","textChars":3,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/58vuxcn6","slide":10,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/k7md4rml","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/j6dcvm50","slide":10,"text":"Application and pipeline logs","textPreview":"Application and pipeline logs","textChars":29,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/y54v2h4f","slide":10,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/twfe1wn2","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/sv6d8rmh","slide":10,"text":"Container and Kubernetes events","textPreview":"Container and Kubernetes events","textChars":31,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/7adwzm5w","slide":10,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/694v6h4r","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/h0fe5wne","slide":10,"text":"Host and workload metrics","textPreview":"Host and workload metrics","textChars":25,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/gz6dcbmt","slide":10,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/0fypozy1","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/1g76x4zm","slide":10,"text":"Synthetic request measurements","textPreview":"Synthetic request measurements","textChars":30,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/edg7m9gv","slide":10,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/zepovehg","slide":10,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/ojypsjyd","slide":10,"text":"Normalize and enrich events","textPreview":"Normalize and enrich events","textChars":27,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/9kr61ozi","slide":10,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/mhg7q9g7","slide":10,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/nipozehs","slide":10,"text":"Search by deployment identity","textPreview":"Search by deployment identity","textChars":29,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/4ne5gfyt","slide":10,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/pon6pkze","slide":10,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/7itsvi1w","slide":10,"text":"Build service dashboards","textPreview":"Build service dashboards","textChars":24,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/6hkrmx0b","slide":10,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/t4vaxsz2","slide":10,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/s3m9onih","slide":10,"text":"Trigger actionable webhook alerts","textPreview":"Trigger actionable webhook alerts","textChars":33,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/mvborm","slide":10,"text":"Purpose: Compare the two sides of elastic data flow.\n\nLeft side, Collection: Application and pipeline logs Container and Kubernetes events Host and workload metrics Synthetic request measurements\n\nRight side, Use: Normalize and enrich events Search by deployment identity Build service dashboards Trigger actionable webhook alerts\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/c42zxk","slide":11,"title":"11","textShapes":4}
+{"kind":"shape","id":"sh/obexwzih","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/3a5gnu1w","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/29wfu90b","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/183yl4jq","slide":11,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/g7uxszi5","slide":11,"text":"Operational signals","textPreview":"Operational signals","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/f6lgju1k","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/tk3yhkju","slide":11,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/sjuxof29","slide":11,"text":"Logs explain events, metrics show trends, traces follow requests, and state collection confirms the behavior of managed infrastructure.","textPreview":"Logs explain events, metrics show trends, traces follow requests, and state collection confirms the behavior of managed infrastructure.","textChars":135,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/vitw3qxc","slide":11,"name":"","alt":"operational signals.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/c42zxk","slide":11,"text":"Purpose: Explain operational signals through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Logs explain events, metrics show trends, traces follow requests, and state collection confirms the behavior of managed infrastructure.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/3i3em2","slide":12,"title":"12","textShapes":4}
+{"kind":"shape","id":"sh/balgv254","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/cbuxo76p","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/xc3yxcna","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/25sfixon","slide":12,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/n61gr258","slide":12,"text":"Change-aware feedback","textPreview":"Change-aware feedback","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/o7uxkn6t","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/m1wfuhor","slide":12,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/725g3m5c","slide":12,"text":"Deployment identity and timestamps connect pipeline events to changes in application, cluster, and network behavior.","textPreview":"Deployment identity and timestamps connect pipeline events to changes in application, cluster, and network behavior.","textChars":116,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/grqx8j2t","slide":12,"name":"","alt":"change aware feedback loop.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/3i3em2","slide":12,"text":"Purpose: Explain change-aware feedback through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Deployment identity and timestamps connect pipeline events to changes in application, cluster, and network behavior.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/xm3jcj","slide":13,"title":"13","textShapes":4}
+{"kind":"shape","id":"sh/7qlgr2lk","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/8rux0725","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ts3ytc3q","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/y1sfux43","slide":13,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/j21gn2lo","slide":13,"text":"Change correlation","textPreview":"Change correlation","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/k3axw7m9","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ixwz61k7","slide":13,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/3y5gzmls","slide":13,"text":"Useful audit records link actor, source revision, pipeline, artifact, target, action, result, and observed service outcome.","textPreview":"Useful audit records link actor, source revision, pipeline, artifact, target, action, result, and observed service outcome.","textChars":123,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/oradkn6x","slide":13,"name":"","alt":"change correlation model.png","bbox":[64,165,1152,425]}
+{"kind":"notes","id":"nt/xm3jcj","slide":13,"text":"Purpose: Explain change correlation through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Useful audit records link actor, source revision, pipeline, artifact, target, action, result, and observed service outcome.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/s3a90x","slide":14,"title":"14","textShapes":21}
+{"kind":"shape","id":"sh/2t4bipsn","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/pgvat4re","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ovmtkzat","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/fqtsna9c","slide":14,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/epkbe5sr","slide":14,"text":"Audit event content","textPreview":"Audit event content","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/1svapkr2","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/0r2tgfah","slide":14,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/zmxsze9g","slide":14,"text":"Identity and intent","textPreview":"Identity and intent","textChars":19,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ylobq98v","slide":14,"text":"Execution and outcome","textPreview":"Execution and outcome","textChars":21,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/kva14zyl","slide":14,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/5wjid4f6","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ytsj2pgf","slide":14,"text":"Timestamp and correlation identifier","textPreview":"Timestamp and correlation identifier","textChars":36,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/ju10bux0","slide":14,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/w7q10zy9","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/xsji9kfu","slide":14,"text":"Actor and workload identity","textPreview":"Actor and workload identity","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/a58jypgj","slide":14,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/b6h07ux4","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/o3q1wfyd","slide":14,"text":"Source revision and pipeline","textPreview":"Source revision and pipeline","textChars":28,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/94zi5kfy","slide":14,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/po7qdcna","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/4nypk7m5","slide":14,"text":"Target and requested action","textPreview":"Target and requested action","textChars":27,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/3mp8b25k","slide":14,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/2lg7ix4z","slide":14,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/hk7q9cne","slide":14,"text":"Tool and dependency versions","textPreview":"Tool and dependency versions","textChars":28,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/gjepg7mt","slide":14,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/fi587258","slide":14,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/uhw7ex4n","slide":14,"text":"Command or API operation","textPreview":"Command or API operation","textChars":24,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/1grqlw3i","slide":14,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/0fipsrmx","slide":14,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/ilcnmtkf","slide":14,"text":"Result and sanitized error detail","textPreview":"Result and sanitized error detail","textChars":33,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/jml4fyl0","slide":14,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/knu5o32l","slide":14,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/5o3mh836","slide":14,"text":"Artifact, evidence, and cleanup status","textPreview":"Artifact, evidence, and cleanup status","textChars":38,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/s3a90x","slide":14,"text":"Purpose: Compare the two sides of audit event content.\n\nLeft side, Identity and intent: Timestamp and correlation identifier Actor and workload identity Source revision and pipeline Target and requested action\n\nRight side, Execution and outcome: Tool and dependency versions Command or API operation Result and sanitized error detail Artifact, evidence, and cleanup status\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/n50lub","slide":15,"title":"15","textShapes":21}
+{"kind":"shape","id":"sh/ofuhkb6x","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/nel0rq5c","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/2dczilo7","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/1c3ipgnm","slide":15,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/0bahgb61","slide":15,"text":"Secrets management","textPreview":"Secrets management","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/fa10n65g","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/epsze1ov","slide":15,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/l8ni10nq","slide":15,"text":"Vault responsibilities","textPreview":"Vault responsibilities","textChars":22,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/k7e1sv65","slide":15,"text":"Pipeline responsibilities","textPreview":"Pipeline responsibilities","textChars":25,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/6l4z65kv","slide":15,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/7md0zal0","slide":15,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/8nmh8f2l","slide":15,"text":"Authenticate the workload","textPreview":"Authenticate the workload","textChars":25,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/tovi1k36","slide":15,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/yhkz25kj","slide":15,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/jid0vql4","slide":15,"text":"Issue or return scoped secrets","textPreview":"Issue or return scoped secrets","textChars":30,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/kjmh4v2p","slide":15,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/lkvix03a","slide":15,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/idojepkn","slide":15,"text":"Apply policy and lifetime","textPreview":"Apply policy and lifetime","textChars":25,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/3ex07u18","slide":15,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/fypwzm10","slide":15,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/exgf6h0f","slide":15,"text":"Record access for audit","textPreview":"Record access for audit","textChars":23,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/10re1wjq","slide":15,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/0zix8ri5","slide":15,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/nm9w3m1w","slide":15,"text":"Request secrets only at runtime","textPreview":"Request secrets only at runtime","textChars":31,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/210fa10b","slide":15,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/pore5wj2","slide":15,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/onixwrih","slide":15,"text":"Avoid printing or persisting values","textPreview":"Avoid printing or persisting values","textChars":35,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/bq9g761s","slide":15,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/ap0fy10n","slide":15,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/8v2dobyl","slide":15,"text":"Limit the job and target scope","textPreview":"Limit the job and target scope","textChars":30,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/twbexgf6","slide":15,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/mtkvm1gf","slide":15,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/7utwv6x0","slide":15,"text":"Revoke access after use","textPreview":"Revoke access after use","textChars":23,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/n50lub","slide":15,"text":"Purpose: Compare the two sides of secrets management.\n\nLeft side, Vault responsibilities: Authenticate the workload Issue or return scoped secrets Apply policy and lifetime Record access for audit\n\nRight side, Pipeline responsibilities: Request secrets only at runtime Avoid printing or persisting values Limit the job and target scope Revoke access after use\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/lf10y5","slide":16,"title":"16","textShapes":21}
+{"kind":"shape","id":"sh/psvahcfq","slide":16,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/2pkrmhwf","slide":16,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/nqdsfmx0","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/wvm9sreh","slide":16,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/xgvalwf2","slide":16,"text":"Dashboards and alerts","textPreview":"Dashboards and alerts","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/at4rqhwb","slide":16,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/budsjmxw","slide":16,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/sz29g7ed","slide":16,"text":"Dashboards","textPreview":"Dashboards","textChars":10,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/dkbq9sfi","slide":16,"text":"Alerts","textPreview":"Alerts","textChars":6,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/t4z6lkbq","slide":16,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/s3q5sfu5","slide":16,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/r2hojutk","slide":16,"text":"Cluster and workload health","textPreview":"Cluster and workload health","textChars":27,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/61onqpcz","slide":16,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/18z6p4b2","slide":16,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/g7qpwzuh","slide":16,"text":"Application request success","textPreview":"Application request success","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/f6honutw","slide":16,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/e587upcb","slide":16,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/pcj6t4by","slide":16,"text":"Response time and resource pressure","textPreview":"Response time and resource pressure","textChars":35,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/obap0jud","slide":16,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/8r2hc761","slide":16,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/9sbi5cn6","slide":16,"text":"Pipeline and change correlation","textPreview":"Pipeline and change correlation","textChars":31,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/mp0zahov","slide":16,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/7qt0325g","slide":16,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/wf2hgr6x","slide":16,"text":"Identify a condition that needs action","textPreview":"Identify a condition that needs action","textChars":38,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/hgbi9wni","slide":16,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/utkzehor","slide":16,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/vut07m5c","slide":16,"text":"Include service and deployment context","textPreview":"Include service and deployment context","textChars":38,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/cjih4n6t","slide":16,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/xkrydsne","slide":16,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/fexkjqpw","slide":16,"text":"Use a tested notification path","textPreview":"Use a tested notification path","textChars":30,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/edo3a58b","slide":16,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/1gf2l07m","slide":16,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/gf6lcvq1","slide":16,"text":"Reduce duplicate and non-actionable signals","textPreview":"Reduce duplicate and non-actionable signals","textChars":43,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/lf10y5","slide":16,"text":"Purpose: Compare the two sides of dashboards and alerts.\n\nLeft side, Dashboards: Cluster and workload health Application request success Response time and resource pressure Pipeline and change correlation\n\nRight side, Alerts: Identify a condition that needs action Include service and deployment context Use a tested notification path Reduce duplicate and non-actionable signals\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/h2cryv","slide":17,"title":"17","textShapes":21}
+{"kind":"shape","id":"sh/i1sjqhov","slide":17,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/p4j2lw7m","slide":17,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/43a1sr61","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vy10fmpk","slide":17,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/uxsjmhoz","slide":17,"text":"Synthetic monitoring","textPreview":"Synthetic monitoring","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/h0jihw7a","slide":17,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/gza1or65","slide":17,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/zulkr6po","slide":17,"text":"Test request","textPreview":"Test request","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/etcjy1o3","slide":17,"text":"Recorded evidence","textPreview":"Recorded evidence","textChars":17,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/w3al8ret","slide":17,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/x4jm1wfy","slide":17,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/a1s36hwn","slide":17,"text":"Authenticate with a dedicated identity","textPreview":"Authenticate with a dedicated identity","textChars":38,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/b214zmx8","slide":17,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/ozql47eh","slide":17,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/90zmxcf2","slide":17,"text":"Access the published service endpoint","textPreview":"Access the published service endpoint","textChars":37,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/2x832hwb","slide":17,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/nyh4v2xw","slide":17,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/0bql07el","slide":17,"text":"Confirm device data appears","textPreview":"Confirm device data appears","textChars":27,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/1wz2tcf6","slide":17,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/hsr2xo7u","slide":17,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/gri143q9","slide":17,"text":"Measure total response time","textPreview":"Measure total response time","textChars":27,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/fq9kvypo","slide":17,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/u5gj2t83","slide":17,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/t47ito7i","slide":17,"text":"HTTP result and timing","textPreview":"HTTP result and timing","textChars":22,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/s3y10jqd","slide":17,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/72p0reps","slide":17,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/61gjy987","slide":17,"text":"Application instance identity","textPreview":"Application instance identity","textChars":29,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/d0b25872","slide":17,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/cz21cn6h","slide":17,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/atc7alkn","slide":17,"text":"Target device and data timestamp","textPreview":"Target device and data timestamp","textChars":32,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/bul8jq18","slide":17,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/wvupcv2t","slide":17,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/xw3qlgje","slide":17,"text":"Related pipeline and deployment version","textPreview":"Related pipeline and deployment version","textChars":39,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"notes","id":"nt/h2cryv","slide":17,"text":"Purpose: Compare the two sides of synthetic monitoring.\n\nLeft side, Test request: Authenticate with a dedicated identity Access the published service endpoint Confirm device data appears Measure total response time\n\nRight side, Recorded evidence: HTTP result and timing Application instance identity Target device and data timestamp Related pipeline and deployment version\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/clv3hd","slide":18,"title":"18","textShapes":8}
+{"kind":"shape","id":"sh/ml47mdcr","slide":18,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9ovqh8v2","slide":18,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/8nmpo3uh","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/zid8ryd0","slide":18,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/yhk7itcf","slide":18,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/lkvqt8v6","slide":18,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/kjmpk3ul","slide":18,"text":"Security controls limit what delivery components can do. Observability shows what they did and whether the service remained healthy.","textPreview":"Security controls limit what delivery components can do. Observability shows what they did and whether the service remained healthy.","textChars":132,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/jex8nid4","slide":18,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/idoruxcz","slide":18,"text":"Use short-lived, scoped workload identity","textPreview":"Use short-lived, scoped workload identity","textChars":41,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/wz6xczil","slide":18,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/h0fel4z6","slide":18,"text":"Keep audit context across every pipeline stage","textPreview":"Keep audit context across every pipeline stage","textChars":46,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/ax4vap0f","slide":18,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/vyxwjuh0","slide":18,"text":"Correlate deployment and runtime signals","textPreview":"Correlate deployment and runtime signals","textChars":40,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/8vmd8fi9","slide":18,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/9wvehkzu","slide":18,"text":"Design alerts around an operational response","textPreview":"Design alerts around an operational response","textChars":44,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"notes","id":"nt/clv3hd","slide":18,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: Security controls limit what delivery components can do. Observability shows what they did and whether the service remained healthy.\n\nDiscuss: Use short-lived, scoped workload identity Keep audit context across every pipeline stage Correlate deployment and runtime signals Design alerts around an operational response\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/nip0cj","slide":19,"title":"19","textShapes":7}
+{"kind":"shape","id":"sh/6lcfy9sf","slide":19,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/tonytor6","slide":19,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/snux0jal","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/jylgne9o","slide":19,"text":"Module 5","textPreview":"Module 5","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ixcfu9sj","slide":19,"text":"Module 5 complete","textPreview":"Module 5 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/5k3yp4ru","slide":19,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/kjuxwja9","slide":19,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/vu1wju9s","slide":19,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/atsfqps7","slide":19,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/obuh872d","slide":19,"text":"Module 5 complete","textPreview":"Module 5 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/pc3ihs3y","slide":19,"text":"Course content complete","textPreview":"Course content complete","textChars":23,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/29cz6xk7","slide":19,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/nalgf2ls","slide":19,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"notes","id":"nt/nip0cj","slide":19,"text":"Purpose: Close Module 5.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Course content complete\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

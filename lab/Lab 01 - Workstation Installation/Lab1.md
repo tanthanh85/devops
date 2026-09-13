@@ -4,17 +4,17 @@
 
 **4 hours**
 
-This lab prepares the workstation used throughout the course. You will install command-line development tools locally, create the course repository on GitLab.com, and deploy the selected supporting platforms as containers. Later labs reuse the same GitLab.com repository, Python environment, Docker Engine, Kubernetes cluster, local runner, secrets service, and monitoring platform.
+This lab prepares the workstation used throughout the course. You will install command-line development tools locally, including the operating-system package required to create Python virtual environments. You will also secure a GitLab.com account and deploy the selected supporting platforms as containers. Lab 2 creates and clones the `network-devops` project, registers its runner, and creates the course Python environment.
 
 The instructions target a dedicated Ubuntu LTS workstation. Complete the lab only on an instructor-approved system. Package names and vendor installation procedures can change; use the course versions supplied by the instructor and compare the commands with the official documentation before using them outside the lab.
 
 ## Objectives
 
-- Install and verify Python, pip, Git, Ansible, Visual Studio Code, Docker Engine, and Docker Compose.
-- Create and activate an isolated Python virtual environment.
+- Install and verify Python, pip, Python `venv` support, Git, Ansible, Visual Studio Code, Docker Engine, and Docker Compose.
+- Confirm that the workstation can create Python virtual environments. The course environment is created in Lab 2.
 - Install and verify `kubectl` and Minikube.
-- Create and secure a GitLab.com account and course project.
-- Start a local GitLab Runner and register it with the GitLab.com project.
+- Create and secure a GitLab.com account.
+- Install and start a local GitLab Runner for registration in Lab 2.
 - Start an Elastic Stack laboratory environment for log collection and visualization.
 - Start HashiCorp Vault in development mode for later secrets exercises.
 - Record installed versions and demonstrate safe platform start, stop, and cleanup operations.
@@ -24,11 +24,11 @@ The instructions target a dedicated Ubuntu LTS workstation. Complete the lab onl
 ```mermaid
 flowchart LR
     U["Ubuntu workstation"] --> D["Docker Engine and Compose"]
-    U --> P["Python virtual environment<br/>Ansible and application tools"]
+    U --> P["Python, pip, and venv support<br/>Ansible and application tools"]
     U --> C["Visual Studio Code<br/>Course extensions"]
     U --> K["kubectl"]
     D --> M["Minikube<br/>Docker driver"]
-    U --> G["GitLab.com repository"]
+    U --> G["GitLab.com account"]
     D --> GR["Local GitLab Runner"]
     GR --> G
     D --> E["Elasticsearch, Logstash, Kibana"]
@@ -85,40 +85,31 @@ git config --global init.defaultBranch main
 git --version
 ```
 
-## Part 2: Install Python, pip, and the virtual environment
+## Part 2: Install Python, pip, and virtual-environment support
 
 ```bash
 sudo apt install -y python3 python3-pip python3-venv
 python3 --version
 python3 -m pip --version
-mkdir -p ~/network-devops
-cd ~/network-devops
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-which python
-python --version
+python3 -m venv --help | head
 ```
 
-The path printed by `which python` must end in `network-devops/.venv/bin/python`. Install the Python tools used in the first course stages:
+The `python3-venv` package supplies the standard-library module used to create isolated Python environments. Lab 1 installs and verifies that capability but does not create the course environment. Lab 2 creates `~/network-devops/.venv` after the course repository is ready.
+
+Install Ansible from the Ubuntu package repository so its command is available for workstation verification:
 
 ```bash
-python -m pip install ansible ansible-lint requests flask pytest pyyaml
-python -m pip check
+sudo apt install -y ansible
 ansible --version
-ansible-lint --version
 ```
 
-Create a simple verification file:
+Verify that Python can load the `venv` module:
 
 ```bash
-python - <<'PY'
-import flask, requests, yaml
-print("Python imports passed")
-PY
+python3 -c 'import venv; print("Python venv support is available")'
 ```
 
-Use `deactivate` to leave the environment and `source ~/network-devops/.venv/bin/activate` to return to it. Do not install course libraries into the system Python environment with `sudo pip`.
+Do not create `.venv` yet, and do not install course libraries into the system Python environment with `sudo pip`. Lab 2 creates the isolated environment and installs the project dependencies inside it.
 
 ## Part 3: Install Visual Studio Code
 
@@ -143,18 +134,19 @@ code --install-extension hashicorp.terraform
 code --list-extensions --show-versions
 ```
 
-Open the cumulative course directory rather than an individual file:
+Open a temporary course workspace. Lab 2 will open the cloned project directory after creating it:
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/course-workspace
+cd ~/course-workspace
 code .
 ```
 
-In VS Code, select the interpreter from `~/network-devops/.venv/bin/python`. Open a terminal inside the editor and verify that Git sees the same repository:
+The project interpreter and repository do not exist until Lab 2. Open a terminal inside the editor and verify that the system Python and Git commands are available:
 
 ```bash
-git status
-python --version
+git --version
+python3 --version
 ```
 
 Extensions execute with the learner's permissions and may access workspace content. Install only the extensions listed by the instructor, review their publishers, and do not paste tokens or passwords into extension settings.
@@ -261,48 +253,17 @@ After signing in:
 4. Review active sessions and sign out any session you do not recognize.
 5. Do not create a personal access token unless a later exercise explicitly requires one.
 
-Create the cumulative project using the current GitLab interface:
+Do not create the course project in this lab. Lab 2 begins by creating a new private project named `network-devops` and cloning it to the workstation.
 
-1. Select **Create new > New project/repository**.
-2. Select **Create blank project**.
-3. Enter `network-devops` as the project name and slug.
-4. Select **Private** unless the instructor requires another visibility level.
-5. Select **Initialize repository with a README**.
-6. Select **Create project**.
+## Part 8: Install the local GitLab Runner
 
-Clone the project using the HTTPS URL displayed by GitLab:
+GitLab.com hosts the repository and pipeline control plane. The learner workstation runs the Docker-based runner. Copy and start the supplied runner Compose project in a platform directory outside the future Git repository:
 
 ```bash
-cd ~
-git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/network-devops.git
-cd network-devops
-git remote -v
-git status
-```
-
-Authenticate with the browser or credential-manager flow offered by Git. Do not place an account password or access token in the clone URL, shell history, or repository. Create a first branch and publish it:
-
-```bash
-git switch -c setup/lab01-workstation
-mkdir -p evidence
-cp "/path/to/Lab 01 - Workstation Installation/verify_workstation.py" .
-cp "/path/to/Lab 01 - Workstation Installation/requirements.txt" .
-git add verify_workstation.py requirements.txt
-git commit -m "Add workstation verification"
-git push -u origin setup/lab01-workstation
-```
-
-Open the project on GitLab.com and confirm the branch is visible. A later module adds merge-request and pipeline controls; this checkpoint proves account, repository, authentication, and push access.
-
-## Part 8: Install and register the local GitLab Runner
-
-GitLab.com hosts the repository and pipeline control plane. The learner workstation runs only a project runner. Copy the supplied runner Compose project:
-
-```bash
-mkdir -p ~/network-devops/platform
+mkdir -p ~/course-platform
 cp -R "/path/to/Lab 01 - Workstation Installation/platform/." \
-  ~/network-devops/platform/
-cd ~/network-devops/platform/gitlab-runner
+  ~/course-platform/
+cd ~/course-platform/gitlab-runner
 cp .env.example .env
 # Confirm the instructor-approved image tag before continuing.
 docker compose config --quiet
@@ -312,44 +273,14 @@ docker compose ps
 docker exec course-gitlab-runner gitlab-runner --version
 ```
 
-In the GitLab.com `network-devops` project:
-
-1. Open **Settings > CI/CD**.
-2. Expand **Runners**.
-3. Select **Create project runner**.
-4. Select Linux and add the tags `docker,validation`.
-5. Allow untagged jobs only if directed by the instructor.
-6. Create the runner and copy its authentication token beginning with `glrt-`.
-
-Register the containerized runner:
-
-```bash
-docker exec -it course-gitlab-runner gitlab-runner register
-```
-
-Use these answers:
-
-- GitLab URL: `https://gitlab.com`
-- Token: the project runner authentication token
-- Description: `course-docker-runner`
-- Executor: `docker`
-- Default image: `python:3.12-slim`
-
-Verify the registration and then return to the GitLab.com runner page:
-
-```bash
-docker exec course-gitlab-runner gitlab-runner list
-docker exec course-gitlab-runner gitlab-runner verify
-```
-
-The runner should appear online. The authentication token is stored in the runner configuration volume; do not copy it into Git or evidence files. Mounting the Docker socket gives jobs broad control of the workstation, so this runner must remain locked to the learner's private course project and must not execute untrusted project code.
+At this stage, `gitlab-runner --version` must work, but the runner remains unregistered. Lab 2 registers it after the learner creates the `network-devops` project. Mounting the Docker socket gives jobs broad control of the workstation, so the runner must later remain locked to the learner's private course project and must not execute untrusted project code.
 
 ## Part 9: Install the Elastic Stack laboratory services
 
 Elastic requires Elasticsearch, Logstash, and Kibana to use the same version. Use the supplied pinned Compose file and confirm its version with the instructor; do not improvise mixed versions.
 
 ```bash
-cd ~/network-devops/platform/elastic
+cd ~/course-platform/elastic
 cp .env.example .env
 # Replace STACK_VERSION with the instructor-approved version.
 docker compose config --quiet
@@ -378,7 +309,7 @@ docker compose stop
 Use the supplied Compose definition to start Vault in development mode bound to the workstation loopback address:
 
 ```bash
-cd ~/network-devops/platform/vault
+cd ~/course-platform/vault
 cp .env.example .env
 # Replace VAULT_VERSION with the instructor-approved version.
 docker compose up -d
@@ -398,7 +329,7 @@ docker start course-vault
 ## Part 11: Capture the workstation baseline
 
 ```bash
-mkdir -p ~/network-devops/evidence
+mkdir -p ~/course-evidence
 {
   date -Is
   python3 --version
@@ -410,9 +341,9 @@ mkdir -p ~/network-devops/evidence
   kubectl version --client
   minikube version
   docker exec course-gitlab-runner gitlab-runner --version | head -1
-} | tee ~/network-devops/evidence/lab01-versions.txt
+} | tee ~/course-evidence/lab01-versions.txt
 docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}' \
-  | tee ~/network-devops/evidence/lab01-containers.txt
+  | tee ~/course-evidence/lab01-containers.txt
 ```
 
 Review the evidence files before committing them. They must contain versions and state only—never passwords, runner tokens, Vault tokens, sandbox credentials, or application secrets.
@@ -422,27 +353,28 @@ Review the evidence files before committing them. They must contain versions and
 | Platform | Start | Stop without deleting data |
 |---|---|---|
 | GitLab.com | Browser-based service; no local lifecycle | Sign out when required |
-| Runner | `docker compose up -d` in `platform/gitlab-runner` | `docker compose stop` |
+| Runner | `docker compose up -d` in `~/course-platform/gitlab-runner` | `docker compose stop` |
 | Minikube | `minikube start -p network-devops` | `minikube stop -p network-devops` |
 | Elastic | `docker compose up -d` in its directory | `docker compose stop` |
 | Vault | `docker compose up -d` in `platform/vault` | `docker compose stop` |
 
 ## Completion criteria
 
-- Python and pip run successfully inside the project virtual environment.
+- Python, pip, and the `venv` module run successfully on the workstation.
+- Learners can explain that Lab 2 creates the course virtual environment.
 - Ansible reports its executable, Python, and collection paths.
-- Visual Studio Code opens the course directory, uses the project interpreter, and contains the required extensions.
+- Visual Studio Code opens the temporary course workspace and contains the required extensions. Lab 2 opens the cloned project and selects its `.venv` interpreter.
 - Docker Engine and Docker Compose pass their verification commands.
 - `kubectl` reaches the `network-devops` Minikube profile.
-- The GitLab.com account is verified, protected with two-factor authentication, and contains the `network-devops` project.
-- The project runner appears online and passes `gitlab-runner verify`.
+- The GitLab.com account is verified and protected with two-factor authentication.
+- The local runner container starts and reports its version; project registration occurs in Lab 2.
 - Elasticsearch, Logstash, and Kibana start, and Elasticsearch answers its local health request.
 - Vault's health endpoint responds, and the learner can explain why development mode is unsafe.
 - Version evidence contains no secret values.
 
 ## Cleanup
 
-For normal course continuation, stop unused local platforms but retain their containers and volumes. Do not delete the GitLab.com project or application data.
+For normal course continuation, stop unused local platforms but retain their containers and volumes. Do not delete application data.
 
 ```bash
 docker stop course-vault course-gitlab-runner 2>/dev/null || true
