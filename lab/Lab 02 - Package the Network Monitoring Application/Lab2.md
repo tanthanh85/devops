@@ -347,15 +347,6 @@ docker image inspect network-monitor:lab02 \
 docker history --no-trunc network-monitor:lab02
 ```
 
-If pip reports `No matching distribution found for Flask==3.1.2`, the learner has an older copy of the supplied dependency file. Confirm that the current file contains `Flask==3.0.3`, then rebuild without the failed build cache:
-
-```bash
-grep -n '^Flask==' requirements.txt
-docker build --pull --no-cache -t network-monitor:lab02 .
-```
-
-If resolution still fails, identify the Python package index or approved mirror available to the workstation and report the missing package to the instructor. Do not remove the version pin merely to make the build pass.
-
 The first build retrieves a base image and installs dependencies. A later source-only change should reuse the dependency layer. Review `docker history` for unexpected commands or values. Secret values must not appear in any layer.
 
 Record the immutable local image identifier:
