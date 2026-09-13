@@ -4,7 +4,7 @@
 
 **4 hours**
 
-The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. You will first create the Python virtual environment that will be reused throughout the course and prove that the supplied application works inside it. You will then define its runtime in a Dockerfile, build an image, run a container, inspect the resulting runtime, and exercise the Docker lifecycle.
+The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. The supporting files, including the Dockerfile and `.dockerignore`, are already supplied. You will create the Python virtual environment used throughout the course, verify the application, inspect and explain the supplied packaging files, build the image, run the container, and exercise the Docker lifecycle.
 
 This is the first implementation stage of the cumulative application. Do not redesign the RESTCONF adapter or add new application features during this lab. The engineering question is whether the same tested application can be packaged and executed consistently.
 
@@ -16,7 +16,7 @@ This is the first implementation stage of the cumulative application. Do not red
 - Verify the supplied Flask application before packaging it.
 - Confirm the RESTCONF read paths and returned data on an authorized router.
 - Explain the Docker build context and `.dockerignore` boundary.
-- Create a Dockerfile for the supplied application.
+- Inspect the supplied Dockerfile and explain the purpose of each instruction.
 - Build and identify the application image.
 - Run the application with external configuration and credentials.
 - Verify container health and application behavior.
@@ -124,6 +124,8 @@ which python
 python --version
 ```
 
+The course pins Flask `3.0.3`, a Python 3.12-compatible release that is available from older approved package mirrors as well as public PyPI. Do not replace the supplied version with a newer release unless the instructor has validated that release against the course mirror and application.
+
 The path printed by `which python` must end in `network-devops/.venv/bin/python`. This is the single learner-managed Python environment for the remainder of the course. Later labs activate the same environment instead of creating separate environments in individual lab directories.
 
 Confirm that Git excludes the environment:
@@ -201,8 +203,11 @@ ROUTER_USERNAME=<assigned-username>
 ROUTER_PASSWORD=<assigned-password>
 RESTCONF_VERIFY=true
 RESTCONF_CA_BUNDLE=/absolute/path/to/router-ca.pem
+MOCK_MODE=false
 FLASK_SECRET_KEY=<generated-local-value>
 ```
+
+Replace every value enclosed in angle brackets. `ROUTER_HOST` must contain the assigned router's resolvable hostname or management IP address, and `MOCK_MODE` must remain `false` when collecting live data. The application now rejects the documentation address `192.0.2.10` in live mode instead of presenting it as the active router.
 
 Keep TLS verification enabled. If the router uses a private CA, point the application at the correct CA certificate. Do not use `verify=False` to conceal a certificate or hostname problem.
 
@@ -212,13 +217,22 @@ Confirm that `.env` is ignored:
 git check-ignore -v .env
 ```
 
-## Part 4: Test the supplied application before containerizing it
-
-Run the automated tests:
+Confirm the effective non-secret settings before starting Flask:
 
 ```bash
-python -m pytest -v
+python - <<'PY'
+from app.config import Settings
+
+settings = Settings()
+print(f"Router: {settings.router_host}:{settings.router_port}")
+print(f"Mock mode: {settings.mock_mode}")
+print(f"TLS verification: {settings.verify}")
+PY
 ```
+
+The router value must match the instructor-assigned target and mock mode must be `False`. This check deliberately does not print the username or password.
+
+## Part 4: Verify the supplied application before containerizing it
 
 Start the application using the documented entry point. One common pattern is:
 
@@ -255,25 +269,29 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 5: Define the Docker build boundary
+## Part 5: Inspect the Docker build boundary
 
-Create `.dockerignore` in the repository root:
+Confirm that the supplied `.dockerignore` exists, then display it with line numbers:
 
-```text
-.git
-.gitignore
-.env
-.venv
-__pycache__/
-*.py[cod]
-.pytest_cache/
-tests/
-evidence/
-certificates/*
-!certificates/.gitkeep
+```bash
+cd ~/network-devops
+test -f .dockerignore
+nl -ba .dockerignore
 ```
 
 The build context is everything Docker can send to the builder. `.dockerignore` reduces accidental disclosure, build size, and cache invalidation. It is not a substitute for keeping secrets outside the project directory.
+
+Explain the supplied patterns before continuing:
+
+| Pattern | Effect on the build context |
+|---|---|
+| `.git` and `.gitignore` | Exclude repository metadata and local Git controls |
+| `.env` | Prevent local runtime configuration and credentials from entering the build context |
+| `.venv` | Exclude the workstation-specific Python environment |
+| `__pycache__/` and `*.py[cod]` | Exclude generated Python bytecode |
+| `tests/` and `evidence/` | Keep non-runtime test and evidence files out of the image |
+| `certificates/*` | Exclude locally supplied certificate material |
+| `!certificates/.gitkeep` | Re-include only the placeholder that preserves the empty directory |
 
 Inspect the candidate context:
 
@@ -284,36 +302,25 @@ find . -maxdepth 3 -type f | sort
 
 Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, test caches, and certificates are excluded.
 
-## Part 6: Create the Dockerfile
+## Part 6: Inspect and explain the Dockerfile
 
-Create `Dockerfile` in the repository root:
+Confirm that the supplied Dockerfile exists and inspect it with line numbers:
 
-```dockerfile
-FROM python:3.12-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-RUN groupadd --system app && useradd --system --gid app app
-
-COPY requirements.txt ./
-RUN python -m pip install --no-cache-dir --upgrade pip \
-    && python -m pip install --no-cache-dir -r requirements.txt
-
-COPY --chown=app:app app/ ./app/
-
-USER app
-EXPOSE 8000
-
-HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)" || exit 1
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "4", "app.app:app"]
+```bash
+cd ~/network-devops
+test -f Dockerfile
+nl -ba Dockerfile
+grep -nE '^(FROM|ENV|WORKDIR|RUN|COPY|USER|EXPOSE|HEALTHCHECK|CMD)' Dockerfile
 ```
 
-If `gunicorn` is not already pinned in `requirements.txt`, add an instructor-approved version and rerun the native tests. The `/health` path must match the supplied application. A liveness endpoint should prove that the process can serve a request without requiring the router to be reachable; otherwise a router outage could restart a healthy application repeatedly.
+Do not rewrite the file. Trace how Docker processes it from top to bottom and relate every path to the supplied project structure. Confirm that `gunicorn` is pinned in `requirements.txt` and that the health-check path exists in the Flask application:
+
+```bash
+grep -n '^gunicorn==' requirements.txt
+grep -R -n '"/health"' app
+```
+
+The liveness endpoint should prove that the application process can serve a request without requiring the router to be reachable. Otherwise, a router outage could cause Docker to report a healthy application process as unhealthy.
 
 Explain the file before building:
 
@@ -328,6 +335,8 @@ Explain the file before building:
 | `HEALTHCHECK` | Defines process-level health evidence |
 | `CMD` | Defines the default production process |
 
+Before building, explain why dependencies are copied and installed before the application source. Also explain what would change if `USER app`, `--chown=app:app`, or the exec-form `CMD` were removed.
+
 ## Part 7: Build and identify the image
 
 ```bash
@@ -337,6 +346,15 @@ docker image inspect network-monitor:lab02 \
   --format 'ID={{.Id}} Architecture={{.Architecture}} Size={{.Size}} User={{.Config.User}}'
 docker history --no-trunc network-monitor:lab02
 ```
+
+If pip reports `No matching distribution found for Flask==3.1.2`, the learner has an older copy of the supplied dependency file. Confirm that the current file contains `Flask==3.0.3`, then rebuild without the failed build cache:
+
+```bash
+grep -n '^Flask==' requirements.txt
+docker build --pull --no-cache -t network-monitor:lab02 .
+```
+
+If resolution still fails, identify the Python package index or approved mirror available to the workstation and report the missing package to the instructor. Do not remove the version pin merely to make the build pass.
 
 The first build retrieves a base image and installs dependencies. A later source-only change should reuse the dependency layer. Review `docker history` for unexpected commands or values. Secret values must not appear in any layer.
 
@@ -458,16 +476,15 @@ A new container starts from the same image and has a new container identity. The
 
 ### Rebuild after a controlled source change
 
-Change only the dashboard subtitle, rerun the native tests, and build a new tag:
+Change only the dashboard subtitle, start the application locally, and confirm that the dashboard and chart-data request still work. Stop the local process, then build a new tag:
 
 ```bash
-python -m pytest -v
 docker build -t network-monitor:lab02.1 .
 docker image inspect network-monitor:lab02 network-monitor:lab02.1 \
   --format '{{.RepoTags}} {{.Id}}'
 ```
 
-Replace the running container with the new image only after tests pass:
+Replace the running container with the new image only after the local verification succeeds:
 
 ```bash
 docker rm -f network-monitor
