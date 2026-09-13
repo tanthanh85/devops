@@ -339,6 +339,17 @@ include:
 
 Create protected `LOGSTASH_HOST` and retain the Lab 5 Kubernetes and synthetic-test variables. Disable earlier jobs that build or deploy the same application and web images. The Lab 6 jobs build commit-addressed app, web, and synthetic images, deploy the collectors, start an immediate synthetic check, and leave the recurring CronJob enabled.
 
+## Part 15: Commit and push the work
+
+```bash
+git status
+git diff
+git add .gitlab-ci.yml ci app web synthetic kubernetes
+git diff --staged
+git commit -m "Add Elastic monitoring and synthetic checks"
+git push -u origin feature/lab06-observability
+```
+
 ## Completion criteria
 
 - Web and application logs are valid JSON and contain workload identity and timing fields.

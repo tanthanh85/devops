@@ -249,6 +249,17 @@ docker push "$CI_REGISTRY_IMAGE/alert-webhook:$CI_COMMIT_SHA"
 
 The supplied deployment job creates the Kubernetes Secret and updates the receiver image. Kibana connector and rule changes remain instructor-reviewed platform configuration unless your environment manages Kibana saved objects as code.
 
+## Part 13: Commit and push the work
+
+```bash
+git status
+git diff
+git add .gitlab-ci.yml ci webhook-receiver kubernetes
+git diff --staged
+git commit -m "Add Elastic webhook alerting"
+git push -u origin feature/lab07-elastic-alerts
+```
+
 ## Completion criteria
 
 - Receiver unit tests pass.

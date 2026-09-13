@@ -22,9 +22,8 @@ def _find(value, names):
 
 
 def collect(router, password):
-    verify = f"/certificates/{router.ca_bundle_name}" if router.ca_bundle_name else True
     base = f"https://{router.host}:{router.port}"
-    kwargs = dict(headers={"Accept": "application/yang-data+json"}, auth=(router.username, password), timeout=(5, 15), verify=verify)
+    kwargs = dict(headers={"Accept": "application/yang-data+json"}, auth=(router.username, password), timeout=(5, 15), verify=False)
     cpu_response = requests.get(base + CPU_PATH, **kwargs)
     memory_response = requests.get(base + MEMORY_PATH, **kwargs)
     cpu_response.raise_for_status(); memory_response.raise_for_status()

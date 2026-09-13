@@ -8,14 +8,13 @@ namespace=${KUBE_NAMESPACE:-network-devops}
 : "${ROUTER_USERNAME:?ROUTER_USERNAME is required}"
 : "${ROUTER_PASSWORD:?ROUTER_PASSWORD is required}"
 ROUTER_PORT=${ROUTER_PORT:-443}
-ROUTER_CA_BUNDLE=${ROUTER_CA_BUNDLE:-}
 
 if [[ ! "$ROUTER_NAME" =~ ^[A-Za-z0-9_.-]{1,80}$ ]]; then
   echo "ROUTER_NAME is not a safe Vault path component." >&2
   exit 1
 fi
 
-payload=$(python3 -c 'import json,os; print(json.dumps({"data":{"host":os.environ["ROUTER_HOST"],"port":int(os.environ["ROUTER_PORT"]),"username":os.environ["ROUTER_USERNAME"],"password":os.environ["ROUTER_PASSWORD"],"ca_bundle_name":os.environ.get("ROUTER_CA_BUNDLE", ""),"enabled":True}}))')
+payload=$(python3 -c 'import json,os; print(json.dumps({"data":{"host":os.environ["ROUTER_HOST"],"port":int(os.environ["ROUTER_PORT"]),"username":os.environ["ROUTER_USERNAME"],"password":os.environ["ROUTER_PASSWORD"],"enabled":True}}))')
 kubectl -n "$namespace" port-forward service/vault 18200:8200 >/tmp/lab04-vault-forward.log 2>&1 &
 forward_pid=$!
 trap 'kill "$forward_pid" 2>/dev/null || true' EXIT

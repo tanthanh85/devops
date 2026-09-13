@@ -45,7 +45,6 @@ spec:
             - name: SESSION_COOKIE_SECURE
               valueFrom: {configMapKeyRef: {name: network-monitor-config, key: SESSION_COOKIE_SECURE}}
           volumeMounts:
-            - {name: certificates, mountPath: /certificates, readOnly: true}
             - {name: temporary-files, mountPath: /tmp}
           securityContext:
             allowPrivilegeEscalation: false
@@ -65,9 +64,5 @@ spec:
             requests: {cpu: 100m, memory: 128Mi}
             limits: {cpu: 500m, memory: 512Mi}
       volumes:
-        - name: certificates
-          secret:
-            secretName: router-ca
-            optional: true
         - name: temporary-files
           emptyDir: {medium: Memory, sizeLimit: 32Mi}

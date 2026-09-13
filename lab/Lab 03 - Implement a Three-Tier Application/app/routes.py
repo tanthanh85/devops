@@ -80,7 +80,7 @@ def add_router():
             if not re.fullmatch(r"[A-Za-z0-9.-]{1,253}", host): raise ValueError("invalid host")
         port=int(data.get("port",443))
         if not 1 <= port <= 65535: raise ValueError("invalid port")
-        router=Router(name=name,host=host,port=port,username=str(data.get("username", "")),password_ciphertext=encrypt(password),ca_bundle_name=data.get("ca_bundle_name") or None,enabled=bool(data.get("enabled",True)))
+        router=Router(name=name,host=host,port=port,username=str(data.get("username", "")),password_ciphertext=encrypt(password),enabled=bool(data.get("enabled",True)))
         db.session.add(router); db.session.commit()
         return jsonify(id=router.id,status="created"),201
     except (ValueError, IntegrityError) as exc:

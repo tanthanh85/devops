@@ -51,7 +51,6 @@ The official MySQL image is not rebuilt simply to claim ownership of a database 
 - Docker Engine and Docker Compose from Lab 1.
 - Instructor-provided Lab 3 starter files or specifications.
 - One authorized IOS XE RESTCONF router; a second router is optional.
-- Trusted CA certificates required by the assigned routers.
 
 Before editing:
 
@@ -86,8 +85,6 @@ network-devops/
 │   ├── security.py
 │   ├── restconf_client.py
 ├── tests/
-├── certificates/
-│   └── .gitkeep
 ├── compose.yaml
 ├── requirements.txt
 ├── .env.example
@@ -136,7 +133,7 @@ users
 
 routers
   id, name, host, port, username, password_ciphertext,
-  ca_bundle_name, enabled, created_at, updated_at
+  enabled, created_at, updated_at
 ```
 
 Use a unique constraint for the normalized username and an appropriate uniqueness rule for router name or management endpoint. Validate lengths and types in the application as well as the database.
@@ -184,7 +181,7 @@ Validate the record on the server. Reject malformed hostnames, invalid IP addres
 
 Encrypt the router password before database storage using the application encryption key supplied at runtime. Password encryption does not replace access control: only the application identity should be able to read the ciphertext, and no API response should return it.
 
-When the administrator selects **Test connection**, perform a bounded read-only RESTCONF request. Return a categorized result such as reachable, TLS failure, authentication failure, authorization failure, resource unsupported, timeout, or unexpected response. Do not save an unverified router unless the instructor permits it for troubleshooting practice.
+When the administrator selects **Test connection**, perform a bounded read-only RESTCONF request. Return a categorized result such as reachable, authentication failure, authorization failure, resource unsupported, timeout, or unexpected response. RESTCONF certificate verification remains disabled for the course routers. Do not save an unverified router unless the instructor permits it for troubleshooting practice.
 
 Run the inventory tests:
 
@@ -326,7 +323,6 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./certificates:/certificates:ro
     networks:
       - frontend
       - data
@@ -462,7 +458,7 @@ docker compose exec db sh -lc \
   "SELECT id, username, is_admin, created_at FROM users;"'
 ```
 
-The table should contain one administrator. Do not query or copy the password-hash column into evidence.
+The table should contain one administrator. Do not display or copy the password-hash column.
 
 ## Part 11: Add and monitor IOS XE inventory
 
@@ -554,22 +550,12 @@ docker compose logs --since=10m app
 
 Do not scale the application tier until session storage, background work, schema migrations, and in-memory chart state have been evaluated for multiple instances.
 
-## Part 14: Record evidence and commit
+## Part 14: Commit and push the work
 
 ```bash
-mkdir -p evidence
-docker compose ps --format json > evidence/lab03-compose-state.json
-docker compose images > evidence/lab03-images.txt
-curl -fsS http://127.0.0.1:8088/api/setup/status \
-  > evidence/lab03-setup-status.json
 git status --ignored
-```
-
-Inspect the files. Remove addresses or identifiers the instructor considers sensitive. Never preserve `.env`, credentials, hashes, encryption keys, session cookies, or unfiltered container inspection output.
-
-```bash
 git add web app tests compose.yaml requirements.txt .env.example \
-  .dockerignore evidence README.md
+  .dockerignore README.md
 git diff --staged
 git commit -m "Deploy three-tier network monitoring application"
 git push -u origin feature/lab03-three-tier

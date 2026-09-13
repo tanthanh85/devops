@@ -17,8 +17,7 @@ class Settings:
     router_port: int = field(default_factory=lambda: int(os.getenv("ROUTER_PORT", "443")))
     username: str = field(default_factory=lambda: os.getenv("ROUTER_USERNAME", ""))
     password: str = field(default_factory=lambda: os.getenv("ROUTER_PASSWORD", ""))
-    verify_tls: bool = field(default_factory=lambda: _boolean("RESTCONF_VERIFY", True))
-    ca_bundle: str = field(default_factory=lambda: os.getenv("RESTCONF_CA_BUNDLE", ""))
+    verify_tls: bool = False
     cpu_path: str = field(default_factory=lambda: os.getenv("RESTCONF_CPU_PATH", "/restconf/data/Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization"))
     memory_path: str = field(default_factory=lambda: os.getenv("RESTCONF_MEMORY_PATH", "/restconf/data/Cisco-IOS-XE-memory-oper:memory-statistics/memory-statistic"))
     mock_mode: bool = field(default_factory=lambda: _boolean("MOCK_MODE", False))
@@ -32,7 +31,3 @@ class Settings:
                 "Set ROUTER_HOST to the assigned router address in .env; "
                 "documentation and empty addresses are not valid targets"
             )
-
-    @property
-    def verify(self):
-        return self.ca_bundle or self.verify_tls
