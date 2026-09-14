@@ -6,7 +6,7 @@
 
 This lab prepares the workstation used throughout the course. You will install command-line development tools locally, including the operating-system package required to create Python virtual environments. You will also secure a GitLab.com account and deploy the selected supporting platforms as containers. Lab 2 creates and clones the `network-devops` project, registers its runner, and creates the course Python environment.
 
-The instructions target a dedicated Ubuntu LTS workstation. Complete the lab only on an instructor-approved system. Package names and vendor installation procedures can change; use the course versions supplied by the instructor and compare the commands with the official documentation before using them outside the lab.
+The instructions target a dedicated 64-bit Ubuntu 26.04 LTS workstation. Complete the lab only on an instructor-approved system. Package names and vendor installation procedures can change; use the course versions supplied by the instructor and compare the commands with the official documentation before using them outside the lab.
 
 ## Objectives
 
@@ -23,7 +23,7 @@ The instructions target a dedicated Ubuntu LTS workstation. Complete the lab onl
 
 ```mermaid
 flowchart LR
-    U["Ubuntu workstation"] --> D["Docker Engine and Compose"]
+    U["Ubuntu 26.04 LTS workstation"] --> D["Docker Engine and Compose"]
     U --> P["Python, pip, and venv support<br/>Ansible and application tools"]
     U --> C["Visual Studio Code<br/>Course extensions"]
     U --> K["kubectl"]
@@ -41,6 +41,7 @@ Recommended minimum for running selected platforms concurrently:
 
 | Resource | Minimum | Recommended |
 |---|---:|---:|
+| Operating system | Ubuntu 26.04 LTS, 64-bit | Fully updated instructor image |
 | CPU | 6 logical CPUs | 8–12 logical CPUs |
 | Memory | 16 GB | 24 GB or more |
 | Free disk | 60 GB | 100 GB or more |
@@ -63,7 +64,7 @@ Suggested local ports:
 ```bash
 whoami
 hostnamectl
-cat /etc/os-release
+grep -E '^(NAME|VERSION|VERSION_ID|VERSION_CODENAME|UBUNTU_CODENAME)=' /etc/os-release
 uname -m
 free -h
 df -h /
@@ -73,6 +74,8 @@ sudo apt upgrade -y
 sudo apt install -y git curl wget jq ca-certificates gnupg lsb-release \
   openssh-client make unzip apt-transport-https
 ```
+
+Confirm that the operating-system output identifies Ubuntu and includes `VERSION_ID="26.04"`. The architecture reported by `uname -m` should be `x86_64` unless the instructor has supplied an approved ARM64 environment. Stop and consult the instructor if the release or architecture does not match the course workstation specification.
 
 The virtualization check should return a value greater than zero. If it returns zero on a virtual machine, ask the instructor whether nested virtualization is enabled. The Minikube Docker driver does not require a second hypervisor, but sufficient CPU and memory are still required.
 
@@ -338,6 +341,7 @@ docker start course-vault
 
 ## Completion criteria
 
+- The workstation reports Ubuntu 26.04 LTS and the instructor-approved processor architecture.
 - Python, pip, and the `venv` module run successfully on the workstation.
 - Learners can explain that Lab 2 creates the course virtual environment.
 - Ansible reports its executable, Python, and collection paths.
