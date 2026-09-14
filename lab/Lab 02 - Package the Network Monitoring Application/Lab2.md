@@ -4,7 +4,7 @@
 
 **4 hours**
 
-The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. The supporting files, including the Dockerfile and `.dockerignore`, are already supplied. You will create the Python virtual environment used throughout the course, verify the application, inspect and explain the supplied packaging files, build the image, run the container, and exercise the Docker lifecycle.
+The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. The supporting files, including the Dockerfile and `.dockerignore`, are already supplied. You will create the Python virtual environment used throughout the course, verify the application, build the image, run the container, and exercise the Docker lifecycle.
 
 This is the first implementation stage of the cumulative application. Do not redesign the RESTCONF adapter or add new application features during this lab. The engineering question is whether the same tested application can be packaged and executed consistently.
 
@@ -15,10 +15,9 @@ This is the first implementation stage of the cumulative application. Do not red
 - Register the workstation runner with the new project.
 - Verify the supplied Flask application before packaging it.
 - Confirm the RESTCONF read paths and returned data on an authorized router.
-- Explain the Docker build context and `.dockerignore` boundary.
-- Inspect the supplied Dockerfile and explain the purpose of each instruction.
 - Build and identify the application image.
 - Run the application with external configuration and credentials.
+- Verify that the container can resolve names and reach the assigned router through Docker networking.
 - Verify container health and application behavior.
 - Inspect image, container, process, network, mount, resource, and log information.
 - Exercise create, start, stop, restart, remove, rebuild, and cleanup operations safely.
@@ -293,73 +292,7 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 6: Inspect the Docker build boundary
-
-Confirm that the supplied `.dockerignore` exists, then display it with line numbers:
-
-```bash
-cd ~/network-devops
-test -f .dockerignore
-nl -ba .dockerignore
-```
-
-The build context is everything Docker can send to the builder. `.dockerignore` reduces accidental disclosure, build size, and cache invalidation. It is not a substitute for keeping secrets outside the project directory.
-
-Explain the supplied patterns before continuing:
-
-| Pattern | Effect on the build context |
-|---|---|
-| `.git` and `.gitignore` | Exclude repository metadata and local Git controls |
-| `.env` | Prevent local runtime configuration and credentials from entering the build context |
-| `.venv` | Exclude the workstation-specific Python environment |
-| `__pycache__/` and `*.py[cod]` | Exclude generated Python bytecode |
-| `tests/` | Keep non-runtime test files out of the image |
-
-Inspect the candidate context:
-
-```bash
-git status --short
-find . -maxdepth 3 -type f | sort
-```
-
-Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, and test files are excluded.
-
-## Part 7: Inspect and explain the Dockerfile
-
-Confirm that the supplied Dockerfile exists and inspect it with line numbers:
-
-```bash
-cd ~/network-devops
-test -f Dockerfile
-nl -ba Dockerfile
-grep -nE '^(FROM|ENV|WORKDIR|RUN|COPY|USER|EXPOSE|HEALTHCHECK|CMD)' Dockerfile
-```
-
-Do not rewrite the file. Trace how Docker processes it from top to bottom and relate every path to the supplied project structure. Confirm that `gunicorn` is pinned in `requirements.txt` and that the health-check path exists in the Flask application:
-
-```bash
-grep -n '^gunicorn==' requirements.txt
-grep -R -n '"/health"' app
-```
-
-The liveness endpoint should prove that the application process can serve a request without requiring the router to be reachable. Otherwise, a router outage could cause Docker to report a healthy application process as unhealthy.
-
-Explain the file before building:
-
-| Instruction | Responsibility |
-|---|---|
-| `FROM` | Selects the controlled base runtime |
-| `ENV` | Sets stable non-secret Python behavior |
-| `WORKDIR` | Defines the application directory |
-| first `COPY` and `RUN` | Installs declared dependencies in a cacheable layer |
-| second `COPY` | Adds application source without local secrets |
-| `USER` | Drops root privileges for normal execution |
-| `HEALTHCHECK` | Defines process-level health evidence |
-| `CMD` | Defines the default production process |
-
-Before building, explain why dependencies are copied and installed before the application source. Also explain what would change if `USER app`, `--chown=app:app`, or the exec-form `CMD` were removed.
-
-## Part 8: Build and identify the image
+## Part 6: Build and identify the image
 
 Build the supplied application definition and inspect the resulting immutable image identity.
 
@@ -381,9 +314,9 @@ docker image inspect network-monitor:lab02 --format '{{.Id}}'
 
 An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
 
-## Part 9: Run the container
+## Part 7: Run the container
 
-The container requires runtime configuration, a published local port, and a route to the assigned router. Start with Docker's default bridge network:
+The container requires runtime configuration, a published local port, and outbound access to the assigned router. Start with Docker's default bridge network. Add only the `NET_RAW` capability required by the supplied `ping` utility; all other Linux capabilities remain dropped:
 
 ```bash
 docker run -d \
@@ -392,6 +325,7 @@ docker run -d \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   --cap-drop ALL \
+  --cap-add NET_RAW \
   --security-opt no-new-privileges:true \
   -p 127.0.0.1:8000:8000 \
   network-monitor:lab02
@@ -406,6 +340,22 @@ docker inspect network-monitor --format '{{json .State.Health}}' | jq
 curl -fsS http://127.0.0.1:8000/health | jq
 ```
 
+Verify the container's outbound network path. The first command confirms name resolution when `ROUTER_HOST` is a hostname. The second sends ICMP packets to the configured target:
+
+```bash
+docker exec network-monitor python -c \
+  'import os, socket; host=os.environ["ROUTER_HOST"]; print(host, "->", socket.gethostbyname(host))'
+docker exec network-monitor sh -c 'ping -c 3 "$ROUTER_HOST"'
+```
+
+Some networks intentionally block ICMP. In that case, a failed ping does not by itself prove that container networking is broken. Request application metrics to verify the actual HTTPS RESTCONF path:
+
+```bash
+curl -fsS http://127.0.0.1:8000/api/metrics | jq
+```
+
+The response must contain the assigned router name or address, a timestamp, `cpu_percent`, and `memory_percent`. Docker's bridge network provides outbound routing through the workstation; no container port needs to be published for this outbound RESTCONF connection.
+
 Open the dashboard and verify both charts again. Confirm that the header shows the assigned router and does not contain **demonstration data**. If it does, set `MOCK_MODE=false` in `.env`, remove the container, and repeat the `docker run` command so the new process receives the corrected value.
 
 If the host can reach the router through a VPN but the bridged container cannot, inspect the route and DNS behavior with the instructor. Use host networking only when the lab platform requires it and only on Linux:
@@ -414,13 +364,13 @@ If the host can reach the router through a VPN but the bridged container cannot,
 docker rm -f network-monitor
 docker run -d --name network-monitor --network host --env-file .env \
   --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-  --cap-drop ALL --security-opt no-new-privileges:true \
+  --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
   network-monitor:lab02
 ```
 
 With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Explain which network mode was required and why.
 
-## Part 10: Inspect and explain the running container
+## Part 8: Inspect and explain the running container
 
 Run each command and explain what its output proves:
 
@@ -458,7 +408,7 @@ Interpretation guide:
 
 Do not run `docker inspect` and share the unfiltered output: environment values can include secrets.
 
-## Part 11: Exercise the Docker lifecycle
+## Part 9: Exercise the Docker lifecycle
 
 ### Stop and start the same container
 
@@ -484,7 +434,7 @@ docker logs --since=2m network-monitor
 docker rm -f network-monitor
 docker run -d --name network-monitor --env-file .env \
   --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-  --cap-drop ALL --security-opt no-new-privileges:true \
+  --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
   -p 127.0.0.1:8000:8000 network-monitor:lab02
 ```
 
@@ -506,13 +456,13 @@ Replace the running container with the new image only after the local verificati
 docker rm -f network-monitor
 docker run -d --name network-monitor --env-file .env \
   --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-  --cap-drop ALL --security-opt no-new-privileges:true \
+  --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
   -p 127.0.0.1:8000:8000 network-monitor:lab02.1
 ```
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
 
-## Part 12: Commit and push the work
+## Part 10: Commit and push the work
 
 Publish the completed packaging change to the learner's GitLab project.
 
@@ -528,10 +478,9 @@ git push -u origin feature/lab02-container-package
 ## Completion criteria
 
 - The supplied Flask application is verified locally and displays live CPU and memory data before packaging.
-- The Docker build context excludes secrets and workstation-only files.
-- The Dockerfile installs pinned dependencies and runs as a non-root user.
 - `network-monitor:lab02.1` builds successfully.
 - The container becomes healthy and both charts display router observations.
+- The container resolves the configured router target and reaches its RESTCONF service through Docker networking.
 - The learner can explain image, container, writable layer, published port, network mode, health state, logs, and resource output.
 - Stop, start, restart, remove, recreate, rebuild, and replacement operations have been demonstrated.
 - No secret appears in Git, image history, or application logs.
