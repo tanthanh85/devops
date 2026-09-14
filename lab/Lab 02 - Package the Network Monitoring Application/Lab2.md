@@ -316,20 +316,22 @@ An image ID identifies local image content. A registry digest becomes the portab
 
 ## Part 7: Run the container
 
-The container requires runtime configuration, a published local port, and outbound access to the assigned router. Start with Docker's default bridge network. Add only the `NET_RAW` capability required by the supplied `ping` utility; all other Linux capabilities remain dropped:
+The Ubuntu workstation reaches the laboratory network through Cisco Secure Client. Traffic originating from Docker's bridge network may not be admitted to that VPN tunnel even when the host itself can reach the router. Run the Lab 2 container with Linux host networking so it uses the workstation's VPN routes and name resolution. Add only the `NET_RAW` capability required by the supplied `ping` utility; all other Linux capabilities remain dropped:
 
 ```bash
 docker run -d \
   --name network-monitor \
+  --network host \
   --env-file .env \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   --cap-drop ALL \
   --cap-add NET_RAW \
   --security-opt no-new-privileges:true \
-  -p 127.0.0.1:8000:8000 \
   network-monitor:lab02
 ```
+
+Host networking is supported for this lab because the learner workstation runs Ubuntu. Docker does not publish a port in this mode; Gunicorn binds to port 8000 in the host network namespace. Access remains `http://127.0.0.1:8000`.
 
 Check status and logs:
 
@@ -354,21 +356,9 @@ Some networks intentionally block ICMP. In that case, a failed ping does not by 
 curl -fsS http://127.0.0.1:8000/api/metrics | jq
 ```
 
-The response must contain the assigned router name or address, a timestamp, `cpu_percent`, and `memory_percent`. Docker's bridge network provides outbound routing through the workstation; no container port needs to be published for this outbound RESTCONF connection.
+The response must contain the assigned router name or address, a timestamp, `cpu_percent`, and `memory_percent`. This confirms that the container can use the workstation's VPN path to reach the RESTCONF service.
 
 Open the dashboard and verify both charts again. Confirm that the header shows the assigned router and does not contain **demonstration data**. If it does, set `MOCK_MODE=false` in `.env`, remove the container, and repeat the `docker run` command so the new process receives the corrected value.
-
-If the host can reach the router through a VPN but the bridged container cannot, inspect the route and DNS behavior with the instructor. Use host networking only when the lab platform requires it and only on Linux:
-
-```bash
-docker rm -f network-monitor
-docker run -d --name network-monitor --network host --env-file .env \
-  --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-  --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
-  network-monitor:lab02
-```
-
-With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Explain which network mode was required and why.
 
 ## Part 8: Inspect and explain the running container
 
@@ -399,7 +389,7 @@ Interpretation guide:
 - `.State.Status` reports lifecycle state; `.State.Health` reports the Docker health-check result.
 - `.Config.User` should identify the non-root application account.
 - The environment-name list can confirm variable names without printing their secret values.
-- Network mode and port bindings explain how the browser and router traffic leave the container.
+- Network mode should report `host`, and `docker port` should return no mapping because host networking does not use published ports.
 - `ReadonlyRootfs`, dropped capabilities, and `no-new-privileges` limit runtime authority.
 - `docker top` shows the container processes from the host view.
 - `docker stats` reports current resource consumption, not application correctness.
@@ -432,10 +422,10 @@ docker logs --since=2m network-monitor
 
 ```bash
 docker rm -f network-monitor
-docker run -d --name network-monitor --env-file .env \
+docker run -d --name network-monitor --network host --env-file .env \
   --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
-  -p 127.0.0.1:8000:8000 network-monitor:lab02
+  network-monitor:lab02
 ```
 
 A new container starts from the same image and has a new container identity. The image remains unchanged.
@@ -454,10 +444,10 @@ Replace the running container with the new image only after the local verificati
 
 ```bash
 docker rm -f network-monitor
-docker run -d --name network-monitor --env-file .env \
+docker run -d --name network-monitor --network host --env-file .env \
   --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   --cap-drop ALL --cap-add NET_RAW --security-opt no-new-privileges:true \
-  -p 127.0.0.1:8000:8000 network-monitor:lab02.1
+  network-monitor:lab02.1
 ```
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
@@ -481,7 +471,7 @@ git push -u origin feature/lab02-container-package
 - `network-monitor:lab02.1` builds successfully.
 - The container becomes healthy and both charts display router observations.
 - The container resolves the configured router target and reaches its RESTCONF service through Docker networking.
-- The learner can explain image, container, writable layer, published port, network mode, health state, logs, and resource output.
+- The learner can explain image, container, writable layer, host network mode, health state, logs, and resource output.
 - Stop, start, restart, remove, recreate, rebuild, and replacement operations have been demonstrated.
 - No secret appears in Git, image history, or application logs.
 
