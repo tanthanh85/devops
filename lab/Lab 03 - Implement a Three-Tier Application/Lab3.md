@@ -50,7 +50,7 @@ The official MySQL image is not rebuilt simply to claim ownership of a database 
 - Completed Lab 2 repository and final `network-monitor` image.
 - Docker Engine and Docker Compose from Lab 1.
 - Instructor-provided Lab 3 starter files or specifications.
-- One authorized IOS XE RESTCONF router; a second router is optional.
+- One instructor-authorized IOS XE RESTCONF router.
 
 Before editing:
 
@@ -62,6 +62,17 @@ git switch -c feature/lab03-three-tier
 source .venv/bin/activate
 ```
 
+Copy the supplied Lab 3 files into the cumulative project, then install the dependencies required by this version of the application:
+
+```bash
+cp -R "/path/to/Lab 03 - Implement a Three-Tier Application/." ~/network-devops/
+cd ~/network-devops
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip check
+```
+
+Confirm that `web/`, `app/`, `tests/`, `compose.yaml`, and both requirements files are present. The remaining parts guide you through inspecting, configuring, running, and explaining the supplied files.
+
 ## Target project structure
 
 ```text
@@ -71,9 +82,6 @@ network-devops/
 │   ├── nginx.conf
 │   └── static/
 │       ├── index.html
-│       ├── login.html
-│       ├── setup.html
-│       ├── inventory.html
 │       ├── app.js
 │       └── style.css
 ├── app/
@@ -92,53 +100,7 @@ network-devops/
 └── README.md
 ```
 
-## Part 1: Define the application contracts
-
-Before writing container definitions, identify the service contracts.
-
-### Browser and web tier
-
-- `GET /` returns the monitoring page.
-- `GET /setup` returns first-use administrator setup.
-- `GET /login` returns the login page.
-- `GET /inventory` returns the authenticated inventory page.
-- Requests under `/api/` are proxied to the application service.
-
-### Application API
-
-The supplied or implemented API should provide equivalent operations:
-
-| Method and path | Purpose | Access requirement |
-|---|---|---|
-| `GET /health/live` | Process liveness | Internal health check |
-| `GET /health/ready` | Database and migration readiness | Internal health check |
-| `GET /api/setup/status` | Report whether an administrator exists | Unauthenticated, no sensitive detail |
-| `POST /api/setup/admin` | Create the first administrator | Allowed only while no user exists |
-| `POST /api/session` | Authenticate and establish a session | Unauthenticated |
-| `DELETE /api/session` | End the current session | Authenticated |
-| `GET /api/routers` | List safe router metadata | Authenticated |
-| `POST /api/routers` | Add an authorized router | Administrator |
-| `DELETE /api/routers/{id}` | Remove an inventory record | Administrator |
-| `GET /api/routers/{id}/metrics` | Retrieve CPU and memory observations | Authenticated |
-
-Do not return router passwords, encrypted credential values, password hashes, MySQL connection strings, session secrets, or RESTCONF authorization headers.
-
-### Database model
-
-The supplied starter uses SQLAlchemy to initialize these records. A production evolution should replace automatic schema creation with versioned database migrations:
-
-```text
-users
-  id, username, password_hash, is_admin, created_at
-
-routers
-  id, name, host, port, username, password_ciphertext,
-  enabled, created_at, updated_at
-```
-
-Use a unique constraint for the normalized username and an appropriate uniqueness rule for router name or management endpoint. Validate lengths and types in the application as well as the database.
-
-## Part 2: Implement safe first-use administrator creation
+## Part 1: Review first-use administrator creation
 
 The setup endpoint must use a transaction:
 
@@ -166,7 +128,7 @@ Expected cases include:
 - A second setup request cannot create another initial administrator.
 - Invalid login fails without revealing whether a username exists.
 
-## Part 3: Implement the router inventory workflow
+## Part 2: Review the router inventory workflow
 
 The inventory form collects:
 
@@ -174,14 +136,13 @@ The inventory form collects:
 - Management hostname or IP address
 - RESTCONF HTTPS port
 - RESTCONF username and password
-- CA bundle selection or trust-profile reference
 - Enabled state
 
 Validate the record on the server. Reject malformed hostnames, invalid IP addresses, ports outside the permitted range, duplicate records, unsupported schemes, and targets outside the instructor-approved lab scope.
 
 Encrypt the router password before database storage using the application encryption key supplied at runtime. Password encryption does not replace access control: only the application identity should be able to read the ciphertext, and no API response should return it.
 
-When the administrator selects **Test connection**, perform a bounded read-only RESTCONF request. Return a categorized result such as reachable, authentication failure, authorization failure, resource unsupported, timeout, or unexpected response. RESTCONF certificate verification remains disabled for the course routers. Do not save an unverified router unless the instructor permits it for troubleshooting practice.
+The supplied application validates the inventory fields before storing the record. RESTCONF certificate verification remains disabled for the course routers. Live reachability is verified when the learner requests CPU and memory data from the monitoring page.
 
 Run the inventory tests:
 
@@ -191,9 +152,9 @@ python -m pytest -v
 
 RESTCONF response fixtures should test normal data, missing leaves, different numeric encodings, authorization failure, and timeout without requiring a live router for every test.
 
-## Part 4: Create the application image
+## Part 3: Inspect the application image
 
-Create `app/Dockerfile`:
+Open the supplied `app/Dockerfile` and follow each instruction from the base image to the runtime command:
 
 ```dockerfile
 FROM python:3.12-slim
@@ -214,14 +175,14 @@ EXPOSE 8000
 HEALTHCHECK --interval=15s --timeout=3s --start-period=30s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live', timeout=2)" || exit 1
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "2", "app.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "2", "app:create_app()"]
 ```
 
 The application entry point may differ in the starter bundle. Update only the import path, not the security boundaries.
 
-## Part 5: Create the web image
+## Part 4: Inspect the web image
 
-Create `web/nginx.conf`:
+Inspect the supplied `web/nginx.conf` and identify the static-content path, API reverse proxy, and health endpoint:
 
 ```nginx
 server {
@@ -249,7 +210,7 @@ server {
 }
 ```
 
-Create `web/Dockerfile`:
+Inspect the supplied `web/Dockerfile` and explain how it combines the NGINX configuration with the static user interface:
 
 ```dockerfile
 FROM nginx:stable-alpine
@@ -262,7 +223,7 @@ HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \
 
 The NGINX image should be pinned to the instructor-approved immutable version or digest before it is promoted beyond the local lab.
 
-## Part 6: Prepare Compose configuration and secrets
+## Part 5: Prepare Compose configuration and secrets
 
 Create `.env` from `.env.example` and restrict it:
 
@@ -286,9 +247,9 @@ INVENTORY_ENCRYPTION_KEY=<generated-value>
 
 Do not commit `.env`. Avoid characters that break a URL unless the password is URL-encoded in `DATABASE_URL`. In a later security stage, these values move to a secrets service; this lab concentrates on service and persistence boundaries.
 
-## Part 7: Create the three-tier Compose application
+## Part 6: Inspect the three-tier Compose application
 
-Create `compose.yaml`:
+Open the supplied `compose.yaml`. Trace the web-to-application and application-to-database paths, then relate the following definition to the resolved configuration on your workstation:
 
 ```yaml
 services:
@@ -322,7 +283,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
     networks:
       - frontend
       - data
@@ -377,7 +337,7 @@ If the selected NGINX image requires different filesystem permissions for read-o
 
 The `management` network does not by itself restrict the application to approved routers. Host firewall policy, VPN routing, and later platform controls enforce the actual destination boundary.
 
-## Part 8: Validate and build the images
+## Part 7: Validate and build the images
 
 Validate the resolved model without displaying secrets in shared output:
 
@@ -413,7 +373,9 @@ docker run --rm network-monitor-web:lab03 nginx -t
 
 The final application image intentionally excludes tests. A later pipeline can run them in a dedicated build stage or test image rather than copying test code into the production runtime.
 
-## Part 9: Start and verify the application
+## Part 8: Start and verify the application
+
+Start the complete service model and verify each tier before using the web interface.
 
 ```bash
 docker compose up -d
@@ -438,7 +400,7 @@ docker compose port db 3306
 
 No mapping should be returned.
 
-## Part 10: Complete first-time administrator setup
+## Part 9: Complete first-time administrator setup
 
 Open `http://127.0.0.1:8088`. The application should redirect to or present the setup page because the database contains no users.
 
@@ -460,18 +422,17 @@ docker compose exec db sh -lc \
 
 The table should contain one administrator. Do not display or copy the password-hash column.
 
-## Part 11: Add and monitor IOS XE inventory
+## Part 10: Add and monitor IOS XE inventory
 
-Open the **Inventory** page and add the assigned router. Use the CA trust configuration provided by the instructor. Select **Test connection** before saving.
+Open the **Router inventory** section and add the assigned router. RESTCONF certificate verification is disabled for the course environment.
 
 After saving:
 
-1. Confirm that the inventory list displays name, endpoint, enabled status, and last test result.
+1. Confirm that the inventory list displays the router name and endpoint.
 2. Confirm that no router password appears in the HTML or browser network response.
 3. Open the dashboard and select the router.
 4. Wait for at least two samples.
 5. Confirm that CPU and memory charts display timestamps and values.
-6. Add a second authorized router if one is available and verify that the dashboard changes target cleanly.
 
 Inspect only safe inventory columns:
 
@@ -481,7 +442,7 @@ docker compose exec db sh -lc \
   "SELECT id, name, host, port, enabled FROM routers;"'
 ```
 
-## Part 12: Verify persistence and failure boundaries
+## Part 11: Verify persistence and failure boundaries
 
 ### Replace application containers while keeping database state
 
@@ -523,7 +484,9 @@ docker volume inspect "$(docker volume ls -q --filter name=mysql_data)"
 
 A volume is persistent local storage, not a backup. A production design requires tested backups, restoration, encryption, retention, and access control.
 
-## Part 13: Docker Compose lifecycle
+## Part 12: Docker Compose lifecycle
+
+Relate each Compose command to its effect on running services and persistent database state.
 
 | Goal | Command | Effect on database volume |
 |---|---|---|
@@ -550,7 +513,9 @@ docker compose logs --since=10m app
 
 Do not scale the application tier until session storage, background work, schema migrations, and in-memory chart state have been evaluated for multiple instances.
 
-## Part 14: Commit and push the work
+## Part 13: Commit and push the work
+
+Publish the verified three-tier implementation to the cumulative GitLab project.
 
 ```bash
 git status --ignored
@@ -569,7 +534,7 @@ git push -u origin feature/lab03-three-tier
 - Only the web tier exposes a workstation port.
 - The first administrator can be created exactly once and can authenticate afterward.
 - Passwords are hashed; router credentials are encrypted and absent from API responses.
-- The inventory page adds and removes authorized IOS XE routers.
+- The inventory section adds an instructor-authorized IOS XE router.
 - CPU and memory charts obtain current data through the application tier.
 - Administrator and router records survive container replacement.
 - Database failure changes readiness and produces an explicit application error.

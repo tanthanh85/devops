@@ -59,25 +59,17 @@ Suggested local ports:
 | Kibana | `http://127.0.0.1:5601` |
 | Logstash input for later labs | `127.0.0.1:5044` |
 
-## Part 1: Inspect and update the workstation
+## Part 1: Prepare the workstation
+
+Install the common packages required by the remaining workstation procedures.
 
 ```bash
-whoami
-hostnamectl
-grep -E '^(NAME|VERSION|VERSION_ID|VERSION_CODENAME|UBUNTU_CODENAME)=' /etc/os-release
-uname -m
-free -h
-df -h /
-egrep -c '(vmx|svm)' /proc/cpuinfo
 sudo apt update
-sudo apt upgrade -y
 sudo apt install -y git curl wget jq ca-certificates gnupg lsb-release \
   openssh-client make unzip apt-transport-https
 ```
 
-Confirm that the operating-system output identifies Ubuntu and includes `VERSION_ID="26.04"`. The architecture reported by `uname -m` should be `x86_64` unless the instructor has supplied an approved ARM64 environment. Stop and consult the instructor if the release or architecture does not match the course workstation specification.
-
-The virtualization check should return a value greater than zero. If it returns zero on a virtual machine, ask the instructor whether nested virtualization is enabled. The Minikube Docker driver does not require a second hypervisor, but sufficient CPU and memory are still required.
+These commands update the Ubuntu package index, apply available updates, and install the common utilities required by later installation procedures.
 
 Configure Git identity:
 
@@ -89,6 +81,8 @@ git --version
 ```
 
 ## Part 2: Install Python, pip, and virtual-environment support
+
+Install the Python runtime and the standard virtual-environment capability that Lab 2 will use for the course project.
 
 ```bash
 sudo apt install -y python3 python3-pip python3-venv
@@ -156,12 +150,9 @@ Extensions execute with the learner's permissions and may access workspace conte
 
 ## Part 4: Install Docker Engine and Docker Compose
 
-Remove conflicting unofficial packages if they are present, then use Docker's official Ubuntu repository:
+Use Docker's official Ubuntu repository:
 
 ```bash
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-  sudo apt-get remove -y "$pkg" 2>/dev/null || true
-done
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
   -o /etc/apt/keyrings/docker.asc
@@ -268,7 +259,7 @@ cp -R "/path/to/Lab 01 - Workstation Installation/platform/." \
   ~/course-platform/
 cd ~/course-platform/gitlab-runner
 cp .env.example .env
-# Confirm the instructor-approved image tag before continuing.
+grep '^GITLAB_RUNNER_IMAGE=' .env
 docker compose config --quiet
 docker compose pull
 docker compose up -d
@@ -285,7 +276,7 @@ Elastic requires Elasticsearch, Logstash, and Kibana to use the same version. Us
 ```bash
 cd ~/course-platform/elastic
 cp .env.example .env
-# Replace STACK_VERSION with the instructor-approved version.
+grep '^STACK_VERSION=' .env
 docker compose config --quiet
 docker compose pull
 docker compose up -d
@@ -314,7 +305,7 @@ Use the supplied Compose definition to start Vault in development mode bound to 
 ```bash
 cd ~/course-platform/vault
 cp .env.example .env
-# Replace VAULT_VERSION with the instructor-approved version.
+grep '^VAULT_VERSION=' .env
 docker compose up -d
 export VAULT_ADDR=http://127.0.0.1:8200
 curl -s "$VAULT_ADDR/v1/sys/health" | jq
@@ -329,6 +320,18 @@ docker stop course-vault
 docker start course-vault
 ```
 
+## Part 11: Run the workstation verification
+
+Copy and run the supplied verification program after all command-line tools have been installed:
+
+```bash
+cp "/path/to/Lab 01 - Workstation Installation/verify_workstation.py" \
+  ~/course-platform/verify_workstation.py
+python3 ~/course-platform/verify_workstation.py
+```
+
+Every entry should report `PASS`. This check confirms that the required commands are available; the service checks completed in the preceding parts confirm that the local platforms can also start and respond.
+
 ## Platform lifecycle summary
 
 | Platform | Start | Stop without deleting data |
@@ -341,7 +344,6 @@ docker start course-vault
 
 ## Completion criteria
 
-- The workstation reports Ubuntu 26.04 LTS and the instructor-approved processor architecture.
 - Python, pip, and the `venv` module run successfully on the workstation.
 - Learners can explain that Lab 2 creates the course virtual environment.
 - Ansible reports its executable, Python, and collection paths.

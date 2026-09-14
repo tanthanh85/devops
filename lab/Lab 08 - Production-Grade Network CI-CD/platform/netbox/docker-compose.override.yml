@@ -8,6 +8,8 @@ services:
     command: ["-e", "-c", "/etc/filebeat.yml"]
     environment:
       LOGSTASH_HOST: ${LOGSTASH_HOST:-host.docker.internal:5044}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./filebeat.yml:/etc/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro

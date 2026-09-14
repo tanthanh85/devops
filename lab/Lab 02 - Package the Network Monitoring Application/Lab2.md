@@ -184,6 +184,10 @@ docker exec course-gitlab-runner gitlab-runner verify
 
 Do not store the runner token in the project or a screenshot.
 
+## Part 4: Prepare the application configuration
+
+The supplied application reads its router endpoint and credentials from environment variables. Prepare the local runtime file before starting the application. The native Python process and the container both use this file, but it must never be added to the repository.
+
 Copy `.env.example` to `.env`, restrict it, and insert only the credentials and endpoint supplied for the lab:
 
 ```bash
@@ -253,7 +257,7 @@ PY
 
 The router value must match the instructor-assigned target and mock mode must be `False`. This check deliberately does not print the username or password.
 
-## Part 4: Verify the supplied application before containerizing it
+## Part 5: Verify the supplied application before containerizing it
 
 Start the application using the documented entry point. One common pattern is:
 
@@ -289,7 +293,7 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 5: Inspect the Docker build boundary
+## Part 6: Inspect the Docker build boundary
 
 Confirm that the supplied `.dockerignore` exists, then display it with line numbers:
 
@@ -320,7 +324,7 @@ find . -maxdepth 3 -type f | sort
 
 Confirm that source, templates, static content, and `requirements.txt` are available, while `.env`, the virtual environment, Git history, and test files are excluded.
 
-## Part 6: Inspect and explain the Dockerfile
+## Part 7: Inspect and explain the Dockerfile
 
 Confirm that the supplied Dockerfile exists and inspect it with line numbers:
 
@@ -355,7 +359,9 @@ Explain the file before building:
 
 Before building, explain why dependencies are copied and installed before the application source. Also explain what would change if `USER app`, `--chown=app:app`, or the exec-form `CMD` were removed.
 
-## Part 7: Build and identify the image
+## Part 8: Build and identify the image
+
+Build the supplied application definition and inspect the resulting immutable image identity.
 
 ```bash
 docker build --pull -t network-monitor:lab02 .
@@ -375,7 +381,7 @@ docker image inspect network-monitor:lab02 --format '{{.Id}}'
 
 An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
 
-## Part 8: Run the container
+## Part 9: Run the container
 
 The container requires runtime configuration, a published local port, and a route to the assigned router. Start with Docker's default bridge network:
 
@@ -414,7 +420,7 @@ docker run -d --name network-monitor --network host --env-file .env \
 
 With host networking, Docker does not publish the port; the application binds directly in the host network namespace. Explain which network mode was required and why.
 
-## Part 9: Inspect and explain the running container
+## Part 10: Inspect and explain the running container
 
 Run each command and explain what its output proves:
 
@@ -452,7 +458,7 @@ Interpretation guide:
 
 Do not run `docker inspect` and share the unfiltered output: environment values can include secrets.
 
-## Part 10: Exercise the Docker lifecycle
+## Part 11: Exercise the Docker lifecycle
 
 ### Stop and start the same container
 
@@ -506,7 +512,9 @@ docker run -d --name network-monitor --env-file .env \
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
 
-## Part 11: Commit and push the work
+## Part 12: Commit and push the work
+
+Publish the completed packaging change to the learner's GitLab project.
 
 ```bash
 git status --ignored

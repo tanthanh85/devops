@@ -83,6 +83,8 @@ Lab 06 - Monitor with the Elastic Stack/
 
 ## Part 1: Prepare the cumulative branch
 
+Add the supplied telemetry components to the same application repository used by the delivery pipeline.
+
 ```bash
 cd ~/network-devops
 git status
@@ -123,7 +125,7 @@ Do not log session cookies, authorization headers, passwords, Vault tokens, REST
 Copy the supplied pipeline and override into the Lab 1 Elastic project:
 
 ```bash
-cd ~/network-devops/platform/elastic
+cd ~/course-platform/elastic
 cp "/path/to/Lab 06 - Monitor with the Elastic Stack/elastic/compose.override.yaml" .
 cp "/path/to/Lab 06 - Monitor with the Elastic Stack/elastic/logstash/pipeline/logstash.conf" pipeline/
 ```
@@ -146,6 +148,8 @@ curl -s http://127.0.0.1:9200/_cluster/health | jq
 The Lab 1 stack disables Elastic authentication and TLS. Do not expose ports 9200, 5601, or 5044 to an untrusted network. Production ingestion requires TLS, authenticated Beats, certificate validation, durable storage, index lifecycle management, and capacity controls.
 
 ## Part 4: Build the observable application images
+
+Package the updated logging configuration and synthetic monitor, then load all three images into Minikube.
 
 ```bash
 cd ~/network-devops
@@ -223,6 +227,8 @@ A successful record contains:
 The measurement combines page access, authentication, application processing, Vault retrieval, RESTCONF requests, and rendering. It represents user-visible service time rather than only server processing time.
 
 ## Part 7: Confirm Elasticsearch ingestion
+
+Confirm that each expected telemetry family has reached Elasticsearch before creating Kibana objects.
 
 ```bash
 curl -s 'http://127.0.0.1:9200/_cat/indices/network-monitor-*,kubernetes-*?v'
@@ -341,6 +347,8 @@ Create protected `LOGSTASH_HOST` and retain the Lab 5 Kubernetes and synthetic-t
 
 ## Part 15: Commit and push the work
 
+Publish the observability implementation after logs, metrics, and synthetic checks have been verified.
+
 ```bash
 git status
 git diff
@@ -374,7 +382,7 @@ kubectl -n network-devops patch cronjob network-monitor-synthetic \
 To stop the workstation Elastic Stack without deleting its data:
 
 ```bash
-cd ~/network-devops/platform/elastic
+cd ~/course-platform/elastic
 docker compose -f compose.yaml -f compose.override.yaml stop
 ```
 

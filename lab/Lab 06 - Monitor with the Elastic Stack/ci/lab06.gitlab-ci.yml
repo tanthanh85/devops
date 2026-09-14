@@ -16,7 +16,7 @@ build-observability-images:
 deploy-observability:
   stage: deploy
   image:
-    name: bitnami/kubectl:1.31
+    name: bitnami/kubectl:1.35
     entrypoint: [""]
   environment: {name: course/minikube}
   resource_group: course-minikube

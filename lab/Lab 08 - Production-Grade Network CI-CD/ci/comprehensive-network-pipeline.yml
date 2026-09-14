@@ -37,7 +37,7 @@ validate-network-delivery-source:
   script:
     - audit_task compile_python python -m compileall -q automation ansible ci
     - audit_task validate_yaml python -c 'import glob,yaml; [list(yaml.safe_load_all(open(f))) for f in glob.glob("ansible/*.yml")+glob.glob("kubernetes/*.yaml")]'
-    - audit_task detect_known_secret_formats sh -c '! git grep -nE "BEGIN (RSA |OPENSSH )?PRIVATE KEY|glpat-[A-Za-z0-9_-]{20,}" -- terraform ansible automation ci'
+    - audit_task detect_known_secret_formats sh -c '! grep -RInE "BEGIN (RSA |OPENSSH )?PRIVATE KEY|glpat-[A-Za-z0-9_-]{20,}" terraform ansible automation ci'
 
 build-network-delivery-images:
   extends: [.network_change_rules, .audit_variables]

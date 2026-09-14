@@ -54,6 +54,8 @@ Lab 07 - Send Elastic Alerts to a Webhook/
 
 ## Part 1: Prepare the branch
 
+Add the supplied receiver, Kubernetes manifest, Elastic override, and pipeline jobs to the cumulative project.
+
 ```bash
 cd ~/network-devops
 git status
@@ -70,8 +72,7 @@ cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/ci/." ci/
 The receiver accepts `POST /webhook/elastic` only when `X-Webhook-Token` matches its configured token. It limits strings and copies only known fields into memory. This prevents an alert action from turning the receiver into an unrestricted data store.
 
 ```bash
-python -m venv .venv-lab07
-source .venv-lab07/bin/activate
+source ~/network-devops/.venv/bin/activate
 python -m pip install -r webhook-receiver/requirements.txt pytest==8.4.2
 cd webhook-receiver
 python -m pytest -q
@@ -79,6 +80,8 @@ cd ..
 ```
 
 ## Part 3: Build and deploy the receiver
+
+Package the tested receiver and deploy it to the existing Minikube namespace.
 
 ```bash
 docker build -t alert-webhook:lab07 webhook-receiver
@@ -124,12 +127,12 @@ The first request should return `401`; the second should return `202` and appear
 Kibana encrypts connector secrets with its encrypted-saved-objects key. Generate a value of at least 32 characters and store it in the Elastic Compose `.env` file, which must remain ignored by Git:
 
 ```bash
-cd ~/network-devops/platform/elastic
+cd ~/course-platform/elastic
 openssl rand -hex 32
 # Set KIBANA_ENCRYPTION_KEY in .env without committing it.
 cp "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/elastic/compose.alerting.override.yaml" .
 docker compose -f compose.yaml -f compose.override.yaml \
-  -f compose.alerting.override.yaml up -d kibana
+  -f compose.alerting.override.yaml up -d
 docker compose ps
 ```
 
@@ -238,7 +241,7 @@ For every rule, answer:
 - Is there a recovery notification?
 - Does the reason suggest the first diagnostic dashboard or query?
 
-## Part 12: Add the optional pipeline jobs
+## Part 12: Add the pipeline jobs
 
 Include `ci/lab07.gitlab-ci.yml` and add a protected, masked `WEBHOOK_TOKEN` variable. Extend the Lab 6 image-build job to build and push:
 
@@ -250,6 +253,8 @@ docker push "$CI_REGISTRY_IMAGE/alert-webhook:$CI_COMMIT_SHA"
 The supplied deployment job creates the Kubernetes Secret and updates the receiver image. Kibana connector and rule changes remain instructor-reviewed platform configuration unless your environment manages Kibana saved objects as code.
 
 ## Part 13: Commit and push the work
+
+Publish the verified receiver and alert-delivery pipeline changes.
 
 ```bash
 git status

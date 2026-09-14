@@ -1,6 +1,6 @@
 # DevOps Course Labs
 
-These labs build one network monitoring application progressively. Complete them in order because each lab reuses the repository and evidence produced by the previous one.
+These labs build one network monitoring application progressively. Complete them in order because each lab starts from the working result of the previous one.
 
 | Lab | Focus | Result |
 |---|---|---|

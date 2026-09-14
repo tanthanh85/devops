@@ -45,7 +45,7 @@ build-e2e-image:
 deploy-minikube:
   stage: deploy
   image:
-    name: bitnami/kubectl:1.31
+    name: bitnami/kubectl:1.35
     entrypoint: [""]
   environment:
     name: course/minikube

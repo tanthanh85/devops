@@ -67,6 +67,8 @@ Lab 04 - Deploy and Scale on Kubernetes/
 
 ## Part 1: Prepare the cumulative branch
 
+Bring the supplied Kubernetes and Vault implementation into the project created in the previous labs.
+
 ```bash
 cd ~/network-devops
 git status
@@ -82,6 +84,8 @@ cp "/path/to/Lab 04 - Deploy and Scale on Kubernetes/requirements"*.txt .
 
 ## Part 2: Test and build the images
 
+Verify the Vault-backed behavior before producing the two application images used by Kubernetes.
+
 ```bash
 python -m pip install -r requirements.txt -r requirements-dev.txt
 python -m pytest -q
@@ -94,6 +98,8 @@ The tests prove that inventory comes from Vault, metric collection uses the comp
 
 ## Part 3: Start Minikube and load images
 
+Start the course cluster and make the locally built images available to its container runtime.
+
 ```bash
 minikube start --profile network-devops
 minikube profile network-devops
@@ -104,6 +110,8 @@ kubectl get nodes -o wide
 ```
 
 ## Part 4: Create application and Vault bootstrap secrets
+
+Create the namespace and runtime secrets required to initialize the application and laboratory Vault service.
 
 ```bash
 kubectl apply -f kubernetes/namespace.yaml
@@ -119,6 +127,8 @@ kubectl -n network-devops create secret generic vault-bootstrap \
 The bootstrap token is used only to configure the laboratory Vault server. Do not commit it, print it, or give it to the application. The supplied Vault runs in development mode and is not suitable for production.
 
 ## Part 5: Deploy and configure Vault
+
+Deploy Vault and bind the application workload identity to a read-only router-record policy.
 
 ```bash
 kubectl apply -f kubernetes/token-review.yaml
@@ -181,6 +191,8 @@ kubectl -n network-devops exec deployment/vault -- env \
 
 ## Part 7: Deploy the three application tiers
 
+Apply the version-controlled manifests in dependency order and wait for each rollout to become ready.
+
 ```bash
 kubectl apply -f kubernetes/configmap.yaml
 kubectl apply -f kubernetes/mysql.yaml
@@ -193,6 +205,8 @@ kubectl -n network-devops get deployment,pod,service,pvc -o wide
 ```
 
 ## Part 8: Open and verify the application
+
+Access the Kubernetes Service and confirm the complete browser-to-router monitoring path.
 
 ```bash
 minikube service network-monitor-web --url --profile network-devops
@@ -215,6 +229,8 @@ curl -i -X POST "$WEB_URL/api/routers" \
 The expected response is `405 Method Not Allowed`. Router administration belongs to Vault in this lab.
 
 ## Part 10: Scale the web tier
+
+Increase only the stateless presentation tier and observe how the Service distributes new connections.
 
 ```bash
 kubectl -n network-devops scale deployment/network-monitor-web --replicas=3
@@ -242,6 +258,8 @@ Temporarily change the application Vault role to an unknown value and request me
 Then update the router password in Vault and on the authorized router. The next request should use the new value without changing an application image, Deployment, database record, or web configuration.
 
 ## Part 12: Commit and push the work
+
+Publish the verified Kubernetes and Vault configuration to the cumulative project.
 
 ```bash
 git status
@@ -271,10 +289,9 @@ Retain the cluster for Lab 5. Scale the web tier to one and clear local shell va
 ```bash
 kubectl -n network-devops scale deployment/network-monitor-web --replicas=1
 unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT
-minikube stop --profile network-devops
 ```
 
-Vault development mode loses its data if the Vault Pod is replaced. Production Vault requires TLS, durable storage, controlled initialization and unsealing, audit logging, backups, and high availability.
+Leave Minikube running when continuing to Lab 5. Vault development mode loses its data if the Vault Pod is replaced, so stopping the cluster at this point can invalidate the next lab's prerequisites. Production Vault requires TLS, durable storage, controlled initialization and unsealing, audit logging, backups, and high availability.
 
 ## Key takeaways
 

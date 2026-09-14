@@ -88,11 +88,40 @@ cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/automation" .
 cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/ci/." ci/
 cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/scripts/." scripts/
 cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/elastic/." elastic/
+cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/kubernetes/." kubernetes/
+cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/tests/." tests/
+mkdir -p platform
+cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/platform/netbox" platform/
 ```
 
 Review every file before committing it. The supplied values are examples, not authorization to access a router or CML system.
 
-## 2. Prepare the instructor-provided CML environment
+## 2. Install and initialize NetBox
+
+NetBox is the source of truth for the final workflow. The workstation runs an instructor-approved NetBox Docker release outside the application repository, while the repository retains only the course-specific setup helpers and integration configuration.
+
+Obtain the exact approved NetBox Docker release tag from the instructor, then run:
+
+```bash
+export NETBOX_DOCKER_REF="<instructor-approved-release-tag>"
+bash platform/netbox/setup-netbox.sh \
+  ~/course-platform/netbox-docker "$NETBOX_DOCKER_REF"
+cd ~/course-platform/netbox-docker
+docker compose pull
+docker compose up -d
+docker compose ps
+```
+
+Wait until the `netbox` service is healthy. Create the local administrator when prompted:
+
+```bash
+docker compose exec netbox /opt/netbox/netbox/manage.py createsuperuser
+curl -fsS http://127.0.0.1:8000/api/status/ | jq
+```
+
+Open `http://127.0.0.1:8000`, sign in, and confirm that the **Devices**, **Interfaces**, **IPAM**, **Custom fields**, **Event rules**, and **Webhooks** areas are available. Keep the NetBox containers running through the remainder of the lab.
+
+## 3. Prepare the instructor-provided CML environment
 
 The instructor supplies a CML 2.9 or later system that the private GitLab runner can reach. Confirm the following before the lab:
 
@@ -103,7 +132,7 @@ The instructor supplies a CML 2.9 or later system that the private GitLab runner
 - The CML API certificate is trusted by the runner, or the instructor has explicitly approved lab-only certificate verification settings.
 - Each learner or group has a restricted CML token and an isolated address allocation.
 
-### 2.1 Allocate learner namespaces before class
+### 3.1 Allocate learner namespaces before class
 
 The instructor assigns immutable identifiers `L01` through `L20`. The identifier is an ownership boundary, not a value learners choose for each run. Prepare this allocation before learners can trigger pipelines:
 
@@ -120,7 +149,7 @@ The resolver rejects an event unless the ownership field and interface number ag
 
 The provider is currently beta and provider/CML compatibility matters. The supplied configuration pins `CiscoDevNet/cml2` to the instructor-tested version range. Run `terraform init -upgrade` only when intentionally testing an upgrade.
 
-## 3. Store integrations and targets in Vault
+## 4. Store integrations and targets in Vault
 
 Keep the following records in Vault. Do not place their values in Git, NetBox custom fields, Terraform variables committed to the repository, GitLab job commands, or screenshots.
 
@@ -144,7 +173,7 @@ bash scripts/configure-vault-netbox.sh
 
 For GitLab Docker-runner jobs, configure a narrowly scoped Vault authentication method. In a production platform, use GitLab OpenID Connect ID tokens with Vault JWT authentication. The course fallback uses protected and masked `VAULT_ROLE_ID` and `VAULT_SECRET_ID` variables for a read-only AppRole. Never use the Vault root or bootstrap token in CI.
 
-## 4. Model loopback intent in NetBox
+## 5. Model loopback intent in NetBox
 
 Use the shared production device and the instructor-created loopback assigned to you. Confirm that its `course_learner_id` matches your identifier before assigning a prefix. Do not create an arbitrary loopback number. The IP-address object must be assigned to the interface; this completed association is what the webhook reports.
 
@@ -158,19 +187,23 @@ docker build -t network-monitor-app:lab08 -f app/Dockerfile .
 docker build -t network-monitor-web:lab08 lab04-web
 ```
 
-## 5. Review the Terraform test environment
+## 6. Review the Terraform test environment
 
 `terraform/cml-test/main.tf` creates a uniquely named lab, an instructor-selected external connector, an unmanaged switch, and one C8000V with a bootstrap configuration. Lab and node names contain both the learner identifier and pipeline ID. Ownership tags and notes carry the same values. The pipeline uses a state name containing the learner and pipeline identifiers, so one cleanup job can destroy only the CML objects recorded in its own state. The lifecycle resource starts the topology after its nodes and links exist. Terraform outputs the test management address and CML object IDs needed for audit and cleanup.
 
 ```bash
-terraform -chdir=terraform/cml-test fmt -check
-terraform -chdir=terraform/cml-test init -backend=false
-terraform -chdir=terraform/cml-test validate
+docker build -t cml-terraform:lab08 -f automation/Dockerfile.terraform .
+docker run --rm -v "$PWD:/workspace" -w /workspace cml-terraform:lab08 \
+  terraform -chdir=terraform/cml-test fmt -check
+docker run --rm -v "$PWD:/workspace" -w /workspace cml-terraform:lab08 \
+  terraform -chdir=terraform/cml-test init -backend=false
+docker run --rm -v "$PWD:/workspace" -w /workspace cml-terraform:lab08 \
+  terraform -chdir=terraform/cml-test validate
 ```
 
 The CML token and generated bootstrap configuration are sensitive. The supplied CI helper uses GitLab's authenticated HTTP Terraform-state backend; it does not publish `terraform.tfstate` as a job artifact. Restrict state access, enable the platform's encryption and backup controls, and rotate the temporary test credential after class.
 
-## 6. Deploy with Ansible
+## 7. Deploy with Ansible
 
 The deployment image uses `ansible.netcommon.network_cli` and `cisco.ios.ios_config`. `inventory_from_vault.py` resolves the NetBox event, selects test or production, and returns dynamic inventory without printing a password. The playbook validates the interface and address, applies the change idempotently, saves only when changed, and writes a sanitized result artifact.
 
@@ -183,7 +216,7 @@ docker image inspect loopback-ansible:lab08 loopback-pyats:lab08 \
 
 pyATS remains independent of Ansible. It reconnects to the selected target and proves that the exact interface and IP address appear with protocol and interface state `up/up`.
 
-## 7. Configure comprehensive Elastic auditing
+## 8. Configure comprehensive Elastic auditing
 
 Expose a TLS-protected HTTP input for CI audit events. Use the supplied Logstash pipeline as a starting point and place authentication or a reverse proxy in front of it. Store the final endpoint and API key in Vault.
 
@@ -208,7 +241,7 @@ python ci/audit.py emit --action audit_connectivity_test --outcome success \
 
 Create a Kibana data view for `network-cicd-audit-*`.
 
-## 8. Add the comprehensive pipeline
+## 9. Add the comprehensive pipeline
 
 Use this include:
 
@@ -235,7 +268,7 @@ The jobs execute in this order:
 
 `needs` relationships enforce the chain. `resource_group: production-network-change` serializes all changes to the shared production router. Configure `course/production-network` as a protected environment with required approvers. An instructor must reject a second active pipeline for the same learner until the first pipeline has completed CML cleanup; two simultaneous routers cannot use the same learner-reserved management address.
 
-## 9. Configure the NetBox trigger
+## 10. Configure the NetBox trigger
 
 Create a GitLab pipeline trigger token named `netbox-network-change`. Configure the NetBox webhook:
 
@@ -251,7 +284,7 @@ variables[PIPELINE_PURPOSE]=network_change&variables[NETBOX_IP_ID]={{ data['id']
 
 Create an Event Rule for **IPAM > IP address**, event **Object created**, using this webhook. Restrict the rule to the course scope where supported. Only trusted administrators should view the webhook because its URL contains a trigger token.
 
-## 10. Execute the test deployment
+## 11. Execute the test deployment
 
 Assign a new IPv4 prefix to your instructor-created loopback interface in NetBox. Follow the triggered pipeline, but do not approve production yet. Confirm this evidence sequence:
 
@@ -268,7 +301,7 @@ event.dataset : "network_cicd.audit" and ci.pipeline.id : "<pipeline-id>"
 
 Sort by `@timestamp`. Every event through `test_validation` must report success.
 
-## 11. Promote and verify production
+## 12. Promote and verify production
 
 Before approving, review the NetBox intent, commit SHA, Terraform plan, CML lab ID, Ansible recap, pyATS result, image digests, maintenance window, and authorization conditions.
 
@@ -276,17 +309,19 @@ An authorized learner or instructor selects **Play** on `approve-production`. Gi
 
 After production verification succeeds, confirm the interface through an approved read-only method and review its Elastic events.
 
-## 12. Confirm cleanup
+## 13. Confirm cleanup
 
 The cleanup job uses the learner-and-pipeline-specific protected GitLab Terraform state and runs after the test path finishes, including when Ansible deployment or pyATS verification fails. It is non-interruptible, calls `terraform destroy`, checks that its state tracks no remaining CML resources, and emits an explicit deletion event. It never searches for or deletes CML objects by a broad name pattern. Cleanup failure blocks the production approval job. Confirm in CML that only your pipeline's lab and C8000V are gone.
 
 Confirm that the pipeline reports successful cleanup and that no learner-owned CML resource remains.
 
-## 13. Controlled failure exercise
+## 14. Controlled failure exercise
 
 Repeat with an instructor-rejected address or temporarily unreachable test router. Verify that test fails closed, production approval is unavailable, no production deployment runs, the failure is auditable, and cleanup still removes the CML lab. Do not manufacture a failure against production.
 
-## 14. Commit and push the work
+## 15. Commit and push the work
+
+Publish the final application and network-delivery pipeline after the test, production, cleanup, and audit paths have been verified.
 
 ```bash
 git status

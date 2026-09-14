@@ -69,6 +69,8 @@ Lab 05 - Build Test and Deploy with GitLab CI-CD/
 
 ## Part 1: Prepare the feature branch
 
+Add the supplied CI/CD files to the application repository without replacing the working Lab 4 runtime files.
+
 ```bash
 cd ~/network-devops
 git status
@@ -118,9 +120,9 @@ Do not enable privileged mode for this lab. Docker-socket access is already high
 The default Minikube kubeconfig refers to certificate files on the workstation. A CI job cannot read those paths. Flatten the selected context so the certificate data is embedded:
 
 ```bash
-mkdir -p evidence/lab05
-kubectl config view --minify --flatten --raw > evidence/lab05/minikube-ci.kubeconfig
-KUBECONFIG=evidence/lab05/minikube-ci.kubeconfig kubectl get nodes
+mkdir -p ~/course-platform
+kubectl config view --minify --flatten --raw > ~/course-platform/minikube-ci.kubeconfig
+KUBECONFIG=~/course-platform/minikube-ci.kubeconfig kubectl get nodes
 ```
 
 This file contains credentials. Upload it to GitLab in the next part, then remove it immediately. Never add it to Git or pipeline artifacts.
@@ -138,7 +140,7 @@ In **Settings > CI/CD > Variables**, create these variables:
 Use environment scope `course/minikube` if available. Do not expose either credential in command output. After saving `KUBE_CONFIG`, delete the local copy:
 
 ```bash
-rm evidence/lab05/minikube-ci.kubeconfig
+rm ~/course-platform/minikube-ci.kubeconfig
 git status --ignored
 ```
 
@@ -187,6 +189,8 @@ The Secret is removed after the Job succeeds. The database retains only the pass
 
 ## Part 8: Validate the files locally
 
+Run fast local checks so formatting or manifest errors do not consume runner time.
+
 ```bash
 python -m pytest -q
 docker build -t network-monitor-e2e:local ci/e2e
@@ -197,6 +201,8 @@ git diff --check
 The provisioning manifest will validate without the temporary credential Secret, but the Job can run only after the script creates that Secret.
 
 ## Part 9: Commit and run the merge-request pipeline
+
+Push the pipeline definition and use a merge request to exercise its non-production validation path.
 
 ```bash
 git add .gitlab-ci.yml ci/e2e kubernetes/test-user-job.yaml \
