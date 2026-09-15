@@ -7,11 +7,7 @@ test-alert-receiver:
   script:
     - python -m pip install --disable-pip-version-check -r webhook-receiver/requirements.txt pytest==8.4.2
     - cd webhook-receiver
-    - python -m pytest -q --junitxml=../test-results/webhook.xml
-  artifacts:
-    when: always
-    reports: {junit: test-results/webhook.xml}
-    expire_in: 7 days
+    - python -m pytest -q
 
 deploy-alert-receiver:
   stage: deploy

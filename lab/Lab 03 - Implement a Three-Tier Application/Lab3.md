@@ -442,7 +442,7 @@ docker compose exec db sh -lc \
   "SELECT id, name, host, port, enabled FROM routers;"'
 ```
 
-## Part 11: Verify persistence and failure boundaries
+## Part 11: Verify database persistence
 
 ### Replace application containers while keeping database state
 
@@ -454,27 +454,6 @@ docker compose ps
 
 Sign in with the same administrator and confirm that router inventory remains. `docker compose down` removed service containers and networks but retained the named volume.
 
-### Restart only the application tier
-
-```bash
-docker compose restart app
-docker compose ps
-curl -fsS http://127.0.0.1:8088/api/setup/status | jq
-```
-
-The administrator and router inventory must remain.
-
-### Observe database unavailability
-
-```bash
-docker compose stop db
-docker compose ps
-curl -i http://127.0.0.1:8088/api/routers
-docker compose start db
-```
-
-The API should report unavailable or not ready; it must not silently return an empty inventory. Wait for the database and application to become healthy, then verify recovery. A liveness probe should not restart the application continuously merely because the database is temporarily unavailable; readiness should represent dependency availability.
-
 ### Verify volume identity
 
 ```bash
@@ -482,7 +461,7 @@ docker volume ls --filter name=mysql_data
 docker volume inspect "$(docker volume ls -q --filter name=mysql_data)"
 ```
 
-A volume is persistent local storage, not a backup. A production design requires tested backups, restoration, encryption, retention, and access control.
+A named volume keeps the database state when the application containers are replaced. It is not removed unless the learner explicitly uses `docker compose down --volumes`.
 
 ## Part 12: Docker Compose lifecycle
 
@@ -511,8 +490,6 @@ docker compose images
 docker compose logs --since=10m app
 ```
 
-Do not scale the application tier until session storage, background work, schema migrations, and in-memory chart state have been evaluated for multiple instances.
-
 ## Part 13: Commit and push the work
 
 Publish the verified three-tier implementation to the cumulative GitLab project.
@@ -537,7 +514,6 @@ git push -u origin feature/lab03-three-tier
 - The inventory section adds an instructor-authorized IOS XE router.
 - CPU and memory charts obtain current data through the application tier.
 - Administrator and router records survive container replacement.
-- Database failure changes readiness and produces an explicit application error.
 - The learner can explain the difference between `stop`, `down`, rebuild, replacement, and `down --volumes`.
 
 ## Cleanup

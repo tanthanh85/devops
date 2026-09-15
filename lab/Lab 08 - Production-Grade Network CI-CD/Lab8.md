@@ -31,9 +31,9 @@ flowchart LR
     TF --> CML[CML C8000V test]
     CML --> AT[Ansible: test]
     AT --> PT[pyATS: test]
-    PT -->|pass + approval| AP[Ansible: production]
+    PT --> CL[Destroy test lab]
+    CL -->|cleanup pass + approval| AP[Ansible: production]
     AP --> PP[pyATS: production]
-    PP --> CL[Destroy test lab]
     GL -. every job .-> ELK[(Elastic audit)]
 ```
 
@@ -121,7 +121,7 @@ curl -fsS http://127.0.0.1:8000/api/status/ | jq
 
 Open `http://127.0.0.1:8000`, sign in, and confirm that the **Devices**, **Interfaces**, **IPAM**, **Custom fields**, **Event rules**, and **Webhooks** areas are available. Keep the NetBox containers running through the remainder of the lab.
 
-## 3. Prepare the instructor-provided CML environment
+## 3. Confirm the shared CML allocation
 
 The instructor supplies a CML 2.9 or later system that the private GitLab runner can reach. Confirm the following before the lab:
 
@@ -132,7 +132,9 @@ The instructor supplies a CML 2.9 or later system that the private GitLab runner
 - The CML API certificate is trusted by the runner, or the instructor has explicitly approved lab-only certificate verification settings.
 - Each learner or group has a restricted CML token and an isolated address allocation.
 
-### 3.1 Allocate learner namespaces before class
+### 3.1 Instructor allocation reference
+
+The instructor completes this allocation before the lab. Learners only confirm their assigned identifier, interface, test address, and Vault namespace; they must not create or change another learner's allocation.
 
 The instructor assigns immutable identifiers `L01` through `L20`. The identifier is an ownership boundary, not a value learners choose for each run. Prepare this allocation before learners can trigger pipelines:
 
@@ -315,11 +317,7 @@ The cleanup job uses the learner-and-pipeline-specific protected GitLab Terrafor
 
 Confirm that the pipeline reports successful cleanup and that no learner-owned CML resource remains.
 
-## 14. Controlled failure exercise
-
-Repeat with an instructor-rejected address or temporarily unreachable test router. Verify that test fails closed, production approval is unavailable, no production deployment runs, the failure is auditable, and cleanup still removes the CML lab. Do not manufacture a failure against production.
-
-## 15. Commit and push the work
+## 14. Commit and push the work
 
 Publish the final application and network-delivery pipeline after the test, production, cleanup, and audit paths have been verified.
 

@@ -4,7 +4,7 @@
 
 **4 hours**
 
-This lab prepares the workstation used throughout the course. You will install command-line development tools locally, including the operating-system package required to create Python virtual environments. You will also secure a GitLab.com account and deploy the selected supporting platforms as containers. Lab 2 creates and clones the `network-devops` project, registers its runner, and creates the course Python environment.
+This lab prepares the workstation used throughout the course. You will install command-line development tools locally, including the operating-system package required to create Python virtual environments. You will also secure a GitLab.com account and deploy the selected supporting platforms as containers. Lab 2 creates and clones the `network-devops` project and creates the course Python environment. Runner registration occurs when CI/CD is introduced in Lab 5.
 
 The instructions target a dedicated 64-bit Ubuntu 26.04 LTS workstation. Complete the lab only on an instructor-approved system. Package names and vendor installation procedures can change; use the course versions supplied by the instructor and compare the commands with the official documentation before using them outside the lab.
 
@@ -14,7 +14,7 @@ The instructions target a dedicated 64-bit Ubuntu 26.04 LTS workstation. Complet
 - Confirm that the workstation can create Python virtual environments. The course environment is created in Lab 2.
 - Install and verify `kubectl` and Minikube.
 - Create and secure a GitLab.com account.
-- Install and start a local GitLab Runner for registration in Lab 2.
+- Install and start a local GitLab Runner for registration in Lab 5.
 - Start an Elastic Stack laboratory environment for log collection and visualization.
 - Start HashiCorp Vault in development mode for later secrets exercises.
 - Demonstrate safe platform start, stop, and cleanup operations.
@@ -267,7 +267,7 @@ docker compose ps
 docker exec course-gitlab-runner gitlab-runner --version
 ```
 
-At this stage, `gitlab-runner --version` must work, but the runner remains unregistered. Lab 2 registers it after the learner creates the `network-devops` project. Mounting the Docker socket gives jobs broad control of the workstation, so the runner must later remain locked to the learner's private course project and must not execute untrusted project code.
+At this stage, `gitlab-runner --version` must work, but the runner remains unregistered. Lab 5 registers it when the learner begins working with CI/CD. Mounting the Docker socket gives jobs broad control of the workstation, so the runner must later remain locked to the learner's private course project and must not execute untrusted project code.
 
 ## Part 9: Install the Elastic Stack laboratory services
 
@@ -351,7 +351,7 @@ Every entry should report `PASS`. This check confirms that the required commands
 - Docker Engine and Docker Compose pass their verification commands.
 - `kubectl` reaches the `network-devops` Minikube profile.
 - The GitLab.com account is verified and protected with two-factor authentication.
-- The local runner container starts and reports its version; project registration occurs in Lab 2.
+- The local runner container starts and reports its version; project registration occurs in Lab 5.
 - Elasticsearch, Logstash, and Kibana start, and Elasticsearch answers its local health request.
 - Vault's health endpoint responds, and the learner can explain why development mode is unsafe.
 

@@ -37,5 +37,4 @@ test("authenticated user can collect and chart router metrics", async ({ page })
     return nonTransparent;
   });
   expect(renderedPixels).toBeGreaterThan(0);
-  await page.screenshot({ path: "test-results/monitoring-page.png", fullPage: true });
 });

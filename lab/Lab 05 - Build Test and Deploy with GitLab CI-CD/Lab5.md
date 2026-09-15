@@ -6,7 +6,7 @@
 
 Lab 4 proved that the monitoring application can run and scale on Minikube. Those operations were still coordinated from a terminal. In this lab, you will express the same checks and deployment controls as a GitLab CI/CD pipeline executed by the private Docker runner prepared in Lab 1.
 
-The pipeline reuses the existing `network-monitor-web:lab04`, `network-monitor-app:lab04`, and `mysql:8.4` images. It builds one new image, `network-monitor-e2e`, whose only purpose is to test the deployed application through its web interface. The test signs in with a dedicated account, collects CPU and memory observations from an authorized inventory target, checks the displayed values and chart, and preserves a screenshot as evidence.
+The pipeline reuses the existing `network-monitor-web:lab04`, `network-monitor-app:lab04`, and `mysql:8.4` images. It builds one new image, `network-monitor-e2e`, whose only purpose is to test the deployed application through its web interface. The test signs in with a dedicated account, collects CPU and memory observations from an authorized inventory target, and checks the displayed values and chart.
 
 ## Objectives
 
@@ -18,8 +18,7 @@ The pipeline reuses the existing `network-monitor-web:lab04`, `network-monitor-a
 - Deploy version-controlled Kubernetes manifests through a protected job.
 - Provision a non-administrator test account without committing its password.
 - Test the application from the user's point of view.
-- Preserve useful evidence while preventing secret disclosure.
-- Explain pipeline ordering, artifacts, environments, retries, and failure behavior.
+- Explain pipeline ordering, environments, job dependencies, and failure behavior.
 
 ## Delivery flow
 
@@ -29,16 +28,16 @@ flowchart LR
     U --> I[Build test image]
     I --> D[Deploy reused images]
     D --> A[Browser acceptance test]
-    A --> E[Report and screenshot]
+    A --> E[Pipeline result]
 ```
 
-The arrows represent evidence gates. A failed job stops later stages by default. The deployment job therefore cannot run when source tests fail, and the acceptance test cannot run until the Kubernetes rollout becomes ready.
+The arrows represent pipeline gates. A failed job stops later stages by default. The deployment job therefore cannot run when source tests fail, and the acceptance test cannot run until the Kubernetes rollout becomes ready.
 
 ## Required state
 
 - Labs 1 through 4 completed in the same `network-devops` repository.
-- Private GitLab.com project with the `course-docker-runner` online.
-- Runner locked to this project and tagged `docker,validation`.
+- Private GitLab.com project created in Lab 2.
+- Local GitLab Runner installed but not yet registered.
 - Minikube profile `network-devops` running on the runner host.
 - Existing images available to Minikube:
   - `network-monitor-app:lab04`
@@ -85,7 +84,39 @@ cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/scripts/." scri
 
 The repository must already contain the Lab 3 application source and tests and the Lab 4 runtime manifests. Resolve any path differences before creating the pipeline.
 
-## Part 2: Prepare the Docker runner
+## Part 2: Register and prepare the Docker runner
+
+In the GitLab.com `network-devops` project:
+
+1. Open **Settings > CI/CD** and expand **Runners**.
+2. Select **Create project runner**.
+3. Select Linux and add the tags `docker,validation`.
+4. Leave **Run untagged jobs** disabled.
+5. Create the runner and copy its authentication token beginning with `glrt-`.
+
+Start and register the runner container installed in Lab 1:
+
+```bash
+docker start course-gitlab-runner
+docker exec -it course-gitlab-runner gitlab-runner register
+```
+
+Enter the following values when prompted:
+
+- GitLab URL: `https://gitlab.com`
+- Token: the project runner authentication token
+- Description: `course-docker-runner`
+- Executor: `docker`
+- Default image: `python:3.12-slim`
+
+Confirm that registration succeeded and that GitLab.com reports the runner as online:
+
+```bash
+docker exec course-gitlab-runner gitlab-runner list
+docker exec course-gitlab-runner gitlab-runner verify
+```
+
+Do not store the runner authentication token in the project or include it in screenshots.
 
 The Docker runner executes each job in an isolated container. Pipeline jobs need two controlled capabilities:
 
@@ -223,7 +254,7 @@ Before merging, verify:
 - Deployment jobs are restricted to the default protected branch.
 - The Kubernetes credential is a file variable and is not in the repository.
 - The testing user is not an administrator.
-- The browser test has a timeout and produces evidence on failure.
+- The browser test has a defined timeout and verifies the complete application workflow.
 
 Merge the approved change. The default-branch pipeline should progress through all four stages.
 
@@ -237,9 +268,7 @@ The deployment job performs these controls in order:
 4. Apply the version-controlled manifests.
 5. Wait for MySQL, Flask, and NGINX rollouts.
 6. Provision the restricted test user.
-7. Record the workload and service state as artifacts.
-
-An artifact describes a pipeline result. It is not the deployable container image and must not contain secrets.
+7. Report the deployed workload and service state in the job log.
 
 ## Part 12: Follow the browser acceptance test
 
@@ -252,31 +281,20 @@ The acceptance job runs inside `network-monitor-e2e`. It starts a local `kubectl
 5. Confirms CPU and memory percentages are displayed as numbers.
 6. Confirms the chart canvas contains rendered pixels.
 7. Confirms the web-instance badge identifies a Pod.
-8. Saves a screenshot and Playwright report.
+8. Reports whether the complete browser workflow passed.
 
-This is an end-to-end test. A failure can originate in the browser, NGINX, Flask, MySQL, Kubernetes networking, RESTCONF reachability, credentials, certificate trust, or the router response. Use the evidence to narrow the failure instead of rerunning blindly.
+This end-to-end test proves that the deployed application works through the same browser boundary used by an operator.
 
-## Part 13: Inspect results
+## Part 13: Review the pipeline result
 
-In GitLab, open **Build > Pipelines**, select the default-branch pipeline, and inspect the graph. Download the artifacts from `browser-acceptance` and review:
+In GitLab, open **Build > Pipelines** and select the default-branch pipeline. Confirm that the graph completed in this order:
 
-- `test-results/monitoring-page.png`
-- `playwright-report/index.html`
-- `evidence/lab05/resources.txt`
-- `evidence/lab05/web-endpoints.txt`
+- `unit-test`
+- `build-e2e-image`
+- `deploy-minikube`
+- `browser-acceptance`
 
-Artifacts expire after seven days. They should prove what ran and what the user observed without preserving authentication state or sensitive device output.
-
-## Part 14: Diagnose controlled failures
-
-With instructor approval, test one failure at a time:
-
-- Pause the assigned router or use a non-working lab target and observe acceptance failure.
-- Change the test password variable and observe an authentication failure.
-- Scale the web tier to zero and observe rollout or page-access failure.
-- Restore the correct state and rerun only the failed job.
-
-A retry is valid after an external transient condition is corrected. Repeatedly retrying deterministic code or configuration failures hides the defect and wastes runner capacity.
+Open each job and identify its image, commands, duration, and final status. The pipeline is complete only when the deployment is ready and the browser acceptance job retrieves CPU and memory data successfully.
 
 ## Completion criteria
 
@@ -289,7 +307,6 @@ A retry is valid after an external transient condition is corrected. Repeatedly 
 - A non-administrator testing account is provisioned idempotently.
 - The browser test retrieves and displays numeric CPU and memory data.
 - The chart contains rendered data and the instance badge identifies a web Pod.
-- The screenshot, Playwright report, and deployment evidence are available as artifacts.
 
 ## Cleanup
 

@@ -216,19 +216,7 @@ Create the first web administrator if the Lab 3 database is empty, sign in, and 
 
 The upper-right badge displays the web Pod name and Pod IP that answered `/instance`. The application Pod independently authenticates to Vault and reads the selected router record when metrics are requested.
 
-## Part 9: Prove the mutation boundary
-
-After authenticating and saving the session cookie with instructor guidance, confirm that the application refuses inventory creation:
-
-```bash
-curl -i -X POST "$WEB_URL/api/routers" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"must-not-be-created"}'
-```
-
-The expected response is `405 Method Not Allowed`. Router administration belongs to Vault in this lab.
-
-## Part 10: Scale the web tier
+## Part 9: Scale the web tier
 
 Increase only the stateless presentation tier and observe how the Service distributes new connections.
 
@@ -251,13 +239,7 @@ done | sort | uniq -c
 
 Kubernetes distributes connections among ready endpoints but does not guarantee that each tab reaches a different Pod.
 
-## Part 11: Test failure and recovery
-
-Temporarily change the application Vault role to an unknown value and request metrics. The request should fail without revealing a credential. Restore `network-monitor`, reapply the manifest, and verify recovery.
-
-Then update the router password in Vault and on the authorized router. The next request should use the new value without changing an application image, Deployment, database record, or web configuration.
-
-## Part 12: Commit and push the work
+## Part 10: Commit and push the work
 
 Publish the verified Kubernetes and Vault configuration to the cumulative project.
 
@@ -279,7 +261,6 @@ git push -u origin feature/lab04-kubernetes-vault
 - No application route creates, updates, or deletes router records.
 - CPU and memory collection succeeds through Vault-backed RESTCONF authentication.
 - Three ready web Pods serve the application and expose distinct runtime identities.
-- Credential rotation requires no application deployment.
 - MySQL is not used as router inventory.
 
 ## Cleanup

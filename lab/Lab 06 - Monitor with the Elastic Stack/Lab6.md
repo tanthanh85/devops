@@ -243,7 +243,7 @@ Expected index families are:
 - `kubernetes-logs-*`
 - `kubernetes-metrics-*`
 
-If an index is absent, work backward: Elasticsearch index, Logstash output, Logstash input, collector output, collector input, then workload emission.
+Do not continue to dashboard creation until all four index families contain recent documents. Ask the instructor to correct the training platform if an expected stream is unavailable.
 
 ## Part 8: Create Kibana data views
 
@@ -316,25 +316,7 @@ Create **Network DevOps — User Experience** with:
 
 Use a two-minute expected interval when interpreting missing data. Absence of checks is itself a monitoring failure; it does not prove the application is healthy.
 
-## Part 13: Correlate a controlled failure
-
-With instructor approval, scale the application tier to zero for one synthetic interval:
-
-```bash
-kubectl -n network-devops scale deployment/network-monitor-app --replicas=0
-kubectl -n network-devops create job --from=cronjob/network-monitor-synthetic synthetic-failure
-kubectl -n network-devops wait --for=condition=failed job/synthetic-failure --timeout=120s || true
-kubectl -n network-devops scale deployment/network-monitor-app --replicas=1
-kubectl -n network-devops rollout status deployment/network-monitor-app
-```
-
-Use the dashboards to trace the sequence:
-
-`available replicas fall → web upstream errors rise → synthetic status becomes down → application recovers → next check becomes up`
-
-Record which telemetry source detected each stage. This is more useful than a screenshot containing four unrelated green charts.
-
-## Part 14: Integrate with GitLab CI/CD
+## Part 13: Integrate with GitLab CI/CD
 
 Include the supplied jobs in `.gitlab-ci.yml`:
 
@@ -345,7 +327,7 @@ include:
 
 Create protected `LOGSTASH_HOST` and retain the Lab 5 Kubernetes and synthetic-test variables. Disable earlier jobs that build or deploy the same application and web images. The Lab 6 jobs build commit-addressed app, web, and synthetic images, deploy the collectors, start an immediate synthetic check, and leave the recurring CronJob enabled.
 
-## Part 15: Commit and push the work
+## Part 14: Commit and push the work
 
 Publish the observability implementation after logs, metrics, and synthetic checks have been verified.
 
@@ -367,7 +349,6 @@ git push -u origin feature/lab06-observability
 - The synthetic container runs every two minutes and retrieves router CPU and memory through the web workflow.
 - Synthetic records include availability outcome and end-to-end response time.
 - Four focused Kibana dashboards cover cluster, containers, application, and user experience.
-- A controlled failure can be followed across state, logs, application behavior, and synthetic results.
 - No credential, session token, Vault token, authorization header, or sensitive response is present in Elasticsearch.
 
 ## Cleanup

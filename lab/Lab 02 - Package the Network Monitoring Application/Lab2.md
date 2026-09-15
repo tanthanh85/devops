@@ -12,7 +12,6 @@ This is the first implementation stage of the cumulative application. Do not red
 
 - Create, activate, and verify the course-wide Python virtual environment.
 - Create the private `network-devops` project on GitLab.com and clone it to the workstation.
-- Register the workstation runner with the new project.
 - Verify the supplied Flask application before packaging it.
 - Confirm the RESTCONF read paths and returned data on an authorized router.
 - Build and identify the application image.
@@ -149,41 +148,7 @@ python -m pip check
 
 Use `deactivate` only when you intentionally want to leave the course environment.
 
-## Part 3: Register the project runner
-
-In the new GitLab.com `network-devops` project:
-
-1. Open **Settings > CI/CD** and expand **Runners**.
-2. Select **Create project runner**.
-3. Select Linux and add the tags `docker,validation`.
-4. Allow untagged jobs only when directed by the instructor.
-5. Create the runner and copy its authentication token beginning with `glrt-`.
-
-Register the runner container installed in Lab 1:
-
-```bash
-docker start course-gitlab-runner
-docker exec -it course-gitlab-runner gitlab-runner register
-```
-
-Use these values when prompted:
-
-- GitLab URL: `https://gitlab.com`
-- Token: the project runner authentication token
-- Description: `course-docker-runner`
-- Executor: `docker`
-- Default image: `python:3.12-slim`
-
-Verify registration and confirm that GitLab.com reports the runner as online:
-
-```bash
-docker exec course-gitlab-runner gitlab-runner list
-docker exec course-gitlab-runner gitlab-runner verify
-```
-
-Do not store the runner token in the project or a screenshot.
-
-## Part 4: Prepare the application configuration
+## Part 3: Prepare the application configuration
 
 The supplied application reads its router endpoint and credentials from environment variables. Prepare the local runtime file before starting the application. The native Python process and the container both use this file, but it must never be added to the repository.
 
@@ -210,30 +175,7 @@ Replace every value enclosed in angle brackets. `ROUTER_HOST` must contain the a
 
 ### Understand `MOCK_MODE`
 
-`MOCK_MODE` selects the source of the CPU and memory values displayed by the application:
-
-| Setting | Application behavior | Intended use |
-|---|---|---|
-| `MOCK_MODE=true` | Generates changing demonstration values locally and does not send RESTCONF requests to the router | Brief user-interface checks when the assigned router is unavailable |
-| `MOCK_MODE=false` | Connects to `ROUTER_HOST` and retrieves current CPU and memory information through RESTCONF | Required setting for the Lab 2 verification and container build |
-
-When mock mode is enabled, the dashboard displays **demonstration data** beside the target name. These values do not prove router reachability, authentication, RESTCONF operation, or correct response parsing.
-
-Learners may briefly observe mock mode before testing the live workflow:
-
-```bash
-sed -i 's/^MOCK_MODE=.*/MOCK_MODE=true/' .env
-flask --app app.app run --host 127.0.0.1 --port 8000
-```
-
-Open the dashboard and confirm that **demonstration data** appears. Stop Flask with `Ctrl+C`, restore live mode, and verify the setting:
-
-```bash
-sed -i 's/^MOCK_MODE=.*/MOCK_MODE=false/' .env
-grep '^MOCK_MODE=' .env
-```
-
-The expected output is `MOCK_MODE=false`. Configuration is read when the application process starts, so restart Flask or recreate the container after changing this value. Do not continue to the live application verification or Docker build while mock mode is enabled.
+`MOCK_MODE=true` generates demonstration CPU and memory values without contacting a router. `MOCK_MODE=false` retrieves live values from the router configured by `ROUTER_HOST`. Keep `MOCK_MODE=false` throughout this lab. If the value is changed, restart the Python process or recreate the container so the application reads the updated configuration.
 
 Confirm that `.env` is ignored:
 
@@ -256,7 +198,7 @@ PY
 
 The router value must match the instructor-assigned target and mock mode must be `False`. This check deliberately does not print the username or password.
 
-## Part 5: Verify the supplied application before containerizing it
+## Part 4: Verify the supplied application before containerizing it
 
 Start the application using the documented entry point. One common pattern is:
 
@@ -292,7 +234,7 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 6: Build and identify the image
+## Part 5: Build and identify the image
 
 Build the supplied application definition and inspect the resulting immutable image identity.
 
@@ -314,7 +256,7 @@ docker image inspect network-monitor:lab02 --format '{{.Id}}'
 
 An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
 
-## Part 7: Run the container
+## Part 6: Run the container
 
 The Ubuntu workstation reaches the laboratory network through Cisco Secure Client. Traffic originating from Docker's bridge network may not be admitted to that VPN tunnel even when the host itself can reach the router. Run the Lab 2 container with Linux host networking so it uses the workstation's VPN routes and name resolution. Add only the `NET_RAW` capability required by the supplied `ping` utility; all other Linux capabilities remain dropped:
 
@@ -360,7 +302,7 @@ The response must contain the assigned router name or address, a timestamp, `cpu
 
 Open the dashboard and verify both charts again. Confirm that the header shows the assigned router and does not contain **demonstration data**. If it does, set `MOCK_MODE=false` in `.env`, remove the container, and repeat the `docker run` command so the new process receives the corrected value.
 
-## Part 8: Inspect and explain the running container
+## Part 7: Inspect and explain the running container
 
 Run each command and explain what its output proves:
 
@@ -378,8 +320,6 @@ docker container inspect network-monitor | jq '.[0] | {
 }'
 docker top network-monitor
 docker stats --no-stream network-monitor
-docker port network-monitor
-docker diff network-monitor
 docker logs --timestamps --tail=20 network-monitor
 ```
 
@@ -389,16 +329,40 @@ Interpretation guide:
 - `.State.Status` reports lifecycle state; `.State.Health` reports the Docker health-check result.
 - `.Config.User` should identify the non-root application account.
 - The environment-name list can confirm variable names without printing their secret values.
-- Network mode should report `host`, and `docker port` should return no mapping because host networking does not use published ports.
+- Network mode should report `host`, confirming that the container uses the Ubuntu workstation's network namespace and VPN routes.
 - `ReadonlyRootfs`, dropped capabilities, and `no-new-privileges` limit runtime authority.
-- `docker top` shows the container processes from the host view.
+- `docker top` shows the container processes from the Ubuntu host's process view.
 - `docker stats` reports current resource consumption, not application correctness.
-- `docker diff` reports changes to the container writable layer.
 - Logs provide application evidence but must not contain credentials.
+
+### Interpret `docker top`
+
+A running application normally shows one Gunicorn master process and one or more worker processes. The exact process identifiers and start time will differ:
+
+```text
+UID    PID    PPID   C   STIME   TTY   TIME       CMD
+app    ...    ...    0   ...     ?     00:00:00   /usr/local/bin/python ... gunicorn ...
+app    ...    ...    0   ...     ?     00:00:00   /usr/local/bin/python ... gunicorn ...
+```
+
+Interpret the main columns as follows:
+
+| Column | Meaning |
+|---|---|
+| `UID` | Linux identity running the process; Docker may display `app` or its numeric UID, but it must not be root (`0`). |
+| `PID` | Process identifier as seen by the Ubuntu host. |
+| `PPID` | Parent process identifier; workers normally identify the Gunicorn master as their parent. |
+| `C` | Current processor-use indicator at the instant the process list was collected. |
+| `STIME` | Time at which the process started. |
+| `TTY` | Controlling terminal; `?` is normal for a detached container. |
+| `TIME` | Cumulative CPU time consumed by the process. |
+| `CMD` | Command that started the process, including the Gunicorn application entry point. |
+
+If `docker top` reports that the container is not running, use `docker ps -a --filter name=network-monitor` and `docker logs network-monitor` to confirm why the process exited.
 
 Do not run `docker inspect` and share the unfiltered output: environment values can include secrets.
 
-## Part 9: Exercise the Docker lifecycle
+## Part 8: Exercise the Docker lifecycle
 
 ### Stop and start the same container
 
@@ -452,7 +416,7 @@ docker run -d --name network-monitor --network host --env-file .env \
 
 Verify health and both charts. Docker does not modify an existing container when a new image is built; replacement is an explicit lifecycle action.
 
-## Part 10: Commit and push the work
+## Part 9: Commit and push the work
 
 Publish the completed packaging change to the learner's GitLab project.
 
