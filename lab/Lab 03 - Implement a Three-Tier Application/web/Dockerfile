@@ -1,4 +1,5 @@
 FROM nginx:stable-alpine
+COPY web/nginx-main.conf /etc/nginx/nginx.conf
 COPY web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY web/static/ /usr/share/nginx/html/
 USER nginx

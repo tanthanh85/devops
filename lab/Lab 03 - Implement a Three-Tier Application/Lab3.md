@@ -84,6 +84,7 @@ Confirm that `web/`, `app/`, `tests/`, `compose.yaml`, and both requirements fil
 netdevops-lab03-three-tier/
 ├── web/
 │   ├── Dockerfile
+│   ├── nginx-main.conf
 │   ├── nginx.conf
 │   └── static/
 │       ├── index.html
@@ -142,11 +143,11 @@ Replace every `replace-with-...` placeholder. Enter the generated values as foll
 MYSQL_IMAGE=mysql:8.4
 MYSQL_DATABASE=network_monitor
 MYSQL_USER=network_app
-MYSQL_PASSWORD=<first-16-byte-hex-value>
-MYSQL_ROOT_PASSWORD=<second-16-byte-hex-value>
-DATABASE_URL=mysql+pymysql://network_app:<same-value-as-MYSQL_PASSWORD>@db:3306/network_monitor
-FLASK_SECRET_KEY=<32-byte-hex-value>
-INVENTORY_ENCRYPTION_KEY=<generated-fernet-key>
+MYSQL_PASSWORD=replace-with-first-16-byte-hex-value
+MYSQL_ROOT_PASSWORD=replace-with-second-16-byte-hex-value
+DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@db:3306/network_monitor
+FLASK_SECRET_KEY=replace-with-32-byte-hex-value
+INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
 ```
 
@@ -269,6 +270,14 @@ docker compose exec db sh -lc \
 ```bash
 docker compose down
 docker compose up -d
+docker compose ps
+```
+
+If an earlier web image was already built, rebuild and replace it before continuing:
+
+```bash
+docker compose build --no-cache web
+docker compose up -d --force-recreate web
 docker compose ps
 ```
 

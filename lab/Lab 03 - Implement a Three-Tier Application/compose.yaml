@@ -49,8 +49,7 @@ services:
     networks: [frontend]
     read_only: true
     tmpfs:
-      - /var/cache/nginx:rw,noexec,nosuid,size=32m
-      - /var/run:rw,noexec,nosuid,size=8m
+      - /tmp:rw,noexec,nosuid,size=32m,mode=1777
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
 
