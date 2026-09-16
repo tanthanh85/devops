@@ -276,10 +276,15 @@ docker compose ps
 If an earlier web image was already built, rebuild and replace it before continuing:
 
 ```bash
+docker compose rm -sf web
+docker image rm network-monitor-web:lab03 2>/dev/null || true
 docker compose build --no-cache web
 docker compose up -d --force-recreate web
+docker compose logs --tail=50 web
 docker compose ps
 ```
+
+The web service should report `healthy`. If it exits or restarts, stop and give the instructor the output from `docker compose logs --tail=100 web`.
 
 Sign in with the same administrator and confirm that router inventory remains. `docker compose down` removed service containers and networks but retained the named volume.
 
