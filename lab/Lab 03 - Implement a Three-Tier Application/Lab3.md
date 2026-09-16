@@ -114,20 +114,51 @@ cp .env.example .env
 chmod 600 .env
 ```
 
-Use generated lab values rather than the examples:
+This lab uses MySQL 8.4. Do not change the image version.
 
-```text
-MYSQL_IMAGE=mysql:<instructor-approved-version>
-MYSQL_DATABASE=network_monitor
-MYSQL_USER=network_app
-MYSQL_PASSWORD=<generated-value>
-MYSQL_ROOT_PASSWORD=<different-generated-value>
-DATABASE_URL=mysql+pymysql://network_app:<url-encoded-password>@db:3306/network_monitor
-FLASK_SECRET_KEY=<generated-value>
-INVENTORY_ENCRYPTION_KEY=<generated-value>
+Generate the two database passwords and the Flask secret key. Copy each output to a temporary secure note:
+
+```bash
+openssl rand -hex 16
+openssl rand -hex 16
+openssl rand -hex 32
 ```
 
-Do not commit `.env`. URL-encode the database password in `DATABASE_URL` when required.
+Generate the inventory encryption key and copy its output:
+
+```bash
+python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
+```
+
+Open `.env`:
+
+```bash
+nano .env
+```
+
+Replace every `replace-with-...` placeholder. Enter the generated values as follows:
+
+```text
+MYSQL_IMAGE=mysql:8.4
+MYSQL_DATABASE=network_monitor
+MYSQL_USER=network_app
+MYSQL_PASSWORD=<first-16-byte-hex-value>
+MYSQL_ROOT_PASSWORD=<second-16-byte-hex-value>
+DATABASE_URL=mysql+pymysql://network_app:<same-value-as-MYSQL_PASSWORD>@db:3306/network_monitor
+FLASK_SECRET_KEY=<32-byte-hex-value>
+INVENTORY_ENCRYPTION_KEY=<generated-fernet-key>
+SESSION_COOKIE_SECURE=false
+```
+
+The value in `DATABASE_URL` must match `MYSQL_PASSWORD` exactly. The generated hexadecimal password is URL-safe and does not require encoding.
+
+Save the file in `nano` with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**. Confirm that no placeholders remain:
+
+```bash
+grep -n 'replace-with\|<.*>' .env && echo "ERROR: update every placeholder" || echo ".env is ready"
+```
+
+Do not commit `.env` or include it in screenshots.
 
 ## Step 2: Test and build the application
 
