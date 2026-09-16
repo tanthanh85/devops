@@ -2,9 +2,9 @@
 
 ## Duration
 
-**4 hours**
+**2 hours**
 
-Lab 6 made cluster, container, application, and synthetic behavior visible in Kibana. Dashboards still require someone to look at them. This lab adds active notification: Elastic rules evaluate the stored telemetry and send a webhook when web response time is high, a Kubernetes workload is unhealthy, or a container exceeds its CPU or memory threshold.
+This standalone lab adds active notification to a supplied observability baseline. Elastic rules evaluate stored telemetry and send a webhook when web response time is high, a Kubernetes workload is unhealthy, or a container exceeds its CPU or memory threshold. The instructor-provided Lab 7 package includes the required sample telemetry and platform configuration; the Lab 6 folder and repository are not required.
 
 You will build a small Flask receiver that authenticates webhook requests, retains a limited in-memory event history, and presents alert and recovery notifications in a simple web page. The receiver is deliberately small so the focus remains on rule quality, payload design, authentication, testing, and operational response.
 
@@ -52,19 +52,27 @@ Lab 07 - Send Elastic Alerts to a Webhook/
 └── ci/lab07.gitlab-ci.yml
 ```
 
-## Part 1: Prepare the branch
+## Part 1: Create the Lab 7 workspace and repository
 
-Add the supplied receiver, Kubernetes manifest, Elastic override, and pipeline jobs to the cumulative project.
+Use a separate folder and private GitLab project:
+
+- Folder: `~/netdevops-labs/netdevops-lab07-elastic-alerts`
+- GitLab project: `netdevops-lab07-elastic-alerts`
+
+Do not reuse, delete, or copy files from another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete Lab 7 package.
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab07-elastic-alerts.git
+cd netdevops-lab07-elastic-alerts
 git status
 git pull --ff-only
 git switch -c feature/lab07-elastic-alerts
-cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/webhook-receiver" .
-cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/kubernetes/." kubernetes/
-cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/scripts/." scripts/
-cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/ci/." ci/
+cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/." \
+  ~/netdevops-labs/netdevops-lab07-elastic-alerts/
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 ## Part 2: Test the receiver
@@ -72,7 +80,7 @@ cp -R "/path/to/Lab 07 - Send Elastic Alerts to a Webhook/ci/." ci/
 The receiver accepts `POST /webhook/elastic` only when `X-Webhook-Token` matches its configured token. It limits strings and copies only known fields into memory. This prevents an alert action from turning the receiver into an unrestricted data store.
 
 ```bash
-source ~/network-devops/.venv/bin/activate
+source ~/netdevops-labs/netdevops-lab07-elastic-alerts/.venv/bin/activate
 python -m pip install -r webhook-receiver/requirements.txt pytest==8.4.2
 cd webhook-receiver
 python -m pytest -q
@@ -81,7 +89,7 @@ cd ..
 
 ## Part 3: Build and deploy the receiver
 
-Package the tested receiver and deploy it to the existing Minikube namespace.
+Package the tested receiver and deploy it to the Lab 7 Minikube environment created from the supplied baseline.
 
 ```bash
 docker build -t alert-webhook:lab07 webhook-receiver
@@ -243,7 +251,7 @@ For every rule, answer:
 
 ## Part 12: Add the pipeline jobs
 
-Include `ci/lab07.gitlab-ci.yml` and add a protected, masked `WEBHOOK_TOKEN` variable. Extend the Lab 6 image-build job to build and push:
+Include `ci/lab07.gitlab-ci.yml` and add a protected, masked `WEBHOOK_TOKEN` variable. Extend the baseline image-build job supplied with Lab 7 to build and push:
 
 ```bash
 docker build -t "$CI_REGISTRY_IMAGE/alert-webhook:$CI_COMMIT_SHA" webhook-receiver
@@ -276,11 +284,11 @@ git push -u origin feature/lab07-elastic-alerts
 - Container CPU and memory rules identify the affected Pod and container.
 - No-data behavior is configured and understood.
 - Webhook payloads contain useful context but no credentials or sensitive telemetry.
-- Learners can connect an alert to the appropriate Lab 6 dashboard and first diagnostic action.
+- Learners can connect an alert to the appropriate supplied observability dashboard and first diagnostic action.
 
 ## Cleanup
 
-Delete the receiver while retaining Lab 6 monitoring:
+Delete the receiver while retaining the Lab 7 monitoring baseline long enough to collect the required evidence:
 
 ```bash
 kubectl -n network-devops delete deployment,service alert-webhook

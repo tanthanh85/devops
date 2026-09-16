@@ -2,9 +2,9 @@
 
 ## Duration
 
-**7 hours**
+**3 hours**
 
-Lab 3 separated the monitoring application into web, application, and database tiers. In this lab, you will deploy those tiers to Minikube, place all router connection information and login credentials in HashiCorp Vault, and scale the stateless web tier from one Pod to three.
+In this standalone lab, you will deploy a supplied three-tier monitoring application to Minikube, place all router connection information and login credentials in HashiCorp Vault, and scale the stateless web tier from one Pod to three. The Lab 4 files contain the complete application baseline; the Lab 3 folder and repository are not required.
 
 The monitoring application no longer creates, changes, or deletes router inventory. Vault is the authoritative store for each router's name, address, RESTCONF port, username, password, and enabled state. The web interface provides a read-only view of that inventory and retrieves CPU and memory data only after the application authenticates to Vault with its Kubernetes workload identity.
 
@@ -65,12 +65,20 @@ Lab 04 - Deploy and Scale on Kubernetes/
     └── verify.sh
 ```
 
-## Part 1: Prepare the cumulative branch
+## Part 1: Create the Lab 4 workspace and repository
 
-Bring the supplied Kubernetes and Vault implementation into the project created in the previous labs.
+Use a new folder and private GitLab project:
+
+- Folder: `~/netdevops-labs/netdevops-lab04-kubernetes`
+- GitLab project: `netdevops-lab04-kubernetes`
+
+Do not reuse, delete, or copy files from a previous lab folder. Create a blank private GitLab project, initialize it with a README, clone it, and copy only the complete instructor-provided Lab 4 files.
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab04-kubernetes.git
+cd netdevops-lab04-kubernetes
 git status
 git pull --ff-only
 git switch -c feature/lab04-kubernetes-vault
@@ -80,6 +88,8 @@ cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/tests" .
 cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/kubernetes" .
 cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/scripts" .
 cp "/path/to/Lab 04 - Deploy and Scale on Kubernetes/requirements"*.txt .
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 ## Part 2: Test and build the images
@@ -212,7 +222,7 @@ Access the Kubernetes Service and confirm the complete browser-to-router monitor
 minikube service network-monitor-web --url --profile network-devops
 ```
 
-Create the first web administrator if the Lab 3 database is empty, sign in, and select **Refresh inventory**. Confirm that the router appears without its username or password. Collect CPU and memory data.
+Create the first web administrator if the Lab 4 database is empty, sign in, and select **Refresh inventory**. Confirm that the router appears without its username or password. Collect CPU and memory data.
 
 The upper-right badge displays the web Pod name and Pod IP that answered `/instance`. The application Pod independently authenticates to Vault and reads the selected router record when metrics are requested.
 
@@ -241,7 +251,7 @@ Kubernetes distributes connections among ready endpoints but does not guarantee 
 
 ## Part 10: Commit and push the work
 
-Publish the verified Kubernetes and Vault configuration to the cumulative project.
+Publish the verified Kubernetes and Vault configuration to the dedicated Lab 4 project.
 
 ```bash
 git status
@@ -265,14 +275,14 @@ git push -u origin feature/lab04-kubernetes-vault
 
 ## Cleanup
 
-Retain the cluster for Lab 5. Scale the web tier to one and clear local shell values:
+Scale the web tier to one and clear local shell values:
 
 ```bash
 kubectl -n network-devops scale deployment/network-monitor-web --replicas=1
 unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT
 ```
 
-Leave Minikube running when continuing to Lab 5. Vault development mode loses its data if the Vault Pod is replaced, so stopping the cluster at this point can invalidate the next lab's prerequisites. Production Vault requires TLS, durable storage, controlled initialization and unsealing, audit logging, backups, and high availability.
+You may stop or delete this lab environment after collecting the required evidence. No later lab depends on it. Vault development mode loses its data if the Vault Pod is replaced. Production Vault requires TLS, durable storage, controlled initialization and unsealing, audit logging, backups, and high availability.
 
 ## Key takeaways
 

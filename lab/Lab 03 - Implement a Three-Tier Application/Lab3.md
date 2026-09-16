@@ -2,9 +2,9 @@
 
 ## Duration
 
-**6 hours**
+**3 hours**
 
-Lab 2 packaged one Flask process that served the interface, application logic, and router integration. In this lab, you will evolve the same repository into a three-tier application: an NGINX web tier, a Flask application/API tier, and a persistent MySQL database tier. The first user creates the administrator account through a controlled initialization workflow. After signing in, the administrator can add authorized IOS XE routers to the inventory and select them for CPU and memory monitoring.
+In this standalone lab, you will implement a three-tier application: an NGINX web tier, a Flask application/API tier, and a persistent MySQL database tier. The instructor-provided Lab 3 files contain the complete starting application; the Lab 2 folder and repository are not used. The first user creates the administrator account through a controlled initialization workflow. After signing in, the administrator can add authorized IOS XE routers to the inventory and select them for CPU and memory monitoring.
 
 Docker Compose defines how the three services are built, configured, connected, checked, started, replaced, stopped, and removed. The result is still one application, but its responsibilities and state boundaries are explicit.
 
@@ -47,26 +47,31 @@ The official MySQL image is not rebuilt simply to claim ownership of a database 
 
 ## Required environment
 
-- Completed Lab 2 repository and final `network-monitor` image.
-- Docker Engine and Docker Compose from Lab 1.
+- Docker Engine and Docker Compose on an instructor-approved workstation.
 - Instructor-provided Lab 3 starter files or specifications.
 - One instructor-authorized IOS XE RESTCONF router.
 
-Before editing:
+## Lab workspace and repository
+
+Use a new folder and private GitLab project for this lab:
+
+- Folder: `~/netdevops-labs/netdevops-lab03-three-tier`
+- GitLab project: `netdevops-lab03-three-tier`
+
+Do not delete or overwrite the Lab 2 folder. Do not copy Lab 2 files into this repository. Create a blank private GitLab project, initialize it with a README, clone it, and copy only the supplied Lab 3 files:
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab03-three-tier.git
+cd netdevops-lab03-three-tier
 git status
 git pull --ff-only
 git switch -c feature/lab03-three-tier
+cp -R "/path/to/Lab 03 - Implement a Three-Tier Application/." \
+  ~/netdevops-labs/netdevops-lab03-three-tier/
+python3 -m venv .venv
 source .venv/bin/activate
-```
-
-Copy the supplied Lab 3 files into the cumulative project, then install the dependencies required by this version of the application:
-
-```bash
-cp -R "/path/to/Lab 03 - Implement a Three-Tier Application/." ~/network-devops/
-cd ~/network-devops
 python -m pip install -r requirements.txt -r requirements-dev.txt
 python -m pip check
 ```
@@ -76,7 +81,7 @@ Confirm that `web/`, `app/`, `tests/`, `compose.yaml`, and both requirements fil
 ## Target project structure
 
 ```text
-network-devops/
+netdevops-lab03-three-tier/
 ├── web/
 │   ├── Dockerfile
 │   ├── nginx.conf
@@ -492,7 +497,7 @@ docker compose logs --since=10m app
 
 ## Part 13: Commit and push the work
 
-Publish the verified three-tier implementation to the cumulative GitLab project.
+Publish the verified three-tier implementation to the dedicated Lab 3 GitLab project.
 
 ```bash
 git status --ignored
@@ -526,7 +531,7 @@ docker compose ps -a
 git status
 ```
 
-Do not run `docker compose down --volumes`. The MySQL volume contains the cumulative application state used by later labs.
+Run `docker compose down --volumes` only when you intentionally want to delete the Lab 3 database. No later lab depends on this volume.
 
 ## Key takeaways
 

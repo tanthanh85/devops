@@ -2,9 +2,9 @@
 
 ## Duration
 
-**6 hours**
+**4 hours**
 
-Lab 4 secured the router inventory and credential path with Vault, and Lab 5 automated delivery. The platform can now place a protected application on Kubernetes, but operators still need evidence that the cluster, containers, application tiers, and monitored service remain healthy after deployment. In this lab, you will send structured application and Kubernetes telemetry to Elasticsearch, inspect it in Kibana, and build dashboards that connect resource state with user-visible behavior.
+In this standalone lab, you will deploy the supplied monitored application baseline, send structured application and Kubernetes telemetry to Elasticsearch, inspect it in Kibana, and build dashboards that connect resource state with user-visible behavior. The Lab 6 package contains the required application and platform baseline; no Lab 4 or Lab 5 repository is required.
 
 The design uses three related telemetry streams:
 
@@ -81,21 +81,27 @@ Lab 06 - Monitor with the Elastic Stack/
     └── lab06.gitlab-ci.yml
 ```
 
-## Part 1: Prepare the cumulative branch
+## Part 1: Create the Lab 6 workspace and repository
 
-Add the supplied telemetry components to the same application repository used by the delivery pipeline.
+Use a separate folder and private GitLab project:
+
+- Folder: `~/netdevops-labs/netdevops-lab06-observability`
+- GitLab project: `netdevops-lab06-observability`
+
+Do not reuse, empty, or copy files from another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete instructor-provided Lab 6 files.
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab06-observability.git
+cd netdevops-lab06-observability
 git status
 git pull --ff-only
 git switch -c feature/lab06-observability
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/app/." app/
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/lab04-web/." lab04-web/
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/synthetic" .
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/kubernetes/." kubernetes/
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/scripts/." scripts/
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/ci/." ci/
+cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/." \
+  ~/netdevops-labs/netdevops-lab06-observability/
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 Keep the Elastic configuration separate until Part 3 because it belongs to the workstation Compose project rather than the application repository runtime.
@@ -122,7 +128,7 @@ Do not log session cookies, authorization headers, passwords, Vault tokens, REST
 
 ## Part 3: Make Logstash reachable from Minikube
 
-Copy the supplied pipeline and override into the Lab 1 Elastic project:
+Create a Lab 6-specific local Elastic project and copy the supplied pipeline and override into it:
 
 ```bash
 cd ~/course-platform/elastic
@@ -152,7 +158,7 @@ The Lab 1 stack disables Elastic authentication and TLS. Do not expose ports 920
 Package the updated logging configuration and synthetic monitor, then load all three images into Minikube.
 
 ```bash
-cd ~/network-devops
+cd ~/netdevops-labs/netdevops-lab06-observability
 docker build -t network-monitor-app:lab06 -f app/Dockerfile .
 docker build -t network-monitor-web:lab06 lab04-web
 docker build -t network-monitor-synthetic:lab06 synthetic
@@ -325,7 +331,7 @@ include:
   - local: ci/lab06.gitlab-ci.yml
 ```
 
-Create protected `LOGSTASH_HOST` and retain the Lab 5 Kubernetes and synthetic-test variables. Disable earlier jobs that build or deploy the same application and web images. The Lab 6 jobs build commit-addressed app, web, and synthetic images, deploy the collectors, start an immediate synthetic check, and leave the recurring CronJob enabled.
+Create protected Lab 6 variables for `LOGSTASH_HOST`, Kubernetes access, and the synthetic-test account. Disable any baseline jobs in the supplied Lab 6 project that would build or deploy the same application and web images twice. The Lab 6 jobs build commit-addressed app, web, and synthetic images, deploy the collectors, start an immediate synthetic check, and leave the recurring CronJob enabled.
 
 ## Part 14: Commit and push the work
 

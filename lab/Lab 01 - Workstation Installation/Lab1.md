@@ -4,20 +4,36 @@
 
 **4 hours**
 
-This lab prepares the workstation used throughout the course. You will install command-line development tools locally, including the operating-system package required to create Python virtual environments. You will also secure a GitLab.com account and deploy the selected supporting platforms as containers. Lab 2 creates and clones the `network-devops` project and creates the course Python environment. Runner registration occurs when CI/CD is introduced in Lab 5.
+This standalone lab prepares a workstation for network DevOps work. You will install command-line development tools locally, secure a GitLab.com account, and deploy selected supporting platforms as containers. You will also create a dedicated Lab 1 folder and GitLab repository. No files from another lab are required.
 
 The instructions target a dedicated 64-bit Ubuntu 26.04 LTS workstation. Complete the lab only on an instructor-approved system. Package names and vendor installation procedures can change; use the course versions supplied by the instructor and compare the commands with the official documentation before using them outside the lab.
 
 ## Objectives
 
 - Install and verify Python, pip, Python `venv` support, Git, Ansible, Visual Studio Code, Docker Engine, and Docker Compose.
-- Confirm that the workstation can create Python virtual environments. The course environment is created in Lab 2.
+- Create a dedicated Lab 1 folder and private GitLab repository.
+- Confirm that the workstation can create Python virtual environments.
 - Install and verify `kubectl` and Minikube.
 - Create and secure a GitLab.com account.
-- Install and start a local GitLab Runner for registration in Lab 5.
+- Install and start a local GitLab Runner for later registration when a CI/CD lab requires it.
 - Start an Elastic Stack laboratory environment for log collection and visualization.
-- Start HashiCorp Vault in development mode for later secrets exercises.
+- Start HashiCorp Vault in development mode for secrets exercises.
 - Demonstrate safe platform start, stop, and cleanup operations.
+
+## Lab workspace and repository
+
+Use a separate folder and GitLab repository for this lab:
+
+- Folder: `~/netdevops-labs/netdevops-lab01-workstation`
+- GitLab project: `netdevops-lab01-workstation`
+
+Do not reuse, empty, or modify another lab's folder. This lab is independent and can be completed in any order once its required workstation access is available.
+
+Create the local folder now. Part 7 creates the GitLab project after the account is ready.
+
+```bash
+mkdir -p ~/netdevops-labs/netdevops-lab01-workstation
+```
 
 ## Workstation architecture
 
@@ -91,7 +107,7 @@ python3 -m pip --version
 python3 -m venv --help | head
 ```
 
-The `python3-venv` package supplies the standard-library module used to create isolated Python environments. Lab 1 installs and verifies that capability but does not create the course environment. Lab 2 creates `~/network-devops/.venv` after the course repository is ready.
+The `python3-venv` package supplies the standard-library module used to create isolated Python environments. Each application lab creates its own `.venv` inside its own repository.
 
 Install Ansible from the Ubuntu package repository so its command is available for workstation verification:
 
@@ -106,7 +122,7 @@ Verify that Python can load the `venv` module:
 python3 -c 'import venv; print("Python venv support is available")'
 ```
 
-Do not create `.venv` yet, and do not install course libraries into the system Python environment with `sudo pip`. Lab 2 creates the isolated environment and installs the project dependencies inside it.
+Do not install lab libraries into the system Python environment with `sudo pip`. Create a separate `.venv` inside each lab repository when that lab requires Python dependencies.
 
 ## Part 3: Install Visual Studio Code
 
@@ -131,11 +147,10 @@ code --install-extension hashicorp.terraform
 code --list-extensions --show-versions
 ```
 
-Open a temporary course workspace. Lab 2 will open the cloned project directory after creating it:
+Open the dedicated Lab 1 workspace:
 
 ```bash
-mkdir -p ~/course-workspace
-cd ~/course-workspace
+cd ~/netdevops-labs/netdevops-lab01-workstation
 code .
 ```
 
@@ -247,7 +262,18 @@ After signing in:
 4. Review active sessions and sign out any session you do not recognize.
 5. Do not create a personal access token unless a later exercise explicitly requires one.
 
-Do not create the course project in this lab. Lab 2 begins by creating a new private project named `network-devops` and cloning it to the workstation.
+Create a blank private project named `netdevops-lab01-workstation` without initializing it with a README. Connect the dedicated Lab 1 folder to the new project:
+
+```bash
+cd ~/netdevops-labs/netdevops-lab01-workstation
+git init -b main
+git remote add origin https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab01-workstation.git
+git commit --allow-empty -m "Initialize Lab 1 workspace"
+git push -u origin main
+git status
+```
+
+Do not place files from any other lab in this repository.
 
 ## Part 8: Install the local GitLab Runner
 

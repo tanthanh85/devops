@@ -2,18 +2,18 @@
 
 ## Duration
 
-**6 hours**
+**3 hours**
 
-Lab 4 proved that the monitoring application can run and scale on Minikube. Those operations were still coordinated from a terminal. In this lab, you will express the same checks and deployment controls as a GitLab CI/CD pipeline executed by the private Docker runner prepared in Lab 1.
+In this standalone lab, you will express application checks and deployment controls as a GitLab CI/CD pipeline executed by a private Docker runner. The instructor-provided Lab 5 package includes the application source, tests, Kubernetes baseline, and pipeline files required for this lab. No earlier lab repository or runtime state is required.
 
-The pipeline reuses the existing `network-monitor-web:lab04`, `network-monitor-app:lab04`, and `mysql:8.4` images. It builds one new image, `network-monitor-e2e`, whose only purpose is to test the deployed application through its web interface. The test signs in with a dedicated account, collects CPU and memory observations from an authorized inventory target, and checks the displayed values and chart.
+The preparation procedure builds or loads the supplied baseline `network-monitor-web:lab05`, `network-monitor-app:lab05`, and `mysql:8.4` images. It also builds `network-monitor-e2e`, whose only purpose is to test the deployed application through its web interface. The test signs in with a dedicated account, collects CPU and memory observations from an authorized inventory target, and checks the displayed values and chart.
 
 ## Objectives
 
 - Map build, unit-test, deployment, and acceptance-test responsibilities to GitLab jobs.
 - Configure a private Docker runner to reach the learner's Minikube API safely.
 - Protect the kubeconfig and test credentials as GitLab CI/CD variables.
-- Reuse the application images already validated in Lab 4.
+- Build or load the application images supplied for Lab 5.
 - Build a dedicated browser-test image.
 - Deploy version-controlled Kubernetes manifests through a protected job.
 - Provision a non-administrator test account without committing its password.
@@ -33,17 +33,12 @@ flowchart LR
 
 The arrows represent pipeline gates. A failed job stops later stages by default. The deployment job therefore cannot run when source tests fail, and the acceptance test cannot run until the Kubernetes rollout becomes ready.
 
-## Required state
+## Required environment
 
-- Labs 1 through 4 completed in the same `network-devops` repository.
-- Private GitLab.com project created in Lab 2.
-- Local GitLab Runner installed but not yet registered.
-- Minikube profile `network-devops` running on the runner host.
-- Existing images available to Minikube:
-  - `network-monitor-app:lab04`
-  - `network-monitor-web:lab04`
-  - `mysql:8.4`
-- Lab 4 namespace, Vault records, application Secret, administrator, and authorized router inventory retained.
+- An instructor-approved workstation with Docker, Git, Python, Minikube, `kubectl`, and a local GitLab Runner installed.
+- The complete instructor-provided Lab 5 standalone package.
+- A new private GitLab.com project created for this lab.
+- A fresh or reusable Minikube profile available on the runner host. The Lab 5 setup creates its required namespace, secrets, Vault records, administrator, and router inventory.
 - The selected router must be reachable from Minikube and return RESTCONF CPU and memory data.
 
 Do not use a production cluster, production credentials, or an unrestricted shared runner. The local runner controls the Docker daemon and receives a Kubernetes credential capable of changing the course namespace.
@@ -66,27 +61,34 @@ Lab 05 - Build Test and Deploy with GitLab CI-CD/
     └── provision-test-user.sh
 ```
 
-## Part 1: Prepare the feature branch
+## Part 1: Create the Lab 5 workspace and repository
 
-Add the supplied CI/CD files to the application repository without replacing the working Lab 4 runtime files.
+Use a separate folder and private GitLab project:
+
+- Folder: `~/netdevops-labs/netdevops-lab05-gitlab-cicd`
+- GitLab project: `netdevops-lab05-gitlab-cicd`
+
+Do not reuse or delete another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete Lab 5 standalone package.
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab05-gitlab-cicd.git
+cd netdevops-lab05-gitlab-cicd
 git status
 git pull --ff-only
 git switch -c feature/lab05-gitlab-pipeline
-mkdir -p ci/e2e/tests kubernetes scripts
-cp "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/.gitlab-ci.yml" .
-cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/ci/." ci/
-cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/kubernetes/." kubernetes/
-cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/scripts/." scripts/
+cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/." \
+  ~/netdevops-labs/netdevops-lab05-gitlab-cicd/
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-The repository must already contain the Lab 3 application source and tests and the Lab 4 runtime manifests. Resolve any path differences before creating the pipeline.
+Confirm that the repository contains the supplied application source, tests, runtime manifests, pipeline file, and end-to-end test files before continuing.
 
 ## Part 2: Register and prepare the Docker runner
 
-In the GitLab.com `network-devops` project:
+In the GitLab.com `netdevops-lab05-gitlab-cicd` project:
 
 1. Open **Settings > CI/CD** and expand **Runners**.
 2. Select **Create project runner**.
@@ -94,7 +96,7 @@ In the GitLab.com `network-devops` project:
 4. Leave **Run untagged jobs** disabled.
 5. Create the runner and copy its authentication token beginning with `glrt-`.
 
-Start and register the runner container installed in Lab 1:
+Start and register the instructor-approved local runner container:
 
 ```bash
 docker start course-gitlab-runner
@@ -316,7 +318,7 @@ Remove the local test image when it is no longer required:
 docker image rm network-monitor-e2e:local
 ```
 
-Retain the GitLab variables, runner, Minikube namespace, and persistent data for later security and observability exercises. If the instructor ends the environment, delete the `e2e-test-credentials` Secret if a failed job left it behind:
+Keep this lab's GitLab variables, runner configuration, Minikube namespace, and persistent data only until you have collected the required evidence. No later lab depends on them. Delete the `e2e-test-credentials` Secret if a failed job left it behind:
 
 ```bash
 kubectl -n network-devops delete secret e2e-test-credentials --ignore-not-found

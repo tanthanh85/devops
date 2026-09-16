@@ -2,9 +2,9 @@
 
 ## Duration
 
-**8 hours**
+**4 hours**
 
-The final lab brings the course components together in a controlled network delivery workflow. NetBox records the intended loopback interface. Its webhook starts a dedicated GitLab pipeline, but the requested change is not sent directly to production. Terraform creates an isolated Cisco C8000V test router on demand on an instructor-provided Cisco Modeling Labs (CML) system. Ansible applies the intended loopback, and pyATS independently verifies its address and operational state. The pipeline then destroys the temporary CML lab and router immediately after the test gate finishes. Only a successful test and successful cleanup permit a reviewed production promotion. Ansible and pyATS then repeat the change and verification against the production router. Because the production router and CML system are shared by 20 learners, every change is bound to an instructor-assigned learner namespace.
+This standalone lab implements a controlled network delivery workflow. The instructor-provided Lab 8 package contains the complete application, automation, and integration baseline; no earlier lab repository is required. NetBox records the intended loopback interface. Its webhook starts a dedicated GitLab pipeline, but the requested change is not sent directly to production. Terraform creates an isolated Cisco C8000V test router on demand on an instructor-provided Cisco Modeling Labs (CML) system. Ansible applies the intended loopback, and pyATS independently verifies its address and operational state. The pipeline then destroys the temporary CML lab and router immediately after the test gate finishes. Only a successful test and successful cleanup permit a reviewed production promotion. Ansible and pyATS then repeat the change and verification against the production router. Because the production router and CML system are shared by 20 learners, every change is bound to an instructor-assigned learner namespace.
 
 Every pipeline job produces two forms of evidence: the immutable GitLab job log and structured audit events in Elasticsearch. Audit records identify the intent, actor, source commit, pipeline, job, target environment, target device, image digest, action, outcome, duration, and error category without recording passwords or tokens.
 
@@ -71,27 +71,27 @@ Lab 08 - Production-Grade Network CI-CD/
 └── tests/
 ```
 
-## 1. Prepare the cumulative project
+## 1. Create the Lab 8 workspace and repository
 
-Start from the repository completed in Lab 7:
+Use a separate folder and private GitLab project:
+
+- Folder: `~/netdevops-labs/netdevops-lab08-production-cicd`
+- GitLab project: `netdevops-lab08-production-cicd`
+
+Do not reuse, delete, or copy files from another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete instructor-provided Lab 8 package:
 
 ```bash
-cd ~/network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab08-production-cicd.git
+cd netdevops-lab08-production-cicd
 git status
 git pull --ff-only
 git switch -c feature/lab08-comprehensive-delivery
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/app/." app/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/lab04-web/." lab04-web/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/terraform" .
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/ansible" .
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/automation" .
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/ci/." ci/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/scripts/." scripts/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/elastic/." elastic/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/kubernetes/." kubernetes/
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/tests/." tests/
-mkdir -p platform
-cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/platform/netbox" platform/
+cp -R "/path/to/Lab 08 - Production-Grade Network CI-CD/." \
+  ~/netdevops-labs/netdevops-lab08-production-cicd/
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 Review every file before committing it. The supplied values are examples, not authorization to access a router or CML system.

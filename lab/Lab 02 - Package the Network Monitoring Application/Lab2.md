@@ -2,16 +2,16 @@
 
 ## Duration
 
-**4 hours**
+**3 hours**
 
-The instructor provides a working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. The supporting files, including the Dockerfile and `.dockerignore`, are already supplied. You will create the Python virtual environment used throughout the course, verify the application, build the image, run the container, and exercise the Docker lifecycle.
+The instructor provides a complete working Flask application that connects to an authorized Cisco IOS XE router through RESTCONF, retrieves processor and memory observations, and displays them as two time-series charts. The supporting files, including the Dockerfile and `.dockerignore`, are already supplied. You will create a Lab 2 repository and Python virtual environment, verify the application, build the image, run the container, and exercise the Docker lifecycle.
 
-This is the first implementation stage of the cumulative application. Do not redesign the RESTCONF adapter or add new application features during this lab. The engineering question is whether the same tested application can be packaged and executed consistently.
+This lab is self-contained. Do not copy files from Lab 1 or any later lab. Do not redesign the RESTCONF adapter or add new application features during this lab. The engineering question is whether the same tested application can be packaged and executed consistently.
 
 ## Objectives
 
-- Create, activate, and verify the course-wide Python virtual environment.
-- Create the private `network-devops` project on GitLab.com and clone it to the workstation.
+- Create, activate, and verify a Lab 2 Python virtual environment.
+- Create the private `netdevops-lab02-docker` project on GitLab.com and clone it to the workstation.
 - Verify the supplied Flask application before packaging it.
 - Confirm the RESTCONF read paths and returned data on an authorized router.
 - Build and identify the application image.
@@ -36,7 +36,7 @@ The application performs read-only operations. IOS XE software versions can expo
 
 ## Required environment
 
-- The workstation prepared in Lab 1.
+- An instructor-approved workstation with the required tools installed. Completing Lab 1 is one way to prepare it, but the Lab 1 repository is not required.
 - Docker Engine and the Compose plugin running.
 - Python, pip, and `venv` support installed in Lab 1.
 - The instructor-provided `network-monitor` starter application.
@@ -48,7 +48,7 @@ Never use a production router unless the instructor has explicitly authorized it
 ## Supplied project structure
 
 ```text
-network-devops/
+netdevops-lab02-docker/
 ├── app/
 │   ├── app.py
 │   ├── config.py
@@ -68,13 +68,13 @@ network-devops/
 
 File names may differ slightly in the instructor bundle. Locate the Flask entry point, configuration loader, RESTCONF adapter, templates, static files, dependency declaration, and tests before proceeding.
 
-## Part 1: Create and clone the course project
+## Part 1: Create and clone the Lab 2 project
 
 Sign in to the GitLab.com account prepared in Lab 1. Create a new project using the current GitLab interface:
 
 1. Select **Create new > New project/repository**.
 2. Select **Create blank project**.
-3. Enter `network-devops` as both the project name and project slug.
+3. Enter `netdevops-lab02-docker` as both the project name and project slug.
 4. Select **Private** unless the instructor specifies another visibility level.
 5. Select **Initialize repository with a README**.
 6. Select **Create project**.
@@ -82,9 +82,10 @@ Sign in to the GitLab.com account prepared in Lab 1. Create a new project using 
 Copy the HTTPS clone URL displayed by GitLab, then clone the new project:
 
 ```bash
-cd ~
-git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/network-devops.git
-cd network-devops
+mkdir -p ~/netdevops-labs
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab02-docker.git
+cd netdevops-lab02-docker
 git remote -v
 git status
 git pull --ff-only
@@ -93,12 +94,12 @@ git switch -c feature/lab02-container-package
 
 Authenticate through the approved browser or credential-manager flow. Never place an account password or access token in the clone URL or shell history.
 
-Copy the instructor-provided starter application into the cloned repository. Preserve the `.git` directory and do not copy any supplied credentials:
+Copy the instructor-provided Lab 2 files into this new repository. Do not delete files from or copy files out of another lab folder. Preserve the `.git` directory and do not copy any supplied credentials:
 
 ```bash
 cp -R "/path/to/Lab 02 - Package the Network Monitoring Application/." \
-  ~/network-devops/
-cd ~/network-devops
+  ~/netdevops-labs/netdevops-lab02-docker/
+cd ~/netdevops-labs/netdevops-lab02-docker
 git status
 ```
 
@@ -109,7 +110,7 @@ Confirm that the expected `app`, `tests`, `requirements.txt`, and example enviro
 Create the environment at the root of the cloned project:
 
 ```bash
-cd ~/network-devops
+cd ~/netdevops-labs/netdevops-lab02-docker
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -121,7 +122,7 @@ python --version
 
 The course pins Flask `3.0.3`, a Python 3.12-compatible release that is available from older approved package mirrors as well as public PyPI. Do not replace the supplied version with a newer release unless the instructor has validated that release against the course mirror and application.
 
-The path printed by `which python` must end in `network-devops/.venv/bin/python`. This is the single learner-managed Python environment for the remainder of the course. Later labs activate the same environment instead of creating separate environments in individual lab directories.
+The path printed by `which python` must end in `netdevops-lab02-docker/.venv/bin/python`. This environment belongs only to Lab 2. Every other lab creates its own repository and virtual environment.
 
 Confirm that Git excludes the environment:
 
@@ -131,17 +132,17 @@ git check-ignore -v .venv
 
 If Git does not report an ignore rule, add `.venv/` to the project `.gitignore` before continuing. Never commit the environment directory. It contains platform-specific executables and installed dependencies that must be reproduced from dependency declarations instead.
 
-In Visual Studio Code, open the command palette, select **Python: Select Interpreter**, and choose `~/network-devops/.venv/bin/python`. New integrated terminals should activate the environment automatically. If activation does not occur, run:
+In Visual Studio Code, open the command palette, select **Python: Select Interpreter**, and choose `~/netdevops-labs/netdevops-lab02-docker/.venv/bin/python`. New integrated terminals should activate the environment automatically. If activation does not occur, run:
 
 ```bash
-cd ~/network-devops
+cd ~/netdevops-labs/netdevops-lab02-docker
 source .venv/bin/activate
 ```
 
 At the start of every later lab, activate this environment and confirm the interpreter before running Python, Ansible, or test commands:
 
 ```bash
-source ~/network-devops/.venv/bin/activate
+source ~/netdevops-labs/netdevops-lab02-docker/.venv/bin/activate
 which python
 python -m pip check
 ```
@@ -441,7 +442,7 @@ git push -u origin feature/lab02-container-package
 
 ## Cleanup
 
-Retain the final image for Lab 3, but remove the disposable container:
+Remove the disposable container. Retaining the image is optional because Lab 3 uses its own supplied files and repository:
 
 ```bash
 docker rm -f network-monitor
@@ -449,7 +450,7 @@ docker image ls network-monitor
 git status
 ```
 
-Do not delete the image or repository. Lab 3 evolves the same application into a three-tier service.
+Keep this repository as the evidence for Lab 2. Do not reuse it for Lab 3.
 
 ## Key takeaways
 

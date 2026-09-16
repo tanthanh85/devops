@@ -1,6 +1,15 @@
 # DevOps Course Labs
 
-These labs build one network monitoring application progressively. Complete them in order because each lab starts from the working result of the previous one.
+Each lab is self-contained and can be completed in any order. Learners create a new local folder and a new private GitLab repository for every lab. The instructor-provided files for a lab include the complete baseline needed for that lab; never copy files from another lab repository.
+
+Use this naming pattern:
+
+```text
+Local parent folder: ~/netdevops-labs/
+Repository:          netdevops-labNN-short-topic
+```
+
+Examples include `netdevops-lab02-docker`, `netdevops-lab04-kubernetes`, and `netdevops-lab07-elastic-alerts`. Keep completed lab folders as independent evidence. Do not empty or overwrite one lab folder when starting another.
 
 | Lab | Focus | Result |
 |---|---|---|
