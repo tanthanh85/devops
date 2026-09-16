@@ -371,15 +371,15 @@ Every entry should report `PASS`. This check confirms that the required commands
 ## Completion criteria
 
 - Python, pip, and the `venv` module run successfully on the workstation.
-- Learners can explain that Lab 2 creates the course virtual environment.
+- Python virtual environments can be created inside individual lab repositories.
 - Ansible reports its executable, Python, and collection paths.
-- Visual Studio Code opens the temporary course workspace and contains the required extensions. Lab 2 opens the cloned project and selects its `.venv` interpreter.
+- Visual Studio Code opens the Lab 1 workspace and contains the required extensions.
 - Docker Engine and Docker Compose pass their verification commands.
 - `kubectl` reaches the `network-devops` Minikube profile.
 - The GitLab.com account is verified and protected with two-factor authentication.
-- The local runner container starts and reports its version; project registration occurs in Lab 5.
+- The local runner container starts and reports its version.
 - Elasticsearch, Logstash, and Kibana start, and Elasticsearch answers its local health request.
-- Vault's health endpoint responds, and the learner can explain why development mode is unsafe.
+- Vault's health endpoint responds.
 
 ## Cleanup
 
@@ -391,25 +391,4 @@ minikube stop --profile network-devops
 docker system df
 ```
 
-Do not run broad pruning commands. They can remove images, volumes, or caches required by later labs.
-
-## Further references
-
-- [Python virtual environments](https://docs.python.org/3/library/venv.html)
-- [Visual Studio Code on Linux](https://code.visualstudio.com/docs/setup/linux)
-- [Visual Studio Code command line](https://code.visualstudio.com/docs/configure/command-line)
-- [Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
-- [Install kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
-- [Minikube start](https://minikube.sigs.k8s.io/docs/start/)
-- [Create a GitLab project](https://docs.gitlab.com/user/project/)
-- [GitLab Runner in Docker](https://docs.gitlab.com/runner/install/docker/)
-- [Elastic local development installation](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/local-development-installation-quickstart)
-- [Vault developer quickstart](https://developer.hashicorp.com/vault/docs/get-started/developer-qs)
-
-## Key takeaways
-
-- Small development tools run locally; larger course platforms use controlled containers and persistent volumes.
-- Version capture makes the learning environment reproducible and supportable.
-- Stopping a service and deleting its state are different lifecycle operations.
-- GitLab Runner, Docker socket access, and Vault root tokens are privileged trust boundaries.
-- Local-development configurations are suitable for learning, not production deployment.
+Do not run broad pruning commands because they can delete unrelated local data.

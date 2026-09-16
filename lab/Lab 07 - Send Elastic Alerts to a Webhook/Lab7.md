@@ -236,7 +236,7 @@ Prefer temporarily lowering the rule threshold to the observed safe baseline. Do
 
 For each test, capture the rule state, webhook event, related dashboard interval, corrective action, and recovery event.
 
-## Part 11: Review rule quality
+## Part 11: Verify rule behavior
 
 For every rule, answer:
 
@@ -297,10 +297,3 @@ unset WEBHOOK_TOKEN WEBHOOK_NODE_URL WEBHOOK_CONNECTOR_URL
 ```
 
 Disable or delete the laboratory rules and connector in Kibana. Retain the encryption key while any encrypted saved objects remain.
-
-## Key takeaways
-
-- Alerts should represent actionable conditions, not every metric fluctuation.
-- Authentication and encrypted connector storage are part of webhook design.
-- Consecutive evaluations, grouping, recovery actions, and no-data handling control alert quality.
-- A useful notification links the measured symptom to an affected component and diagnostic path.

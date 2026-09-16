@@ -282,11 +282,4 @@ kubectl -n network-devops scale deployment/network-monitor-web --replicas=1
 unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT
 ```
 
-You may stop or delete this lab environment after collecting the required evidence. No later lab depends on it. Vault development mode loses its data if the Vault Pod is replaced. Production Vault requires TLS, durable storage, controlled initialization and unsealing, audit logging, backups, and high availability.
-
-## Key takeaways
-
-- Vault can own both connection metadata and credentials behind one policy boundary.
-- Workload identity avoids distributing a static Vault token to the application.
-- Kubernetes scaling changes runtime capacity without changing router inventory.
-- Inventory mutation should occur through the designated authority, not every consuming application.
+You may stop or delete this lab environment after collecting the required evidence. No later lab depends on it.

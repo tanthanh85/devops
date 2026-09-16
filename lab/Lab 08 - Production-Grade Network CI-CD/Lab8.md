@@ -94,7 +94,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Review every file before committing it. The supplied values are examples, not authorization to access a router or CML system.
+Use only the instructor-assigned router, CML system, addresses, and credentials.
 
 ## 2. Install and initialize NetBox
 
@@ -189,7 +189,7 @@ docker build -t network-monitor-app:lab08 -f app/Dockerfile .
 docker build -t network-monitor-web:lab08 lab04-web
 ```
 
-## 6. Review the Terraform test environment
+## 6. Build the Terraform test environment
 
 `terraform/cml-test/main.tf` creates a uniquely named lab, an instructor-selected external connector, an unmanaged switch, and one C8000V with a bootstrap configuration. Lab and node names contain both the learner identifier and pipeline ID. Ownership tags and notes carry the same values. The pipeline uses a state name containing the learner and pipeline identifiers, so one cleanup job can destroy only the CML objects recorded in its own state. The lifecycle resource starts the topology after its nodes and links exist. Terraform outputs the test management address and CML object IDs needed for audit and cleanup.
 
@@ -212,8 +212,7 @@ The deployment image uses `ansible.netcommon.network_cli` and `cisco.ios.ios_con
 ```bash
 docker build -t loopback-ansible:lab08 -f automation/Dockerfile.ansible .
 docker build -t loopback-pyats:lab08 -f automation/Dockerfile.pyats .
-docker image inspect loopback-ansible:lab08 loopback-pyats:lab08 \
-  --format 'Image={{.RepoTags}} Digest={{.Id}} User={{.Config.User}}'
+docker image ls loopback-ansible loopback-pyats
 ```
 
 pyATS remains independent of Ansible. It reconnects to the selected target and proves that the exact interface and IP address appear with protocol and interface state `up/up`.
@@ -348,17 +347,3 @@ git push -u origin feature/lab08-comprehensive-delivery
 - [ ] No secret appears in logs, artifacts, or Elasticsearch.
 - [ ] Terraform destroys the temporary CML lab.
 - [ ] Production approval remains unavailable until CML cleanup succeeds.
-
-## References
-
-- [CiscoDevNet CML2 Terraform provider](https://registry.terraform.io/providers/CiscoDevNet/cml2/latest/docs)
-- [Cisco Modeling Labs documentation](https://developer.cisco.com/docs/modeling-labs/)
-- [GitLab pipeline triggers](https://docs.gitlab.com/ci/triggers/)
-- [GitLab protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-- [NetBox webhooks](https://netboxlabs.com/docs/netbox/integrations/webhooks/)
-- [Ansible Cisco IOS collection](https://docs.ansible.com/ansible/latest/collections/cisco/ios/)
-- [Cisco pyATS documentation](https://developer.cisco.com/docs/pyats/)
-
-## Summary
-
-Terraform supplies a disposable CML test environment, Ansible performs repeatable deployment, pyATS supplies independent acceptance evidence, GitLab governs promotion, Vault protects secrets, NetBox carries intent, and Elastic preserves a correlated audit history. The result is a controlled and explainable network delivery system.

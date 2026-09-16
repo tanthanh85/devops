@@ -179,7 +179,7 @@ git status --ignored
 
 Protected variables are available only to pipelines on protected branches or tags. Ask the instructor to protect `main` and allow the learner's role to merge before running the deployment pipeline.
 
-## Part 5: Review the pipeline stages
+## Part 5: Confirm the pipeline stages
 
 The supplied `.gitlab-ci.yml` defines four stages:
 
@@ -192,21 +192,16 @@ The supplied `.gitlab-ci.yml` defines four stages:
 
 The runtime application images are not rebuilt in this lab. The deployment job inspects their presence inside Minikube before applying the manifests. If an image is missing, the job fails and identifies the prerequisite that must be restored.
 
-## Part 6: Understand the browser-test image
-
-The test image contains Chromium, Playwright, `kubectl`, and the test specification. It contains no test username, password, router password, kubeconfig, or application secret.
-
-Build and inspect it locally:
+## Part 6: Build the browser-test image
 
 ```bash
 docker build -t network-monitor-e2e:local ci/e2e
-docker image inspect network-monitor-e2e:local \
-  --format 'Image={{.Id}} User={{.Config.User}}'
+docker run --rm network-monitor-e2e:local npx playwright --version
 ```
 
-The pipeline gives credentials to the running test container as short-lived environment variables. GitLab masking reduces accidental log exposure, but scripts must still avoid commands such as `env`, `set -x`, or verbose HTTP tracing.
+Do not place credentials in the image.
 
-## Part 7: Understand test-user provisioning
+## Part 7: Configure test-user provisioning
 
 The supplied Kubernetes Job uses the existing application image and application model to create or update one non-administrator account. Its password arrives from a temporary Kubernetes Secret created by `provision-test-user.sh`.
 
@@ -247,7 +242,7 @@ git push -u origin feature/lab05-gitlab-pipeline
 
 Create a merge request into `main`. The merge-request pipeline runs source tests and builds the test image, but the rules prevent deployment from an unprotected feature branch. Review the job logs and confirm that no protected values appear.
 
-## Part 10: Review and merge
+## Part 10: Merge the validated change
 
 Before merging, verify:
 
@@ -287,7 +282,7 @@ The acceptance job runs inside `network-monitor-e2e`. It starts a local `kubectl
 
 This end-to-end test proves that the deployed application works through the same browser boundary used by an operator.
 
-## Part 13: Review the pipeline result
+## Part 13: Verify the pipeline result
 
 In GitLab, open **Build > Pipelines** and select the default-branch pipeline. Confirm that the graph completed in this order:
 
@@ -296,7 +291,7 @@ In GitLab, open **Build > Pipelines** and select the default-branch pipeline. Co
 - `deploy-minikube`
 - `browser-acceptance`
 
-Open each job and identify its image, commands, duration, and final status. The pipeline is complete only when the deployment is ready and the browser acceptance job retrieves CPU and memory data successfully.
+Confirm that every job succeeds, the deployment becomes ready, and the browser acceptance job retrieves CPU and memory data.
 
 ## Completion criteria
 
@@ -323,11 +318,3 @@ Keep this lab's GitLab variables, runner configuration, Minikube namespace, and 
 ```bash
 kubectl -n network-devops delete secret e2e-test-credentials --ignore-not-found
 ```
-
-## Key takeaways
-
-- CI/CD turns a working sequence into a reviewed, repeatable control path.
-- Runtime images do not need to be rebuilt when their content has not changed.
-- Acceptance tests should cross the same web boundary used by a learner or operator.
-- Test identities require least privilege and the same secret discipline as other identities.
-- A successful deployment is not sufficient; the delivered service must produce the expected result.

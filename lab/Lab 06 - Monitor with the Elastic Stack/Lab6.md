@@ -106,7 +106,7 @@ source .venv/bin/activate
 
 Keep the Elastic configuration separate until Part 3 because it belongs to the workstation Compose project rather than the application repository runtime.
 
-## Part 2: Examine the telemetry contract
+## Part 2: Confirm the telemetry fields
 
 The Flask formatter emits one JSON object per request. Important fields include:
 
@@ -372,11 +372,3 @@ To stop the workstation Elastic Stack without deleting its data:
 cd ~/course-platform/elastic
 docker compose -f compose.yaml -f compose.override.yaml stop
 ```
-
-## Key takeaways
-
-- Logs explain events, metrics describe resource behavior, and synthetic checks prove user-visible outcomes.
-- Kubernetes identity fields connect replaceable containers to stable services and workloads.
-- Router utilization and container utilization are different measurements and require clear labels.
-- A dashboard is useful when it supports diagnosis, not when it merely displays many charts.
-- Observability data requires the same access control, retention, and secret discipline as application data.

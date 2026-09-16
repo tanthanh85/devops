@@ -235,27 +235,14 @@ Classify the failure:
 | Parser error | Returned model revision or response shape |
 | Empty chart | Collection, normalization, chart API, or browser JavaScript |
 
-## Part 5: Build and identify the image
-
-Build the supplied application definition and inspect the resulting immutable image identity.
+## Part 5: Build the image
 
 ```bash
 docker build --pull -t network-monitor:lab02 .
 docker image ls network-monitor
-docker image inspect network-monitor:lab02 \
-  --format 'ID={{.Id}} Architecture={{.Architecture}} Size={{.Size}} User={{.Config.User}}'
-docker history --no-trunc network-monitor:lab02
 ```
 
-The first build retrieves a base image and installs dependencies. A later source-only change should reuse the dependency layer. Review `docker history` for unexpected commands or values. Secret values must not appear in any layer.
-
-Record the immutable local image identifier:
-
-```bash
-docker image inspect network-monitor:lab02 --format '{{.Id}}'
-```
-
-An image ID identifies local image content. A registry digest becomes the portable promotion identity after the image is pushed in a later lab.
+Confirm that the build completes successfully and that no credentials were copied into the image.
 
 ## Part 6: Run the container
 
@@ -303,9 +290,9 @@ The response must contain the assigned router name or address, a timestamp, `cpu
 
 Open the dashboard and verify both charts again. Confirm that the header shows the assigned router and does not contain **demonstration data**. If it does, set `MOCK_MODE=false` in `.env`, remove the container, and repeat the `docker run` command so the new process receives the corrected value.
 
-## Part 7: Inspect and explain the running container
+## Part 7: Verify the running container
 
-Run each command and explain what its output proves:
+Run the verification commands:
 
 ```bash
 docker container inspect network-monitor | jq '.[0] | {
@@ -401,8 +388,7 @@ Change only the dashboard subtitle, start the application locally, and confirm t
 
 ```bash
 docker build -t network-monitor:lab02.1 .
-docker image inspect network-monitor:lab02 network-monitor:lab02.1 \
-  --format '{{.RepoTags}} {{.Id}}'
+docker image ls network-monitor
 ```
 
 Replace the running container with the new image only after the local verification succeeds:
@@ -436,7 +422,7 @@ git push -u origin feature/lab02-container-package
 - `network-monitor:lab02.1` builds successfully.
 - The container becomes healthy and both charts display router observations.
 - The container resolves the configured router target and reaches its RESTCONF service through Docker networking.
-- The learner can explain image, container, writable layer, host network mode, health state, logs, and resource output.
+- Container health, logs, networking, and resource output have been verified.
 - Stop, start, restart, remove, recreate, rebuild, and replacement operations have been demonstrated.
 - No secret appears in Git, image history, or application logs.
 
@@ -450,12 +436,4 @@ docker image ls network-monitor
 git status
 ```
 
-Keep this repository as the evidence for Lab 2. Do not reuse it for Lab 3.
-
-## Key takeaways
-
-- Test the application before packaging it so that application failures are not confused with container failures.
-- A Dockerfile defines a reproducible runtime boundary; it does not provide router authorization or prove the network outcome.
-- Images are immutable templates, while containers are replaceable runtime instances.
-- Configuration and credentials enter at runtime and remain outside image layers.
-- Health, process state, logs, and resource usage provide different kinds of evidence.
+Keep this repository as the evidence for Lab 2. Do not reuse it for another lab.
