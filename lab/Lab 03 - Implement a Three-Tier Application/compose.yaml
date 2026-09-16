@@ -7,6 +7,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports: ["127.0.0.1:3307:3306"]
     volumes: ["mysql_data:/var/lib/mysql"]
     networks: [data]
     healthcheck:
@@ -25,7 +26,7 @@ services:
     env_file: [.env]
     depends_on:
       db: {condition: service_healthy}
-    networks: [frontend, data, management]
+    network_mode: host
     read_only: true
     tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
     cap_drop: [ALL]
@@ -47,6 +48,7 @@ services:
       app: {condition: service_healthy}
     ports: ["127.0.0.1:8088:8080"]
     networks: [frontend]
+    extra_hosts: ["host.docker.internal:host-gateway"]
     read_only: true
     tmpfs: ["/tmp:rw,noexec,nosuid,size=32m,mode=1777"]
     cap_drop: [ALL]
@@ -55,7 +57,6 @@ services:
 networks:
   frontend:
   data: {internal: true}
-  management:
 
 volumes:
   mysql_data:

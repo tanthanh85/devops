@@ -33,7 +33,7 @@ flowchart LR
     A --> W
 ```
 
-Only the web tier publishes a host port. The application and database communicate on a private Compose network. The application tier alone reaches router management endpoints. MySQL has a persistent named volume and is not published to the workstation network.
+The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL is published only on workstation loopback port `3307`; it is not exposed to the external network. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
 
 ## Service responsibilities
 
@@ -145,7 +145,7 @@ MYSQL_DATABASE=network_monitor
 MYSQL_USER=network_app
 MYSQL_PASSWORD=replace-with-first-16-byte-hex-value
 MYSQL_ROOT_PASSWORD=replace-with-second-16-byte-hex-value
-DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@db:3306/network_monitor
+DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@127.0.0.1:3307/network_monitor
 FLASK_SECRET_KEY=replace-with-32-byte-hex-value
 INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
@@ -204,29 +204,29 @@ docker compose ps
 docker compose logs --tail=100 db app web
 ```
 
-Wait until all services are healthy. Inspect dependency behavior:
+Wait until all services are healthy. Verify the host-network connections:
 
 ```bash
 docker compose exec app python -c \
-  "import socket; print(socket.gethostbyname('db'))"
-docker compose exec web wget -q -O - http://app:8000/health/ready
+  "import socket; socket.create_connection(('127.0.0.1',3307),5); print('MySQL reachable')"
+docker compose exec web wget -q -O - http://host.docker.internal:8000/health/ready
 curl -fsS http://127.0.0.1:8088/health
 ```
 
-Confirm that MySQL has no published host port:
+Confirm that MySQL is bound only to workstation loopback:
 
 ```bash
 docker compose port db 3306
 ```
 
-No mapping should be returned.
+The result must begin with `127.0.0.1:3307`.
 
 ## Step 4: Complete first-time administrator setup
 
 Open `http://127.0.0.1:8088`. The application should redirect to or present the setup page because the database contains no users.
 
 1. Enter the administrator username assigned by the instructor.
-2. Enter and confirm a strong unique lab password.
+2. Enter any non-empty password. A simple password is acceptable for this isolated lab.
 3. Submit the form once.
 4. Sign out and sign in using the new account.
 5. Attempt to revisit the setup page.

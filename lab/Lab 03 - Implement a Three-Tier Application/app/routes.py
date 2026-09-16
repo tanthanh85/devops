@@ -39,7 +39,7 @@ def setup_status(): return jsonify(setup_required=User.query.first() is None)
 def setup_admin():
     data = body(); username = str(data.get("username", "")).strip().lower(); password = str(data.get("password", ""))
     if not re.fullmatch(r"[a-z][a-z0-9_.-]{2,31}", username): return jsonify(error="invalid username"), 422
-    if len(password) < 12: return jsonify(error="password must contain at least 12 characters"), 422
+    if not password: return jsonify(error="password is required"), 422
     try:
         if User.query.with_for_update().first() is not None: return jsonify(error="setup already completed"), 409
         # Reserving identifier 1 makes concurrent first-use inserts contend on

@@ -6,6 +6,12 @@ def test_setup_is_one_time_and_login_works(client):
     assert client.post("/api/session",json={"username":"admin","password":"correct-horse-battery"}).status_code==200
 
 
+def test_setup_accepts_a_simple_password(client):
+    response=client.post("/api/setup/admin",json={"username":"admin","password":"1"})
+    assert response.status_code==201
+    assert client.post("/api/session",json={"username":"admin","password":"1"}).status_code==200
+
+
 def test_inventory_requires_authentication(client):
     assert client.get("/api/routers").status_code==401
 
