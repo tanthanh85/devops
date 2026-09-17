@@ -59,7 +59,8 @@ $("collect").onclick = async () => {
     const data = await call(`/api/routers/${id}/metrics`); samples.push(data); samples = samples.slice(-30);
     $("cpu-value").textContent = `${data.cpu_percent}%`; $("memory-value").textContent = `${data.memory_percent}%`;
     $("time-value").textContent = new Date(data.timestamp).toLocaleTimeString(); $("router-value").textContent = data.router;
-    $("chart-empty").hidden = true; $("connection-status").textContent = "Connected"; draw(); message("Metrics collected.", "success");
+    $("chart-empty").hidden = true; $("chart-empty").style.display = "none";
+    $("connection-status").textContent = "Connected"; draw(); message("Metrics collected.", "success");
   } catch (error) { $("connection-status").textContent = "Collection failed"; message(error.message); }
   finally { $("connection-status").classList.remove("working"); $("collect").disabled = false; $("collect").textContent = "Collect now"; }
 };
@@ -74,7 +75,30 @@ function draw() {
   const pad = {left: 44, right: 18, top: 18, bottom: 30}, plotW = width - pad.left - pad.right, plotH = height - pad.top - pad.bottom;
   context.font = "12px system-ui"; context.fillStyle = "#718096"; context.strokeStyle = "#e4eaf1"; context.lineWidth = 1;
   for (let value = 0; value <= 100; value += 25) { const y = pad.top + plotH - value * plotH / 100; context.beginPath(); context.moveTo(pad.left, y); context.lineTo(width - pad.right, y); context.stroke(); context.fillText(`${value}%`, 5, y + 4); }
-  [["cpu_percent", "#2563eb"], ["memory_percent", "#10b981"]].forEach(([key, color]) => { context.strokeStyle = color; context.lineWidth = 3; context.lineJoin = "round"; context.beginPath(); samples.forEach((sample, index) => { const x = pad.left + (samples.length < 2 ? plotW : index * plotW / (samples.length - 1)); const y = pad.top + plotH - Math.max(0, Math.min(100, sample[key])) * plotH / 100; index ? context.lineTo(x, y) : context.moveTo(x, y); }); context.stroke(); });
+  [["cpu_percent", "#2563eb"], ["memory_percent", "#10b981"]].forEach(([key, color]) => {
+    const points = samples.map((sample, index) => ({
+      x: pad.left + (samples.length < 2 ? plotW / 2 : index * plotW / (samples.length - 1)),
+      y: pad.top + plotH - Math.max(0, Math.min(100, Number(sample[key]) || 0)) * plotH / 100,
+    }));
+
+    context.strokeStyle = color;
+    context.lineWidth = 3;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.beginPath();
+    points.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y));
+    context.stroke();
+
+    context.fillStyle = color;
+    points.forEach(point => {
+      context.beginPath();
+      context.arc(point.x, point.y, 5, 0, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = "#ffffff";
+      context.lineWidth = 2;
+      context.stroke();
+    });
+  });
 }
 
 window.addEventListener("resize", draw);

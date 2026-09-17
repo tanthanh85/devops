@@ -4,120 +4,69 @@
 
 **3 hours**
 
-In this standalone lab, you will implement a three-tier application: an NGINX web tier, a Flask application/API tier, and a persistent MySQL database tier. The instructor-provided Lab 3 files contain the complete starting application; the Lab 2 folder and repository are not used. The first user creates the administrator account through a controlled initialization workflow. After signing in, the administrator can add authorized IOS XE routers to the inventory and select them for CPU and memory monitoring.
-
-Docker Compose defines how the three services are built, configured, connected, checked, started, replaced, stopped, and removed. The result is still one application, but its responsibilities and state boundaries are explicit.
+In this standalone lab, you will deploy an NGINX web tier, a Flask application tier, and a persistent MySQL database tier. You will create an administrator, manage an IOS XE router inventory, and monitor router CPU and memory through RESTCONF.
 
 ## Objectives
 
-- Separate presentation, application, and data responsibilities.
-- Implement a one-time administrator initialization workflow.
-- Hash account passwords before storage.
-- Store application users and router inventory in persistent MySQL storage.
-- Add an authenticated inventory page for authorized IOS XE routers.
-- Keep router credentials out of browser responses and container images.
-- Build the web and application images and use a pinned MySQL image.
-- Deploy the application with Docker Compose.
-- Verify service dependencies, health, persistence, and RESTCONF monitoring.
-- Exercise the Docker Compose lifecycle without accidentally deleting data.
-
-## Three-tier architecture
-
-```mermaid
-flowchart LR
-    B["Browser"] -->|"HTTP :8080"| W["Web tier<br/>NGINX and static UI"]
-    W -->|"/api reverse proxy"| A["Application tier<br/>Flask API"]
-    A -->|"SQL"| D[("Database tier<br/>MySQL volume")]
-    A -->|"RESTCONF HTTPS<br/>read only"| R["Authorized IOS XE routers"]
-    R --> A
-    A --> W
-```
-
-The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL remains on an internal Docker network and publishes only `127.0.0.1:3307` for the application; it is not exposed externally. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
-
-## Service responsibilities
-
-| Tier | Responsibilities | Must not own |
-|---|---|---|
-| Web | Static HTML, CSS, JavaScript, reverse proxy | Password validation, database access, router credentials |
-| Application | Authentication, authorization, validation, inventory API, RESTCONF collection | Durable database files, public exposure of credentials |
-| Database | Users, password hashes, router records, encrypted credential fields, schema state | RESTCONF sessions, browser rendering, authorization decisions |
-
-The official MySQL image is not rebuilt simply to claim ownership of a database image. It is pulled by immutable version tag, inspected, and used as the database artifact. Custom initialization or migrations belong in versioned application migration files, not in a hand-edited database container.
+- Deploy the three-tier application with Docker Compose.
+- Store application users and router inventory in MySQL.
+- Create the first administrator and sign in.
+- Add an instructor-authorized IOS XE router.
+- Select a router and collect CPU and memory data.
+- Verify database persistence.
 
 ## Required environment
 
-- Docker Engine and Docker Compose on an instructor-approved workstation.
-- Instructor-provided Lab 3 starter files or specifications.
-- One instructor-authorized IOS XE RESTCONF router.
+- An instructor-approved Ubuntu workstation with Docker Engine and Docker Compose.
+- Cisco Secure Client connected to the laboratory VPN.
+- An instructor-authorized IOS XE router with RESTCONF enabled.
+- The complete instructor-provided Lab 3 files.
 
-## Lab workspace and repository
+## Network layout
 
-Use a new folder and private GitLab project for this lab:
+- Open the application at `http://127.0.0.1:8088`.
+- NGINX forwards API requests to Flask at `host.docker.internal:8000`.
+- Flask uses host networking so RESTCONF traffic follows the workstation VPN.
+- MySQL remains on an internal Docker network and is published only to `127.0.0.1:3307` for Flask.
 
-- Folder: `~/netdevops-labs/netdevops-lab03-three-tier`
-- GitLab project: `netdevops-lab03-three-tier`
+## Step 1: Create the Lab 3 repository
 
-Do not delete or overwrite the Lab 2 folder. Do not copy Lab 2 files into this repository. Create a blank private GitLab project, initialize it with a README, clone it, and copy only the supplied Lab 3 files:
+Create a blank private GitLab project named `netdevops-lab03-three-tier` and initialize it with a README.
 
 ```bash
 mkdir -p ~/netdevops-labs
 cd ~/netdevops-labs
 git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab03-three-tier.git
 cd netdevops-lab03-three-tier
-git status
-git pull --ff-only
 git switch -c feature/lab03-three-tier
+```
+
+Copy only the supplied Lab 3 files into the new repository:
+
+```bash
 cp -R "/path/to/Lab 03 - Implement a Three-Tier Application/." \
   ~/netdevops-labs/netdevops-lab03-three-tier/
+```
+
+Create the Lab 3 Python environment:
+
+```bash
+cd ~/netdevops-labs/netdevops-lab03-three-tier
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt -r requirements-dev.txt
-python -m pip check
 ```
 
-Confirm that `web/`, `app/`, `tests/`, `compose.yaml`, and both requirements files are present.
+## Step 2: Configure `.env`
 
-## Target project structure
-
-```text
-netdevops-lab03-three-tier/
-├── web/
-│   ├── Dockerfile
-│   ├── nginx-main.conf
-│   ├── nginx.conf
-│   └── static/
-│       ├── index.html
-│       ├── app.js
-│       └── style.css
-├── app/
-│   ├── Dockerfile
-│   ├── __init__.py
-│   ├── config.py
-│   ├── models.py
-│   ├── routes.py
-│   ├── security.py
-│   ├── restconf_client.py
-├── tests/
-├── compose.yaml
-├── requirements.txt
-├── .env.example
-├── .dockerignore
-└── README.md
-```
-
-## Step 1: Prepare configuration and secrets
-
-Create `.env` from `.env.example` and restrict it:
+Create the runtime environment file:
 
 ```bash
 cp .env.example .env
 chmod 600 .env
 ```
 
-This lab uses MySQL 8.4. Do not change the image version.
-
-Generate the two database passwords and the Flask secret key. Copy each output to a temporary secure note:
+Generate two MySQL passwords and one Flask secret. Copy the three outputs:
 
 ```bash
 openssl rand -hex 16
@@ -137,7 +86,7 @@ Open `.env`:
 nano .env
 ```
 
-Replace every `replace-with-...` placeholder. Enter the generated values as follows:
+Replace every `replace-with-...` value:
 
 ```text
 MYSQL_IMAGE=mysql:8.4
@@ -151,82 +100,48 @@ INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
 ```
 
-The value in `DATABASE_URL` must match `MYSQL_PASSWORD` exactly. The generated hexadecimal password is URL-safe and does not require encoding. Compose also constructs this URL from the MySQL variables when the application starts, preventing an old database hostname from being used.
+Use the exact `MYSQL_PASSWORD` value inside `DATABASE_URL`. Save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
 
-Save the file in `nano` with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**. Confirm that no placeholders remain:
+Confirm that no placeholders remain:
 
 ```bash
-grep -n 'replace-with\|<.*>' .env && echo "ERROR: update every placeholder" || echo ".env is ready"
+grep -n 'replace-with' .env && echo "ERROR: update every placeholder" || echo ".env is ready"
 ```
 
-Do not commit `.env` or include it in screenshots.
+Never commit or share `.env`.
 
-MySQL reads the initial database passwords only when it creates a new data volume. If you change either MySQL password after starting the database, delete the Lab 3 volume before continuing. This deletes the Lab 3 administrator and router inventory:
+## Step 3: Test and build
 
-```bash
-docker compose down --volumes
-```
-
-## Step 2: Test and build the application
-
-Validate the resolved model without displaying secrets in shared output:
+Confirm that the required files are in the current directory:
 
 ```bash
-docker compose config --quiet
-python -m pytest -q
-```
-
-Run all Compose commands from the repository root—the directory containing both `compose.yaml` and `.env`. Confirm the location before continuing:
-
-```bash
-pwd
 test -f compose.yaml && test -f .env && echo "Lab 3 project files found"
 ```
 
-Build the two custom images and pull the pinned database image:
+Run the application tests and validate Compose:
+
+```bash
+python -m pytest -q
+docker compose config --quiet
+```
+
+Build the web and application images and pull MySQL:
 
 ```bash
 docker compose build --pull web app
 docker compose pull db
-docker image ls network-monitor-web network-monitor-app mysql
 ```
 
-List the built images:
-
-```bash
-docker compose images
-```
-
-Run the source tests and perform a small smoke check against each image before starting the complete stack:
-
-```bash
-python -m pytest -q
-docker run --rm network-monitor-app:lab03 python -c 'import flask, pymysql'
-docker run --rm network-monitor-web:lab03 nginx -t
-```
-
-The final application image intentionally excludes tests. A later pipeline can run them in a dedicated build stage or test image rather than copying test code into the production runtime.
-
-## Step 3: Start and verify the application
-
-Start the complete service model and verify each tier before using the web interface.
+## Step 4: Start the application
 
 ```bash
 docker compose up -d
 docker compose ps
-docker compose logs --tail=100 db app web
 ```
 
-If the application is reported as unhealthy, recreate it with the current Compose configuration and display its startup log:
+Wait until `db`, `app`, and `web` report `healthy`.
 
-```bash
-docker compose rm -sf app web
-docker compose up -d --force-recreate app web
-docker compose logs --tail=100 app
-docker compose ps
-```
-
-Wait until all services are healthy. Verify the host-network connections:
+Verify the three service paths:
 
 ```bash
 docker compose exec app python -c \
@@ -235,59 +150,35 @@ docker compose exec web wget -q -O - http://host.docker.internal:8000/health/rea
 curl -fsS http://127.0.0.1:8088/health
 ```
 
-Confirm that MySQL listens only on workstation loopback:
+## Step 5: Create the administrator
 
-```bash
-ss -lnt | grep '127.0.0.1:3307'
-```
+Open `http://127.0.0.1:8088`.
 
-The result must show `127.0.0.1:3307` and must not show `0.0.0.0:3307`.
-
-## Step 4: Complete first-time administrator setup
-
-Open `http://127.0.0.1:8088`. The application should redirect to or present the setup page because the database contains no users.
-
-1. Enter the administrator username assigned by the instructor.
+1. Enter an administrator username.
 2. Enter any non-empty password. A simple password is acceptable for this isolated lab.
-3. Submit the form once.
-4. Sign out and sign in using the new account.
-5. Attempt to revisit the setup page.
+3. Select **Create administrator**.
+4. Sign in with the new account.
 
-The second setup attempt must be rejected by the server even if the browser request is submitted manually.
+## Step 6: Add a router to inventory
 
-Verify the database without printing hashes or secrets:
+1. Open the **Inventory management** tab.
+2. Enter the assigned router name, management address, RESTCONF port, username, and password.
+3. Select **Add to inventory**.
+4. Confirm that the router appears in **Configured routers**.
 
-```bash
-docker compose exec db sh -lc \
-  'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e \
-  "SELECT id, username, is_admin, created_at FROM users;"'
-```
+Do not add a production router or a router that the instructor has not authorized.
 
-The table should contain one administrator. Do not display or copy the password-hash column.
+## Step 7: Monitor the router
 
-## Step 5: Add and monitor IOS XE inventory
+1. Open the **Monitoring** tab.
+2. Select the router from the dropdown list.
+3. Select **Collect now**.
+4. Confirm that CPU utilization, memory utilization, collection time, and router name appear.
+5. Collect several samples and confirm that the utilization chart updates.
 
-Open the **Router inventory** section and add the assigned router. RESTCONF certificate verification is disabled for the course environment.
+## Step 8: Verify persistence
 
-After saving:
-
-1. Confirm that the inventory list displays the router name and endpoint.
-2. Confirm that no router password appears in the HTML or browser network response.
-3. Open the dashboard and select the router.
-4. Wait for at least two samples.
-5. Confirm that CPU and memory charts display timestamps and values.
-
-Inspect only safe inventory columns:
-
-```bash
-docker compose exec db sh -lc \
-  'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e \
-  "SELECT id, name, host, port, enabled FROM routers;"'
-```
-
-## Step 6: Verify database persistence
-
-### Replace application containers while keeping database state
+Stop and recreate the containers without deleting the database volume:
 
 ```bash
 docker compose down
@@ -295,91 +186,89 @@ docker compose up -d
 docker compose ps
 ```
 
-If an earlier web image was already built, rebuild and replace it before continuing:
+Sign in again and confirm that the administrator and router inventory still exist.
+
+## Step 9: Commit and push
+
+```bash
+git status --ignored
+git add web app tests compose.yaml requirements.txt requirements-dev.txt \
+  .env.example .dockerignore .gitignore
+git diff --staged
+git commit -m "Deploy three-tier network monitoring application"
+git push -u origin feature/lab03-three-tier
+```
+
+Confirm that `.env` is not included in the commit.
+
+## Completion criteria
+
+- All three containers report `healthy`.
+- The administrator can sign in.
+- The inventory page stores an authorized router without displaying its password.
+- The monitoring dropdown lists the router.
+- CPU and memory values are collected through the VPN.
+- The chart displays multiple samples.
+- The administrator and inventory survive container recreation.
+- `.env` is not committed.
+
+## Cleanup
+
+Stop the services without deleting the database:
+
+```bash
+docker compose stop
+```
+
+## Troubleshooting
+
+Run all commands from the repository containing `compose.yaml` and `.env`:
+
+```bash
+cd ~/netdevops-labs/netdevops-lab03-three-tier
+ls -l compose.yaml .env
+```
+
+### A container is unhealthy or restarting
+
+```bash
+docker compose ps
+docker compose logs --no-color --tail=200 db app web
+```
+
+### The web image was built before the NGINX fix
 
 ```bash
 docker compose rm -sf web
 docker image rm network-monitor-web:lab03 2>/dev/null || true
 docker compose build --no-cache web
 docker compose up -d --force-recreate web
-docker compose logs --tail=50 web
-docker compose ps
 ```
 
-The web service should report `healthy`. If it exits or restarts, stop and give the instructor the output from `docker compose logs --tail=100 web`.
+### MySQL passwords were changed after the first start
 
-Sign in with the same administrator and confirm that router inventory remains. `docker compose down` removed service containers and networks but retained the named volume.
-
-### Verify volume identity
+MySQL applies the initial passwords only when it creates a new data volume. The following command permanently deletes the Lab 3 administrator and router inventory:
 
 ```bash
-docker volume ls --filter name=mysql_data
-docker volume inspect "$(docker volume ls -q --filter name=mysql_data)"
+docker compose down --volumes
+docker compose up -d
 ```
 
-A named volume keeps the database state when the application containers are replaced. It is not removed unless the learner explicitly uses `docker compose down --volumes`.
-
-## Step 7: Docker Compose lifecycle
-
-Relate each Compose command to its effect on running services and persistent database state.
-
-| Goal | Command | Effect on database volume |
-|---|---|---|
-| Create or update services | `docker compose up -d` | Retained |
-| View service state | `docker compose ps` | No change |
-| Follow logs | `docker compose logs -f app` | No change |
-| Stop processes | `docker compose stop` | Retained |
-| Start stopped services | `docker compose start` | Retained |
-| Restart one service | `docker compose restart app` | Retained |
-| Rebuild custom images | `docker compose build web app` | Retained |
-| Replace changed services | `docker compose up -d --build` | Retained |
-| Remove containers and networks | `docker compose down` | Retained |
-| Remove containers, networks, and volumes | `docker compose down --volumes` | **Deleted** |
-
-Practice safe scaling and inspection:
+### Compose searches for `.env` in the wrong directory
 
 ```bash
-docker compose top
-docker compose stats --no-stream
-docker compose config --services
-docker compose images
-docker compose logs --since=10m app
+env | grep '^COMPOSE_'
+unset COMPOSE_FILE COMPOSE_PROJECT_NAME
+docker compose up -d
 ```
 
-## Step 8: Commit and push the work
+### RESTCONF collection times out
 
-Publish the verified three-tier implementation to the dedicated Lab 3 GitLab project.
+Confirm that Cisco Secure Client is connected, then test the router port from the host-networked application container:
 
 ```bash
-git status --ignored
-git add web app tests compose.yaml requirements.txt .env.example \
-  .dockerignore README.md
-git diff --staged
-git commit -m "Deploy three-tier network monitoring application"
-git push -u origin feature/lab03-three-tier
+docker compose exec app python -c \
+  "import socket; socket.create_connection(('ROUTER_IP',443),5); print('Router reachable')"
 ```
 
-## Completion criteria
-
-- Web, application, and database responsibilities are separated.
-- The web and application images build successfully, and the pinned MySQL image is present.
-- Docker Compose starts all three services and reports healthy state.
-- Only the web tier exposes a workstation port.
-- The first administrator can be created exactly once and can authenticate afterward.
-- Passwords are hashed; router credentials are encrypted and absent from API responses.
-- The inventory section adds an instructor-authorized IOS XE router.
-- CPU and memory charts obtain current data through the application tier.
-- Administrator and router records survive container replacement.
-- Stop, rebuild, replacement, and volume-preservation operations have been verified.
-
-## Cleanup
-
-Stop the Lab 3 services after collecting the required evidence:
-
-```bash
-docker compose stop
-docker compose ps -a
-git status
-```
-
-Run `docker compose down --volumes` only when you intentionally want to delete the Lab 3 database. No later lab depends on this volume.
+Replace `ROUTER_IP` with the assigned router address. If the connection fails, verify the VPN, router address, RESTCONF port, and instructor authorization.
