@@ -1,20 +1,20 @@
-# Lab 4: Deploy the Web and Application Tiers on Minikube
+# Lab 4: Deploy the Three-Tier Application on Minikube
 
 ## Duration
 
 **2 hours**
 
-In this standalone lab, you will deploy the same working network-monitoring application used in Lab 3. MySQL runs in Docker on the Ubuntu workstation. The Flask application tier and NGINX web tier run in Minikube.
+In this standalone lab, you will deploy the complete working three-tier network-monitoring application used in Lab 3 to Minikube. MySQL, Flask, and NGINX all run as Kubernetes workloads.
 
 The supplied Lab 4 folder contains a complete copy of the application. You do not need to complete Lab 3 first.
 
 ## Objectives
 
-- Run the MySQL database tier with Docker Compose.
+- Deploy MySQL as a persistent Kubernetes StatefulSet.
 - Build the existing Flask and NGINX images.
 - Load the images into Minikube.
 - Store runtime configuration in a Kubernetes Secret.
-- Deploy the application and web tiers as Kubernetes Deployments and Services.
+- Deploy the database, application, and web tiers as Kubernetes workloads and Services.
 - Verify inventory management and automatic RESTCONF monitoring.
 - Display the responding web and application Pod names in the interface.
 - Scale the web and application tiers.
@@ -37,21 +37,20 @@ flowchart LR
         W["NGINX web Pods<br/>report Web Pod name"]
         AS["Application Service<br/>port 8000"]
         A["Flask application Pods<br/>report App Pod name"]
+        DS["Database Service<br/>port 3306"]
+        D[("MySQL StatefulSet<br/>persistent volume")]
 
         WS --> W
         W --> AS
         AS --> A
+        A --> DS
+        DS --> D
     end
 
-    subgraph U["Ubuntu workstation"]
-        D[("MySQL Docker container<br/>port 3307")]
-        V["Cisco Secure Client VPN"]
-    end
-
+    V["Cisco Secure Client VPN"]
     R["IOS XE router<br/>RESTCONF port 443"]
 
     B --> WS
-    A <-->|"SQL via host.minikube.internal:3307"| D
     A <-->|"HTTPS RESTCONF"| V
     V <-->|"VPN tunnel"| R
 ```
@@ -62,7 +61,6 @@ flowchart LR
 Lab 04 - Deploy and Scale on Kubernetes/
 ├── Lab4.md
 ├── .env.example
-├── database-compose.yaml
 ├── app/
 ├── web/
 ├── tests/
@@ -70,6 +68,7 @@ Lab 04 - Deploy and Scale on Kubernetes/
 ├── requirements-dev.txt
 └── kubernetes/
     ├── namespace.yaml
+    ├── mysql.yaml
     ├── app.yaml
     └── web.yaml
 ```
@@ -114,12 +113,11 @@ python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().
 Edit `.env` and replace every placeholder:
 
 ```dotenv
-MYSQL_IMAGE=mysql:8.4
 MYSQL_DATABASE=network_monitor
 MYSQL_USER=network_app
 MYSQL_PASSWORD=replace-with-first-16-byte-hex-value
 MYSQL_ROOT_PASSWORD=replace-with-second-16-byte-hex-value
-DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@host.minikube.internal:3307/network_monitor
+DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@network-monitor-db:3306/network_monitor
 FLASK_SECRET_KEY=replace-with-32-byte-hex-value
 INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
@@ -127,7 +125,7 @@ SESSION_COOKIE_SECURE=false
 
 Do not commit `.env`.
 
-## Step 3: Start Minikube and MySQL
+## Step 3: Start Minikube
 
 Start the course Minikube profile:
 
@@ -136,17 +134,6 @@ minikube start --profile network-devops --driver=docker
 minikube profile network-devops
 kubectl get nodes
 ```
-
-Start only the database tier on the Ubuntu workstation:
-
-```bash
-docker compose --env-file .env -f database-compose.yaml up -d
-docker compose --env-file .env -f database-compose.yaml ps
-```
-
-Wait until the database reports `healthy`.
-
-The database port is reachable from Minikube for this isolated lab. Do not use this configuration on a shared or production workstation.
 
 ## Step 4: Test and build the application
 
@@ -188,6 +175,10 @@ Create the namespace and application Secret:
 ```bash
 kubectl apply -f kubernetes/namespace.yaml
 kubectl -n network-devops create secret generic network-monitor-runtime \
+  --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
+  --from-literal=MYSQL_USER="$MYSQL_USER" \
+  --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+  --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   --from-literal=DATABASE_URL="$DATABASE_URL" \
   --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" \
   --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" \
@@ -201,7 +192,24 @@ Confirm the Secret exists without displaying its values:
 kubectl -n network-devops get secret network-monitor-runtime
 ```
 
-## Step 6: Deploy the application tier
+## Step 6: Deploy the database tier
+
+Create the MySQL Service, StatefulSet, and persistent volume claim:
+
+```bash
+kubectl apply -f kubernetes/mysql.yaml
+kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
+kubectl -n network-devops get pod,service,pvc -l app=network-monitor -o wide
+```
+
+Confirm that the database Pod is ready and its persistent volume claim is `Bound`:
+
+```bash
+kubectl -n network-devops get pod network-monitor-db-0
+kubectl -n network-devops get pvc
+```
+
+## Step 7: Deploy the application tier
 
 ```bash
 kubectl apply -f kubernetes/app.yaml
@@ -224,7 +232,7 @@ Expected response:
 {"status":"ready"}
 ```
 
-## Step 7: Deploy the web tier
+## Step 8: Deploy the web tier
 
 ```bash
 kubectl apply -f kubernetes/web.yaml
@@ -241,7 +249,7 @@ minikube service network-monitor-web \
   --profile network-devops
 ```
 
-## Step 8: Verify the monitoring workflow
+## Step 9: Verify the monitoring workflow
 
 1. Create the administrator and sign in.
 2. Open **Inventory management** and add the assigned router.
@@ -256,7 +264,7 @@ Compare the displayed names with the running Pods:
 kubectl -n network-devops get pods -o wide
 ```
 
-## Step 9: Scale the Minikube tiers
+## Step 10: Scale the Minikube tiers
 
 Scale the stateless web tier to three Pods and the application tier to two Pods:
 
@@ -288,9 +296,17 @@ done
 
 The returned `instance` values should match names shown by `kubectl get pods`.
 
-## Step 10: Verify database persistence
+## Step 11: Verify database persistence
 
-Restart both Minikube Deployments:
+Delete the MySQL Pod. The StatefulSet recreates it and mounts the same persistent volume:
+
+```bash
+kubectl -n network-devops delete pod network-monitor-db-0
+kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
+kubectl -n network-devops get pod network-monitor-db-0
+```
+
+Restart both stateless Deployments:
 
 ```bash
 kubectl -n network-devops rollout restart deployment/network-monitor-app
@@ -301,13 +317,13 @@ kubectl -n network-devops rollout status deployment/network-monitor-web
 
 Sign in again and confirm that the administrator and router inventory still exist in MySQL.
 
-## Step 11: Commit and push
+## Step 12: Commit and push
 
 ```bash
 git status
 git add .
 git status
-git commit -m "Deploy web and application tiers on Minikube"
+git commit -m "Deploy three-tier application on Minikube"
 git push -u origin feature/lab04-minikube
 ```
 
@@ -316,24 +332,25 @@ Confirm that `.env` is not staged before committing.
 ## Completion criteria
 
 - The original Lab 3 application tests pass.
-- MySQL is healthy on the Ubuntu workstation.
+- The MySQL StatefulSet is ready and its persistent volume claim is bound.
 - The application and web images are present in Minikube.
-- The application and web Deployments are ready.
+- The database, application, and web workloads are ready.
 - The browser reaches the application through the web Service.
 - Inventory management works with the existing MySQL data model.
 - CPU and memory metrics refresh automatically.
 - The interface displays the responding Web Pod and App Pod names.
 - Three web Pods and two application Pods run successfully.
-- Data remains available after both Minikube Deployments restart.
+- Data remains available after the MySQL Pod and both Deployments restart.
 
 ## Cleanup
 
-Remove the Kubernetes workloads and stop the database without deleting its volume:
+Remove the complete lab namespace, including its persistent volume claim:
 
 ```bash
 kubectl delete namespace network-devops
-docker compose --env-file .env -f database-compose.yaml stop
 ```
+
+This deletes the Lab 4 MySQL data. Run it only after collecting the required evidence.
 
 ## Troubleshooting
 
@@ -349,12 +366,13 @@ kubectl -n network-devops describe pod <pod-name>
 ### The application Pod is not ready
 
 ```bash
-docker compose --env-file .env -f database-compose.yaml ps
+kubectl -n network-devops get pod network-monitor-db-0
+kubectl -n network-devops logs network-monitor-db-0 --tail=200
 kubectl -n network-devops logs deployment/network-monitor-app --tail=200
 kubectl -n network-devops describe deployment network-monitor-app
 ```
 
-Confirm that `DATABASE_URL` in `.env` uses `host.minikube.internal:3307`, then recreate the Secret and restart the application Deployment.
+Confirm that `DATABASE_URL` in `.env` uses `network-monitor-db:3306`, then recreate the Secret and restart the application Deployment.
 
 ### Router collection times out
 
