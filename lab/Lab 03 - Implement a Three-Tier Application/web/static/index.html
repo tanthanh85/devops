@@ -4,16 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Network Operations Console</title>
-  <link rel="stylesheet" href="style.css?v=1.1.0">
+  <link rel="stylesheet" href="style.css?v=1.2.0">
   <style>
     [hidden]{display:none!important}
     .version-badge{padding:6px 10px;border:1px solid #ffffff35;border-radius:999px;color:#dbeafe;font-size:12px;font-weight:800;white-space:nowrap}
+    .page-version{display:block;margin-bottom:8px;text-align:right;color:#2563eb;font-size:12px;font-weight:800;letter-spacing:.04em}
+    .refresh-control{display:grid;gap:5px;color:#526077;font-size:12px;font-weight:700;white-space:nowrap}
+    .refresh-control select{min-width:130px}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .chart-grid .chart-wrap{height:300px}
+    .chart-grid .chart-wrap canvas{height:280px}
+    @media(max-width:900px){.chart-grid{grid-template-columns:1fr}.monitor-controls{flex-wrap:wrap}.page-version{text-align:left}}
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand"><span class="brand-mark">N</span><div><h1>Network Operations</h1><p>RESTCONF monitoring console</p></div></div>
-    <div class="header-actions"><span id="connection-status" class="status-pill">Ready</span><span class="version-badge">Web v1.1.0</span><button id="logout" class="button secondary" hidden>Sign out</button></div>
+    <div class="header-actions"><span id="connection-status" class="status-pill">Ready</span><span class="version-badge">Web v1.2.0</span><button id="logout" class="button secondary" hidden>Sign out</button></div>
   </header>
   <main>
     <section id="setup" class="auth-card" hidden>
@@ -27,13 +34,17 @@
     <section id="application" hidden>
       <nav class="tabs" aria-label="Application sections"><button class="tab active" data-tab="monitoring">Monitoring</button><button class="tab" data-tab="inventory">Inventory management</button></nav>
       <section id="monitoring-panel" class="tab-panel">
-        <div class="page-heading"><div><p class="eyebrow">Live telemetry</p><h2>Router monitoring</h2><p>Select an inventory router and collect its current resource utilization.</p></div><div class="monitor-controls"><select id="router-select" aria-label="Router to monitor"></select><button id="collect" class="button">Collect now</button></div></div>
+        <span class="page-version">WEB VERSION 1.2.0</span>
+        <div class="page-heading"><div><p class="eyebrow">Live telemetry</p><h2>Router monitoring</h2><p>Select a router and monitor its resource utilization automatically.</p></div><div class="monitor-controls"><select id="router-select" aria-label="Router to monitor"></select><label class="refresh-control">Refresh interval<select id="refresh-interval" aria-label="Automatic refresh interval"><option value="5000" selected>Every 5 seconds</option><option value="10000">Every 10 seconds</option><option value="15000">Every 15 seconds</option></select></label><button id="collect" class="button">Collect now</button></div></div>
         <div class="metric-grid">
           <article class="metric-card cpu"><span>CPU utilization</span><strong id="cpu-value">--</strong><small>Percent</small></article>
           <article class="metric-card memory"><span>Memory utilization</span><strong id="memory-value">--</strong><small>Percent</small></article>
           <article class="metric-card neutral"><span>Last collection</span><strong id="time-value">--</strong><small id="router-value">No router selected</small></article>
         </div>
-        <article class="chart-card"><div class="chart-heading"><div><h3>Utilization history</h3><p>Last 30 samples</p></div><div class="legend"><span><i class="cpu-dot"></i>CPU</span><span><i class="memory-dot"></i>Memory</span></div></div><div class="chart-wrap"><canvas id="chart"></canvas><p id="chart-empty">Collect metrics to populate the chart.</p></div></article>
+        <div class="chart-grid">
+          <article class="chart-card"><div class="chart-heading"><div><h3>CPU utilization history</h3><p>Last 30 samples</p></div><div class="legend"><span><i class="cpu-dot"></i>CPU</span></div></div><div class="chart-wrap"><canvas id="cpu-chart"></canvas><p id="cpu-chart-empty">Waiting for the first sample.</p></div></article>
+          <article class="chart-card"><div class="chart-heading"><div><h3>Memory utilization history</h3><p>Last 30 samples</p></div><div class="legend"><span><i class="memory-dot"></i>Memory</span></div></div><div class="chart-wrap"><canvas id="memory-chart"></canvas><p id="memory-chart-empty">Waiting for the first sample.</p></div></article>
+        </div>
       </section>
       <section id="inventory-panel" class="tab-panel" hidden>
         <div class="page-heading"><div><p class="eyebrow">Configuration</p><h2>Inventory management</h2><p>Add only instructor-authorized IOS XE routers.</p></div></div>
@@ -45,6 +56,6 @@
     </section>
     <div id="message" class="toast" hidden></div>
   </main>
-  <script src="app.js?v=1.1.0"></script>
+  <script src="app.js?v=1.2.0"></script>
 </body>
 </html>

@@ -172,9 +172,11 @@ Do not add a production router or a router that the instructor has not authorize
 
 1. Open the **Monitoring** tab.
 2. Select the router from the dropdown list.
-3. Select **Collect now**.
-4. Confirm that CPU utilization, memory utilization, collection time, and router name appear.
-5. Collect several samples and confirm that the utilization chart updates.
+3. Select a refresh interval of 5, 10, or 15 seconds.
+4. Confirm that CPU utilization, memory utilization, collection time, and router name update automatically.
+5. Confirm that the separate CPU and memory charts display the last 30 samples.
+
+Use **Collect now** when you want an additional sample immediately.
 
 ## Step 8: Verify persistence
 
@@ -208,7 +210,7 @@ Confirm that `.env` is not included in the commit.
 - The inventory page stores an authorized router without displaying its password.
 - The monitoring dropdown lists the router.
 - CPU and memory values are collected through the VPN.
-- The chart displays multiple samples.
+- The CPU and memory charts display multiple automatically collected samples.
 - The administrator and inventory survive container recreation.
 - `.env` is not committed.
 
