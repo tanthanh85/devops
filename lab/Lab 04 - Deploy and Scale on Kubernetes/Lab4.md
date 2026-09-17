@@ -51,12 +51,14 @@ flowchart LR
 
     G["Ubuntu Minikube bridge gateway<br/>RESTCONF relay · port 9443"]
     V["Cisco Secure Client VPN"]
-    R["IOS XE router<br/>RESTCONF port 443"]
+    R["Remote IOS XE router<br/>RESTCONF port 443"]
+    C["Local LAN C8000v<br/>RESTCONF port 443"]
 
     B --> WS
     A <-->|"HTTPS via bridge IP:9443"| G
     G <-->|"TCP relay"| V
     V <-->|"VPN tunnel"| R
+    A <-->|"Direct HTTPS when provided"| C
 ```
 
 ## Supplied files
@@ -265,9 +267,23 @@ minikube service network-monitor-web \
 
 ## Step 9: Create the RESTCONF VPN relay
 
+> **Local C8000v option:** If the instructor provides a C8000v router on the local
+> LAN, do not complete this step. Verify direct access from the App Pod instead:
+>
+> ```bash
+> ROUTER_IP=REPLACE_WITH_LOCAL_C8000V_IP
+> kubectl -n network-devops exec deployment/network-monitor-app -- \
+>   python -c "import socket; socket.create_connection(('$ROUTER_IP',443),5); print('Local C8000v RESTCONF reachable')"
+> ```
+>
+> Continue to Step 10 and add the C8000v's LAN IP with port `443` to the inventory.
+
 Cisco Secure Client terminates the VPN on Ubuntu and does not normally export its
 routes into a Docker-driver Minikube node. Create a TCP relay on the Ubuntu bridge
 address so the App Pods can use Ubuntu's VPN route without host DNS.
+
+Complete the remainder of Step 9 only when the assigned router is reached through
+Cisco Secure Client VPN.
 
 Install `socat` on Ubuntu if it is not already available:
 
@@ -312,7 +328,10 @@ kubectl -n network-devops exec deployment/network-monitor-app -- \
 ## Step 10: Verify the monitoring workflow
 
 1. Create the administrator and sign in.
-2. Open **Inventory management** and add the numeric value of `$MINIKUBE_HOST_IP` as the router host, port `9443`, and the assigned router credentials.
+2. Open **Inventory management** and add the assigned router:
+   - For a local instructor-provided C8000v, use its LAN IP and port `443`.
+   - For a router reached through Cisco Secure Client, use the numeric value of `$MINIKUBE_HOST_IP` and port `9443`.
+   - Use the assigned RESTCONF username and password in both cases.
 3. Open **Monitoring** and select the router.
 4. Select a 5-, 10-, or 15-second refresh interval.
 5. Confirm that the CPU and memory values and both charts update automatically.
