@@ -8,6 +8,8 @@ In this standalone lab, you will deploy the complete working three-tier network-
 
 The supplied Lab 4 folder contains a complete copy of the application. You do not need to complete Lab 3 first.
 
+This lab does not use `host.minikube.internal`, `host.docker.internal`, or workstation DNS. Communication between tiers uses Kubernetes Services. Minikube provides the internal Service name `network-monitor-db` to Pods automatically.
+
 ## Objectives
 
 - Deploy MySQL as a persistent Kubernetes StatefulSet.
@@ -117,7 +119,8 @@ MYSQL_DATABASE=network_monitor
 MYSQL_USER=network_app
 MYSQL_PASSWORD=replace-with-first-16-byte-hex-value
 MYSQL_ROOT_PASSWORD=replace-with-second-16-byte-hex-value
-DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@network-monitor-db:3306/network_monitor
+# Kubernetes Service address; no workstation DNS entry is required.
+DATABASE_URL=mysql+pymysql://network_app:replace-with-same-value-as-MYSQL_PASSWORD@network-monitor-db:3306/network_monitor
 FLASK_SECRET_KEY=replace-with-32-byte-hex-value
 INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
