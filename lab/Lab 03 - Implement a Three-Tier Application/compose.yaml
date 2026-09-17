@@ -23,9 +23,11 @@ services:
       dockerfile: app/Dockerfile
     image: network-monitor-app:lab03
     restart: unless-stopped
-    env_file: [.env]
     environment:
       DATABASE_URL: mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@127.0.0.1:3307/${MYSQL_DATABASE}
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:?Set FLASK_SECRET_KEY in .env}
+      INVENTORY_ENCRYPTION_KEY: ${INVENTORY_ENCRYPTION_KEY:?Set INVENTORY_ENCRYPTION_KEY in .env}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
     depends_on:
       db: {condition: service_healthy}
     network_mode: host

@@ -170,6 +170,13 @@ docker compose config --quiet
 python -m pytest -q
 ```
 
+Run all Compose commands from the repository root—the directory containing both `compose.yaml` and `.env`. Confirm the location before continuing:
+
+```bash
+pwd
+test -f compose.yaml && test -f .env && echo "Lab 3 project files found"
+```
+
 Build the two custom images and pull the pinned database image:
 
 ```bash
