@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: network-devops-lab05
+  labels:
+    app.kubernetes.io/part-of: network-monitor

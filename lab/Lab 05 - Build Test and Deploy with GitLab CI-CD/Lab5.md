@@ -2,319 +2,333 @@
 
 ## Duration
 
-**3 hours**
+**2 hours**
 
-In this standalone lab, you will express application checks and deployment controls as a GitLab CI/CD pipeline executed by a private Docker runner. The instructor-provided Lab 5 package includes the application source, tests, Kubernetes baseline, and pipeline files required for this lab. No earlier lab repository or runtime state is required.
+In this standalone lab, you will deliver the same three-tier application used in Lab 4 through GitLab CI/CD. Learners work on a feature branch, open a merge request, obtain approval, and merge into `main`. Only the resulting push to `main` creates a pipeline.
 
-The preparation procedure builds or loads the supplied baseline `network-monitor-web:lab05`, `network-monitor-app:lab05`, and `mysql:8.4` images. It also builds `network-monitor-e2e`, whose only purpose is to test the deployed application through its web interface. The test signs in with a dedicated account, collects CPU and memory observations from an authorized inventory target, and checks the displayed values and chart.
+The pipeline tests the application, builds both application images directly in Minikube's container runtime, deploys MySQL, Flask, and NGINX, and verifies the running Services. Learners do not run deployment commands manually.
 
 ## Objectives
 
-- Map build, unit-test, deployment, and acceptance-test responsibilities to GitLab jobs.
-- Configure a private Docker runner to reach the learner's Minikube API safely.
-- Protect the kubeconfig and test credentials as GitLab CI/CD variables.
-- Build or load the application images supplied for Lab 5.
-- Build a dedicated browser-test image.
-- Deploy version-controlled Kubernetes manifests through a protected job.
-- Provision a non-administrator test account without committing its password.
-- Test the application from the user's point of view.
-- Explain pipeline ordering, environments, job dependencies, and failure behavior.
+- Configure a trusted local GitLab shell runner for the course workstation.
+- Protect `main` from direct pushes.
+- Require one merge-request approval before merge.
+- Store runtime secrets as protected GitLab CI/CD variables.
+- Restrict pipeline creation to pushes on the default branch.
+- Test and build the Lab 4 application in CI.
+- Deploy all three tiers to Minikube from CI.
+- Verify the deployment and Pod identities from CI.
 
 ## Delivery flow
 
 ```mermaid
 flowchart LR
-    C[Commit] --> U[Unit tests]
-    U --> I[Build test image]
-    I --> D[Deploy reused images]
-    D --> A[Browser acceptance test]
-    A --> E[Pipeline result]
+    F["Feature branch"] --> P["Push to GitLab"]
+    P --> M["Merge request to main"]
+    M --> R["Instructor review"]
+    R --> A["Approval"]
+    A --> G["Merge to main"]
+    G --> T["Test"]
+    T --> B["Build images"]
+    B --> D["Deploy to Minikube"]
+    D --> V["Verify Kubernetes rollout"]
+    V --> W["Post-deployment web test"]
 ```
 
-The arrows represent pipeline gates. A failed job stops later stages by default. The deployment job therefore cannot run when source tests fail, and the acceptance test cannot run until the Kubernetes rollout becomes ready.
+Feature-branch pushes and merge-request events do not create pipelines in this lab. The merge commit pushed to `main` starts the pipeline.
 
 ## Required environment
 
-- An instructor-approved workstation with Docker, Git, Python, Minikube, `kubectl`, and a local GitLab Runner installed.
-- The complete instructor-provided Lab 5 standalone package.
-- A new private GitLab.com project created for this lab.
-- A fresh or reusable Minikube profile available on the runner host. The Lab 5 setup creates its required namespace, secrets, Vault records, administrator, and router inventory.
-- The selected router must be reachable from Minikube and return RESTCONF CPU and memory data.
+- The Lab 1 Ubuntu workstation with Docker, Minikube, `kubectl`, Git, Python, and GitLab Runner.
+- A private GitLab project where an instructor or another authorized user can approve merge requests.
+- The complete instructor-provided Lab 5 files.
+- A running Minikube profile named `network-devops`.
+- A local C8000v or the Lab 4 RESTCONF VPN relay when router monitoring is tested.
 
-Do not use a production cluster, production credentials, or an unrestricted shared runner. The local runner controls the Docker daemon and receives a Kubernetes credential capable of changing the course namespace.
+The shell runner executes trusted repository commands directly on the workstation. Use it only for this private course project.
 
-## Supplied Lab 5 structure
+## Supplied files
 
 ```text
 Lab 05 - Build Test and Deploy with GitLab CI-CD/
-├── Lab5.md
 ├── .gitlab-ci.yml
-├── ci/
-│   └── e2e/
-│       ├── Dockerfile
-│       ├── package.json
-│       └── tests/
-│           └── monitoring.spec.js
-├── kubernetes/
-│   └── test-user-job.yaml
-└── scripts/
-    └── provision-test-user.sh
+├── .env.example
+├── Lab5.md
+├── app/
+├── web/
+├── tests/
+├── requirements.txt
+├── requirements-dev.txt
+└── kubernetes/
+    ├── namespace.yaml
+    ├── mysql.yaml
+    ├── app.yaml
+    └── web.yaml
 ```
 
-## Part 1: Create the Lab 5 workspace and repository
+## Step 1: Create the Lab 5 repository
 
-Use a separate folder and private GitLab project:
+Create a blank private GitLab project named `netdevops-lab05-gitlab-cicd` and initialize it with a README.
 
-- Folder: `~/netdevops-labs/netdevops-lab05-gitlab-cicd`
-- GitLab project: `netdevops-lab05-gitlab-cicd`
-
-Do not reuse or delete another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete Lab 5 standalone package.
+Clone the project and create the working branch:
 
 ```bash
 mkdir -p ~/netdevops-labs
 cd ~/netdevops-labs
 git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab05-gitlab-cicd.git
 cd netdevops-lab05-gitlab-cicd
-git status
-git pull --ff-only
-git switch -c feature/lab05-gitlab-pipeline
-cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/." \
-  ~/netdevops-labs/netdevops-lab05-gitlab-cicd/
-python3 -m venv .venv
-source .venv/bin/activate
+git switch -c feature/lab05-cicd
 ```
 
-Confirm that the repository contains the supplied application source, tests, runtime manifests, pipeline file, and end-to-end test files before continuing.
-
-## Part 2: Register and prepare the Docker runner
-
-In the GitLab.com `netdevops-lab05-gitlab-cicd` project:
-
-1. Open **Settings > CI/CD** and expand **Runners**.
-2. Select **Create project runner**.
-3. Select Linux and add the tags `docker,validation`.
-4. Leave **Run untagged jobs** disabled.
-5. Create the runner and copy its authentication token beginning with `glrt-`.
-
-Start and register the instructor-approved local runner container:
+Copy only the supplied Lab 5 files into this repository:
 
 ```bash
-docker start course-gitlab-runner
-docker exec -it course-gitlab-runner gitlab-runner register
+cp -R "/path/to/Lab 05 - Build Test and Deploy with GitLab CI-CD/." .
+git status
 ```
 
-Enter the following values when prompted:
+## Step 2: Start Minikube
+
+```bash
+minikube start --profile network-devops --driver=docker
+minikube profile network-devops
+minikube status --profile network-devops
+```
+
+The CI runner uses this profile. Do not deploy the application manually.
+
+## Step 3: Create and register the project runner
+
+In GitLab:
+
+1. Open **Settings > CI/CD > Runners**.
+2. Select **Create project runner**.
+3. Select Linux.
+4. Add the tags `lab5` and `minikube`.
+5. Disable **Run untagged jobs**.
+6. Create the runner and copy its authentication token beginning with `glrt-`.
+
+Register a dedicated user-mode configuration on Ubuntu:
+
+```bash
+mkdir -p ~/.gitlab-runner-lab05
+gitlab-runner --config ~/.gitlab-runner-lab05/config.toml register
+```
+
+Enter:
 
 - GitLab URL: `https://gitlab.com`
 - Token: the project runner authentication token
-- Description: `course-docker-runner`
-- Executor: `docker`
-- Default image: `python:3.12-slim`
+- Description: `lab05-minikube-shell-runner`
+- Tags: `lab5,minikube`
+- Executor: `shell`
 
-Confirm that registration succeeded and that GitLab.com reports the runner as online:
-
-```bash
-docker exec course-gitlab-runner gitlab-runner list
-docker exec course-gitlab-runner gitlab-runner verify
-```
-
-Do not store the runner authentication token in the project or include it in screenshots.
-
-The Docker runner executes each job in an isolated container. Pipeline jobs need two controlled capabilities:
-
-1. The image-build job requires the host Docker socket.
-2. Kubernetes jobs require a flattened kubeconfig supplied as a protected file variable.
-
-Confirm the runner configuration contains the Docker socket and uses locally built images when present:
-
-```toml
-[[runners]]
-  executor = "docker"
-  [runners.docker]
-    image = "python:3.12-slim"
-    privileged = false
-    pull_policy = "if-not-present"
-    volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
-```
-
-The exact `config.toml` is stored in the runner's Docker volume. Inspect it without printing the authentication token:
+Verify the registration:
 
 ```bash
-docker exec course-gitlab-runner sh -c \
-  'grep -E "executor|image|privileged|pull_policy|volumes" /etc/gitlab-runner/config.toml'
-docker restart course-gitlab-runner
-docker exec course-gitlab-runner gitlab-runner verify
+gitlab-runner --config ~/.gitlab-runner-lab05/config.toml list
+gitlab-runner --config ~/.gitlab-runner-lab05/config.toml verify
 ```
 
-Do not enable privileged mode for this lab. Docker-socket access is already highly privileged and is acceptable only on the dedicated course workstation.
-
-## Part 3: Create a portable kubeconfig
-
-The default Minikube kubeconfig refers to certificate files on the workstation. A CI job cannot read those paths. Flatten the selected context so the certificate data is embedded:
+In a separate terminal, start the runner as the current Ubuntu user and keep it running during the lab:
 
 ```bash
-mkdir -p ~/course-platform
-kubectl config view --minify --flatten --raw > ~/course-platform/minikube-ci.kubeconfig
-KUBECONFIG=~/course-platform/minikube-ci.kubeconfig kubectl get nodes
+gitlab-runner --config ~/.gitlab-runner-lab05/config.toml run
 ```
 
-This file contains credentials. Upload it to GitLab in the next part, then remove it immediately. Never add it to Git or pipeline artifacts.
+Running it as the current user gives the jobs access to that user's Docker, Minikube, and Kubernetes configuration.
 
-## Part 4: Configure protected GitLab variables
+## Step 4: Protect `main` and require approval
 
-In **Settings > CI/CD > Variables**, create these variables:
+In GitLab, configure the default branch before pushing the feature branch:
 
-| Variable | Type | Protection | Purpose |
-|---|---|---|---|
-| `KUBE_CONFIG` | File | Protected | Flattened Minikube kubeconfig |
-| `E2E_USERNAME` | Variable | Protected and masked | Dedicated test username, such as `ci-monitor` |
-| `E2E_PASSWORD` | Variable | Protected and masked | Unique test password of at least 12 characters |
+1. Open **Settings > Repository > Branch rules**.
+2. Protect `main`.
+3. Set **Allowed to push and merge** to **No one**.
+4. Allow only the instructor or designated maintainer role to merge.
+5. Disable force pushes.
+6. Under the project's merge checks, leave **Pipelines must succeed** disabled because this lab intentionally creates no merge-request pipeline. The approved merge triggers the validation pipeline on `main` afterward.
 
-Use environment scope `course/minikube` if available. Do not expose either credential in command output. After saving `KUBE_CONFIG`, delete the local copy:
+Configure merge-request approval:
+
+1. Open **Settings > Merge requests > Merge request approvals**.
+2. Create an approval rule for the `main` branch.
+3. Require one approval.
+4. Add the instructor or designated reviewer as an approver.
+5. Prevent authors from approving their own merge requests when that option is available.
+
+These settings prevent learners from bypassing review with a direct push to `main`.
+
+## Step 5: Create protected CI/CD variables
+
+Generate the values on Ubuntu:
 
 ```bash
-rm ~/course-platform/minikube-ci.kubeconfig
-git status --ignored
+openssl rand -hex 16
+openssl rand -hex 16
+openssl rand -hex 32
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 
-Protected variables are available only to pipelines on protected branches or tags. Ask the instructor to protect `main` and allow the learner's role to merge before running the deployment pipeline.
+In **Settings > CI/CD > Variables**, create these project variables:
 
-## Part 5: Confirm the pipeline stages
-
-The supplied `.gitlab-ci.yml` defines four stages:
-
-| Stage | Job | Result |
+| Key | Value | Settings |
 |---|---|---|
-| `verify` | `unit-test` | Application source tests pass |
-| `package-test` | `build-e2e-image` | Browser-test image exists on the runner host |
-| `deploy` | `deploy-minikube` | Existing application images are deployed and ready |
-| `acceptance` | `browser-acceptance` | Authenticated monitoring works through the web page |
+| `MYSQL_PASSWORD` | First 16-byte hexadecimal value | Protected and masked |
+| `MYSQL_ROOT_PASSWORD` | Second 16-byte hexadecimal value | Protected and masked |
+| `FLASK_SECRET_KEY` | 32-byte hexadecimal value | Protected and masked |
+| `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key | Protected and masked |
 
-The runtime application images are not rebuilt in this lab. The deployment job inspects their presence inside Minikube before applying the manifests. If an image is missing, the job fails and identifies the prerequisite that must be restored.
+Use the environment scope `course/minikube` when the GitLab interface provides it. Keep `main` protected so these variables are available to its pipeline.
 
-## Part 6: Build the browser-test image
+Do not create `.env`, Kubernetes Secrets, or application credentials manually in this lab. The pipeline creates the Kubernetes Secret from the protected variables.
 
-```bash
-docker build -t network-monitor-e2e:local ci/e2e
-docker run --rm network-monitor-e2e:local npx playwright --version
+## Step 6: Review the main-only pipeline
+
+Open `.gitlab-ci.yml` and identify the global workflow rule:
+
+```yaml
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - when: never
 ```
 
-Do not place credentials in the image.
+The pipeline contains five automatic stages:
 
-## Part 7: Configure test-user provisioning
+1. `unit-test` installs dependencies and runs `pytest`.
+2. `build-images` builds commit-specific Flask and NGINX images directly in Minikube's container runtime.
+3. `deploy-minikube` creates the runtime Secret and deploys MySQL, Flask, and NGINX.
+4. `verify-deployment` checks Pod readiness and Kubernetes Service endpoints.
+5. `post-deployment-web-test` accesses the web Service through a temporary port-forward and verifies the page, health endpoint, setup API, and Web/App Pod identity endpoints.
 
-The supplied Kubernetes Job uses the existing application image and application model to create or update one non-administrator account. Its password arrives from a temporary Kubernetes Secret created by `provision-test-user.sh`.
+The optional `cleanup-minikube` job is manual and appears only in the successful `main` pipeline.
 
-```mermaid
-flowchart LR
-    V[Protected GitLab variables] --> S[Temporary Kubernetes Secret]
-    S --> J[One-time provisioning Job]
-    J --> M[(MySQL users table)]
-    M --> T[Browser sign-in]
-```
-
-The Secret is removed after the Job succeeds. The database retains only the password hash. The account can read Vault-backed router inventory and collect metrics; the application exposes no router inventory mutation operations.
-
-## Part 8: Validate the files locally
-
-Run fast local checks so formatting or manifest errors do not consume runner time.
+## Step 7: Commit and push the feature branch
 
 ```bash
-python -m pytest -q
-docker build -t network-monitor-e2e:local ci/e2e
-kubectl apply --dry-run=client -f kubernetes/test-user-job.yaml
-git diff --check
-```
-
-The provisioning manifest will validate without the temporary credential Secret, but the Job can run only after the script creates that Secret.
-
-## Part 9: Commit and run the merge-request pipeline
-
-Push the pipeline definition and use a merge request to exercise its non-production validation path.
-
-```bash
-git add .gitlab-ci.yml ci/e2e kubernetes/test-user-job.yaml \
-  scripts/provision-test-user.sh
+git status
+git add .
 git diff --staged
-git commit -m "Add GitLab delivery and acceptance pipeline"
-git push -u origin feature/lab05-gitlab-pipeline
+git commit -m "Add GitLab pipeline for Minikube deployment"
+git push -u origin feature/lab05-cicd
 ```
 
-Create a merge request into `main`. The merge-request pipeline runs source tests and builds the test image, but the rules prevent deployment from an unprotected feature branch. Review the job logs and confirm that no protected values appear.
+Open **Build > Pipelines**. Confirm that the feature-branch push did not create a pipeline.
 
-## Part 10: Merge the validated change
+## Step 8: Create the merge request
 
-Before merging, verify:
+In GitLab:
 
-- Unit tests exercise authentication and inventory authorization.
-- The test image is the only image built by this pipeline.
-- Deployment jobs are restricted to the default protected branch.
-- The Kubernetes credential is a file variable and is not in the repository.
-- The testing user is not an administrator.
-- The browser test has a defined timeout and verifies the complete application workflow.
+1. Open **Code > Merge requests**.
+2. Create a merge request from `feature/lab05-cicd` into `main`.
+3. Title it **Deploy the three-tier application with GitLab CI/CD**.
+4. Assign the instructor or designated reviewer.
+5. Submit the merge request.
 
-Merge the approved change. The default-branch pipeline should progress through all four stages.
+Confirm that creating the merge request does not create a pipeline. Review the changes in the **Changes** tab.
 
-## Part 11: Follow the deployment job
+## Step 9: Review and approve
 
-The deployment job performs these controls in order:
+The designated reviewer must:
 
-1. Select the supplied kubeconfig.
-2. Confirm the target context, namespace, and node.
-3. Confirm the Lab 4 application images are already present.
-4. Apply the version-controlled manifests.
-5. Wait for MySQL, Flask, and NGINX rollouts.
-6. Provision the restricted test user.
-7. Report the deployed workload and service state in the job log.
+1. Review `.gitlab-ci.yml`, the application changes, and Kubernetes manifests.
+2. Confirm that no plaintext secret or `.env` file is included.
+3. Select **Approve**.
 
-## Part 12: Follow the browser acceptance test
+The learner must not approve their own merge request.
 
-The acceptance job runs inside `network-monitor-e2e`. It starts a local `kubectl port-forward`, then Playwright:
+## Step 10: Merge into `main`
 
-1. Opens the monitoring web page.
-2. Signs in using `E2E_USERNAME` and `E2E_PASSWORD`.
-3. Confirms an inventory router is available.
-4. Collects two observations through the web interface.
-5. Confirms CPU and memory percentages are displayed as numbers.
-6. Confirms the chart canvas contains rendered pixels.
-7. Confirms the web-instance badge identifies a Pod.
-8. Reports whether the complete browser workflow passed.
+After approval, select **Merge**. Do not bypass the merge request and do not push directly to `main`.
 
-This end-to-end test proves that the deployed application works through the same browser boundary used by an operator.
+The merge creates a push on `main`, which starts the only pipeline for this workflow.
 
-## Part 13: Verify the pipeline result
+## Step 11: Follow the pipeline
 
-In GitLab, open **Build > Pipelines** and select the default-branch pipeline. Confirm that the graph completed in this order:
+Open **Build > Pipelines**, select the `main` pipeline, and follow each job in order:
 
-- `unit-test`
-- `build-e2e-image`
-- `deploy-minikube`
-- `browser-acceptance`
+```text
+unit-test → build-images → deploy-minikube → verify-deployment → post-deployment-web-test
+```
 
-Confirm that every job succeeds, the deployment becomes ready, and the browser acceptance job retrieves CPU and memory data.
+Do not run `docker build`, `kubectl apply`, `kubectl set image`, or `kubectl create secret` manually. Correct a failure on a new feature branch and repeat the merge-request process.
+
+## Step 12: Verify the deployed application
+
+After the pipeline succeeds, open the web Service:
+
+```bash
+minikube service network-monitor-web \
+  --namespace network-devops-lab05 \
+  --profile network-devops
+```
+
+1. Create the administrator and sign in.
+2. Add the instructor-provided router using the Lab 4 connection method.
+3. Confirm automatic CPU and memory monitoring.
+4. Confirm that the interface displays the responding Web Pod and App Pod names.
+
+## Step 13: Make a follow-up change
+
+Create another feature branch from the updated default branch:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/lab05-follow-up
+```
+
+Make an instructor-approved documentation or interface change, then commit and push it. Repeat the merge request, review, approval, and merge workflow. Confirm that a new `main` pipeline builds images tagged with the new commit ID and updates the Deployments.
 
 ## Completion criteria
 
-- The private Docker runner completes tagged jobs without privileged mode.
-- The kubeconfig and testing credentials exist only as protected GitLab variables and temporary runtime values.
-- Unit tests pass before deployment.
-- The pipeline builds only the dedicated browser-test image.
-- The previously built web, app, and database images remain the deployed runtime images.
-- Kubernetes rollouts become ready on the protected default branch.
-- A non-administrator testing account is provisioned idempotently.
-- The browser test retrieves and displays numeric CPU and memory data.
-- The chart contains rendered data and the instance badge identifies a web Pod.
+- The Lab 4 application source, tests, and Kubernetes manifests are present.
+- Direct pushes to `main` are blocked.
+- A merge request requires an authorized approval.
+- Feature-branch pushes and merge-request events do not create pipelines.
+- Merging the approved request creates a pipeline on `main`.
+- Unit tests pass before images are built.
+- CI builds commit-specific application and web images.
+- CI deploys MySQL, Flask, and NGINX to `network-devops-lab05`.
+- CI verifies Kubernetes readiness and Service endpoints.
+- The post-deployment stage confirms that the web page and application API are accessible.
+- The application works without a manual deployment command.
 
 ## Cleanup
 
-Remove the local test image when it is no longer required:
+When the lab evidence has been collected, open the successful `main` pipeline and start the manual `cleanup-minikube` job. It deletes only the `network-devops-lab05` namespace, including its MySQL persistent volume claim.
+
+Stop the user-mode runner with `Ctrl+C` in its terminal.
+
+## Troubleshooting
+
+### No pipeline appears after a feature-branch push
+
+This is expected. Only a push to the default branch creates a pipeline.
+
+### The merge button is disabled
+
+Confirm that the designated reviewer approved the merge request and that the learner has not attempted a direct push to `main`.
+
+### Jobs remain pending
+
+Confirm that the local runner terminal is still running, that GitLab reports the project runner online, and that its tags are `lab5` and `minikube`:
 
 ```bash
-docker image rm network-monitor-e2e:local
+gitlab-runner --config ~/.gitlab-runner-lab05/config.toml verify
 ```
 
-Keep this lab's GitLab variables, runner configuration, Minikube namespace, and persistent data only until you have collected the required evidence. No later lab depends on them. Delete the `e2e-test-credentials` Secret if a failed job left it behind:
+### The build job cannot access Docker or Minikube
+
+Confirm that the runner was started as the same Ubuntu user who can run these commands:
 
 ```bash
-kubectl -n network-devops delete secret e2e-test-credentials --ignore-not-found
+docker version
+minikube status --profile network-devops
+kubectl get nodes
 ```
+
+### Deployment fails after changing MySQL variables
+
+The persistent MySQL volume was initialized with the original credentials. Use stable protected variables for the entire lab. If the instructor authorizes a full reset, run the manual cleanup job, correct the variables, and merge a new feature branch so the pipeline creates a fresh database.
