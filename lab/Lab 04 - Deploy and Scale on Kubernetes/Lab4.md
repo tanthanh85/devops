@@ -375,6 +375,19 @@ done
 
 The returned `instance` values should match names shown by `kubectl get pods`.
 
+### Why the database remains at one replica
+
+Do not scale `network-monitor-db` by changing its replica count. Each MySQL
+StatefulSet replica would receive a separate persistent volume and run as an
+independent database. Without database replication, the replicas would contain
+different users, inventory records, and application data.
+
+The web and application tiers are stateless and can scale horizontally behind
+Kubernetes Services. A production MySQL scale-out design requires configured
+replication, read/write routing, failover, backups, and recovery testing. Those
+database-clustering tasks are outside the scope of this lab, so MySQL remains a
+single persistent replica.
+
 ## Step 12: Verify database persistence
 
 Delete the MySQL Pod. The StatefulSet recreates it and mounts the same persistent volume:
@@ -420,6 +433,7 @@ Confirm that `.env` is not staged before committing.
 - CPU and memory metrics refresh automatically.
 - The interface displays the responding Web Pod and App Pod names.
 - Three web Pods and two application Pods run successfully.
+- MySQL remains one persistent replica to preserve a single consistent data set.
 - Data remains available after the MySQL Pod and both Deployments restart.
 
 ## Cleanup
