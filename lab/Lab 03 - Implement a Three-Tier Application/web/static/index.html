@@ -4,12 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Network Operations Console</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1.1.0">
+  <style>
+    [hidden]{display:none!important}
+    .version-badge{padding:6px 10px;border:1px solid #ffffff35;border-radius:999px;color:#dbeafe;font-size:12px;font-weight:800;white-space:nowrap}
+  </style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand"><span class="brand-mark">N</span><div><h1>Network Operations</h1><p>RESTCONF monitoring console</p></div></div>
-    <div class="header-actions"><span id="connection-status" class="status-pill">Ready</span><button id="logout" class="button secondary" hidden>Sign out</button></div>
+    <div class="header-actions"><span id="connection-status" class="status-pill">Ready</span><span class="version-badge">Web v1.1.0</span><button id="logout" class="button secondary" hidden>Sign out</button></div>
   </header>
   <main>
     <section id="setup" class="auth-card" hidden>
@@ -41,6 +45,6 @@
     </section>
     <div id="message" class="toast" hidden></div>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=1.1.0"></script>
 </body>
 </html>
