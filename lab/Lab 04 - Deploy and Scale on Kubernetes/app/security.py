@@ -1,6 +1,22 @@
 from functools import wraps
 
-from flask import jsonify, session
+from cryptography.fernet import Fernet
+from flask import current_app, jsonify, session
+
+
+def cipher():
+    key = current_app.config["INVENTORY_ENCRYPTION_KEY"]
+    if not key:
+        raise RuntimeError("INVENTORY_ENCRYPTION_KEY is required")
+    return Fernet(key.encode())
+
+
+def encrypt(value: str) -> str:
+    return cipher().encrypt(value.encode()).decode()
+
+
+def decrypt(value: str) -> str:
+    return cipher().decrypt(value.encode()).decode()
 
 
 def login_required(function):

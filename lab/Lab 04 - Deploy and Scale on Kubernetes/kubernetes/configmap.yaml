@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: network-monitor-config
-  namespace: network-devops
-data:
-  MYSQL_DATABASE: network_monitor
-  MYSQL_USER: network_app
-  SESSION_COOKIE_SECURE: "false"

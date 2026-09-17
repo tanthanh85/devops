@@ -1,285 +1,379 @@
-# Lab 4: Deploy, Secure, and Scale the Application on Kubernetes
+# Lab 4: Deploy the Web and Application Tiers on Minikube
 
 ## Duration
 
-**3 hours**
+**2 hours**
 
-In this standalone lab, you will deploy a supplied three-tier monitoring application to Minikube, place all router connection information and login credentials in HashiCorp Vault, and scale the stateless web tier from one Pod to three. The Lab 4 files contain the complete application baseline; the Lab 3 folder and repository are not required.
+In this standalone lab, you will deploy the same working network-monitoring application used in Lab 3. MySQL runs in Docker on the Ubuntu workstation. The Flask application tier and NGINX web tier run in Minikube.
 
-The monitoring application no longer creates, changes, or deletes router inventory. Vault is the authoritative store for each router's name, address, RESTCONF port, username, password, and enabled state. The web interface provides a read-only view of that inventory and retrieves CPU and memory data only after the application authenticates to Vault with its Kubernetes workload identity.
+The supplied Lab 4 folder contains a complete copy of the application. You do not need to complete Lab 3 first.
 
 ## Objectives
 
-- Map the three-tier Compose application to Kubernetes objects.
-- Deploy MySQL, Flask, NGINX, and Vault to Minikube.
-- Configure Vault KV v2 and Kubernetes authentication.
-- Bind a least-privilege policy to the application service account.
-- Create complete router records directly in Vault.
-- Confirm that the application exposes no router inventory mutation API.
-- Display the responding web Pod name and IP address.
-- Scale the web Deployment from one replica to three.
-- Verify service distribution, persistence, Vault access, and RESTCONF monitoring.
+- Run the MySQL database tier with Docker Compose.
+- Build the existing Flask and NGINX images.
+- Load the images into Minikube.
+- Store runtime configuration in a Kubernetes Secret.
+- Deploy the application and web tiers as Kubernetes Deployments and Services.
+- Verify inventory management and automatic RESTCONF monitoring.
+- Display the responding web and application Pod names in the interface.
+- Scale the web and application tiers.
 
-## Runtime architecture
+## Required environment
+
+- The Lab 1 workstation with Docker, Minikube, `kubectl`, Git, and Python.
+- Cisco Secure Client connected when the assigned router requires the course VPN.
+- An instructor-authorized IOS XE router with RESTCONF enabled.
+- The complete instructor-provided Lab 4 files.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    B[Browser] --> S[Web Service]
-    S --> W1[Web Pod 1]
-    S --> W2[Web Pod 2]
-    S --> W3[Web Pod 3]
-    W1 --> A[Application Service]
-    W2 --> A
-    W3 --> A
-    A --> AP[Flask Pod]
-    AP --> D[(MySQL users)]
-    AP -->|Kubernetes identity| V[Vault router records]
-    AP -->|RESTCONF| R[Authorized router]
-```
+    B["Learner browser"]
 
-MySQL retains application users and sessions. Vault owns router data. The application service account can list router names and read router records, but it cannot write or delete them.
+    subgraph K["Minikube"]
+        WS["Web Service<br/>NodePort"]
+        W["NGINX web Pods<br/>report Web Pod name"]
+        AS["Application Service<br/>port 8000"]
+        A["Flask application Pods<br/>report App Pod name"]
+
+        WS --> W
+        W --> AS
+        AS --> A
+    end
+
+    subgraph U["Ubuntu workstation"]
+        D[("MySQL Docker container<br/>port 3307")]
+        V["Cisco Secure Client VPN"]
+    end
+
+    R["IOS XE router<br/>RESTCONF port 443"]
+
+    B --> WS
+    A <-->|"SQL via host.minikube.internal:3307"| D
+    A <-->|"HTTPS RESTCONF"| V
+    V <-->|"VPN tunnel"| R
+```
 
 ## Supplied files
 
 ```text
 Lab 04 - Deploy and Scale on Kubernetes/
 ├── Lab4.md
-├── app/                       # Vault-backed Flask application
-├── web/                       # Read-only inventory UI and Pod identity
+├── .env.example
+├── database-compose.yaml
+├── app/
+├── web/
 ├── tests/
 ├── requirements.txt
 ├── requirements-dev.txt
-├── kubernetes/
-│   ├── namespace.yaml
-│   ├── configmap.yaml
-│   ├── mysql.yaml
-│   ├── vault.yaml
-│   ├── token-review.yaml
-│   ├── app.yaml
-│   └── web.yaml
-└── scripts/
-    ├── create-secrets.sh
-    ├── configure-vault.sh
-    ├── store-router-record.sh
-    ├── deploy.sh
-    └── verify.sh
+└── kubernetes/
+    ├── namespace.yaml
+    ├── app.yaml
+    └── web.yaml
 ```
 
-## Part 1: Create the Lab 4 workspace and repository
+## Step 1: Create the Lab 4 repository
 
-Use a new folder and private GitLab project:
-
-- Folder: `~/netdevops-labs/netdevops-lab04-kubernetes`
-- GitLab project: `netdevops-lab04-kubernetes`
-
-Do not reuse, delete, or copy files from a previous lab folder. Create a blank private GitLab project, initialize it with a README, clone it, and copy only the complete instructor-provided Lab 4 files.
+Create a blank private GitLab project named `netdevops-lab04-kubernetes` and initialize it with a README.
 
 ```bash
 mkdir -p ~/netdevops-labs
 cd ~/netdevops-labs
 git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab04-kubernetes.git
 cd netdevops-lab04-kubernetes
+git switch -c feature/lab04-minikube
+```
+
+Copy only the supplied Lab 4 files into this repository. Do not copy files from a learner's Lab 3 repository.
+
+```bash
+cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/." .
 git status
-git pull --ff-only
-git switch -c feature/lab04-kubernetes-vault
-cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/app" .
-cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/web" .
-cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/tests" .
-cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/kubernetes" .
-cp -R "/path/to/Lab 04 - Deploy and Scale on Kubernetes/scripts" .
-cp "/path/to/Lab 04 - Deploy and Scale on Kubernetes/requirements"*.txt .
+```
+
+## Step 2: Configure the database environment
+
+Create the local environment file:
+
+```bash
+cp .env.example .env
+chmod 600 .env
+```
+
+Generate the required values:
+
+```bash
+openssl rand -hex 16
+openssl rand -hex 16
+openssl rand -hex 32
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Edit `.env` and replace every placeholder:
+
+```dotenv
+MYSQL_IMAGE=mysql:8.4
+MYSQL_DATABASE=network_monitor
+MYSQL_USER=network_app
+MYSQL_PASSWORD=replace-with-first-16-byte-hex-value
+MYSQL_ROOT_PASSWORD=replace-with-second-16-byte-hex-value
+DATABASE_URL=mysql+pymysql://network_app:replace-with-same-MYSQL_PASSWORD-value@host.minikube.internal:3307/network_monitor
+FLASK_SECRET_KEY=replace-with-32-byte-hex-value
+INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
+SESSION_COOKIE_SECURE=false
+```
+
+Do not commit `.env`.
+
+## Step 3: Start Minikube and MySQL
+
+Start the course Minikube profile:
+
+```bash
+minikube start --profile network-devops --driver=docker
+minikube profile network-devops
+kubectl get nodes
+```
+
+Start only the database tier on the Ubuntu workstation:
+
+```bash
+docker compose --env-file .env -f database-compose.yaml up -d
+docker compose --env-file .env -f database-compose.yaml ps
+```
+
+Wait until the database reports `healthy`.
+
+The database port is reachable from Minikube for this isolated lab. Do not use this configuration on a shared or production workstation.
+
+## Step 4: Test and build the application
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-## Part 2: Test and build the images
-
-Verify the Vault-backed behavior before producing the two application images used by Kubernetes.
-
-```bash
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt -r requirements-dev.txt
 python -m pytest -q
-docker build -t network-monitor-app:lab04 -f app/Dockerfile .
-docker build -t network-monitor-web:lab04 web
-docker run --rm network-monitor-web:lab04 nginx -t
 ```
 
-The tests prove that inventory comes from Vault, metric collection uses the complete Vault record, and `POST /api/routers` is unavailable.
-
-## Part 3: Start Minikube and load images
-
-Start the course cluster and make the locally built images available to its container runtime.
+Build the same application and web tiers used in Lab 3:
 
 ```bash
-minikube start --profile network-devops
-minikube profile network-devops
+docker build -t network-monitor-app:lab04 -f app/Dockerfile .
+docker build -t network-monitor-web:lab04 -f web/Dockerfile .
+```
+
+Load both images into Minikube:
+
+```bash
 minikube image load network-monitor-app:lab04 --profile network-devops
 minikube image load network-monitor-web:lab04 --profile network-devops
 minikube image ls --profile network-devops | grep network-monitor
-kubectl get nodes -o wide
 ```
 
-## Part 4: Create application and Vault bootstrap secrets
+## Step 5: Create the Kubernetes runtime configuration
 
-Create the namespace and runtime secrets required to initialize the application and laboratory Vault service.
+Load the values from `.env` into the current shell:
+
+```bash
+set -a
+source .env
+set +a
+```
+
+Create the namespace and application Secret:
 
 ```bash
 kubectl apply -f kubernetes/namespace.yaml
-bash scripts/create-secrets.sh
-read -rsp "Vault laboratory bootstrap token: " VAULT_BOOTSTRAP_TOKEN
-echo
-export VAULT_BOOTSTRAP_TOKEN
-kubectl -n network-devops create secret generic vault-bootstrap \
-  --from-literal=token="$VAULT_BOOTSTRAP_TOKEN" \
+kubectl -n network-devops create secret generic network-monitor-runtime \
+  --from-literal=DATABASE_URL="$DATABASE_URL" \
+  --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" \
+  --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" \
+  --from-literal=SESSION_COOKIE_SECURE="$SESSION_COOKIE_SECURE" \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-The bootstrap token is used only to configure the laboratory Vault server. Do not commit it, print it, or give it to the application. The supplied Vault runs in development mode and is not suitable for production.
-
-## Part 5: Deploy and configure Vault
-
-Deploy Vault and bind the application workload identity to a read-only router-record policy.
+Confirm the Secret exists without displaying its values:
 
 ```bash
-kubectl apply -f kubernetes/token-review.yaml
-kubectl apply -f kubernetes/vault.yaml
-kubectl -n network-devops rollout status deployment/vault --timeout=180s
-bash scripts/configure-vault.sh
+kubectl -n network-devops get secret network-monitor-runtime
 ```
 
-The policy allows:
-
-```hcl
-path "secret/metadata/network/routers" {
-  capabilities = ["list"]
-}
-path "secret/data/network/routers/*" {
-  capabilities = ["read"]
-}
-```
-
-It grants no write, update, delete, administrative, or unrelated-secret access.
-
-## Part 6: Add router information to Vault
-
-Choose a short Vault-safe name. Enter every router field on the controlled workstation:
+## Step 6: Deploy the application tier
 
 ```bash
-read -rp "Router name: " ROUTER_NAME
-read -rp "Router host or IP: " ROUTER_HOST
-read -rp "RESTCONF port [443]: " ROUTER_PORT
-ROUTER_PORT=${ROUTER_PORT:-443}
-read -rp "Router login username: " ROUTER_USERNAME
-read -rsp "Router login password: " ROUTER_PASSWORD
-echo
-export ROUTER_NAME ROUTER_HOST ROUTER_PORT ROUTER_USERNAME ROUTER_PASSWORD
-bash scripts/store-router-record.sh
-unset ROUTER_USERNAME ROUTER_PASSWORD
-```
-
-The resulting path is `secret/data/network/routers/<router-name>`. Its data contains:
-
-```json
-{
-  "host": "router.example.net",
-  "port": 443,
-  "username": "monitoring-user",
-  "password": "stored-only-in-vault",
-  "enabled": true
-}
-```
-
-Repeat the procedure for additional instructor-authorized routers. Do not add router records through the monitoring page, application API, MySQL, Kubernetes ConfigMaps, or GitLab variables.
-
-Inspect metadata without displaying secret values:
-
-```bash
-kubectl -n network-devops exec deployment/vault -- env \
-  VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN="$VAULT_BOOTSTRAP_TOKEN" \
-  vault kv metadata get "secret/network/routers/$ROUTER_NAME"
-```
-
-## Part 7: Deploy the three application tiers
-
-Apply the version-controlled manifests in dependency order and wait for each rollout to become ready.
-
-```bash
-kubectl apply -f kubernetes/configmap.yaml
-kubectl apply -f kubernetes/mysql.yaml
-kubectl -n network-devops rollout status deployment/mysql --timeout=180s
 kubectl apply -f kubernetes/app.yaml
 kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
-kubectl apply -f kubernetes/web.yaml
-kubectl -n network-devops rollout status deployment/network-monitor-web --timeout=180s
-kubectl -n network-devops get deployment,pod,service,pvc -o wide
+kubectl -n network-devops get pods -l tier=app -o wide
+kubectl -n network-devops get service network-monitor-app
 ```
 
-## Part 8: Open and verify the application
-
-Access the Kubernetes Service and confirm the complete browser-to-router monitoring path.
+Verify the application readiness endpoint from inside the cluster:
 
 ```bash
-minikube service network-monitor-web --url --profile network-devops
+kubectl -n network-devops run app-check --rm -i --restart=Never \
+  --image=curlimages/curl:8.12.1 -- \
+  curl -fsS http://network-monitor-app:8000/health/ready
 ```
 
-Create the first web administrator if the Lab 4 database is empty, sign in, and select **Refresh inventory**. Confirm that the router appears without its username or password. Collect CPU and memory data.
+Expected response:
 
-The upper-right badge displays the web Pod name and Pod IP that answered `/instance`. The application Pod independently authenticates to Vault and reads the selected router record when metrics are requested.
+```json
+{"status":"ready"}
+```
 
-## Part 9: Scale the web tier
+## Step 7: Deploy the web tier
 
-Increase only the stateless presentation tier and observe how the Service distributes new connections.
+```bash
+kubectl apply -f kubernetes/web.yaml
+kubectl -n network-devops rollout status deployment/network-monitor-web --timeout=180s
+kubectl -n network-devops get pods -l tier=web -o wide
+kubectl -n network-devops get service network-monitor-web
+```
+
+Open the web service:
+
+```bash
+minikube service network-monitor-web \
+  --namespace network-devops \
+  --profile network-devops
+```
+
+## Step 8: Verify the monitoring workflow
+
+1. Create the administrator and sign in.
+2. Open **Inventory management** and add the assigned router.
+3. Open **Monitoring** and select the router.
+4. Select a 5-, 10-, or 15-second refresh interval.
+5. Confirm that the CPU and memory values and both charts update automatically.
+6. Confirm that the header displays the responding **Web Pod** and **App Pod** names.
+
+Compare the displayed names with the running Pods:
+
+```bash
+kubectl -n network-devops get pods -o wide
+```
+
+## Step 9: Scale the Minikube tiers
+
+Scale the stateless web tier to three Pods and the application tier to two Pods:
 
 ```bash
 kubectl -n network-devops scale deployment/network-monitor-web --replicas=3
+kubectl -n network-devops scale deployment/network-monitor-app --replicas=2
 kubectl -n network-devops rollout status deployment/network-monitor-web
-kubectl -n network-devops get pods -l app=network-monitor,tier=web -o wide
-kubectl -n network-devops get endpointslice \
-  -l kubernetes.io/service-name=network-monitor-web
+kubectl -n network-devops rollout status deployment/network-monitor-app
+kubectl -n network-devops get pods -o wide
 ```
 
-Open several tabs or issue repeated new connections:
+Refresh the monitoring page and confirm that the application still works through both Services.
+
+Wait for automatic collections or select **Collect now** several times. Observe the **Web Pod** and **App Pod** names in the header. Kubernetes may reuse an existing connection, so a different Pod is not guaranteed on every request.
+
+To make repeated new connections from the terminal:
 
 ```bash
-WEB_URL=$(minikube service network-monitor-web --url --profile network-devops)
-for attempt in $(seq 1 15); do
+WEB_URL=$(minikube service network-monitor-web \
+  --namespace network-devops \
+  --profile network-devops \
+  --url)
+
+for attempt in $(seq 1 12); do
   curl -s -H 'Connection: close' "$WEB_URL/instance"
-done | sort | uniq -c
+  curl -s -H 'Connection: close' "$WEB_URL/api/instance"
+done
 ```
 
-Kubernetes distributes connections among ready endpoints but does not guarantee that each tab reaches a different Pod.
+The returned `instance` values should match names shown by `kubectl get pods`.
 
-## Part 10: Commit and push the work
+## Step 10: Verify database persistence
 
-Publish the verified Kubernetes and Vault configuration to the dedicated Lab 4 project.
+Restart both Minikube Deployments:
+
+```bash
+kubectl -n network-devops rollout restart deployment/network-monitor-app
+kubectl -n network-devops rollout restart deployment/network-monitor-web
+kubectl -n network-devops rollout status deployment/network-monitor-app
+kubectl -n network-devops rollout status deployment/network-monitor-web
+```
+
+Sign in again and confirm that the administrator and router inventory still exist in MySQL.
+
+## Step 11: Commit and push
 
 ```bash
 git status
-git diff
-git add app web tests requirements*.txt kubernetes scripts
-git diff --staged
-git commit -m "Deploy Kubernetes application with Vault inventory"
-git push -u origin feature/lab04-kubernetes-vault
+git add .
+git status
+git commit -m "Deploy web and application tiers on Minikube"
+git push -u origin feature/lab04-minikube
 ```
+
+Confirm that `.env` is not staged before committing.
 
 ## Completion criteria
 
-- The application and web images pass tests and build successfully.
-- Vault stores every router connection and authentication field.
-- The application uses Kubernetes authentication and a short-lived Vault token.
-- The web interface displays read-only Vault inventory without credentials.
-- No application route creates, updates, or deletes router records.
-- CPU and memory collection succeeds through Vault-backed RESTCONF authentication.
-- Three ready web Pods serve the application and expose distinct runtime identities.
-- MySQL is not used as router inventory.
+- The original Lab 3 application tests pass.
+- MySQL is healthy on the Ubuntu workstation.
+- The application and web images are present in Minikube.
+- The application and web Deployments are ready.
+- The browser reaches the application through the web Service.
+- Inventory management works with the existing MySQL data model.
+- CPU and memory metrics refresh automatically.
+- The interface displays the responding Web Pod and App Pod names.
+- Three web Pods and two application Pods run successfully.
+- Data remains available after both Minikube Deployments restart.
 
 ## Cleanup
 
-Scale the web tier to one and clear local shell values:
+Remove the Kubernetes workloads and stop the database without deleting its volume:
 
 ```bash
-kubectl -n network-devops scale deployment/network-monitor-web --replicas=1
-unset VAULT_BOOTSTRAP_TOKEN ROUTER_NAME ROUTER_HOST ROUTER_PORT
+kubectl delete namespace network-devops
+docker compose --env-file .env -f database-compose.yaml stop
 ```
 
-You may stop or delete this lab environment after collecting the required evidence. No later lab depends on it.
+## Troubleshooting
+
+### An image cannot be pulled
+
+Confirm that both local images were loaded into the selected profile:
+
+```bash
+minikube image ls --profile network-devops | grep network-monitor
+kubectl -n network-devops describe pod <pod-name>
+```
+
+### The application Pod is not ready
+
+```bash
+docker compose --env-file .env -f database-compose.yaml ps
+kubectl -n network-devops logs deployment/network-monitor-app --tail=200
+kubectl -n network-devops describe deployment network-monitor-app
+```
+
+Confirm that `DATABASE_URL` in `.env` uses `host.minikube.internal:3307`, then recreate the Secret and restart the application Deployment.
+
+### Router collection times out
+
+Connect Cisco Secure Client before starting Minikube. Confirm that the Ubuntu workstation can reach the router, then restart the profile so the Minikube node receives the current routes:
+
+```bash
+ping -c 3 ROUTER_IP
+minikube stop --profile network-devops
+minikube start --profile network-devops --driver=docker
+kubectl -n network-devops rollout restart deployment/network-monitor-app
+```
+
+### The old web interface is displayed
+
+Rebuild and reload the image, then recreate the web Pods:
+
+```bash
+docker build --no-cache -t network-monitor-web:lab04 -f web/Dockerfile .
+minikube image load network-monitor-web:lab04 --profile network-devops --overwrite
+kubectl -n network-devops rollout restart deployment/network-monitor-web
+kubectl -n network-devops rollout status deployment/network-monitor-web
+```

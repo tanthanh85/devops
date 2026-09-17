@@ -1,6 +1,8 @@
 import os
+from cryptography.fernet import Fernet
 
 os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["INVENTORY_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
 os.environ["FLASK_SECRET_KEY"] = "test-secret"
 
 import pytest

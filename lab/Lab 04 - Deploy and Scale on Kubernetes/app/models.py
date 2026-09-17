@@ -19,3 +19,13 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+class Router(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    host = db.Column(db.String(255), nullable=False)
+    port = db.Column(db.Integer, nullable=False, default=443)
+    username = db.Column(db.String(128), nullable=False)
+    password_ciphertext = db.Column(db.Text, nullable=False)
+    enabled = db.Column(db.Boolean, nullable=False, default=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))

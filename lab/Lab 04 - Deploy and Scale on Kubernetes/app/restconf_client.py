@@ -21,9 +21,9 @@ def _find(value, names):
     return None
 
 
-def collect(router):
+def collect(router, password):
     base = f"https://{router.host}:{router.port}"
-    kwargs = dict(headers={"Accept": "application/yang-data+json"}, auth=(router.username, router.password), timeout=(5, 15), verify=False)
+    kwargs = dict(headers={"Accept": "application/yang-data+json"}, auth=(router.username, password), timeout=(5, 15), verify=False)
     cpu_response = requests.get(base + CPU_PATH, **kwargs)
     memory_response = requests.get(base + MEMORY_PATH, **kwargs)
     cpu_response.raise_for_status(); memory_response.raise_for_status()
