@@ -33,7 +33,7 @@ flowchart LR
     A --> W
 ```
 
-The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL is published only on workstation loopback port `3307`; it is not exposed to the external network. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
+The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL also uses host networking but binds strictly to workstation loopback at `127.0.0.1:3307`; it is not exposed externally. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
 
 ## Service responsibilities
 
@@ -151,7 +151,7 @@ INVENTORY_ENCRYPTION_KEY=replace-with-generated-fernet-key
 SESSION_COOKIE_SECURE=false
 ```
 
-The value in `DATABASE_URL` must match `MYSQL_PASSWORD` exactly. The generated hexadecimal password is URL-safe and does not require encoding.
+The value in `DATABASE_URL` must match `MYSQL_PASSWORD` exactly. The generated hexadecimal password is URL-safe and does not require encoding. Compose also constructs this URL from the MySQL variables when the application starts, preventing an old database hostname from being used.
 
 Save the file in `nano` with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**. Confirm that no placeholders remain:
 
@@ -204,6 +204,15 @@ docker compose ps
 docker compose logs --tail=100 db app web
 ```
 
+If the application is reported as unhealthy, recreate it with the current Compose configuration and display its startup log:
+
+```bash
+docker compose rm -sf app web
+docker compose up -d --force-recreate app web
+docker compose logs --tail=100 app
+docker compose ps
+```
+
 Wait until all services are healthy. Verify the host-network connections:
 
 ```bash
@@ -213,13 +222,13 @@ docker compose exec web wget -q -O - http://host.docker.internal:8000/health/rea
 curl -fsS http://127.0.0.1:8088/health
 ```
 
-Confirm that MySQL is bound only to workstation loopback:
+Confirm that MySQL listens only on workstation loopback:
 
 ```bash
-docker compose port db 3306
+ss -lnt | grep '127.0.0.1:3307'
 ```
 
-The result must begin with `127.0.0.1:3307`.
+The result must show `127.0.0.1:3307` and must not show `0.0.0.0:3307`.
 
 ## Step 4: Complete first-time administrator setup
 
