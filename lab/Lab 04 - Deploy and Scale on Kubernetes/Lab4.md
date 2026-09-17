@@ -158,8 +158,8 @@ docker build -t network-monitor-web:lab04 -f web/Dockerfile .
 Load both images into Minikube:
 
 ```bash
-minikube image load network-monitor-app:lab04 --profile network-devops
-minikube image load network-monitor-web:lab04 --profile network-devops
+minikube image load network-monitor-app:lab04 --profile network-devops --overwrite
+minikube image load network-monitor-web:lab04 --profile network-devops --overwrite
 minikube image ls --profile network-devops | grep network-monitor
 ```
 
@@ -417,6 +417,19 @@ kubectl -n network-devops create secret generic network-monitor-runtime \
 
 kubectl -n network-devops rollout restart statefulset/network-monitor-db
 kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
+kubectl -n network-devops rollout restart deployment/network-monitor-app
+kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+```
+
+If the event reports that Kubernetes cannot verify a non-root image user, rebuild
+the corrected image, overwrite the copy held by Minikube, and restart the
+Deployment:
+
+```bash
+docker build --no-cache -t network-monitor-app:lab04 -f app/Dockerfile .
+minikube image load network-monitor-app:lab04 \
+  --profile network-devops \
+  --overwrite
 kubectl -n network-devops rollout restart deployment/network-monitor-app
 kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
 ```

@@ -15,6 +15,11 @@ spec:
         app: network-monitor
         tier: app
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       containers:
         - name: app
           image: network-monitor-app:lab04
@@ -70,7 +75,6 @@ spec:
             capabilities:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
-            runAsNonRoot: true
           volumeMounts:
             - name: temporary-files
               mountPath: /tmp
