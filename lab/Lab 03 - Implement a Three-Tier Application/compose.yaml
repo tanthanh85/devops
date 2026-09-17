@@ -2,16 +2,16 @@ services:
   db:
     image: ${MYSQL_IMAGE:?Set MYSQL_IMAGE}
     restart: unless-stopped
-    command: ["--port=3307", "--bind-address=127.0.0.1"]
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports: ["127.0.0.1:3307:3306"]
     volumes: ["mysql_data:/var/lib/mysql"]
-    network_mode: host
+    networks: [data]
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P 3307 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P 3306 --silent"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -60,6 +60,7 @@ services:
 
 networks:
   frontend:
+  data: {internal: true}
 
 volumes:
   mysql_data:

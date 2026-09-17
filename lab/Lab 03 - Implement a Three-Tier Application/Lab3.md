@@ -33,7 +33,7 @@ flowchart LR
     A --> W
 ```
 
-The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL also uses host networking but binds strictly to workstation loopback at `127.0.0.1:3307`; it is not exposed externally. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
+The application container uses host networking so RESTCONF traffic follows the Ubuntu workstation's Cisco Secure Client VPN routes. MySQL remains on an internal Docker network and publishes only `127.0.0.1:3307` for the application; it is not exposed externally. NGINX remains on a Docker bridge network and reaches the application through `host.docker.internal:8000`.
 
 ## Service responsibilities
 
@@ -160,6 +160,12 @@ grep -n 'replace-with\|<.*>' .env && echo "ERROR: update every placeholder" || e
 ```
 
 Do not commit `.env` or include it in screenshots.
+
+MySQL reads the initial database passwords only when it creates a new data volume. If you change either MySQL password after starting the database, delete the Lab 3 volume before continuing. This deletes the Lab 3 administrator and router inventory:
+
+```bash
+docker compose down --volumes
+```
 
 ## Step 2: Test and build the application
 
