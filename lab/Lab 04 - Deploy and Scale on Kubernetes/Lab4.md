@@ -49,11 +49,13 @@ flowchart LR
         DS --> D
     end
 
+    G["Ubuntu Minikube bridge gateway<br/>RESTCONF relay · port 9443"]
     V["Cisco Secure Client VPN"]
     R["IOS XE router<br/>RESTCONF port 443"]
 
     B --> WS
-    A <-->|"HTTPS RESTCONF"| V
+    A <-->|"HTTPS via bridge IP:9443"| G
+    G <-->|"TCP relay"| V
     V <-->|"VPN tunnel"| R
 ```
 
@@ -261,10 +263,56 @@ minikube service network-monitor-web \
   --profile network-devops
 ```
 
-## Step 9: Verify the monitoring workflow
+## Step 9: Create the RESTCONF VPN relay
+
+Cisco Secure Client terminates the VPN on Ubuntu and does not normally export its
+routes into a Docker-driver Minikube node. Create a TCP relay on the Ubuntu bridge
+address so the App Pods can use Ubuntu's VPN route without host DNS.
+
+Install `socat` on Ubuntu if it is not already available:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y socat
+```
+
+Determine the numeric Ubuntu gateway address used by the Minikube node:
+
+```bash
+MINIKUBE_HOST_IP=$(docker inspect network-devops \
+  --format '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}')
+echo "$MINIKUBE_HOST_IP"
+```
+
+Confirm that Ubuntu can reach the assigned router through Cisco Secure Client:
+
+```bash
+ping -c 3 ROUTER_IP
+```
+
+In a separate terminal, start the relay and keep it running during the lab:
+
+```bash
+MINIKUBE_HOST_IP=$(docker inspect network-devops \
+  --format '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}')
+ROUTER_IP=REPLACE_WITH_ROUTER_IP
+
+sudo socat -d -d \
+  TCP-LISTEN:9443,bind="$MINIKUBE_HOST_IP",reuseaddr,fork \
+  TCP:"$ROUTER_IP":443
+```
+
+From the original terminal, verify that the App Pod can reach the relay:
+
+```bash
+kubectl -n network-devops exec deployment/network-monitor-app -- \
+  python -c "import socket; socket.create_connection(('$MINIKUBE_HOST_IP',9443),5); print('RESTCONF relay reachable')"
+```
+
+## Step 10: Verify the monitoring workflow
 
 1. Create the administrator and sign in.
-2. Open **Inventory management** and add the assigned router.
+2. Open **Inventory management** and add the numeric value of `$MINIKUBE_HOST_IP` as the router host, port `9443`, and the assigned router credentials.
 3. Open **Monitoring** and select the router.
 4. Select a 5-, 10-, or 15-second refresh interval.
 5. Confirm that the CPU and memory values and both charts update automatically.
@@ -276,7 +324,7 @@ Compare the displayed names with the running Pods:
 kubectl -n network-devops get pods -o wide
 ```
 
-## Step 10: Scale the Minikube tiers
+## Step 11: Scale the Minikube tiers
 
 Scale the stateless web tier to three Pods and the application tier to two Pods:
 
@@ -308,7 +356,7 @@ done
 
 The returned `instance` values should match names shown by `kubectl get pods`.
 
-## Step 11: Verify database persistence
+## Step 12: Verify database persistence
 
 Delete the MySQL Pod. The StatefulSet recreates it and mounts the same persistent volume:
 
@@ -329,7 +377,7 @@ kubectl -n network-devops rollout status deployment/network-monitor-web
 
 Sign in again and confirm that the administrator and router inventory still exist in MySQL.
 
-## Step 12: Commit and push
+## Step 13: Commit and push
 
 ```bash
 git status
@@ -347,6 +395,7 @@ Confirm that `.env` is not staged before committing.
 - The MySQL StatefulSet is ready and its persistent volume claim is bound.
 - The application and web images are present in Minikube.
 - The database, application, and web workloads are ready.
+- The App Pod reaches the router through the Ubuntu RESTCONF relay and Cisco Secure Client.
 - The browser reaches the application through the web Service.
 - Inventory management works with the existing MySQL data model.
 - CPU and memory metrics refresh automatically.
@@ -363,6 +412,8 @@ kubectl delete namespace network-devops
 ```
 
 This deletes the Lab 4 MySQL data. Run it only after collecting the required evidence.
+
+Press `Ctrl+C` in the relay terminal to stop `socat`.
 
 ## Troubleshooting
 
@@ -436,14 +487,19 @@ kubectl -n network-devops rollout status deployment/network-monitor-app --timeou
 
 ### Router collection times out
 
-Connect Cisco Secure Client before starting Minikube. Confirm that the Ubuntu workstation can reach the router, then restart the profile so the Minikube node receives the current routes:
+Confirm that Cisco Secure Client is connected, the relay terminal is still running,
+and the App Pod can reach the numeric bridge address:
 
 ```bash
 ping -c 3 ROUTER_IP
-minikube stop --profile network-devops
-minikube start --profile network-devops --driver=docker
-kubectl -n network-devops rollout restart deployment/network-monitor-app
+MINIKUBE_HOST_IP=$(docker inspect network-devops \
+  --format '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}')
+kubectl -n network-devops exec deployment/network-monitor-app -- \
+  python -c "import socket; socket.create_connection(('$MINIKUBE_HOST_IP',9443),5); print('RESTCONF relay reachable')"
 ```
+
+The inventory entry must use the value of `$MINIKUBE_HOST_IP` and port `9443`, not
+the router's VPN address and not a host DNS name.
 
 ### The old web interface is displayed
 
