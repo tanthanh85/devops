@@ -112,7 +112,7 @@ Register a dedicated user-mode configuration on Ubuntu:
 
 ```bash
 mkdir -p ~/.gitlab-runner-lab05
-gitlab-runner --config ~/.gitlab-runner-lab05/config.toml register
+gitlab-runner register --config "$HOME/.gitlab-runner-lab05/config.toml"
 ```
 
 Enter:
@@ -126,14 +126,14 @@ Enter:
 Verify the registration:
 
 ```bash
-gitlab-runner --config ~/.gitlab-runner-lab05/config.toml list
-gitlab-runner --config ~/.gitlab-runner-lab05/config.toml verify
+gitlab-runner list --config "$HOME/.gitlab-runner-lab05/config.toml"
+gitlab-runner verify --config "$HOME/.gitlab-runner-lab05/config.toml"
 ```
 
 In a separate terminal, start the runner as the current Ubuntu user and keep it running during the lab:
 
 ```bash
-gitlab-runner --config ~/.gitlab-runner-lab05/config.toml run
+gitlab-runner run --config "$HOME/.gitlab-runner-lab05/config.toml"
 ```
 
 Running it as the current user gives the jobs access to that user's Docker, Minikube, and Kubernetes configuration.
@@ -316,7 +316,7 @@ Confirm that the designated reviewer approved the merge request and that the lea
 Confirm that the local runner terminal is still running, that GitLab reports the project runner online, and that its tags are `lab5` and `minikube`:
 
 ```bash
-gitlab-runner --config ~/.gitlab-runner-lab05/config.toml verify
+gitlab-runner verify --config "$HOME/.gitlab-runner-lab05/config.toml"
 ```
 
 ### The build job cannot access Docker or Minikube
