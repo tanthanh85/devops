@@ -22,12 +22,32 @@ In this standalone lab, you will deploy an NGINX web tier, a Flask application t
 - An instructor-authorized IOS XE router with RESTCONF enabled.
 - The complete instructor-provided Lab 3 files.
 
-## Network layout
+## Architecture and data flow
 
-- Open the application at `http://127.0.0.1:8088`.
-- NGINX forwards API requests to Flask at `host.docker.internal:8000`.
-- Flask uses host networking so RESTCONF traffic follows the workstation VPN.
-- MySQL remains on an internal Docker network and is published only to `127.0.0.1:3307` for Flask.
+```mermaid
+flowchart LR
+    U["Learner browser"]
+
+    subgraph H["Ubuntu workstation"]
+        W["NGINX web container<br/>127.0.0.1:8088"]
+        A["Flask application container<br/>host network · port 8000"]
+        D[("MySQL database container<br/>internal data network · port 3306")]
+    end
+
+    V["Cisco Secure Client VPN"]
+    R["IOS XE router<br/>RESTCONF · port 443"]
+
+    U -->|"Open web interface"| W
+    W -->|"API requests<br/>host.docker.internal:8000"| A
+    A <-->|"SQL<br/>127.0.0.1:3307"| D
+    A <-->|"HTTPS RESTCONF"| V
+    V <-->|"VPN tunnel"| R
+```
+
+1. The browser loads the interface from NGINX on port `8088`.
+2. NGINX sends `/api` requests to the Flask application on port `8000`.
+3. Flask reads the router inventory and encrypted credentials from MySQL, then collects metrics through the VPN.
+4. The browser requests new metrics every 5, 10, or 15 seconds and updates the CPU and memory charts.
 
 ## Step 1: Create the Lab 3 repository
 
