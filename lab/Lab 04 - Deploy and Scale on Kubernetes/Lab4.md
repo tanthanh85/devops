@@ -165,34 +165,33 @@ minikube image ls --profile network-devops | grep network-monitor
 
 ## Step 5: Create the Kubernetes runtime configuration
 
-Load the values from `.env` into the current shell:
-
-```bash
-set -a
-source .env
-set +a
-```
-
-Create the namespace and application Secret:
+Create the namespace and runtime Secret directly from `.env`:
 
 ```bash
 kubectl apply -f kubernetes/namespace.yaml
 kubectl -n network-devops create secret generic network-monitor-runtime \
-  --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
-  --from-literal=MYSQL_USER="$MYSQL_USER" \
-  --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
-  --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
-  --from-literal=DATABASE_URL="$DATABASE_URL" \
-  --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" \
-  --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" \
-  --from-literal=SESSION_COOKIE_SECURE="$SESSION_COOKIE_SECURE" \
+  --from-env-file=.env \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-Confirm the Secret exists without displaying its values:
+Confirm that the Secret contains every required key without displaying any values:
 
 ```bash
-kubectl -n network-devops get secret network-monitor-runtime
+kubectl -n network-devops get secret network-monitor-runtime \
+  -o go-template='{{range $key, $value := .data}}{{$key}}{{"\n"}}{{end}}' | sort
+```
+
+Required keys:
+
+```text
+DATABASE_URL
+FLASK_SECRET_KEY
+INVENTORY_ENCRYPTION_KEY
+MYSQL_DATABASE
+MYSQL_PASSWORD
+MYSQL_ROOT_PASSWORD
+MYSQL_USER
+SESSION_COOKIE_SECURE
 ```
 
 ## Step 6: Deploy the database tier
@@ -217,9 +216,19 @@ kubectl -n network-devops get pvc
 ```bash
 kubectl apply -f kubernetes/app.yaml
 kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+kubectl -n network-devops wait \
+  --for=condition=Ready pod \
+  -l app=network-monitor,tier=app \
+  --timeout=180s
 kubectl -n network-devops get pods -l tier=app -o wide
 kubectl -n network-devops get service network-monitor-app
+kubectl -n network-devops get endpointslice \
+  -l kubernetes.io/service-name=network-monitor-app
 ```
+
+Do not continue until the App Pod shows `1/1 Running` and the EndpointSlice lists
+an address on port `8000`. An `EXTERNAL-IP` value of `<none>` is correct because
+the application Service is available only inside the cluster.
 
 Verify the application readiness endpoint from inside the cluster:
 
@@ -371,11 +380,46 @@ kubectl -n network-devops describe pod <pod-name>
 ```bash
 kubectl -n network-devops get pod network-monitor-db-0
 kubectl -n network-devops logs network-monitor-db-0 --tail=200
+kubectl -n network-devops get pods -l app=network-monitor,tier=app -o wide
+kubectl -n network-devops get endpointslice \
+  -l kubernetes.io/service-name=network-monitor-app
 kubectl -n network-devops logs deployment/network-monitor-app --tail=200
-kubectl -n network-devops describe deployment network-monitor-app
+kubectl -n network-devops describe pods -l app=network-monitor,tier=app
 ```
 
-Confirm that `DATABASE_URL` in `.env` uses `network-monitor-db:3306`, then recreate the Secret and restart the application Deployment.
+If the EndpointSlice has no endpoint address, the application Pod is not ready.
+Confirm that MySQL is ready and that `DATABASE_URL` in `.env` uses
+`network-monitor-db:3306`. Recreate the Secret if necessary, then restart and wait
+for the application:
+
+```bash
+kubectl -n network-devops rollout restart deployment/network-monitor-app
+kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+```
+
+Run the `app-check` command only after the EndpointSlice contains an address.
+
+### A Pod shows `CreateContainerConfigError`
+
+Display the Pod events to identify the missing Secret or key:
+
+```bash
+kubectl -n network-devops describe pods \
+  -l app=network-monitor,tier=app
+```
+
+Recreate the complete Secret from `.env`, then recreate the affected Pods:
+
+```bash
+kubectl -n network-devops create secret generic network-monitor-runtime \
+  --from-env-file=.env \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl -n network-devops rollout restart statefulset/network-monitor-db
+kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
+kubectl -n network-devops rollout restart deployment/network-monitor-app
+kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+```
 
 ### Router collection times out
 
