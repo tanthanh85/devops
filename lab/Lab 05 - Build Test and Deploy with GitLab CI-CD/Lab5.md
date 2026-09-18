@@ -4,7 +4,7 @@
 
 **2 hours**
 
-In this standalone lab, you will deliver the same three-tier application used in Lab 4 through GitLab CI/CD. Learners work on a feature branch, open a merge request, obtain approval, and merge into `main`. Only the resulting push to `main` creates a pipeline.
+In this standalone lab, you will deliver the same three-tier application used in Lab 4 through GitLab CI/CD. Learners work on a feature branch, open a merge request, and merge into `main`. Only the resulting push to `main` creates a pipeline.
 
 The pipeline tests the application, builds both application images directly in Minikube's container runtime, deploys MySQL, Flask, and NGINX, and verifies the running Services. Learners do not run deployment commands manually.
 
@@ -12,7 +12,7 @@ The pipeline tests the application, builds both application images directly in M
 
 - Configure a trusted local GitLab shell runner for the course workstation.
 - Protect `main` from direct pushes.
-- Require one merge-request approval before merge.
+- Merge changes through a merge request instead of pushing directly to `main`.
 - Store runtime secrets as protected GitLab CI/CD variables.
 - Restrict pipeline creation to pushes on the default branch.
 - Test and build the Lab 4 application in CI.
@@ -25,9 +25,7 @@ The pipeline tests the application, builds both application images directly in M
 flowchart LR
     F["Feature branch"] --> P["Push to GitLab"]
     P --> M["Merge request to main"]
-    M --> R["Instructor review"]
-    R --> A["Approval"]
-    A --> G["Merge to main"]
+    M --> G["Merge to main"]
     G --> T["Test"]
     T --> B["Build images"]
     B --> D["Deploy to Minikube"]
@@ -40,7 +38,7 @@ Feature-branch pushes and merge-request events do not create pipelines in this l
 ## Required environment
 
 - The Lab 1 Ubuntu workstation with Docker, Minikube, `kubectl`, Git, Python, and GitLab Runner.
-- A private GitLab project where an instructor or another authorized user can approve merge requests.
+- A private GitLab project where the learner can create and merge merge requests.
 - The complete instructor-provided Lab 5 files.
 - A running Minikube profile named `network-devops`.
 - A local C8000v or the Lab 4 RESTCONF VPN relay when router monitoring is tested.
@@ -138,26 +136,32 @@ gitlab-runner run --config "$HOME/.gitlab-runner-lab05/config.toml"
 
 Running it as the current user gives the jobs access to that user's Docker, Minikube, and Kubernetes configuration.
 
-## Step 4: Protect `main` and require approval
+## Step 4: Protect `main`
 
-In GitLab, configure the default branch before pushing the feature branch:
+The instructor or project owner must complete this step with the **Maintainer** or **Owner** role.
 
-1. Open **Settings > Repository > Branch rules**.
-2. Protect `main`.
-3. Set **Allowed to push and merge** to **No one**.
-4. Allow only the instructor or designated maintainer role to merge.
-5. Disable force pushes.
-6. Under the project's merge checks, leave **Pipelines must succeed** disabled because this lab intentionally creates no merge-request pipeline. The approved merge triggers the validation pipeline on `main` afterward.
+### Protect the `main` branch
 
-Configure merge-request approval:
+1. In the GitLab project, open **Settings > Repository**.
+2. Expand **Branch rules**.
+3. Find `main` and select **View details**.
+4. If no `main` rule exists, select **Add branch rule > Branch name or pattern**, select `main`, and then select **Create branch rule**.
+5. In **Protect branch**, find **Allowed to merge** and select **Edit**.
+6. Select **Developers + Maintainers**, and then select **Save changes**.
+7. Find **Allowed to push and merge** and select **Edit**.
+8. Select **No one**, and then select **Save changes**. Do not leave this setting unconfigured.
+9. Confirm that force push is not allowed.
 
-1. Open **Settings > Merge requests > Merge request approvals**.
-2. Create an approval rule for the `main` branch.
-3. Require one approval.
-4. Add the instructor or designated reviewer as an approver.
-5. Prevent authors from approving their own merge requests when that option is available.
+This configuration blocks direct pushes to `main` while allowing learners with the Developer role to merge through a merge request.
 
-These settings prevent learners from bypassing review with a direct push to `main`.
+### Configure the merge check
+
+1. Open **Settings > Merge requests**.
+2. Scroll to **Merge checks**.
+3. Clear **Pipelines must succeed**.
+4. Select **Save changes**.
+
+This lab does not create a merge-request pipeline. The pipeline starts only after the merge is pushed to `main`, so enabling **Pipelines must succeed** would prevent the merge request from being merged.
 
 ## Step 5: Create protected CI/CD variables
 
@@ -223,28 +227,21 @@ In GitLab:
 1. Open **Code > Merge requests**.
 2. Create a merge request from `feature/lab05-cicd` into `main`.
 3. Title it **Deploy the three-tier application with GitLab CI/CD**.
-4. Assign the instructor or designated reviewer.
-5. Submit the merge request.
+4. Select **Create merge request**.
 
 Confirm that creating the merge request does not create a pipeline. Review the changes in the **Changes** tab.
 
-## Step 9: Review and approve
+## Step 9: Review and merge into `main`
 
-The designated reviewer must:
-
-1. Review `.gitlab-ci.yml`, the application changes, and Kubernetes manifests.
+1. Review `.gitlab-ci.yml`, the application changes, and the Kubernetes manifests in the **Changes** tab.
 2. Confirm that no plaintext secret or `.env` file is included.
-3. Select **Approve**.
+3. Return to the **Overview** tab and select **Merge**.
 
-The learner must not approve their own merge request.
-
-## Step 10: Merge into `main`
-
-After approval, select **Merge**. Do not bypass the merge request and do not push directly to `main`.
+Do not bypass the merge request and do not push directly to `main`.
 
 The merge creates a push on `main`, which starts the only pipeline for this workflow.
 
-## Step 11: Follow the pipeline
+## Step 10: Follow the pipeline
 
 Open **Build > Pipelines**, select the `main` pipeline, and follow each job in order:
 
@@ -254,7 +251,7 @@ unit-test → build-images → deploy-minikube → verify-deployment → post-de
 
 Do not run `docker build`, `kubectl apply`, `kubectl set image`, or `kubectl create secret` manually. Correct a failure on a new feature branch and repeat the merge-request process.
 
-## Step 12: Verify the deployed application
+## Step 11: Verify the deployed application
 
 After the pipeline succeeds, open the web Service:
 
@@ -269,7 +266,7 @@ minikube service network-monitor-web \
 3. Confirm automatic CPU and memory monitoring.
 4. Confirm that the interface displays the responding Web Pod and App Pod names.
 
-## Step 13: Make a follow-up change
+## Step 12: Make a follow-up change
 
 Create another feature branch from the updated default branch:
 
@@ -279,15 +276,15 @@ git pull --ff-only
 git switch -c feature/lab05-follow-up
 ```
 
-Make an instructor-approved documentation or interface change, then commit and push it. Repeat the merge request, review, approval, and merge workflow. Confirm that a new `main` pipeline builds images tagged with the new commit ID and updates the Deployments.
+Make a documentation or interface change, then commit and push it. Repeat the merge-request and merge workflow. Confirm that a new `main` pipeline builds images tagged with the new commit ID and updates the Deployments.
 
 ## Completion criteria
 
 - The Lab 4 application source, tests, and Kubernetes manifests are present.
 - Direct pushes to `main` are blocked.
-- A merge request requires an authorized approval.
+- Changes reach `main` through a merge request.
 - Feature-branch pushes and merge-request events do not create pipelines.
-- Merging the approved request creates a pipeline on `main`.
+- Merging the request creates a pipeline on `main`.
 - Unit tests pass before images are built.
 - CI builds commit-specific application and web images.
 - CI deploys MySQL, Flask, and NGINX to `network-devops-lab05`.
@@ -309,7 +306,7 @@ This is expected. Only a push to the default branch creates a pipeline.
 
 ### The merge button is disabled
 
-Confirm that the designated reviewer approved the merge request and that the learner has not attempted a direct push to `main`.
+Confirm that the learner has the Developer role or higher, **Allowed to merge** is set to **Developers + Maintainers**, and **Pipelines must succeed** is cleared.
 
 ### Jobs remain pending
 
