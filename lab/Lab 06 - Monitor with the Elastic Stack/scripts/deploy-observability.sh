@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace=${KUBE_NAMESPACE:-network-devops}
+namespace=${KUBE_NAMESPACE:-network-devops-lab05}
 : "${LOGSTASH_HOST:?Set LOGSTASH_HOST to the host and port reachable from Minikube}"
 : "${E2E_USERNAME:?E2E_USERNAME is required}"
 : "${E2E_PASSWORD:?E2E_PASSWORD is required}"

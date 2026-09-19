@@ -1,0 +1,14 @@
+metricbeat.modules:
+  - module: docker
+    period: 10s
+    hosts: ["unix:///var/run/docker.sock"]
+    metricsets: [container, cpu, diskio, event, healthcheck, info, memory, network]
+
+processors:
+  - add_fields:
+      target: observer
+      fields:
+        type: lab06-docker
+
+output.logstash:
+  hosts: ["logstash:5044"]

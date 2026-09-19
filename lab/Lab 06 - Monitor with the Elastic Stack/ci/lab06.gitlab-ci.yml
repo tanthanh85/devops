@@ -6,7 +6,7 @@ build-observability-images:
   script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker build --pull -t "$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHA" -f app/Dockerfile .
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA" lab04-web
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA" web
     - docker build --pull -t "$CI_REGISTRY_IMAGE/synthetic:$CI_COMMIT_SHA" synthetic
     - docker push "$CI_REGISTRY_IMAGE/app:$CI_COMMIT_SHA"
     - docker push "$CI_REGISTRY_IMAGE/web:$CI_COMMIT_SHA"

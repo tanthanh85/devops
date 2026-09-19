@@ -1,372 +1,370 @@
-# Lab 6: Monitor the Application and Kubernetes with the Elastic Stack
+# Lab 6: Monitor the Three-Tier Application with ELK
 
 ## Duration
 
 **4 hours**
 
-In this standalone lab, you will deploy the supplied monitored application baseline, send structured application and Kubernetes telemetry to Elasticsearch, inspect it in Kibana, and build dashboards that connect resource state with user-visible behavior. The Lab 6 package contains the required application and platform baseline; no Lab 4 or Lab 5 repository is required.
+In this lab, you will add Elastic observability to the three-tier application deployed in Lab 5. You will monitor the Minikube Docker container, Kubernetes, the web/application/database tiers, RESTCONF activity, and a synthetic user journey.
 
-The design uses three related telemetry streams:
-
-- **Logs:** NGINX, Flask, MySQL, Vault, and Kubernetes workload output collected by Filebeat.
-- **Metrics:** node, Pod, container, volume, and workload-state measurements collected by Metricbeat and kube-state-metrics.
-- **Synthetic checks:** a scheduled browser container that signs in, requests router CPU and memory data, measures elapsed time, and reports success or failure.
-
-Container resource utilization is produced by the Kubernetes metrics collector rather than copied into every application log line. Kibana correlates the streams by time, namespace, workload, Pod, container, and service fields.
+The normal application capacity is three web Pods, three application Pods, and one MySQL Pod.
 
 ## Objectives
 
-- Emit structured JSON logs from the web and application tiers.
-- Include Pod/container identity and IP information where the event is produced.
-- Collect web, application, database, Vault, and test-container logs from Kubernetes.
-- Collect Kubernetes node, workload, Pod, container CPU, memory, restart, and readiness metrics.
-- Run an authenticated synthetic monitoring check every two minutes.
-- Measure monitoring-page reachability, router-metric retrieval, and end-to-end response time.
-- Route telemetry into separate Elasticsearch index families.
-- Build dashboards for cluster, container, application, and synthetic-service health.
-- Correlate a slow or failed user check with logs and container behavior.
+- Collect Docker metrics for Minikube and the other Docker containers.
+- Collect Kubernetes node, Pod, container, readiness, restart, and replica metrics.
+- Display the number of running Pods for each application tier.
+- Centralize NGINX, Flask, MySQL, and synthetic-monitor logs.
+- Log each RESTCONF request and response without storing credentials or response payloads.
+- Display synthetic HTTP status, availability, and response time.
+- Correlate a failed or slow check with application and infrastructure telemetry.
 
-## Observability architecture
+## How the components work
 
 ```mermaid
 flowchart LR
+    D[Docker containers] --> DM[Docker Metricbeat]
     subgraph K[Minikube]
-      W[Web Pods]
-      A[App Pod]
-      D[(MySQL Pod)]
+      W[Web Pods x3]
+      A[App Pods x3]
+      DB[(MySQL Pod x1)]
       S[Synthetic CronJob]
       F[Filebeat]
-      M[Metricbeat]
+      KM[Kubernetes Metricbeat]
       KS[kube-state-metrics]
-      F --- W
-      F --- A
-      F --- D
-      F --- S
-      M --- W
-      M --- A
-      M --- D
-      M --- KS
+      W --> F
+      A --> F
+      DB --> F
+      S --> F
+      K --> KM
+      KS --> KM
     end
-    F --> L[Logstash]
-    M --> L
+    DM --> L[Logstash]
+    F --> L
+    KM --> L
     L --> E[(Elasticsearch)]
     E --> B[Kibana dashboards]
 ```
 
-## Supplied files
+Docker Metricbeat monitors the Minikube container and the other Docker containers. Kubernetes Metricbeat monitors resources inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects container logs and short RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
 
-```text
-Lab 06 - Monitor with the Elastic Stack/
-├── Lab6.md
-├── app/
-│   ├── __init__.py
-│   └── observability.py
-├── lab04-web/
-│   └── nginx.conf
-├── synthetic/
-│   ├── Dockerfile
-│   ├── package.json
-│   └── synthetic-check.js
-├── elastic/
-│   ├── compose.override.yaml
-│   └── logstash/pipeline/logstash.conf
-├── kubernetes/
-│   ├── app-observability-patch.yaml
-│   ├── filebeat.yaml
-│   ├── metricbeat.yaml
-│   └── synthetic-monitor.yaml
-├── scripts/
-│   └── deploy-observability.sh
-└── ci/
-    └── lab06.gitlab-ci.yml
-```
-
-## Part 1: Create the Lab 6 workspace and repository
-
-Use a separate folder and private GitLab project:
-
-- Folder: `~/netdevops-labs/netdevops-lab06-observability`
-- GitLab project: `netdevops-lab06-observability`
-
-Do not reuse, empty, or copy files from another lab folder. Create a blank private project, initialize it with a README, clone it, and copy only the complete instructor-provided Lab 6 files.
+## Step 1: Confirm the Lab 5 application
 
 ```bash
-mkdir -p ~/netdevops-labs
-cd ~/netdevops-labs
-git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab06-observability.git
-cd netdevops-lab06-observability
-git status
-git pull --ff-only
-git switch -c feature/lab06-observability
-cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/." \
-  ~/netdevops-labs/netdevops-lab06-observability/
-python3 -m venv .venv
-source .venv/bin/activate
+minikube profile network-devops
+kubectl -n network-devops-lab05 get deployment,statefulset,pods -o wide
 ```
 
-Keep the Elastic configuration separate until Part 3 because it belongs to the workstation Compose project rather than the application repository runtime.
+Expected capacity:
 
-## Part 2: Confirm the telemetry fields
+```text
+network-monitor-web    3/3
+network-monitor-app    3/3
+network-monitor-db     1/1
+```
 
-The Flask formatter emits one JSON object per request. Important fields include:
+Complete the Lab 5 scaling exercise before continuing if the web or application Deployment is not at three replicas.
 
-| Field | Meaning |
-|---|---|
-| `service.name` | Stable application component |
-| `event.dataset` | Telemetry stream and parser selection |
-| `kubernetes.pod.name` | Replaceable runtime instance |
-| `kubernetes.pod.ip` | Pod address when the event was emitted |
-| `trace.id` | Request correlation identifier |
-| `http.response.status_code` | Application result |
-| `event.duration_ms` | Application processing time |
-| `network.router.cpu.pct` | CPU value observed from the router |
-| `network.router.memory.pct` | Memory value observed from the router |
+## Step 2: Create the Lab 6 repository
 
-NGINX writes access logs to standard output and errors to standard error. Its JSON log includes the container hostname, serving IP, request path, status, request duration in seconds, and upstream duration in seconds. MySQL continues to write its native logs. Filebeat enriches all container logs with Kubernetes namespace, Pod, container, node, and label metadata.
+Create a blank private GitLab project named `netdevops-lab06-elk`. Do not initialize it with a README.
 
-Do not log session cookies, authorization headers, passwords, Vault tokens, RESTCONF payloads, or full request bodies.
+Create a separate working folder from the completed Lab 5 repository:
 
-## Part 3: Make Logstash reachable from Minikube
+```bash
+cd ~/netdevops-labs
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab05-gitlab-cicd.git \
+  netdevops-lab06-elk
+cd netdevops-lab06-elk
+git remote rename origin lab05
+git remote add origin \
+  https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab06-elk.git
+git switch -c feature/lab06-elk
+```
 
-Create a Lab 6-specific local Elastic project and copy the supplied pipeline and override into it:
+Copy the supplied Lab 6 files over the Lab 5 application:
+
+```bash
+cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/." .
+git status
+```
+
+The new repository contains its own application copy. Do not make Lab 6 changes in the Lab 5 repository.
+
+## Step 3: Start ELK and Docker-host monitoring
 
 ```bash
 cd ~/course-platform/elastic
-cp "/path/to/Lab 06 - Monitor with the Elastic Stack/elastic/compose.override.yaml" .
-cp "/path/to/Lab 06 - Monitor with the Elastic Stack/elastic/logstash/pipeline/logstash.conf" pipeline/
-```
-
-Determine the workstation address reachable from the Minikube node. With the Docker driver, `host.minikube.internal` commonly resolves inside the node:
-
-```bash
-minikube ssh --profile network-devops -- getent hosts host.minikube.internal
-```
-
-Set `ELASTIC_INGEST_HOST=0.0.0.0` only on an isolated training workstation with its firewall restricting TCP 5044 to the Minikube network. Then start the stack:
-
-```bash
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/compose.override.yaml .
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/metricbeat-docker.yml .
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
 export ELASTIC_INGEST_HOST=0.0.0.0
 docker compose -f compose.yaml -f compose.override.yaml config --quiet
 docker compose -f compose.yaml -f compose.override.yaml up -d
-curl -s http://127.0.0.1:9200/_cluster/health | jq
+docker compose -f compose.yaml -f compose.override.yaml ps
+curl -fsS http://127.0.0.1:9200/_cluster/health
 ```
 
-The Lab 1 stack disables Elastic authentication and TLS. Do not expose ports 9200, 5601, or 5044 to an untrusted network. Production ingestion requires TLS, authenticated Beats, certificate validation, durable storage, index lifecycle management, and capacity controls.
+The override exposes Logstash port `5044` to Minikube and starts `metricbeat-docker`. Only Docker-container metrics are collected by this service. Use the exposed ingestion port only on the isolated course workstation.
 
-## Part 4: Build the observable application images
+## Step 4: Determine the Logstash address
 
-Package the updated logging configuration and synthetic monitor, then load all three images into Minikube.
+Use the Minikube gateway IP instead of a DNS hostname:
 
 ```bash
-cd ~/netdevops-labs/netdevops-lab06-observability
+export LOGSTASH_IP=$(minikube ssh --profile network-devops -- \
+  "ip route show default" | awk '{print $3; exit}')
+export LOGSTASH_HOST="${LOGSTASH_IP}:5044"
+echo "$LOGSTASH_HOST"
+minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 5044"
+```
+
+Do not continue until the connection test reaches port `5044`.
+
+## Step 5: Build and load observable images
+
+```bash
+cd ~/netdevops-labs/netdevops-lab06-elk
 docker build -t network-monitor-app:lab06 -f app/Dockerfile .
-docker build -t network-monitor-web:lab06 lab04-web
+docker build -t network-monitor-web:lab06 web
 docker build -t network-monitor-synthetic:lab06 synthetic
 minikube image load network-monitor-app:lab06 --profile network-devops
 minikube image load network-monitor-web:lab06 --profile network-devops
 minikube image load network-monitor-synthetic:lab06 --profile network-devops
 ```
 
-Patch and restart the runtime tiers:
+Update the running Lab 5 Deployments without changing their replica counts:
 
 ```bash
-kubectl -n network-devops patch deployment network-monitor-app \
+kubectl -n network-devops-lab05 patch deployment network-monitor-app \
   --type=strategic --patch-file kubernetes/app-observability-patch.yaml
-kubectl -n network-devops set image deployment/network-monitor-web \
+kubectl -n network-devops-lab05 set image deployment/network-monitor-web \
   web=network-monitor-web:lab06
-kubectl -n network-devops rollout status deployment/network-monitor-app
-kubectl -n network-devops rollout status deployment/network-monitor-web
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-app --timeout=180s
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web --timeout=180s
+kubectl -n network-devops-lab05 get deployment network-monitor-web network-monitor-app
 ```
 
-Verify that one application request produces parseable JSON:
+Both Deployments must remain at `3/3`.
+
+Generate a router collection from the web interface, and then confirm that the application logged short RESTCONF request and response events:
 
 ```bash
-kubectl -n network-devops logs deployment/network-monitor-app --tail=1 | jq
-kubectl -n network-devops logs deployment/network-monitor-web --tail=1 | jq
+kubectl -n network-devops-lab05 logs deployment/network-monitor-app --since=2m \
+  | grep RESTCONF
 ```
 
-## Part 5: Deploy Kubernetes log and metric collectors
+For each CPU and memory query, the log shows the request path followed by the response status and duration. It does not contain the username, password, authorization header, or RESTCONF response body.
 
-The endpoint must be addressable from a Pod. For the Docker Minikube driver, begin with:
+## Step 6: Deploy Kubernetes collectors
+
+Use the existing application administrator account. The inventory must contain at least one router.
 
 ```bash
-export LOGSTASH_HOST=host.minikube.internal:5044
-export E2E_USERNAME
-export E2E_PASSWORD
+export KUBE_NAMESPACE=network-devops-lab05
+export E2E_USERNAME='YOUR-APPLICATION-USERNAME'
+export E2E_PASSWORD='YOUR-APPLICATION-PASSWORD'
 bash scripts/deploy-observability.sh
 ```
 
-Filebeat runs once per node because container log files are node-local. Metricbeat also runs once per node to query kubelet resource metrics. A separate Metricbeat Deployment reads desired and current workload state from kube-state-metrics.
-
-Inspect status and errors:
+Verify the collectors:
 
 ```bash
-kubectl -n network-devops get daemonset,deployment,pod -o wide
-kubectl -n network-devops logs daemonset/filebeat --tail=30
-kubectl -n network-devops logs daemonset/metricbeat --tail=30
-kubectl -n network-devops logs deployment/metricbeat-state --tail=30
+kubectl -n network-devops-lab05 get daemonset,deployment,cronjob,pods -o wide
+kubectl -n network-devops-lab05 logs daemonset/filebeat --tail=20
+kubectl -n network-devops-lab05 logs daemonset/metricbeat --tail=20
+kubectl -n network-devops-lab05 logs deployment/metricbeat-state --tail=20
 ```
 
-The supplied kubelet configuration disables certificate verification only for the single-node laboratory. A production collector must validate the kubelet certificate.
-
-## Part 6: Run the synthetic monitoring container
-
-The CronJob runs every two minutes with `concurrencyPolicy: Forbid`. It opens the real web interface, signs in with the restricted Lab 5 account, selects an inventory router, collects CPU and memory, and writes one JSON result.
-
-Create an immediate test run instead of waiting for the schedule:
+## Step 7: Run a synthetic check
 
 ```bash
-JOB="synthetic-manual-$(date +%s)"
-kubectl -n network-devops create job --from=cronjob/network-monitor-synthetic "$JOB"
-kubectl -n network-devops wait --for=condition=complete "job/$JOB" --timeout=120s
-kubectl -n network-devops logs "job/$JOB" | jq
+export SYNTHETIC_JOB="synthetic-manual-$(date +%s)"
+kubectl -n network-devops-lab05 create job \
+  --from=cronjob/network-monitor-synthetic "$SYNTHETIC_JOB"
+kubectl -n network-devops-lab05 wait --for=condition=complete \
+  "job/$SYNTHETIC_JOB" --timeout=120s
+kubectl -n network-devops-lab05 logs "job/$SYNTHETIC_JOB" | jq
 ```
 
-A successful record contains:
+A successful result contains:
 
 - `monitor.status: up`
 - `event.outcome: success`
-- HTTP status from the web page
-- end-to-end `event.duration_ms`
-- retrieved router CPU and memory percentages
+- `http.response.status_code: 200`
+- `event.duration_ms`
+- Router CPU and memory values returned through the application
 
-The measurement combines page access, authentication, application processing, Vault retrieval, RESTCONF requests, and rendering. It represents user-visible service time rather than only server processing time.
+The duration covers page access, sign-in, router selection, RESTCONF collection, and display of the result.
 
-## Part 7: Confirm Elasticsearch ingestion
+## Step 8: Confirm Elasticsearch data
 
-Confirm that each expected telemetry family has reached Elasticsearch before creating Kibana objects.
+Wait approximately 30 seconds, and then run:
 
 ```bash
-curl -s 'http://127.0.0.1:9200/_cat/indices/network-monitor-*,kubernetes-*?v'
-curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@timestamp:desc' | jq '.hits.hits[0]._source'
-curl -s 'http://127.0.0.1:9200/kubernetes-metrics-*/_search?size=1&sort=@timestamp:desc' | jq '.hits.hits[0]._source'
+curl -s 'http://127.0.0.1:9200/_cat/indices/infrastructure-metrics-*,kubernetes-metrics-*,kubernetes-logs-*,network-monitor-logs-*,network-monitor-synthetic-*?v'
+curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@timestamp:desc' \
+  | jq '.hits.hits[0]._source'
 ```
 
-Expected index families are:
+Do not create dashboards until all five index families contain recent documents.
 
-- `network-monitor-logs-*`
-- `network-monitor-synthetic-*`
-- `kubernetes-logs-*`
-- `kubernetes-metrics-*`
+## Step 9: Create Kibana data views
 
-Do not continue to dashboard creation until all four index families contain recent documents. Ask the instructor to correct the training platform if an expected stream is unavailable.
+Open `http://127.0.0.1:5601`, then open **Stack Management > Data Views**. Create these data views using `@timestamp` as the time field:
 
-## Part 8: Create Kibana data views
+| Data view | Index pattern |
+|---|---|
+| Infrastructure metrics | `infrastructure-metrics-*` |
+| Kubernetes metrics | `kubernetes-metrics-*` |
+| Kubernetes logs | `kubernetes-logs-*` |
+| Application logs | `network-monitor-logs-*` |
+| Synthetic service | `network-monitor-synthetic-*` |
 
-Open `http://127.0.0.1:5601`, go to **Stack Management > Data Views**, and create:
+Use **Discover** to confirm that each data view returns recent events.
 
-| Name | Index pattern | Time field |
-|---|---|---|
-| Network monitoring logs | `network-monitor-logs-*` | `@timestamp` |
-| Synthetic availability | `network-monitor-synthetic-*` | `@timestamp` |
-| Kubernetes logs | `kubernetes-logs-*` | `@timestamp` |
-| Kubernetes metrics | `kubernetes-metrics-*` | `@timestamp` |
+## Step 10: Build the Minikube and Docker dashboard
 
-Use **Discover** before building visualizations. Confirm numerical fields are mapped as numbers and identity fields are searchable keywords. Do not build dashboards on malformed or empty data.
+Create **Network DevOps — Minikube and Docker** using `event.module: docker`. Add:
 
-## Part 9: Build the Kubernetes cluster-status dashboard
+1. Current Docker container count.
+2. Minikube container status.
+3. Minikube container CPU and memory over time.
+4. Docker container CPU and memory grouped by container name.
+5. Docker container network receive and transmit rates.
+6. Docker container disk I/O.
+7. A table showing container name, image, status, CPU, memory, network, and restart information.
 
-Create a dashboard named **Network DevOps — Kubernetes Status** with:
+Filter the Minikube-specific panels by the Docker container name associated with the `network-devops` Minikube profile.
 
-1. Metric: count of ready nodes.
-2. Metric: desired versus available Deployment replicas.
-3. Metric: count of Pods by phase.
-4. Line chart: node CPU percentage over time.
-5. Line chart: node memory working set over time.
-6. Table: Pod, namespace, node, phase, restart count, and age.
-7. Table: PersistentVolumeClaim phase and requested capacity.
-8. Log panel filtered to warning and error events.
+## Step 11: Build the Kubernetes and application dashboard
 
-Set the dashboard namespace control to `network-devops`. A green current state alone is insufficient; retain time-series panels so learners can see transitions during rollouts.
+Create **Network DevOps — Kubernetes and Application** and filter it with:
 
-## Part 10: Build the container-status dashboard
-
-Create **Network DevOps — Container Status** with:
-
-1. Container CPU usage grouped by `kubernetes.container.name` and Pod.
-2. Container memory working set grouped by container and Pod.
-3. CPU and memory limit-utilization ratios where limits exist.
-4. Container restart count and termination reason.
-5. Pod-network receive and transmit rate.
-6. Table containing container name, container ID, Pod name, Pod IP, image, node, CPU, and memory.
-7. Log stream filtered by the selected Pod or container.
-
-Use a top-N limit only for overview charts. The detailed table must allow every course container to be found.
-
-## Part 11: Build the web-application dashboard
-
-Create **Network DevOps — Application Health** with:
-
-1. Request rate by `service.name`.
-2. HTTP status count split into success, client error, and server error.
-3. Average and 95th-percentile `event.duration_ms`.
-4. Average upstream response duration for NGINX.
-5. Router metric-collection success and failure count.
-6. Latest observed router CPU and memory percentages.
-7. Logs from `network-monitor-web`, `network-monitor-app`, and MySQL on one timeline.
-8. Table containing timestamp, service, Pod name, Pod IP, path, status, duration, and trace identifier.
-
-The router CPU and memory values describe the monitored router. Metricbeat CPU and memory values describe the containers. Label them explicitly to prevent incorrect interpretation.
-
-## Part 12: Build the synthetic-service dashboard
-
-Create **Network DevOps — User Experience** with:
-
-1. Current monitor status.
-2. Availability percentage: successful checks divided by all checks.
-3. End-to-end response time with average, 95th percentile, and maximum.
-4. Check outcome count over time.
-5. Latest router CPU and memory values returned through the web workflow.
-6. Failure table showing timestamp, error type, sanitized message, and duration.
-7. Annotation or linked view for application errors in the same time window.
-
-Use a two-minute expected interval when interpreting missing data. Absence of checks is itself a monitoring failure; it does not prove the application is healthy.
-
-## Part 13: Integrate with GitLab CI/CD
-
-Include the supplied jobs in `.gitlab-ci.yml`:
-
-```yaml
-include:
-  - local: ci/lab06.gitlab-ci.yml
+```text
+kubernetes.namespace: "network-devops-lab05"
 ```
 
-Create protected Lab 6 variables for `LOGSTASH_HOST`, Kubernetes access, and the synthetic-test account. Disable any baseline jobs in the supplied Lab 6 project that would build or deploy the same application and web images twice. The Lab 6 jobs build commit-addressed app, web, and synthetic images, deploy the collectors, start an immediate synthetic check, and leave the recurring CronJob enabled.
+Add metric panels using a unique count of `kubernetes.pod.name`:
 
-## Part 14: Commit and push the work
+| Panel | Filter | Expected |
+|---|---|---:|
+| Running web Pods | `kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
+| Running application Pods | `kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
+| Running database Pods | `kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
 
-Publish the observability implementation after logs, metrics, and synthetic checks have been verified.
+Add these supporting panels:
+
+1. Desired versus available replicas by Deployment.
+2. Pod phase and restart count by tier.
+3. Container CPU and memory by Pod and tier.
+4. Kubernetes node CPU and memory.
+5. NGINX and Flask HTTP status counts.
+6. NGINX and Flask response time over time.
+7. RESTCONF request and response events filtered by `event.action: restconf_request OR event.action: restconf_response`.
+8. RESTCONF response status and duration by router and requested metric.
+9. Recent warning and error logs.
+
+The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics. Router CPU and memory fields must not be used for Kubernetes resource charts.
+
+## Step 12: Build the synthetic-service dashboard
+
+Create **Network DevOps — Synthetic Service** using the **Synthetic service** data view. Add:
+
+1. Latest monitor status from `monitor.status`.
+2. Latest HTTP code from `http.response.status_code`.
+3. HTTP-code count over time.
+4. Availability percentage using successful checks divided by all checks.
+5. Average, 95th-percentile, and maximum `event.duration_ms`.
+6. Response-time line chart over time.
+7. Failure table with timestamp, HTTP code, error type, sanitized message, and duration.
+
+Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**. The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
+
+## Step 13: Test Pod-count monitoring
+
+Scale the web tier down temporarily:
+
+```bash
+kubectl -n network-devops-lab05 scale deployment/network-monitor-web --replicas=2
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web
+```
+
+Confirm that the dashboard changes from three running web Pods to two. Restore the Lab 5 state:
+
+```bash
+kubectl -n network-devops-lab05 scale deployment/network-monitor-web --replicas=3
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web
+```
+
+Run another manual synthetic check and confirm that its HTTP code and response time appear on the synthetic dashboard.
+
+## Step 14: Commit and push
 
 ```bash
 git status
-git diff
-git add .gitlab-ci.yml ci app web synthetic kubernetes
+git add .
 git diff --staged
-git commit -m "Add Elastic monitoring and synthetic checks"
-git push -u origin feature/lab06-observability
+git commit -m "Add ELK infrastructure and synthetic monitoring"
+git push -u origin feature/lab06-elk
 ```
+
+Create a merge request into `main`, review the changes, and merge it.
 
 ## Completion criteria
 
-- Web and application logs are valid JSON and contain workload identity and timing fields.
-- Filebeat ingests logs for web, app, database, Vault, and synthetic workloads.
-- Metricbeat ingests node, Pod, container, volume, and workload-state metrics.
-- Container dashboards show name, Pod IP, CPU, memory, restarts, and status.
-- The synthetic container runs every two minutes and retrieves router CPU and memory through the web workflow.
-- Synthetic records include availability outcome and end-to-end response time.
-- Four focused Kibana dashboards cover cluster, containers, application, and user experience.
-- No credential, session token, Vault token, authorization header, or sensitive response is present in Elasticsearch.
+- Minikube and Docker-container metrics are visible in Kibana.
+- Kubernetes node, Pod, container, readiness, restart, and replica metrics are visible.
+- Pod-count panels show web `3`, application `3`, and database `1` during normal operation.
+- NGINX, Flask, MySQL, and synthetic logs are searchable.
+- Every RESTCONF CPU and memory query creates a short request event and response event without recording the payload.
+- The synthetic CronJob runs every two minutes.
+- The synthetic dashboard shows HTTP status codes, availability, and response time.
+- No password, cookie, authorization header, or router credential is stored in Elasticsearch.
+
+## Troubleshooting
+
+### Kubernetes collectors cannot reach Logstash
+
+Repeat the gateway and port test from Step 4. Confirm that the Compose project publishes `0.0.0.0:5044` and that the workstation firewall permits traffic from the Minikube network.
+
+### Pod counts are empty
+
+```bash
+kubectl -n network-devops-lab05 get deployment kube-state-metrics metricbeat-state
+kubectl -n network-devops-lab05 logs deployment/metricbeat-state --tail=50
+```
+
+Use the `kubernetes-metrics-*` data view and a time range containing recent events.
+
+### The synthetic check fails
+
+Confirm the application credentials, router inventory, and router reachability. Then inspect the Job log:
+
+```bash
+kubectl -n network-devops-lab05 get jobs,pods -l app=network-monitor-synthetic
+kubectl -n network-devops-lab05 logs "job/$SYNTHETIC_JOB"
+```
+
+### Docker metrics are empty
+
+```bash
+cd ~/course-platform/elastic
+docker compose -f compose.yaml -f compose.override.yaml ps metricbeat-docker
+docker compose -f compose.yaml -f compose.override.yaml logs --tail=50 metricbeat-docker
+```
+
+Confirm that Docker is running and `/var/run/docker.sock` exists.
 
 ## Cleanup
 
-Retain telemetry services for review. To suspend only synthetic traffic:
+Suspend synthetic checks while retaining the collected data:
 
 ```bash
-kubectl -n network-devops patch cronjob network-monitor-synthetic \
+kubectl -n network-devops-lab05 patch cronjob network-monitor-synthetic \
   --type=merge -p '{"spec":{"suspend":true}}'
 ```
 
-To stop the workstation Elastic Stack without deleting its data:
+Stop ELK without deleting its data:
 
 ```bash
 cd ~/course-platform/elastic

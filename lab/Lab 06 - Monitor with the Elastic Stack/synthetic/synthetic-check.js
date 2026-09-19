@@ -26,17 +26,19 @@ const emit = fields => console.log(JSON.stringify({
     await page.locator("#application").waitFor({ state: "visible", timeout: 15000 });
     if (await page.locator("#router-select option").count() < 1) throw new Error("router inventory is empty");
     await page.locator("#collect").click();
-    await page.locator("#values").waitFor({ state: "visible" });
-    const text = await page.locator("#values").textContent();
-    const match = text.match(/CPU (\d+(?:\.\d+)?)% · Memory (\d+(?:\.\d+)?)%/);
-    if (!match) throw new Error("CPU and memory values were not displayed");
+    await page.waitForFunction(() => document.querySelector("#time-value")?.textContent !== "--", null, { timeout: 30000 });
+    const cpuText = await page.locator("#cpu-value").textContent();
+    const memoryText = await page.locator("#memory-value").textContent();
+    const cpu = Number.parseFloat(cpuText);
+    const memory = Number.parseFloat(memoryText);
+    if (!Number.isFinite(cpu) || !Number.isFinite(memory)) throw new Error("CPU and memory values were not displayed");
     emit({
       "event.outcome": "success",
       "monitor.status": "up",
       "http.response.status_code": response.status(),
       "event.duration_ms": Math.round((performance.now() - started) * 100) / 100,
-      "network.router.cpu.pct": Number(match[1]),
-      "network.router.memory.pct": Number(match[2])
+      "network.router.cpu.pct": cpu,
+      "network.router.memory.pct": memory
     });
   } catch (error) {
     emit({
@@ -51,4 +53,3 @@ const emit = fields => console.log(JSON.stringify({
     if (browser) await browser.close();
   }
 })();
-
