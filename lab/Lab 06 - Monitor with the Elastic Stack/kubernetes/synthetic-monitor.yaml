@@ -1,6 +1,6 @@
 apiVersion: batch/v1
 kind: CronJob
-metadata: {name: network-monitor-synthetic, namespace: network-devops-lab05}
+metadata: {name: network-monitor-synthetic, namespace: network-devops}
 spec:
   schedule: "*/2 * * * *"
   concurrencyPolicy: Forbid

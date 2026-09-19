@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ServiceAccount
-metadata: {name: metricbeat, namespace: network-devops-lab05}
+metadata: {name: metricbeat, namespace: network-devops}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
-metadata: {name: network-devops-lab05-metricbeat}
+metadata: {name: network-devops-metricbeat}
 rules:
   - apiGroups: [""]
     resources: [nodes, namespaces, events, pods, services]
@@ -17,14 +17,14 @@ rules:
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
-metadata: {name: network-devops-lab05-metricbeat}
-roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: network-devops-lab05-metricbeat}
+metadata: {name: network-devops-metricbeat}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: network-devops-metricbeat}
 subjects:
-  - {kind: ServiceAccount, name: metricbeat, namespace: network-devops-lab05}
+  - {kind: ServiceAccount, name: metricbeat, namespace: network-devops}
 ---
 apiVersion: v1
 kind: ConfigMap
-metadata: {name: metricbeat-config, namespace: network-devops-lab05}
+metadata: {name: metricbeat-config, namespace: network-devops}
 data:
   metricbeat.yml: |
     metricbeat.modules:
@@ -42,7 +42,7 @@ data:
 ---
 apiVersion: apps/v1
 kind: DaemonSet
-metadata: {name: metricbeat, namespace: network-devops-lab05}
+metadata: {name: metricbeat, namespace: network-devops}
 spec:
   selector: {matchLabels: {app: metricbeat, role: node}}
   template:
@@ -71,18 +71,18 @@ spec:
 ---
 apiVersion: v1
 kind: ServiceAccount
-metadata: {name: kube-state-metrics, namespace: network-devops-lab05}
+metadata: {name: kube-state-metrics, namespace: network-devops}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
-metadata: {name: network-devops-lab05-kube-state-metrics}
+metadata: {name: network-devops-kube-state-metrics}
 roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: view}
 subjects:
-  - {kind: ServiceAccount, name: kube-state-metrics, namespace: network-devops-lab05}
+  - {kind: ServiceAccount, name: kube-state-metrics, namespace: network-devops}
 ---
 apiVersion: v1
 kind: Service
-metadata: {name: kube-state-metrics, namespace: network-devops-lab05}
+metadata: {name: kube-state-metrics, namespace: network-devops}
 spec:
   selector: {app: kube-state-metrics}
   ports:
@@ -90,7 +90,7 @@ spec:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: kube-state-metrics, namespace: network-devops-lab05}
+metadata: {name: kube-state-metrics, namespace: network-devops}
 spec:
   replicas: 1
   selector: {matchLabels: {app: kube-state-metrics}}
@@ -108,7 +108,7 @@ spec:
 ---
 apiVersion: v1
 kind: ConfigMap
-metadata: {name: metricbeat-state-config, namespace: network-devops-lab05}
+metadata: {name: metricbeat-state-config, namespace: network-devops}
 data:
   metricbeat.yml: |
     metricbeat.modules:
@@ -121,7 +121,7 @@ data:
 ---
 apiVersion: apps/v1
 kind: Deployment
-metadata: {name: metricbeat-state, namespace: network-devops-lab05}
+metadata: {name: metricbeat-state, namespace: network-devops}
 spec:
   replicas: 1
   selector: {matchLabels: {app: metricbeat, role: state}}

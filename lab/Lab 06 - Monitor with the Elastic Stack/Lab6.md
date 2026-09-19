@@ -4,7 +4,7 @@
 
 **4 hours**
 
-In this lab, you will add Elastic observability to the three-tier application deployed in Lab 5. You will monitor the Minikube Docker container, Kubernetes, the web/application/database tiers, RESTCONF activity, and a synthetic user journey.
+In this standalone lab, you will deploy the same three-tier application used in Lab 5 and add Elastic observability. You will monitor the Minikube Docker container, Kubernetes, the web/application/database tiers, RESTCONF activity, and a synthetic user journey. All required application files are included in the Lab 6 package.
 
 The normal application capacity is three web Pods, three application Pods, and one MySQL Pod.
 
@@ -47,48 +47,70 @@ flowchart LR
 
 Docker Metricbeat monitors the Minikube container and the other Docker containers. Kubernetes Metricbeat monitors resources inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects container logs and short RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
 
-## Step 1: Confirm the Lab 5 application
+## Before you begin: clean up Lab 5
+
+Complete this section only if you performed Lab 5 on the same Minikube profile:
+
+1. Open the Lab 5 project in GitLab.
+2. Open **Build > Pipelines**.
+3. Open the most recent successful pipeline for `main`.
+4. Find the **cleanup** stage.
+5. Select **Run** for the manual `cleanup-minikube` job.
+6. Wait until the cleanup job succeeds.
+
+Confirm that the Lab 5 namespace has been removed:
 
 ```bash
-minikube profile network-devops
-kubectl -n network-devops-lab05 get deployment,statefulset,pods -o wide
+kubectl get namespace network-devops-lab05
 ```
 
-Expected capacity:
+The expected result is `NotFound`. Lab 6 creates and uses the separate `network-devops` namespace.
 
-```text
-network-monitor-web    3/3
-network-monitor-app    3/3
-network-monitor-db     1/1
-```
+## Step 1: Create the Lab 6 repository
 
-Complete the Lab 5 scaling exercise before continuing if the web or application Deployment is not at three replicas.
+Create a private GitLab project named `netdevops-lab06-elk` and initialize it with a README.
 
-## Step 2: Create the Lab 6 repository
-
-Create a blank private GitLab project named `netdevops-lab06-elk`. Do not initialize it with a README.
-
-Create a separate working folder from the completed Lab 5 repository:
+Clone the new project and create the working branch:
 
 ```bash
+mkdir -p ~/netdevops-labs
 cd ~/netdevops-labs
-git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab05-gitlab-cicd.git \
-  netdevops-lab06-elk
+git clone https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab06-elk.git
 cd netdevops-lab06-elk
-git remote rename origin lab05
-git remote add origin \
-  https://gitlab.com/YOUR-GITLAB-NAMESPACE/netdevops-lab06-elk.git
 git switch -c feature/lab06-elk
 ```
 
-Copy the supplied Lab 6 files over the Lab 5 application:
+Copy only the complete instructor-provided Lab 6 files into the new repository:
 
 ```bash
 cp -R "/path/to/Lab 06 - Monitor with the Elastic Stack/." .
 git status
 ```
 
-The new repository contains its own application copy. Do not make Lab 6 changes in the Lab 5 repository.
+Lab 6 has its own application source, tests, Dockerfiles, Kubernetes manifests, and namespace. It does not use the Lab 5 folder or deployment.
+
+## Step 2: Prepare the Lab 6 configuration
+
+Create `.env` and generate the required values:
+
+```bash
+cp .env.example .env
+chmod 600 .env
+openssl rand -hex 16
+openssl rand -hex 16
+openssl rand -hex 32
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Open `.env` and replace every `replace-with-...` value. Use the same `MYSQL_PASSWORD` value inside `DATABASE_URL`.
+
+Start the dedicated Minikube profile if it is not already running:
+
+```bash
+minikube start --profile network-devops --driver=docker
+minikube profile network-devops
+minikube status --profile network-devops
+```
 
 ## Step 3: Start ELK and Docker-host monitoring
 
@@ -120,7 +142,7 @@ minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 5044"
 
 Do not continue until the connection test reaches port `5044`.
 
-## Step 5: Build and load observable images
+## Step 5: Deploy the isolated three-tier application
 
 ```bash
 cd ~/netdevops-labs/netdevops-lab06-elk
@@ -132,24 +154,48 @@ minikube image load network-monitor-web:lab06 --profile network-devops
 minikube image load network-monitor-synthetic:lab06 --profile network-devops
 ```
 
-Update the running Lab 5 Deployments without changing their replica counts:
+Load `.env`, create the Kubernetes Secret, and deploy the three tiers:
 
 ```bash
-kubectl -n network-devops-lab05 patch deployment network-monitor-app \
-  --type=strategic --patch-file kubernetes/app-observability-patch.yaml
-kubectl -n network-devops-lab05 set image deployment/network-monitor-web \
-  web=network-monitor-web:lab06
-kubectl -n network-devops-lab05 rollout status deployment/network-monitor-app --timeout=180s
-kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web --timeout=180s
-kubectl -n network-devops-lab05 get deployment network-monitor-web network-monitor-app
+set -a
+source .env
+set +a
+kubectl apply -f kubernetes/namespace.yaml
+kubectl -n network-devops create secret generic network-monitor-runtime \
+  --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
+  --from-literal=MYSQL_USER="$MYSQL_USER" \
+  --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
+  --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
+  --from-literal=DATABASE_URL="$DATABASE_URL" \
+  --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" \
+  --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" \
+  --from-literal=SESSION_COOKIE_SECURE="$SESSION_COOKIE_SECURE" \
+  --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f kubernetes/mysql.yaml
+kubectl apply -f kubernetes/app.yaml
+kubectl apply -f kubernetes/web.yaml
+kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
+kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
+kubectl -n network-devops rollout status deployment/network-monitor-web --timeout=180s
+kubectl -n network-devops get deployment,statefulset,pods -o wide
 ```
 
-Both Deployments must remain at `3/3`.
+The web and application Deployments must show `3/3`; the database StatefulSet must show `1/1`.
+
+Open the application:
+
+```bash
+minikube service network-monitor-web \
+  --namespace network-devops \
+  --profile network-devops
+```
+
+Create the administrator account, sign in, and add the instructor-provided router in **Inventory management**.
 
 Generate a router collection from the web interface, and then confirm that the application logged short RESTCONF request and response events:
 
 ```bash
-kubectl -n network-devops-lab05 logs deployment/network-monitor-app --since=2m \
+kubectl -n network-devops logs deployment/network-monitor-app --since=2m \
   | grep RESTCONF
 ```
 
@@ -157,10 +203,10 @@ For each CPU and memory query, the log shows the request path followed by the re
 
 ## Step 6: Deploy Kubernetes collectors
 
-Use the existing application administrator account. The inventory must contain at least one router.
+Use the application administrator account created in Step 5. The inventory must contain at least one router.
 
 ```bash
-export KUBE_NAMESPACE=network-devops-lab05
+export KUBE_NAMESPACE=network-devops
 export E2E_USERNAME='YOUR-APPLICATION-USERNAME'
 export E2E_PASSWORD='YOUR-APPLICATION-PASSWORD'
 bash scripts/deploy-observability.sh
@@ -169,21 +215,21 @@ bash scripts/deploy-observability.sh
 Verify the collectors:
 
 ```bash
-kubectl -n network-devops-lab05 get daemonset,deployment,cronjob,pods -o wide
-kubectl -n network-devops-lab05 logs daemonset/filebeat --tail=20
-kubectl -n network-devops-lab05 logs daemonset/metricbeat --tail=20
-kubectl -n network-devops-lab05 logs deployment/metricbeat-state --tail=20
+kubectl -n network-devops get daemonset,deployment,cronjob,pods -o wide
+kubectl -n network-devops logs daemonset/filebeat --tail=20
+kubectl -n network-devops logs daemonset/metricbeat --tail=20
+kubectl -n network-devops logs deployment/metricbeat-state --tail=20
 ```
 
 ## Step 7: Run a synthetic check
 
 ```bash
 export SYNTHETIC_JOB="synthetic-manual-$(date +%s)"
-kubectl -n network-devops-lab05 create job \
+kubectl -n network-devops create job \
   --from=cronjob/network-monitor-synthetic "$SYNTHETIC_JOB"
-kubectl -n network-devops-lab05 wait --for=condition=complete \
+kubectl -n network-devops wait --for=condition=complete \
   "job/$SYNTHETIC_JOB" --timeout=120s
-kubectl -n network-devops-lab05 logs "job/$SYNTHETIC_JOB" | jq
+kubectl -n network-devops logs "job/$SYNTHETIC_JOB" | jq
 ```
 
 A successful result contains:
@@ -241,7 +287,7 @@ Filter the Minikube-specific panels by the Docker container name associated with
 Create **Network DevOps — Kubernetes and Application** and filter it with:
 
 ```text
-kubernetes.namespace: "network-devops-lab05"
+kubernetes.namespace: "network-devops"
 ```
 
 Add metric panels using a unique count of `kubernetes.pod.name`:
@@ -285,15 +331,15 @@ Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**. Th
 Scale the web tier down temporarily:
 
 ```bash
-kubectl -n network-devops-lab05 scale deployment/network-monitor-web --replicas=2
-kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web
+kubectl -n network-devops scale deployment/network-monitor-web --replicas=2
+kubectl -n network-devops rollout status deployment/network-monitor-web
 ```
 
-Confirm that the dashboard changes from three running web Pods to two. Restore the Lab 5 state:
+Confirm that the dashboard changes from three running web Pods to two. Restore the Lab 6 baseline:
 
 ```bash
-kubectl -n network-devops-lab05 scale deployment/network-monitor-web --replicas=3
-kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web
+kubectl -n network-devops scale deployment/network-monitor-web --replicas=3
+kubectl -n network-devops rollout status deployment/network-monitor-web
 ```
 
 Run another manual synthetic check and confirm that its HTTP code and response time appear on the synthetic dashboard.
@@ -330,8 +376,8 @@ Repeat the gateway and port test from Step 4. Confirm that the Compose project p
 ### Pod counts are empty
 
 ```bash
-kubectl -n network-devops-lab05 get deployment kube-state-metrics metricbeat-state
-kubectl -n network-devops-lab05 logs deployment/metricbeat-state --tail=50
+kubectl -n network-devops get deployment kube-state-metrics metricbeat-state
+kubectl -n network-devops logs deployment/metricbeat-state --tail=50
 ```
 
 Use the `kubernetes-metrics-*` data view and a time range containing recent events.
@@ -341,8 +387,8 @@ Use the `kubernetes-metrics-*` data view and a time range containing recent even
 Confirm the application credentials, router inventory, and router reachability. Then inspect the Job log:
 
 ```bash
-kubectl -n network-devops-lab05 get jobs,pods -l app=network-monitor-synthetic
-kubectl -n network-devops-lab05 logs "job/$SYNTHETIC_JOB"
+kubectl -n network-devops get jobs,pods -l app=network-monitor-synthetic
+kubectl -n network-devops logs "job/$SYNTHETIC_JOB"
 ```
 
 ### Docker metrics are empty
@@ -360,7 +406,7 @@ Confirm that Docker is running and `/var/run/docker.sock` exists.
 Suspend synthetic checks while retaining the collected data:
 
 ```bash
-kubectl -n network-devops-lab05 patch cronjob network-monitor-synthetic \
+kubectl -n network-devops patch cronjob network-monitor-synthetic \
   --type=merge -p '{"spec":{"suspend":true}}'
 ```
 
