@@ -1,0 +1,112 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - when: never
+
+stages:
+  - test
+  - build
+  - deploy
+  - verify
+  - post-deployment-test
+  - cleanup
+
+default:
+  tags: [lab6, minikube]
+  interruptible: true
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  KUBE_NAMESPACE: "network-devops"
+  MYSQL_DATABASE: "network_monitor"
+  MYSQL_USER: "network_app"
+  APP_IMAGE: "network-monitor-app:lab06-$CI_COMMIT_SHORT_SHA"
+  WEB_IMAGE: "network-monitor-web:lab06-$CI_COMMIT_SHORT_SHA"
+  SYNTHETIC_IMAGE: "network-monitor-synthetic:lab06-$CI_COMMIT_SHORT_SHA"
+
+unit-test:
+  stage: test
+  cache:
+    key: lab6-python-dependencies
+    paths: [.cache/pip]
+  script:
+    - python3 -m venv .ci-venv
+    - .ci-venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt -r requirements-dev.txt
+    - .ci-venv/bin/python -m pytest -q
+
+build-images:
+  stage: build
+  script:
+    - minikube status --profile network-devops
+    - eval "$(minikube docker-env --profile network-devops --shell bash)"
+    - docker build --pull -t "$APP_IMAGE" -f app/Dockerfile .
+    - docker build --pull -t "$WEB_IMAGE" -f web/Dockerfile .
+    - docker build --pull -t "$SYNTHETIC_IMAGE" -f synthetic/Dockerfile synthetic
+
+deploy-minikube:
+  stage: deploy
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  script:
+    - test -n "$MYSQL_PASSWORD"
+    - test -n "$MYSQL_ROOT_PASSWORD"
+    - test -n "$FLASK_SECRET_KEY"
+    - test -n "$INVENTORY_ENCRYPTION_KEY"
+    - test -n "$LOGSTASH_HOST"
+    - test -n "$E2E_USERNAME"
+    - test -n "$E2E_PASSWORD"
+    - minikube update-context --profile network-devops
+    - kubectl apply -f kubernetes/namespace.yaml
+    - export DATABASE_URL="mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@network-monitor-db:3306/${MYSQL_DATABASE}"
+    - kubectl -n "$KUBE_NAMESPACE" create secret generic network-monitor-runtime --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" --from-literal=MYSQL_USER="$MYSQL_USER" --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --from-literal=DATABASE_URL="$DATABASE_URL" --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" --from-literal=SESSION_COOKIE_SECURE=false --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl apply -f kubernetes/mysql.yaml
+    - kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/network-monitor-db --timeout=240s
+    - 'sed "s|image: network-monitor-app:lab06|image: $APP_IMAGE|" kubernetes/app.yaml | kubectl apply -f -'
+    - 'sed "s|image: network-monitor-web:lab06|image: $WEB_IMAGE|" kubernetes/web.yaml | kubectl apply -f -'
+    - kubectl -n "$KUBE_NAMESPACE" create configmap observability-endpoints --from-literal=LOGSTASH_HOST="$LOGSTASH_HOST" --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" create secret generic synthetic-monitor-credentials --from-literal=username="$E2E_USERNAME" --from-literal=password="$E2E_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl apply -f kubernetes/filebeat.yaml
+    - kubectl apply -f kubernetes/metricbeat.yaml
+    - 'sed "s|image: network-monitor-synthetic:lab06|image: $SYNTHETIC_IMAGE|" kubernetes/synthetic-monitor.yaml | kubectl apply -f -'
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/filebeat --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/metricbeat --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/kube-state-metrics --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/metricbeat-state --timeout=180s
+
+verify-deployment:
+  stage: verify
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  script:
+    - minikube update-context --profile network-devops
+    - kubectl -n "$KUBE_NAMESPACE" wait --for=condition=Ready pod -l app=network-monitor --timeout=240s
+    - kubectl -n "$KUBE_NAMESPACE" get deployment,statefulset,pods -o wide
+
+post-deployment-web-test:
+  stage: post-deployment-test
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  script:
+    - minikube update-context --profile network-devops
+    - kubectl -n "$KUBE_NAMESPACE" port-forward service/network-monitor-web 18088:8080 > port-forward.log 2>&1 &
+    - export PORT_FORWARD_PID=$!
+    - trap 'kill "$PORT_FORWARD_PID" 2>/dev/null || true' EXIT
+    - for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:18088/health && break; sleep 2; done
+    - curl --fail --silent http://127.0.0.1:18088/health
+    - curl --fail --silent http://127.0.0.1:18088/ | grep -F 'Network Operations Console'
+    - curl --fail --silent http://127.0.0.1:18088/api/setup/status
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths: [port-forward.log]
+
+cleanup-minikube:
+  stage: cleanup
+  resource_group: course-minikube
+  when: manual
+  allow_failure: true
+  script:
+    - minikube update-context --profile network-devops
+    - kubectl delete namespace "$KUBE_NAMESPACE" --ignore-not-found=true

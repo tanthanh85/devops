@@ -89,26 +89,24 @@ Lab 6 has its own application source, tests, Dockerfiles, Kubernetes manifests, 
 
 ## Step 2: Prepare the Lab 6 configuration
 
-Create `.env` and generate the required values:
-
-```bash
-cp .env.example .env
-chmod 600 .env
-openssl rand -hex 16
-openssl rand -hex 16
-openssl rand -hex 32
-python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
-Open `.env` and replace every `replace-with-...` value. Use the same `MYSQL_PASSWORD` value inside `DATABASE_URL`.
-
-Start the dedicated Minikube profile if it is not already running:
+Start the Minikube profile:
 
 ```bash
 minikube start --profile network-devops --driver=docker
 minikube profile network-devops
 minikube status --profile network-devops
 ```
+
+Generate values for the pipeline variables and keep the output available for Step 4:
+
+```bash
+openssl rand -hex 16
+openssl rand -hex 16
+openssl rand -hex 32
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Choose a simple application username and password for the synthetic monitor. You will use the same values when creating the application administrator after deployment.
 
 ## Step 3: Start ELK
 
@@ -139,45 +137,83 @@ minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 5044"
 
 Do not continue until the connection test reaches port `5044`.
 
-## Step 5: Deploy the isolated three-tier application
+In GitLab, open **Settings > CI/CD > Variables** and create:
+
+| Key | Value |
+|---|---|
+| `MYSQL_PASSWORD` | First 16-byte hexadecimal value |
+| `MYSQL_ROOT_PASSWORD` | Second 16-byte hexadecimal value |
+| `FLASK_SECRET_KEY` | 32-byte hexadecimal value |
+| `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
+| `LOGSTASH_HOST` | The value printed in Step 4 |
+| `E2E_USERNAME` | Chosen application username |
+| `E2E_PASSWORD` | Chosen application password |
+
+Select **Masked and hidden** when GitLab accepts the value. Use environment scope `course/minikube` when that field is available.
+
+## Step 5: Create and start the Lab 6 runner
+
+In GitLab:
+
+1. Open **Settings > CI/CD > Runners**.
+2. Select **Create project runner**.
+3. Select Linux.
+4. Add the tags `lab6` and `minikube`.
+5. Disable **Run untagged jobs**.
+6. Create the runner and copy its `glrt-` authentication token.
+
+Register the runner as the current Ubuntu user:
 
 ```bash
-cd ~/netdevops-labs/netdevops-lab06-elk
-docker build -t network-monitor-app:lab06 -f app/Dockerfile .
-docker build -t network-monitor-web:lab06 web
-docker build -t network-monitor-synthetic:lab06 synthetic
-minikube image load network-monitor-app:lab06 --profile network-devops
-minikube image load network-monitor-web:lab06 --profile network-devops
-minikube image load network-monitor-synthetic:lab06 --profile network-devops
+mkdir -p ~/.gitlab-runner-lab06
+gitlab-runner register --config "$HOME/.gitlab-runner-lab06/config.toml"
 ```
 
-Load `.env`, create the Kubernetes Secret, and deploy the three tiers:
+Enter:
+
+- GitLab URL: `https://gitlab.com`
+- Token: the Lab 6 project runner token
+- Description: `lab06-minikube-shell-runner`
+- Tags: `lab6,minikube`
+- Executor: `shell`
+
+Start the runner in a separate terminal and keep it running:
 
 ```bash
-set -a
-source .env
-set +a
-kubectl apply -f kubernetes/namespace.yaml
-kubectl -n network-devops create secret generic network-monitor-runtime \
-  --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" \
-  --from-literal=MYSQL_USER="$MYSQL_USER" \
-  --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" \
-  --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
-  --from-literal=DATABASE_URL="$DATABASE_URL" \
-  --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" \
-  --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" \
-  --from-literal=SESSION_COOKIE_SECURE="$SESSION_COOKIE_SECURE" \
-  --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -f kubernetes/mysql.yaml
-kubectl apply -f kubernetes/app.yaml
-kubectl apply -f kubernetes/web.yaml
-kubectl -n network-devops rollout status statefulset/network-monitor-db --timeout=240s
-kubectl -n network-devops rollout status deployment/network-monitor-app --timeout=180s
-kubectl -n network-devops rollout status deployment/network-monitor-web --timeout=180s
+gitlab-runner run --config "$HOME/.gitlab-runner-lab06/config.toml"
+```
+
+## Step 6: Deploy Lab 6 through CI/CD
+
+Commit and push the supplied Lab 6 implementation:
+
+```bash
+git status
+git add .
+git diff --staged
+git commit -m "Deploy Kubernetes monitoring with ELK"
+git push -u origin feature/lab06-elk
+```
+
+The feature-branch push does not create a pipeline. In GitLab:
+
+1. Open **Code > Merge requests**.
+2. Create a merge request from `feature/lab06-elk` into `main`.
+3. Review the changes and select **Merge**.
+4. Open **Build > Pipelines** and select the new `main` pipeline.
+5. Wait for `unit-test`, `build-images`, `deploy-minikube`, `verify-deployment`, and `post-deployment-web-test` to succeed.
+
+The pipeline builds all three images and deploys the application, Filebeat, Metricbeat, kube-state-metrics, and the synthetic CronJob. Do not run `docker build`, `minikube image load`, or `kubectl apply` manually.
+
+Verify the deployed capacity:
+
+```bash
 kubectl -n network-devops get deployment,statefulset,pods -o wide
 ```
 
 The web and application Deployments must show `3/3`; the database StatefulSet must show `1/1`.
+
+## Step 7: Configure and test the application
 
 Open the application:
 
@@ -187,7 +223,7 @@ minikube service network-monitor-web \
   --profile network-devops
 ```
 
-Create the administrator account, sign in, and add the instructor-provided router in **Inventory management**.
+Create the administrator with the same username and password stored in `E2E_USERNAME` and `E2E_PASSWORD`. Sign in and add the instructor-provided router in **Inventory management**.
 
 Generate a router collection from the web interface, and then confirm that the application logged short RESTCONF request and response events:
 
@@ -198,29 +234,11 @@ kubectl -n network-devops logs deployment/network-monitor-app --since=2m \
 
 For each CPU and memory query, the log shows the request path followed by the response status and duration. It does not contain the username, password, authorization header, or RESTCONF response body.
 
-## Step 6: Deploy Kubernetes collectors
-
-Use the application administrator account created in Step 5. The inventory must contain at least one router.
-
-```bash
-export KUBE_NAMESPACE=network-devops
-export E2E_USERNAME='YOUR-APPLICATION-USERNAME'
-export E2E_PASSWORD='YOUR-APPLICATION-PASSWORD'
-bash scripts/deploy-observability.sh
-```
-
-Verify the collectors:
-
 ```bash
 kubectl -n network-devops get daemonset,deployment,cronjob,pods -o wide
 kubectl -n network-devops logs daemonset/filebeat --tail=20
 kubectl -n network-devops logs daemonset/metricbeat --tail=20
 kubectl -n network-devops logs deployment/metricbeat-state --tail=20
-```
-
-## Step 7: Run a synthetic check
-
-```bash
 export SYNTHETIC_JOB="synthetic-manual-$(date +%s)"
 kubectl -n network-devops create job \
   --from=cronjob/network-monitor-synthetic "$SYNTHETIC_JOB"
@@ -308,35 +326,86 @@ Create **Network DevOps — Synthetic Service** using the **Synthetic service** 
 
 Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**. The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
 
-## Step 12: Test Pod-count monitoring
+## Step 12: Scale the web and application tiers through CI/CD
 
-Scale the web tier down temporarily:
+Do not use `kubectl scale`. Change the desired replica counts in Git and let the pipeline update Kubernetes.
 
-```bash
-kubectl -n network-devops scale deployment/network-monitor-web --replicas=2
-kubectl -n network-devops rollout status deployment/network-monitor-web
-```
+### Scale down to one replica
 
-Confirm that the dashboard changes from three running web Pods to two. Restore the Lab 6 baseline:
+Create a feature branch from the latest `main`:
 
 ```bash
-kubectl -n network-devops scale deployment/network-monitor-web --replicas=3
-kubectl -n network-devops rollout status deployment/network-monitor-web
+git switch main
+git pull --ff-only
+git switch -c feature/scale-down-web-app
 ```
 
-Run another manual synthetic check and confirm that its HTTP code and response time appear on the synthetic dashboard.
+In both `kubernetes/web.yaml` and `kubernetes/app.yaml`, change:
 
-## Step 13: Commit and push
+```yaml
+replicas: 3
+```
+
+to:
+
+```yaml
+replicas: 1
+```
+
+Commit and push the change:
 
 ```bash
-git status
-git add .
-git diff --staged
-git commit -m "Add ELK infrastructure and synthetic monitoring"
-git push -u origin feature/lab06-elk
+git diff -- kubernetes/web.yaml kubernetes/app.yaml
+git add kubernetes/web.yaml kubernetes/app.yaml
+git commit -m "Scale web and application tiers down to one replica"
+git push -u origin feature/scale-down-web-app
 ```
 
-Create a merge request into `main`, review the changes, and merge it.
+In GitLab, create a merge request into `main`, review the two replica changes, and select **Merge**. Open **Build > Pipelines** and wait for the new `main` pipeline to succeed.
+
+Confirm that the Kibana Pod-count panels change to:
+
+```text
+Web Pods          1
+Application Pods  1
+Database Pods     1
+```
+
+Use this read-only command to confirm the dashboard values:
+
+```bash
+kubectl -n network-devops get deployment network-monitor-web network-monitor-app
+```
+
+### Scale up to three replicas
+
+Create another feature branch from the updated `main`:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/scale-up-web-app
+```
+
+Change `replicas: 1` back to `replicas: 3` in both `kubernetes/web.yaml` and `kubernetes/app.yaml`, then commit and push:
+
+```bash
+git add kubernetes/web.yaml kubernetes/app.yaml
+git commit -m "Scale web and application tiers up to three replicas"
+git push -u origin feature/scale-up-web-app
+```
+
+Create and merge another merge request into `main`. Wait for the resulting `main` pipeline to succeed.
+
+Confirm that Kibana updates in real time to show:
+
+```text
+Web Pods          3
+Application Pods  3
+Database Pods     1
+```
+
+The Pod-count panels may take up to one Metricbeat collection interval to reflect the new state. The MySQL tier remains at one replica throughout the exercise.
 
 ## Completion criteria
 
@@ -346,6 +415,8 @@ Create a merge request into `main`, review the changes, and merge it.
 - Every RESTCONF CPU and memory query creates a short request event and response event without recording the payload.
 - The synthetic CronJob runs every two minutes.
 - The synthetic dashboard shows HTTP status codes, availability, and response time.
+- Scaling changes are committed, merged, and deployed through GitLab CI/CD.
+- Kibana reflects the web and application Pod counts changing from three to one and back to three.
 - No password, cookie, authorization header, or router credential is stored in Elasticsearch.
 
 ## Troubleshooting
