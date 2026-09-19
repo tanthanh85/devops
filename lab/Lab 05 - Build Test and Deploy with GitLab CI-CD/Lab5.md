@@ -266,17 +266,64 @@ minikube service network-monitor-web \
 3. Confirm automatic CPU and memory monitoring.
 4. Confirm that the interface displays the responding Web Pod and App Pod names.
 
-## Step 12: Make a follow-up change
+## Step 12: Scale the web and application tiers through CI/CD
 
 Create another feature branch from the updated default branch:
 
 ```bash
 git switch main
 git pull --ff-only
-git switch -c feature/lab05-follow-up
+git switch -c feature/scale-web-app
 ```
 
-Make a documentation or interface change, then commit and push it. Repeat the merge-request and merge workflow. Confirm that a new `main` pipeline builds images tagged with the new commit ID and updates the Deployments.
+In `kubernetes/app.yaml`, change the application Deployment replica count from one to three:
+
+```yaml
+spec:
+  replicas: 3
+```
+
+In `kubernetes/web.yaml`, make the same change for the web Deployment:
+
+```yaml
+spec:
+  replicas: 3
+```
+
+Do not change the MySQL StatefulSet. The database remains a single replica because this lab does not configure database replication or shared database storage.
+
+Review and commit the changes:
+
+```bash
+git diff -- kubernetes/app.yaml kubernetes/web.yaml
+git add kubernetes/app.yaml kubernetes/web.yaml
+git commit -m "Scale web and application tiers to three replicas"
+git push -u origin feature/scale-web-app
+```
+
+The feature-branch push does not start a pipeline. In GitLab:
+
+1. Open **Code > Merge requests**.
+2. Select **New merge request**.
+3. Select `feature/scale-web-app` as the source branch and `main` as the target branch.
+4. Select **Compare branches and continue**.
+5. Enter `Scale web and application tiers` as the title.
+6. Select **Create merge request**.
+7. Review the two replica-count changes, and then select **Merge**.
+
+The merge pushes the change to `main` and starts a new pipeline. Open **Build > Pipelines**, select the newest pipeline, and wait for every automatic stage to succeed.
+
+Verify that Kubernetes now runs three web Pods and three application Pods:
+
+```bash
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-web --timeout=180s
+kubectl -n network-devops-lab05 rollout status deployment/network-monitor-app --timeout=180s
+kubectl -n network-devops-lab05 get pods -l tier=web -o wide
+kubectl -n network-devops-lab05 get pods -l tier=app -o wide
+kubectl -n network-devops-lab05 get deployment network-monitor-web network-monitor-app
+```
+
+The `READY` value for both Deployments should be `3/3`. Refresh the application several times and observe the displayed Web Pod and App Pod names to see requests being handled by the scaled replicas.
 
 ## Completion criteria
 
@@ -290,6 +337,8 @@ Make a documentation or interface change, then commit and push it. Repeat the me
 - CI deploys MySQL, Flask, and NGINX to `network-devops-lab05`.
 - CI verifies Kubernetes readiness and Service endpoints.
 - The post-deployment stage confirms that the web page and application API are accessible.
+- A second merge and pipeline scale the web and application tiers to three replicas each.
+- MySQL remains a single replica.
 - The application works without a manual deployment command.
 
 ## Cleanup
