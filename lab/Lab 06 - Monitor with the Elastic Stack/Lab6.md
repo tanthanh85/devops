@@ -114,14 +114,13 @@ Choose a simple application username and password for the synthetic monitor. You
 cd ~/course-platform/elastic
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/compose.override.yaml .
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
-export ELASTIC_INGEST_HOST=0.0.0.0
 docker compose -f compose.yaml -f compose.override.yaml config --quiet
 docker compose -f compose.yaml -f compose.override.yaml up -d
 docker compose -f compose.yaml -f compose.override.yaml ps
-curl -fsS http://127.0.0.1:9200/_cluster/health
+curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=120s'
 ```
 
-The override exposes Logstash port `5044` to the Kubernetes collectors. Use the exposed ingestion port only on the isolated course workstation.
+The Logstash row must include `0.0.0.0:15044->5044/tcp`. Port `5044` remains available only on localhost for Lab 1, while port `15044` is the Lab 6 ingestion port for Kubernetes. Use this only on the isolated course workstation.
 
 ## Step 4: Determine the Logstash address
 
@@ -130,12 +129,12 @@ Use the Minikube gateway IP instead of a DNS hostname:
 ```bash
 export LOGSTASH_IP=$(minikube ssh --profile network-devops -- \
   "ip route show default" | awk '{print $3; exit}')
-export LOGSTASH_HOST="${LOGSTASH_IP}:5044"
+export LOGSTASH_HOST="${LOGSTASH_IP}:15044"
 echo "$LOGSTASH_HOST"
-minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 5044"
+minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 15044"
 ```
 
-Do not continue until the connection test reaches port `5044`.
+Do not continue until the connection test reaches port `15044`.
 
 In GitLab, open **Settings > CI/CD > Variables** and create:
 
@@ -423,7 +422,34 @@ The Pod-count panels may take up to one Metricbeat collection interval to reflec
 
 ### Kubernetes collectors cannot reach Logstash
 
-Repeat the gateway and port test from Step 4. Confirm that the Compose project publishes `0.0.0.0:5044` and that the workstation firewall permits traffic from the Minikube network.
+Repeat the gateway and port test from Step 4. Confirm that the Compose project publishes `0.0.0.0:15044->5044/tcp` and that the workstation firewall permits traffic from the Minikube network.
+
+If `docker compose ps` does not show the `15044` mapping, copy the supplied override again and recreate Logstash:
+
+```bash
+cd ~/course-platform/elastic
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/compose.override.yaml .
+docker compose -f compose.yaml -f compose.override.yaml up -d --force-recreate logstash
+docker compose -f compose.yaml -f compose.override.yaml ps logstash
+sudo ss -lntp | grep ':15044'
+```
+
+### Elasticsearch remains red
+
+Wait up to two minutes for primary shards to start:
+
+```bash
+curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=120s' | jq
+```
+
+If the status remains red, inspect Elasticsearch before continuing:
+
+```bash
+cd ~/course-platform/elastic
+docker compose -f compose.yaml -f compose.override.yaml logs --tail=100 elasticsearch
+curl -s 'http://127.0.0.1:9200/_cat/shards?v'
+curl -s 'http://127.0.0.1:9200/_cluster/allocation/explain?pretty'
+```
 
 ### Pod counts are empty
 
