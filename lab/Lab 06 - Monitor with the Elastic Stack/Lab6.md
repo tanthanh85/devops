@@ -24,6 +24,7 @@ The normal application capacity is three web Pods, three application Pods, and o
 flowchart LR
     D[Docker containers] --> DM[Docker Metricbeat]
     subgraph K[Minikube]
+      MN[Minikube node]
       W[Web Pods x3]
       A[App Pods x3]
       DB[(MySQL Pod x1)]
@@ -35,7 +36,7 @@ flowchart LR
       A --> F
       DB --> F
       S --> F
-      K --> KM
+      MN --> KM
       KS --> KM
     end
     DM --> L[Logstash]
