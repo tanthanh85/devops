@@ -4,15 +4,3 @@ services:
       - "${ELASTIC_INGEST_HOST:-127.0.0.1}:5044:5044"
     volumes:
       - ./pipeline:/usr/share/logstash/pipeline:ro
-
-  metricbeat-docker:
-    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
-    user: root
-    command: ["-e", "--strict.perms=false"]
-    depends_on:
-      logstash:
-        condition: service_started
-    volumes:
-      - ./metricbeat-docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped

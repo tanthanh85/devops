@@ -4,25 +4,23 @@
 
 **4 hours**
 
-In this standalone lab, you will deploy the same three-tier application used in Lab 5 and add Elastic observability. You will monitor the Minikube Docker container, Kubernetes, the web/application/database tiers, RESTCONF activity, and a synthetic user journey. All required application files are included in the Lab 6 package.
+In this standalone lab, you will deploy the same three-tier application used in Lab 5 and add Elastic observability. You will monitor Kubernetes, its Pods, the web/application/database tiers, RESTCONF activity, and a synthetic user journey. All required application files are included in the Lab 6 package.
 
 The normal application capacity is three web Pods, three application Pods, and one MySQL Pod.
 
 ## Objectives
 
-- Collect Docker metrics for Minikube and the other Docker containers.
 - Collect Kubernetes node, Pod, container, readiness, restart, and replica metrics.
 - Display the number of running Pods for each application tier.
 - Centralize NGINX, Flask, MySQL, and synthetic-monitor logs.
 - Log each RESTCONF request and response without storing credentials or response payloads.
 - Display synthetic HTTP status, availability, and response time.
-- Correlate a failed or slow check with application and infrastructure telemetry.
+- Correlate a failed or slow check with application and Kubernetes telemetry.
 
 ## How the components work
 
 ```mermaid
 flowchart LR
-    D[Docker containers] --> DM[Docker Metricbeat]
     subgraph K[Minikube]
       MN[Minikube node]
       W[Web Pods x3]
@@ -39,14 +37,13 @@ flowchart LR
       MN --> KM
       KS --> KM
     end
-    DM --> L[Logstash]
     F --> L
     KM --> L
     L --> E[(Elasticsearch)]
     E --> B[Kibana dashboards]
 ```
 
-Docker Metricbeat monitors the Minikube container and the other Docker containers. Kubernetes Metricbeat monitors resources inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects container logs and short RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
+Kubernetes Metricbeat monitors the node, Pods, containers, and volumes inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects Pod logs and short RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
 
 ## Before you begin: clean up Lab 5
 
@@ -113,12 +110,11 @@ minikube profile network-devops
 minikube status --profile network-devops
 ```
 
-## Step 3: Start ELK and Docker-host monitoring
+## Step 3: Start ELK
 
 ```bash
 cd ~/course-platform/elastic
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/compose.override.yaml .
-cp ~/netdevops-labs/netdevops-lab06-elk/elastic/metricbeat-docker.yml .
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
 export ELASTIC_INGEST_HOST=0.0.0.0
 docker compose -f compose.yaml -f compose.override.yaml config --quiet
@@ -127,7 +123,7 @@ docker compose -f compose.yaml -f compose.override.yaml ps
 curl -fsS http://127.0.0.1:9200/_cluster/health
 ```
 
-The override exposes Logstash port `5044` to Minikube and starts `metricbeat-docker`. Only Docker-container metrics are collected by this service. Use the exposed ingestion port only on the isolated course workstation.
+The override exposes Logstash port `5044` to the Kubernetes collectors. Use the exposed ingestion port only on the isolated course workstation.
 
 ## Step 4: Determine the Logstash address
 
@@ -248,12 +244,12 @@ The duration covers page access, sign-in, router selection, RESTCONF collection,
 Wait approximately 30 seconds, and then run:
 
 ```bash
-curl -s 'http://127.0.0.1:9200/_cat/indices/infrastructure-metrics-*,kubernetes-metrics-*,kubernetes-logs-*,network-monitor-logs-*,network-monitor-synthetic-*?v'
+curl -s 'http://127.0.0.1:9200/_cat/indices/kubernetes-metrics-*,kubernetes-logs-*,network-monitor-logs-*,network-monitor-synthetic-*?v'
 curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@timestamp:desc' \
   | jq '.hits.hits[0]._source'
 ```
 
-Do not create dashboards until all five index families contain recent documents.
+Do not create dashboards until all four index families contain recent documents.
 
 ## Step 9: Create Kibana data views
 
@@ -261,7 +257,6 @@ Open `http://127.0.0.1:5601`, then open **Stack Management > Data Views**. Creat
 
 | Data view | Index pattern |
 |---|---|
-| Infrastructure metrics | `infrastructure-metrics-*` |
 | Kubernetes metrics | `kubernetes-metrics-*` |
 | Kubernetes logs | `kubernetes-logs-*` |
 | Application logs | `network-monitor-logs-*` |
@@ -269,21 +264,7 @@ Open `http://127.0.0.1:5601`, then open **Stack Management > Data Views**. Creat
 
 Use **Discover** to confirm that each data view returns recent events.
 
-## Step 10: Build the Minikube and Docker dashboard
-
-Create **Network DevOps — Minikube and Docker** using `event.module: docker`. Add:
-
-1. Current Docker container count.
-2. Minikube container status.
-3. Minikube container CPU and memory over time.
-4. Docker container CPU and memory grouped by container name.
-5. Docker container network receive and transmit rates.
-6. Docker container disk I/O.
-7. A table showing container name, image, status, CPU, memory, network, and restart information.
-
-Filter the Minikube-specific panels by the Docker container name associated with the `network-devops` Minikube profile.
-
-## Step 11: Build the Kubernetes and application dashboard
+## Step 10: Build the Kubernetes and application dashboard
 
 Create **Network DevOps — Kubernetes and Application** and filter it with:
 
@@ -313,7 +294,7 @@ Add these supporting panels:
 
 The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics. Router CPU and memory fields must not be used for Kubernetes resource charts.
 
-## Step 12: Build the synthetic-service dashboard
+## Step 11: Build the synthetic-service dashboard
 
 Create **Network DevOps — Synthetic Service** using the **Synthetic service** data view. Add:
 
@@ -327,7 +308,7 @@ Create **Network DevOps — Synthetic Service** using the **Synthetic service** 
 
 Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**. The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
 
-## Step 13: Test Pod-count monitoring
+## Step 12: Test Pod-count monitoring
 
 Scale the web tier down temporarily:
 
@@ -345,7 +326,7 @@ kubectl -n network-devops rollout status deployment/network-monitor-web
 
 Run another manual synthetic check and confirm that its HTTP code and response time appear on the synthetic dashboard.
 
-## Step 14: Commit and push
+## Step 13: Commit and push
 
 ```bash
 git status
@@ -359,7 +340,6 @@ Create a merge request into `main`, review the changes, and merge it.
 
 ## Completion criteria
 
-- Minikube and Docker-container metrics are visible in Kibana.
 - Kubernetes node, Pod, container, readiness, restart, and replica metrics are visible.
 - Pod-count panels show web `3`, application `3`, and database `1` during normal operation.
 - NGINX, Flask, MySQL, and synthetic logs are searchable.
@@ -391,16 +371,6 @@ Confirm the application credentials, router inventory, and router reachability. 
 kubectl -n network-devops get jobs,pods -l app=network-monitor-synthetic
 kubectl -n network-devops logs "job/$SYNTHETIC_JOB"
 ```
-
-### Docker metrics are empty
-
-```bash
-cd ~/course-platform/elastic
-docker compose -f compose.yaml -f compose.override.yaml ps metricbeat-docker
-docker compose -f compose.yaml -f compose.override.yaml logs --tail=50 metricbeat-docker
-```
-
-Confirm that Docker is running and `/var/run/docker.sock` exists.
 
 ## Cleanup
 
