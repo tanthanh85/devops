@@ -343,7 +343,7 @@ The `READY` value for both Deployments should be `3/3`. Refresh the application 
 
 ## Cleanup
 
-When the lab evidence has been collected, open the successful `main` pipeline and start the manual `cleanup-minikube` job. Wait for the job to succeed. It deletes the `network-devops-lab05` workloads and namespace, and the MySQL persistent volume claim and its associated persistent volume. The database contents cannot be recovered after this job runs.
+When the lab evidence has been collected, open the successful `main` pipeline and start the manual `cleanup-minikube` job. Wait for the job to succeed. It first drops the application database, clearing the administrator, router inventory, and other application records. It then deletes the `network-devops-lab05` workloads and namespace, and the MySQL persistent volume claim and its associated persistent volume. The database contents cannot be recovered after this job runs.
 
 The cleanup job verifies that both the namespace and captured database PV are gone. It does not delete Minikube images, the shared `network-devops` Minikube profile, or resources belonging to another lab.
 

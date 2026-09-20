@@ -113,6 +113,11 @@ cleanup-minikube:
     - minikube update-context --profile network-devops
     - export DB_PVC="mysql-data-network-monitor-db-0"
     - export DB_PV="$(kubectl -n "$KUBE_NAMESPACE" get pvc "$DB_PVC" -o jsonpath='{.spec.volumeName}' 2>/dev/null || true)"
+    - |
+      if kubectl -n "$KUBE_NAMESPACE" get statefulset network-monitor-db >/dev/null 2>&1; then
+        kubectl -n "$KUBE_NAMESPACE" exec statefulset/network-monitor-db -- \
+          sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e "DROP DATABASE IF EXISTS network_monitor;"'
+      fi
     - kubectl -n "$KUBE_NAMESPACE" delete statefulset network-monitor-db --ignore-not-found=true --wait=true --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" delete pvc "$DB_PVC" --ignore-not-found=true --wait=true --timeout=180s
     - kubectl delete namespace "$KUBE_NAMESPACE" --ignore-not-found=true --wait=true --timeout=300s
