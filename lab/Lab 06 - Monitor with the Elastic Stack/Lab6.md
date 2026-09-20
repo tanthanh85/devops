@@ -285,7 +285,7 @@ curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@
 
 Do not continue to Step 9 until all four index families are listed. Kibana cannot create a data view for an index pattern that has not received any documents.
 
-Filebeat collects Kubernetes container logs from the Minikube node. Use the `kubernetes.namespace: "network-devops"` dashboard filter in Step 10 to restrict the displayed logs to this lab. Namespace filtering is intentionally performed in Kibana so a temporary metadata-enrichment delay cannot discard application or synthetic events during ingestion.
+Filebeat reads Kubernetes container-log symlinks and enriches each event by matching its Pod UID under `/var/log/pods`. The Step 10 namespace filter keeps the dashboard scoped to this lab.
 
 ## Step 9: Create Kibana data views
 
@@ -531,9 +531,11 @@ This means Metricbeat is publishing, but Filebeat is not publishing container lo
 kubectl -n network-devops rollout status daemonset/filebeat --timeout=180s
 kubectl -n network-devops get pods -l app=filebeat -o wide
 kubectl -n network-devops logs daemonset/filebeat --tail=100
+kubectl -n network-devops get configmap filebeat-config \
+  -o jsonpath='{.data.filebeat\.yml}' | grep 'paths:'
 ```
 
-Commit and push the current Lab 6 files. The main-branch pipeline reapplies the Filebeat ConfigMap and restarts the DaemonSet. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
+The configured path must be `/var/log/containers/*.log`, and the metadata matcher must use `/var/log/pods/`. Commit and push the current Lab 6 files. The main-branch pipeline reapplies the Filebeat ConfigMap and restarts the DaemonSet. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
 
 ### The synthetic check fails
 
