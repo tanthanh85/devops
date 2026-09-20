@@ -285,7 +285,7 @@ curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@
 
 Do not continue to Step 9 until all four index families are listed. Kibana cannot create a data view for an index pattern that has not received any documents.
 
-Filebeat mounts the Minikube node's `/var/log` tree and Docker's `/var/lib/docker/containers` directory read-only. Kubernetes container links resolve through `/var/log/pods` to the Docker runtime log, and Filebeat enriches each event with Pod metadata. The Step 10 namespace filter keeps the dashboard scoped to this lab.
+Filebeat mounts the Minikube node's `/var/log` tree and Docker's `/var/lib/docker/containers` directory read-only. Kubernetes container links resolve through `/var/log/pods` to the Docker runtime log, and Filebeat enriches each event with Pod metadata. Its fingerprint length is reduced to 64 bytes so the single short record produced by a synthetic Job is harvested. The Step 10 namespace filter keeps the dashboard scoped to this lab.
 
 ## Step 9: Create Kibana data views
 
@@ -537,7 +537,7 @@ kubectl -n network-devops exec daemonset/filebeat -- sh -c \
   'find -L /var/log/containers -type f -print -quit'
 ```
 
-The configured path must be `/var/log/containers/*.log`, and the metadata matcher must use `/var/log/pods/`. The final command must print a readable log-file path. No output means the container symlinks are broken inside the Filebeat Pod.
+The configured path must be `/var/log/containers/*.log`, the fingerprint length must be `64`, and the metadata matcher must use `/var/log/pods/`. The final command must print a readable log-file path. No output means the container symlinks are broken inside the Filebeat Pod.
 
 Commit and push the current Lab 6 files. The main-branch pipeline reapplies the configuration, mounts both the Kubernetes and Docker runtime log paths, restarts Filebeat, and verifies that at least one complete symlink chain is readable. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
 

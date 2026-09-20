@@ -28,6 +28,9 @@ data:
         paths:
           - /var/log/containers/*.log
         prospector.scanner.symlinks: true
+        # Synthetic Jobs emit one short JSON record. Filebeat 9.2 otherwise
+        # waits for 1024 bytes before fingerprinting and harvesting the file.
+        prospector.scanner.fingerprint.length: 64
         parsers:
           - container: ~
         processors:
