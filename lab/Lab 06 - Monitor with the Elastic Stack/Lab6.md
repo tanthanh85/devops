@@ -307,8 +307,6 @@ Confirm the data in **Discover**:
 5. Select each of the four data views and confirm that recent documents appear.
 6. Set the time picker to **Last 24 hours** if no documents are initially displayed.
 
-The feature is named **Discover**, not **Discovery**.
-
 ## Step 10: Build the Kubernetes and application dashboard
 
 Open the main navigation menu, select **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Kubernetes and Application**.
