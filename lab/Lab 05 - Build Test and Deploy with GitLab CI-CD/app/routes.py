@@ -65,6 +65,18 @@ def login():
     return jsonify(status="authenticated", username=user.username)
 
 
+@api.get("/api/session")
+def session_status():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify(authenticated=False)
+    user = db.session.get(User, user_id)
+    if user is None:
+        session.clear()
+        return jsonify(authenticated=False)
+    return jsonify(authenticated=True, username=user.username, is_admin=user.is_admin)
+
+
 @api.delete("/api/session")
 def logout(): session.clear(); return ("", 204)
 

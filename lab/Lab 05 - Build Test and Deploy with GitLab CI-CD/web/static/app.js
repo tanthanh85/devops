@@ -23,7 +23,18 @@ function selectTab(name) {
 document.querySelectorAll(".tab").forEach(tab => tab.onclick = () => selectTab(tab.dataset.tab));
 
 async function boot() {
-  try { const status = await call("/api/setup/status"); $("setup").hidden = !status.setup_required; $("login").hidden = status.setup_required; await loadInstanceInfo(); }
+  try {
+    $("setup").hidden = true; $("login").hidden = true; $("application").hidden = true; $("logout").hidden = true;
+    const status = await call("/api/setup/status");
+    if (status.setup_required) {
+      $("setup").hidden = false;
+    } else {
+      const currentSession = await call("/api/session");
+      if (currentSession.authenticated) await loadRouters();
+      else $("login").hidden = false;
+    }
+    await loadInstanceInfo();
+  }
   catch (error) { message(error.message); }
 }
 
@@ -116,4 +127,4 @@ function drawChart(canvasId, key, color) {
 
 function drawCharts() { drawChart("cpu-chart", "cpu_percent", "#2563eb"); drawChart("memory-chart", "memory_percent", "#10b981"); }
 window.addEventListener("resize", drawCharts);
-boot(); loadRouters();
+boot();
