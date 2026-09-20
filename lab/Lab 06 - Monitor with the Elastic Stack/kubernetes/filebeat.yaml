@@ -37,9 +37,6 @@ data:
           host: ${NODE_NAME}
           matchers:
             - logs_path: {logs_path: /var/log/containers/}
-      - drop_event:
-          when.not.equals:
-            kubernetes.namespace: network-devops
     output.logstash:
       hosts: ["${LOGSTASH_HOST}"]
 ---
