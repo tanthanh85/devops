@@ -67,6 +67,8 @@ deploy-minikube:
     - kubectl -n "$KUBE_NAMESPACE" create secret generic synthetic-monitor-credentials --from-literal=username="$E2E_USERNAME" --from-literal=password="$E2E_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
     - kubectl apply -f kubernetes/filebeat.yaml
     - kubectl apply -f kubernetes/metricbeat.yaml
+    - kubectl -n "$KUBE_NAMESPACE" rollout restart daemonset/filebeat daemonset/metricbeat
+    - kubectl -n "$KUBE_NAMESPACE" rollout restart deployment/metricbeat-state
     - 'sed "s|image: network-monitor-synthetic:lab06|image: $SYNTHETIC_IMAGE|" kubernetes/synthetic-monitor.yaml | kubectl apply -f -'
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
@@ -96,6 +98,7 @@ post-deployment-web-test:
     - for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:18088/health && break; sleep 2; done
     - curl --fail --silent http://127.0.0.1:18088/health
     - curl --fail --silent http://127.0.0.1:18088/ | grep -F 'Network Operations Console'
+    - curl --fail --silent http://127.0.0.1:18088/instance | grep -F '"instance":"network-monitor-web-'
     - curl --fail --silent http://127.0.0.1:18088/api/setup/status
   artifacts:
     when: always

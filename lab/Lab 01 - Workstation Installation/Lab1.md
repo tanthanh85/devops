@@ -299,6 +299,14 @@ At this stage, `gitlab-runner --version` must work, but the runner remains unreg
 
 Elastic requires Elasticsearch, Logstash, and Kibana to use the same version. Use the supplied pinned Compose file and confirm its version with the instructor; do not improvise mixed versions.
 
+Elasticsearch requires at least **10 GB of free space** on the filesystem that stores Docker data. Check the available space before pulling or starting the Elastic images:
+
+```bash
+df -h /var/lib/docker
+```
+
+The `Avail` column must show `10G` or more. Stop here and free or expand disk space if less than 10 GB is available. Elasticsearch blocks primary-shard allocation when the filesystem exceeds its disk watermark, leaving the cluster in `red` status.
+
 ```bash
 cd ~/course-platform/elastic
 cp .env.example .env
@@ -313,8 +321,11 @@ The supplied Compose project includes Elasticsearch, Logstash, and Kibana at one
 ```bash
 docker compose ps
 curl -s http://127.0.0.1:9200 | jq
+curl -s http://127.0.0.1:9200/_cluster/health | jq
 docker compose ps --services | grep -E 'elasticsearch|logstash|kibana'
 ```
+
+The cluster status must be `yellow` or `green`. Do not continue while it is `red`.
 
 Open `http://127.0.0.1:5601`. Do not combine a Logstash image from a different stack version. A production Elastic deployment requires TLS, authentication, durable storage, capacity planning, backup, and lifecycle policy; the quickstart is not a production design.
 

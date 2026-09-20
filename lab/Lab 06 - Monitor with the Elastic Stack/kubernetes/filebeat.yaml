@@ -29,6 +29,9 @@ data:
         parsers:
           - container: {stream: all, format: auto}
         prospector.scanner.symlinks: true
+        # The default 1024-byte fingerprint delays harvesting quiet lab Pods.
+        # Start after 64 bytes so the Kubernetes log index appears promptly.
+        prospector.scanner.fingerprint.length: 64
     processors:
       - add_kubernetes_metadata:
           host: ${NODE_NAME}

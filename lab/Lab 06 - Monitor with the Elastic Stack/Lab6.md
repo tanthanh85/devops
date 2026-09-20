@@ -110,17 +110,26 @@ Choose a simple application username and password for the synthetic monitor. You
 
 ## Step 3: Start ELK
 
+Confirm that the Docker data filesystem has at least **10 GB of free space**:
+
+```bash
+df -h /var/lib/docker
+```
+
+The `Avail` column must show `10G` or more. Stop and free or expand disk space before continuing if the available space is lower. Insufficient disk space prevents Elasticsearch from allocating primary shards and leaves the cluster in `red` status.
+
 ```bash
 cd ~/course-platform/elastic
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/compose.override.yaml .
 cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
 docker compose -f compose.yaml -f compose.override.yaml config --quiet
 docker compose -f compose.yaml -f compose.override.yaml up -d
+docker compose -f compose.yaml -f compose.override.yaml up -d --force-recreate logstash
 docker compose -f compose.yaml -f compose.override.yaml ps
 curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=120s'
 ```
 
-The Logstash row must include `0.0.0.0:15044->5044/tcp`. Port `5044` remains available only on localhost for Lab 1, while port `15044` is the Lab 6 ingestion port for Kubernetes. Use this only on the isolated course workstation.
+Recreating Logstash activates the Lab 6 index-routing pipeline even when the ELK containers were already running from Lab 1. The Logstash row must include `0.0.0.0:15044->5044/tcp`. Port `5044` remains available only on localhost for Lab 1, while port `15044` is the Lab 6 ingestion port for Kubernetes. Use this only on the isolated course workstation.
 
 ## Step 4: Determine the Logstash address
 
@@ -258,15 +267,23 @@ The duration covers page access, sign-in, router selection, RESTCONF collection,
 
 ## Step 8: Confirm Elasticsearch data
 
-Wait approximately 30 seconds, and then run:
+Use the web application at least once, wait approximately 30 seconds, and then run:
 
 ```bash
-curl -s 'http://127.0.0.1:9200/_cat/indices/kubernetes-metrics-*,kubernetes-logs-*,network-monitor-logs-*,network-monitor-synthetic-*?v'
+for INDEX_PATTERN in \
+  'kubernetes-metrics-*' \
+  'kubernetes-logs-*' \
+  'network-monitor-logs-*' \
+  'network-monitor-synthetic-*'; do
+  printf '\n%s\n' "$INDEX_PATTERN"
+  curl -s "http://127.0.0.1:9200/_cat/indices/$INDEX_PATTERN?v"
+done
+
 curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@timestamp:desc' \
   | jq '.hits.hits[0]._source'
 ```
 
-Do not create dashboards until all four index families contain recent documents.
+Do not continue to Step 9 until all four index families are listed. Kibana cannot create a data view for an index pattern that has not received any documents.
 
 ## Step 9: Create Kibana data views
 
@@ -436,6 +453,14 @@ sudo ss -lntp | grep ':15044'
 
 ### Elasticsearch remains red
 
+Check disk space first. Elasticsearch requires at least 10 GB free for this lab:
+
+```bash
+df -h /var/lib/docker
+```
+
+If less than 10 GB is available, free or expand the VM disk before retrying shard allocation.
+
 Wait up to two minutes for primary shards to start:
 
 ```bash
@@ -459,6 +484,42 @@ kubectl -n network-devops logs deployment/metricbeat-state --tail=50
 ```
 
 Use the `kubernetes-metrics-*` data view and a time range containing recent events.
+
+### Kibana cannot create `kubernetes-logs-*`
+
+If Kibana lists `kubernetes-metrics-*` but rejects `kubernetes-logs-*`, Metricbeat is working but Filebeat has not published a Pod log event. Do not substitute the metrics index for the logs data view.
+
+Confirm that Filebeat is ready and inspect its output:
+
+```bash
+kubectl -n network-devops get daemonset filebeat
+kubectl -n network-devops get pods -l app=filebeat -o wide
+kubectl -n network-devops logs daemonset/filebeat --tail=100 \
+  | grep -Ei 'error|warn|logstash|publish|harvest' || true
+```
+
+Generate application activity by signing in to the web interface and opening the Monitoring tab. Wait 30 seconds, and then check again:
+
+```bash
+curl -s 'http://127.0.0.1:9200/_cat/indices/kubernetes-logs-*?v'
+curl -s 'http://127.0.0.1:9200/_cat/indices/network-monitor-logs-*?v'
+```
+
+If neither index appears, commit and push the current Lab 6 files so the main-branch pipeline reapplies the Filebeat configuration and restarts the collector. Create the Kibana data views only after the indices appear.
+
+### Only `kubernetes-logs-*` exists
+
+This indicates that events are reaching Logstash but the Lab 6 routing pipeline is not active. Recopy the supplied pipeline and recreate only Logstash:
+
+```bash
+cd ~/course-platform/elastic
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
+docker compose -f compose.yaml -f compose.override.yaml \
+  up -d --force-recreate logstash
+docker compose -f compose.yaml -f compose.override.yaml logs --tail=100 logstash
+```
+
+Use the application, run the synthetic check from Step 7, wait 30 seconds, and verify the four index families again with the Step 8 commands. Existing events remain in `kubernetes-logs-*`; newly received events are routed to the appropriate indices.
 
 ### The synthetic check fails
 
