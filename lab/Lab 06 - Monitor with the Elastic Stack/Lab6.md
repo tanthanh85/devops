@@ -298,17 +298,30 @@ Open `http://127.0.0.1:5601`, then open **Stack Management > Data Views**. Creat
 | Application logs | `network-monitor-logs-*` |
 | Synthetic service | `network-monitor-synthetic-*` |
 
-Use **Discover** to confirm that each data view returns recent events.
+Confirm the data in **Discover**:
+
+1. Open the main navigation menu in the upper-left corner.
+2. Select **Discover**. If it is not visible, use the global search field at the top of Kibana, search for `Discover`, and select **Discover** from the results.
+3. Alternatively, open `http://127.0.0.1:5601/app/discover` directly.
+4. Open the data-view selector in the upper-left area of Discover.
+5. Select each of the four data views and confirm that recent documents appear.
+6. Set the time picker to **Last 24 hours** if no documents are initially displayed.
+
+The feature is named **Discover**, not **Discovery**.
 
 ## Step 10: Build the Kubernetes and application dashboard
 
-Create **Network DevOps — Kubernetes and Application** and filter it with:
+Open the main navigation menu, select **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Kubernetes and Application**.
+
+Set the time picker to **Last 15 minutes** and the refresh interval to **30 seconds**. In the dashboard query bar, enter:
 
 ```text
 kubernetes.namespace: "network-devops"
 ```
 
-Add metric panels using a unique count of `kubernetes.pod.name`:
+Select **Add panel > New visualization** to open Lens. For every panel, first select the data view shown below, choose the visualization type, configure the fields, enter the panel filter, and select **Save and return**.
+
+Create three **Metric** panels with the **Kubernetes metrics** data view:
 
 | Panel | Filter | Expected |
 |---|---|---:|
@@ -316,33 +329,74 @@ Add metric panels using a unique count of `kubernetes.pod.name`:
 | Running application Pods | `kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
 | Running database Pods | `kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
 
-Add these supporting panels:
+For each metric, select **Unique count** of `kubernetes.pod.name` as the primary metric. If Pod counts include recently terminated Pods, reduce the dashboard time range to **Last 5 minutes** and wait for the next 15-second Metricbeat collection.
 
-1. Desired versus available replicas by Deployment.
-2. Pod phase and restart count by tier.
-3. Container CPU and memory by Pod and tier.
-4. Kubernetes node CPU and memory.
-5. NGINX and Flask HTTP status counts.
-6. NGINX and Flask response time over time.
-7. RESTCONF request and response events filtered by `event.action: restconf_request OR event.action: restconf_response`.
-8. RESTCONF response status and duration by router and requested metric.
-9. Recent warning and error logs.
+Add the Kubernetes charts with these Lens settings:
+
+| Panel title | Visualization | Horizontal axis / Rows | Vertical axis / Metrics | Breakdown | Panel filter |
+|---|---|---|---|---|---|
+| Deployment replicas | Line | `@timestamp` date histogram | Last value of `kubernetes.deployment.replicas.desired`; last value of `kubernetes.deployment.replicas.available` | Top values of `kubernetes.deployment.name` | `event.dataset: kubernetes.state_deployment` |
+| Pod phase by tier | Bar, stacked | Top values of `kubernetes.labels.tier` | Unique count of `kubernetes.pod.name` | Top values of `kubernetes.pod.status.phase` | `event.dataset: kubernetes.state_pod` |
+| Container restarts | Bar | Top values of `kubernetes.pod.name` | Maximum of `kubernetes.container.status.restarts` | Top values of `kubernetes.container.name` | `event.dataset: kubernetes.state_container` |
+| Pod CPU | Line | `@timestamp` date histogram | Average of `kubernetes.pod.cpu.usage.node.pct` | Top values of `kubernetes.pod.name` | `event.dataset: kubernetes.pod` |
+| Pod memory | Line | `@timestamp` date histogram | Average of `kubernetes.pod.memory.usage.node.pct` | Top values of `kubernetes.pod.name` | `event.dataset: kubernetes.pod` |
+| Minikube node CPU | Line | `@timestamp` date histogram | Average of `kubernetes.node.cpu.usage.nanocores` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node` |
+| Minikube node memory | Line | `@timestamp` date histogram | Average of `kubernetes.node.memory.usage.bytes` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node` |
+
+For percentage fields, open the metric dimension and set **Value format** to **Percent**. For byte fields, select **Bytes**. Give every panel the title shown in the table.
+
+Add the application charts using the **Application logs** data view:
+
+| Panel title | Visualization | Horizontal axis | Vertical axis | Breakdown | Panel filter |
+|---|---|---|---|---|---|
+| HTTP status codes | Bar | `@timestamp` date histogram | Count of records | Top values of `http.response.status_code` | `event.action: http_request` |
+| Flask response time | Line | `@timestamp` date histogram | Average of `event.duration_ms` | None | `service.name: network-monitor-app AND event.action: http_request` |
+| NGINX response time | Line | `@timestamp` date histogram | Average of `http.request.duration_seconds` | None | `service.name: network-monitor-web AND event.action: http_request` |
+| RESTCONF duration | Line | `@timestamp` date histogram | Average of `event.duration_ms` | Top values of `network.router.metric` | `event.action: restconf_response` |
+| RESTCONF status | Bar | Top values of `network.router.name` | Count of records | Top values of `http.response.status_code` | `event.action: restconf_response` |
+
+Create the recent warning and error table in Discover:
+
+1. Open **Discover** and select **Application logs**.
+2. Enter `log.level: (warning OR error)` in the KQL query bar.
+3. Add `@timestamp`, `service.name`, `kubernetes.pod.name`, `log.level`, and `message` as table columns.
+4. Sort `@timestamp` in descending order.
+5. Select **Save**, name the session **Network DevOps — Recent warnings and errors**, and return to the dashboard.
+6. Select **Add from library**, find the saved Discover session, and add it.
+
+Arrange the three Pod-count metrics across the top, place Kubernetes resource charts in the middle, and place application and RESTCONF panels below them. Select **Save**.
 
 The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics. Router CPU and memory fields must not be used for Kubernetes resource charts.
 
 ## Step 11: Build the synthetic-service dashboard
 
-Create **Network DevOps — Synthetic Service** using the **Synthetic service** data view. Add:
+Open **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Synthetic Service**. Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**.
 
-1. Latest monitor status from `monitor.status`.
-2. Latest HTTP code from `http.response.status_code`.
-3. HTTP-code count over time.
-4. Availability percentage using successful checks divided by all checks.
-5. Average, 95th-percentile, and maximum `event.duration_ms`.
-6. Response-time line chart over time.
-7. Failure table with timestamp, HTTP code, error type, sanitized message, and duration.
+Select **Add panel > New visualization**, choose the **Synthetic service** data view, and create these Lens panels:
 
-Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**. The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
+| Panel title | Visualization | Configuration | Panel filter |
+|---|---|---|---|
+| Latest monitor status | Metric | Last value of `monitor.status`, sorted by `@timestamp` | None |
+| Latest HTTP code | Metric | Last value of `http.response.status_code`, sorted by `@timestamp` | None |
+| Checks by HTTP code | Bar | `@timestamp` date histogram; count of records; break down by top values of `http.response.status_code` | None |
+| Availability | Metric | Formula: `count(kql='monitor.status: "up"') / count()`; format as Percent | None |
+| Average response time | Metric | Average of `event.duration_ms`; format as milliseconds | None |
+| 95th-percentile response time | Metric | Percentile of `event.duration_ms`; percentile `95`; format as milliseconds | None |
+| Maximum response time | Metric | Maximum of `event.duration_ms`; format as milliseconds | None |
+| Response time | Line | `@timestamp` date histogram; average of `event.duration_ms` | None |
+
+Create the failure table in Discover:
+
+1. Open **Discover** and select **Synthetic service**.
+2. Enter `event.outcome: failure` in the KQL query bar.
+3. Add `@timestamp`, `monitor.status`, `http.response.status_code`, `error.type`, `error.message`, and `event.duration_ms` as table columns.
+4. Sort `@timestamp` in descending order.
+5. Select **Save** and name the session **Network DevOps — Synthetic failures**.
+6. Return to **Network DevOps — Synthetic Service**, select **Edit > Add from library**, and add the saved Discover session.
+
+Arrange the status and response-time metrics across the top, place the HTTP-code and response-time charts in the middle, and place the failure table at the bottom. Select **Save**.
+
+The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
 
 ## Step 12: Scale the web and application tiers through CI/CD
 
