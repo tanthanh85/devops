@@ -66,6 +66,8 @@ spec:
             - {name: config, mountPath: /etc/filebeat.yml, subPath: filebeat.yml, readOnly: true}
             # Keep container symlinks and Pod targets in one mounted tree.
             - {name: host-logs, mountPath: /var/log, readOnly: true}
+            # Minikube's Docker runtime links Pod logs to this directory.
+            - {name: docker-container-logs, mountPath: /var/lib/docker/containers, readOnly: true}
             - {name: data, mountPath: /usr/share/filebeat/data}
           resources:
             requests: {cpu: 50m, memory: 100Mi}
@@ -73,4 +75,5 @@ spec:
       volumes:
         - {name: config, configMap: {name: filebeat-config}}
         - {name: host-logs, hostPath: {path: /var/log, type: Directory}}
+        - {name: docker-container-logs, hostPath: {path: /var/lib/docker/containers, type: Directory}}
         - {name: data, emptyDir: {}}
