@@ -321,11 +321,7 @@ Set the time picker to **Last 15 minutes**. To enable automatic refresh:
 
 The circular-arrow button to the right of the time range performs one manual refresh; it does not display the configured interval.
 
-In the dashboard query bar, enter:
-
-```text
-kubernetes.namespace: "network-devops"
-```
+Leave the dashboard-level KQL query bar empty. Apply the namespace in the individual Pod, deployment, container, and application panel filters below. Node metric documents do not contain `kubernetes.namespace`, so a dashboard-wide namespace filter would hide the node panels.
 
 Select **Add panel > New visualization** to open Lens. For every panel, first select the data view shown below, choose the visualization type, configure the fields, enter the panel filter, and select **Save and return**.
 
@@ -345,7 +341,7 @@ Create the first Pod-count panel exactly as follows:
 3. Enter this complete filter in the KQL bar and press **Enter**:
 
    ```text
-   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running
+   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running
    ```
 
 4. In the left **Search field names** box, search for `kubernetes.pod.name`.
@@ -354,15 +350,15 @@ Create the first Pod-count panel exactly as follows:
 7. Confirm that the preview shows a number, and select **Save and return**.
 8. On the dashboard, open the panel actions menu, select **Edit visualization**, and use the same process whenever a panel needs correction.
 
-Create the application and database Pod metrics with the same procedure. Replace only the KQL filter and panel title. Include `event.dataset: kubernetes.state_pod` in all three filters.
+Create the application and database Pod metrics with the same procedure. Replace only the tier value and panel title. Include `event.dataset: kubernetes.pod AND metricset.name: state_pod` in all three filters.
 
 Create three **Metric** panels with the **Kubernetes metrics** data view:
 
 | Panel | Filter | Expected |
 |---|---|---:|
-| Running web Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
-| Running application Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
-| Running database Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
+| Running web Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
+| Running application Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
+| Running database Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
 
 For each metric, select **Unique count** of `kubernetes.pod.name` as the primary metric. If Pod counts include recently terminated Pods, reduce the dashboard time range to **Last 5 minutes** and wait for the next 15-second Metricbeat collection.
 
@@ -370,13 +366,13 @@ Add the Kubernetes charts with these Lens settings:
 
 | Panel title | Visualization | Horizontal axis / Rows | Vertical axis / Metrics | Breakdown | Panel filter |
 |---|---|---|---|---|---|
-| Deployment replicas | Line | `@timestamp` date histogram | Last value of `kubernetes.deployment.replicas.desired`; last value of `kubernetes.deployment.replicas.available` | Top values of `kubernetes.deployment.name` | `event.dataset: kubernetes.state_deployment` |
-| Pod phase by tier | Bar, stacked | Top values of `kubernetes.labels.tier` | Unique count of `kubernetes.pod.name` | Top values of `kubernetes.pod.status.phase` | `event.dataset: kubernetes.state_pod` |
-| Container restarts | Bar | Top values of `kubernetes.pod.name` | Maximum of `kubernetes.container.status.restarts` | Top values of `kubernetes.container.name` | `event.dataset: kubernetes.state_container` |
-| Pod CPU | Line | `@timestamp` date histogram | Average of `kubernetes.pod.cpu.usage.node.pct` | Top values of `kubernetes.pod.name` | `event.dataset: kubernetes.pod` |
-| Pod memory | Line | `@timestamp` date histogram | Average of `kubernetes.pod.memory.usage.node.pct` | Top values of `kubernetes.pod.name` | `event.dataset: kubernetes.pod` |
-| Minikube node CPU | Line | `@timestamp` date histogram | Average of `kubernetes.node.cpu.usage.nanocores` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node` |
-| Minikube node memory | Line | `@timestamp` date histogram | Average of `kubernetes.node.memory.usage.bytes` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node` |
+| Deployment replicas | Line | `@timestamp` date histogram | Last value of `kubernetes.deployment.replicas.desired`; last value of `kubernetes.deployment.replicas.available` | Top values of `kubernetes.deployment.name` | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.deployment AND metricset.name: state_deployment` |
+| Pod phase by tier | Bar, stacked | Top values of `kubernetes.labels.tier` | Unique count of `kubernetes.pod.name` | Top values of `kubernetes.pod.status.phase` | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod` |
+| Container restarts | Bar | Top values of `kubernetes.pod.name` | Maximum of `kubernetes.container.status.restarts` | Top values of `kubernetes.container.name` | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.container AND metricset.name: state_container` |
+| Pod CPU | Line | `@timestamp` date histogram | Average of `kubernetes.pod.cpu.usage.node.pct` | Top values of `kubernetes.pod.name` | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: pod` |
+| Pod memory | Line | `@timestamp` date histogram | Average of `kubernetes.pod.memory.usage.node.pct` | Top values of `kubernetes.pod.name` | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: pod` |
+| Minikube node CPU | Line | `@timestamp` date histogram | Average of `kubernetes.node.cpu.usage.nanocores` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node AND metricset.name: node` |
+| Minikube node memory | Line | `@timestamp` date histogram | Average of `kubernetes.node.memory.usage.bytes` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node AND metricset.name: node` |
 
 For percentage fields, open the metric dimension and set **Value format** to **Percent**. For byte fields, select **Bytes**. Give every panel the title shown in the table.
 
@@ -396,16 +392,16 @@ Add the application charts using the **Application logs** data view:
 
 | Panel title | Visualization | Horizontal axis | Vertical axis | Breakdown | Panel filter |
 |---|---|---|---|---|---|
-| HTTP status codes | Bar | `@timestamp` date histogram | Count of records | Top values of `http.response.status_code` | `event.action: http_request` |
-| Flask response time | Line | `@timestamp` date histogram | Average of `event.duration_ms` | None | `service.name: network-monitor-app AND event.action: http_request` |
-| NGINX response time | Line | `@timestamp` date histogram | Average of `http.request.duration_seconds` | None | `service.name: network-monitor-web AND event.action: http_request` |
-| RESTCONF duration | Line | `@timestamp` date histogram | Average of `event.duration_ms` | Top values of `network.router.metric` | `event.action: restconf_response` |
-| RESTCONF status | Bar | Top values of `network.router.name` | Count of records | Top values of `http.response.status_code` | `event.action: restconf_response` |
+| HTTP status codes | Bar | `@timestamp` date histogram | Count of records | Top values of `http.response.status_code` | `kubernetes.namespace: "network-devops" AND event.action: http_request` |
+| Flask response time | Line | `@timestamp` date histogram | Average of `event.duration_ms` | None | `kubernetes.namespace: "network-devops" AND service.name: network-monitor-app AND event.action: http_request` |
+| NGINX response time | Line | `@timestamp` date histogram | Average of `http.request.duration_seconds` | None | `kubernetes.namespace: "network-devops" AND service.name: network-monitor-web AND event.action: http_request` |
+| RESTCONF duration | Line | `@timestamp` date histogram | Average of `event.duration_ms` | Top values of `network.router.metric` | `kubernetes.namespace: "network-devops" AND event.action: restconf_response` |
+| RESTCONF status | Bar | Top values of `network.router.name` | Count of records | Top values of `http.response.status_code` | `kubernetes.namespace: "network-devops" AND event.action: restconf_response` |
 
 Create the recent warning and error table in Discover:
 
 1. Open **Discover** and select **Application logs**.
-2. Enter `log.level: (warning OR error)` in the KQL query bar.
+2. Enter `kubernetes.namespace: "network-devops" AND log.level: (warning OR error)` in the KQL query bar.
 3. Add `@timestamp`, `service.name`, `kubernetes.pod.name`, `log.level`, and `message` as table columns.
 4. Sort `@timestamp` in descending order.
 5. Select **Save**, name the session **Network DevOps — Recent warnings and errors**, and return to the dashboard.
