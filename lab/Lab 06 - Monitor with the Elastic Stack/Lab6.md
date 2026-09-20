@@ -313,7 +313,15 @@ The feature is named **Discover**, not **Discovery**.
 
 Open the main navigation menu, select **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Kubernetes and Application**.
 
-Set the time picker to **Last 15 minutes** and the refresh interval to **30 seconds**. In the dashboard query bar, enter:
+Set the time picker to **Last 15 minutes**. To enable automatic refresh:
+
+1. Select the calendar and down-arrow control immediately to the left of **Last 15 minutes**.
+2. In the time-filter menu, open **Refresh every**.
+3. Enter `30`, select **Seconds**, and enable or start the refresh interval.
+
+The circular-arrow button to the right of the time range performs one manual refresh; it does not display the configured interval.
+
+In the dashboard query bar, enter:
 
 ```text
 kubernetes.namespace: "network-devops"
@@ -370,7 +378,7 @@ The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics
 
 ## Step 11: Build the synthetic-service dashboard
 
-Open **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Synthetic Service**. Set the time range to **Last 30 minutes** and auto-refresh to **30 seconds**.
+Open **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Synthetic Service**. Set the time range to **Last 30 minutes**. Open the calendar and down-arrow time-filter control, select **Refresh every**, set it to `30 Seconds`, and enable the interval.
 
 Select **Add panel > New visualization**, choose the **Synthetic service** data view, and create these Lens panels:
 
