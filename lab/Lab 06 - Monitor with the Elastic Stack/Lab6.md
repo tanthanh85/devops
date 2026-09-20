@@ -550,6 +550,25 @@ kubectl -n network-devops get jobs,pods -l app=network-monitor-synthetic
 kubectl -n network-devops logs "job/$SYNTHETIC_JOB"
 ```
 
+### The synthetic Job succeeds but its index is missing
+
+Confirm that the Job log contains `"event.dataset":"network_monitor.synthetic"`. Then reinstall the supplied Logstash pipeline and recreate Logstash so the dedicated synthetic routing rule is active:
+
+```bash
+cd ~/course-platform/elastic
+cp ~/netdevops-labs/netdevops-lab06-elk/elastic/logstash/pipeline/logstash.conf pipeline/
+docker compose -f compose.yaml -f compose.override.yaml \
+  up -d --force-recreate logstash
+```
+
+Run a new Step 7 synthetic Job, wait 30 seconds, and verify:
+
+```bash
+curl -s 'http://127.0.0.1:9200/_cat/indices/network-monitor-synthetic-*?v'
+```
+
+Previously collected synthetic events remain in `network-monitor-logs-*`; Logstash does not move historical documents when its routing pipeline changes.
+
 ## Cleanup
 
 Suspend synthetic checks while retaining the collected data:
