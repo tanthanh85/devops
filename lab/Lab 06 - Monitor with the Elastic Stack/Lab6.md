@@ -329,13 +329,40 @@ kubernetes.namespace: "network-devops"
 
 Select **Add panel > New visualization** to open Lens. For every panel, first select the data view shown below, choose the visualization type, configure the fields, enter the panel filter, and select **Save and return**.
 
+The Lens editor contains these controls:
+
+- **Data view** is at the upper left and should show **Kubernetes metrics** or **Application logs**.
+- The KQL query bar runs across the top. Enter the panel filter here and press **Enter**.
+- The visualization-type dropdown is the first control in the right pane. It initially displays **Bar**.
+- **Horizontal axis**, **Vertical axis**, and **Breakdown** are field wells in the right pane.
+- Select a configured field in a field well to change its operation, display name, value format, or other options.
+- **Save and return** remains unavailable until the visualization has at least one metric.
+
+Create the first Pod-count panel exactly as follows:
+
+1. Confirm that **Data view** shows **Kubernetes metrics**.
+2. In the right pane, select **Bar**, and then select **Metric**.
+3. Enter this complete filter in the KQL bar and press **Enter**:
+
+   ```text
+   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running
+   ```
+
+4. In the left **Search field names** box, search for `kubernetes.pod.name`.
+5. Drag `kubernetes.pod.name` to the **Primary metric** field well in the right pane. Selecting the field instead of dragging it also adds it to the visualization.
+6. Select the added field, change **Operation** to **Unique count**, and set **Name** or **Display name** to `Running web Pods`.
+7. Confirm that the preview shows a number, and select **Save and return**.
+8. On the dashboard, open the panel actions menu, select **Edit visualization**, and use the same process whenever a panel needs correction.
+
+Create the application and database Pod metrics with the same procedure. Replace only the KQL filter and panel title. Include `event.dataset: kubernetes.state_pod` in all three filters.
+
 Create three **Metric** panels with the **Kubernetes metrics** data view:
 
 | Panel | Filter | Expected |
 |---|---|---:|
-| Running web Pods | `kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
-| Running application Pods | `kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
-| Running database Pods | `kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
+| Running web Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
+| Running application Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
+| Running database Pods | `event.dataset: kubernetes.state_pod AND kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
 
 For each metric, select **Unique count** of `kubernetes.pod.name` as the primary metric. If Pod counts include recently terminated Pods, reduce the dashboard time range to **Last 5 minutes** and wait for the next 15-second Metricbeat collection.
 
@@ -352,6 +379,18 @@ Add the Kubernetes charts with these Lens settings:
 | Minikube node memory | Line | `@timestamp` date histogram | Average of `kubernetes.node.memory.usage.bytes` | Top values of `kubernetes.node.name` | `event.dataset: kubernetes.node` |
 
 For percentage fields, open the metric dimension and set **Value format** to **Percent**. For byte fields, select **Bytes**. Give every panel the title shown in the table.
+
+For each chart in the table:
+
+1. Return to the dashboard and select **Add > New visualization**.
+2. Confirm that the correct data view is selected.
+3. Enter the full panel filter in the top KQL bar and press **Enter**.
+4. Select **Bar** in the right pane and change it to the visualization listed in the table.
+5. Select **Add or drag-and-drop a field** under each field well, search for the exact field name, and select it.
+6. Select the added field to change its operation to **Average**, **Maximum**, **Last value**, **Unique count**, **Date histogram**, or **Top values**, as specified.
+7. To add the second replica metric, select the plus control under **Vertical axis** and add `kubernetes.deployment.replicas.available` separately.
+8. Use **Breakdown** only when the table specifies one. Leave it empty when the table says **None**.
+9. Check the preview, select **Save and return**, open the panel actions menu, select **Edit panel settings**, and enter the panel title.
 
 Add the application charts using the **Application logs** data view:
 
@@ -381,6 +420,18 @@ The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics
 Open **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Synthetic Service**. Set the time range to **Last 30 minutes**. Open the calendar and down-arrow time-filter control, select **Refresh every**, set it to `30 Seconds`, and enable the interval.
 
 Select **Add panel > New visualization**, choose the **Synthetic service** data view, and create these Lens panels:
+
+For the first synthetic panel:
+
+1. Select **Add > New visualization**.
+2. Open the data-view dropdown at the upper left and select **Synthetic service**.
+3. Select the visualization-type dropdown in the right pane and choose **Metric**.
+4. Search for `monitor.status` in the left field list and add it as the **Primary metric**.
+5. Select the added field and choose **Last value**. If Lens displays a sort-field option, select `@timestamp` and descending order.
+6. Set its display name to `Latest monitor status`.
+7. Select **Save and return**, and set the panel title to **Latest monitor status**.
+
+Repeat **Add > New visualization** for every row in the following table. Always reselect **Synthetic service**, because Lens can retain the data view used by the previous panel.
 
 | Panel title | Visualization | Configuration | Panel filter |
 |---|---|---|---|
