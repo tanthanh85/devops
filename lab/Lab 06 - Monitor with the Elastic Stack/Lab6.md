@@ -285,7 +285,7 @@ curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@
 
 Do not continue to Step 9 until all four index families are listed. Kibana cannot create a data view for an index pattern that has not received any documents.
 
-Filebeat reads Kubernetes container-log symlinks and enriches each event by matching its Pod UID under `/var/log/pods`. The Step 10 namespace filter keeps the dashboard scoped to this lab.
+Filebeat mounts the Minikube node's `/var/log` tree read-only, reads Kubernetes container-log symlinks, and enriches each event by matching its Pod UID under `/var/log/pods`. Mounting the complete tree ensures the symlinks and their targets remain resolvable. The Step 10 namespace filter keeps the dashboard scoped to this lab.
 
 ## Step 9: Create Kibana data views
 
@@ -533,9 +533,13 @@ kubectl -n network-devops get pods -l app=filebeat -o wide
 kubectl -n network-devops logs daemonset/filebeat --tail=100
 kubectl -n network-devops get configmap filebeat-config \
   -o jsonpath='{.data.filebeat\.yml}' | grep 'paths:'
+kubectl -n network-devops exec daemonset/filebeat -- sh -c \
+  'find -L /var/log/containers -type f -print -quit'
 ```
 
-The configured path must be `/var/log/containers/*.log`, and the metadata matcher must use `/var/log/pods/`. Commit and push the current Lab 6 files. The main-branch pipeline reapplies the Filebeat ConfigMap and restarts the DaemonSet. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
+The configured path must be `/var/log/containers/*.log`, and the metadata matcher must use `/var/log/pods/`. The final command must print a readable log-file path. No output means the container symlinks are broken inside the Filebeat Pod.
+
+Commit and push the current Lab 6 files. The main-branch pipeline reapplies the configuration, mounts the complete host `/var/log` tree, restarts Filebeat, and verifies that at least one symlink target is readable. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
 
 ### The synthetic check fails
 

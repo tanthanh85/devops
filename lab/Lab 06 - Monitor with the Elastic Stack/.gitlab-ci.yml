@@ -73,6 +73,7 @@ deploy-minikube:
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/filebeat --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" exec daemonset/filebeat -- sh -c 'find -L /var/log/containers -type f -print -quit | grep -q .'
     - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/metricbeat --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/kube-state-metrics --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/metricbeat-state --timeout=180s

@@ -64,14 +64,13 @@ spec:
           securityContext: {runAsUser: 0, readOnlyRootFilesystem: true}
           volumeMounts:
             - {name: config, mountPath: /etc/filebeat.yml, subPath: filebeat.yml, readOnly: true}
-            - {name: container-logs, mountPath: /var/log/containers, readOnly: true}
-            - {name: pod-logs, mountPath: /var/log/pods, readOnly: true}
+            # Keep container symlinks and Pod targets in one mounted tree.
+            - {name: host-logs, mountPath: /var/log, readOnly: true}
             - {name: data, mountPath: /usr/share/filebeat/data}
           resources:
             requests: {cpu: 50m, memory: 100Mi}
             limits: {cpu: 300m, memory: 300Mi}
       volumes:
         - {name: config, configMap: {name: filebeat-config}}
-        - {name: container-logs, hostPath: {path: /var/log/containers, type: Directory}}
-        - {name: pod-logs, hostPath: {path: /var/log/pods, type: Directory}}
+        - {name: host-logs, hostPath: {path: /var/log, type: Directory}}
         - {name: data, emptyDir: {}}
