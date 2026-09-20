@@ -29,6 +29,13 @@ def _find(value, names):
 
 
 def _restconf_get(router, path, metric, request_options):
+    url = f"https://{router.host}:{router.port}{path}"
+    request_payload = {
+        "method": "GET",
+        "url": url,
+        "headers": {"Accept": request_options["headers"]["Accept"]},
+        "body": None,
+    }
     fields = {
         "event.action": "restconf_request",
         "network.protocol": "restconf",
@@ -37,13 +44,14 @@ def _restconf_get(router, path, metric, request_options):
         "network.router.name": router.name,
         "network.router.address": router.host,
         "network.router.metric": metric,
+        "restconf.request.payload": request_payload,
     }
     current_app.logger.info("RESTCONF GET %s", path, extra={"event_fields": fields})
 
     started = time.perf_counter()
     try:
         response = requests.get(
-            f"https://{router.host}:{router.port}{path}",
+            url,
             **request_options,
         )
     except requests.RequestException as exc:
@@ -58,12 +66,17 @@ def _restconf_get(router, path, metric, request_options):
                 "event.outcome": "failure",
                 "event.duration_ms": duration_ms,
                 "error.type": type(exc).__name__,
+                "restconf.response.payload": None,
             }},
         )
         raise
 
     duration_ms = round((time.perf_counter() - started) * 1000, 2)
     outcome = "success" if response.ok else "failure"
+    try:
+        response_payload = response.json()
+    except ValueError:
+        response_payload = response.text
     current_app.logger.info(
         "RESTCONF %s %s %.2fms",
         response.status_code,
@@ -75,6 +88,7 @@ def _restconf_get(router, path, metric, request_options):
             "event.outcome": outcome,
             "http.response.status_code": response.status_code,
             "event.duration_ms": duration_ms,
+            "restconf.response.payload": response_payload,
         }},
     )
     response.raise_for_status()

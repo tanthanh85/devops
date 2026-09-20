@@ -13,7 +13,7 @@ The normal application capacity is three web Pods, three application Pods, and o
 - Collect Kubernetes node, Pod, container, readiness, restart, and replica metrics.
 - Display the number of running Pods for each application tier.
 - Centralize NGINX, Flask, MySQL, and synthetic-monitor logs.
-- Log each RESTCONF request and response without storing credentials or response payloads.
+- Log each RESTCONF request and its complete response payload without storing credentials.
 - Display synthetic HTTP status, availability, and response time.
 - Correlate a failed or slow check with application and Kubernetes telemetry.
 
@@ -43,7 +43,7 @@ flowchart LR
     E --> B[Kibana dashboards]
 ```
 
-Kubernetes Metricbeat monitors the node, Pods, containers, and volumes inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects Pod logs and short RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
+Kubernetes Metricbeat monitors the node, Pods, containers, and volumes inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects Pod logs and detailed RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
 
 ## Before you begin: clean up Lab 5
 
@@ -233,14 +233,29 @@ minikube service network-monitor-web \
 
 Create the administrator with the same username and password stored in `E2E_USERNAME` and `E2E_PASSWORD`. Sign in and add the instructor-provided router in **Inventory management**.
 
-Generate a router collection from the web interface, and then confirm that the application logged short RESTCONF request and response events:
+Generate a router collection from the web interface, and then confirm that the application logged RESTCONF request and response events:
 
 ```bash
 kubectl -n network-devops logs deployment/network-monitor-app --since=2m \
   | grep RESTCONF
 ```
 
-For each CPU and memory query, the log shows the request path followed by the response status and duration. It does not contain the username, password, authorization header, or RESTCONF response body.
+For each CPU and memory query, the request event contains `restconf.request.payload`, including the method, complete URL, Accept header, and an empty GET body. The response event contains the HTTP status, duration, and complete decoded RESTCONF payload in `restconf.response.payload`. The log does not contain the username, password, or authorization header.
+
+To inspect the payloads directly, run:
+
+```bash
+kubectl -n network-devops logs deployment/network-monitor-app --since=10m \
+  | jq 'select(."event.action" == "restconf_request" or ."event.action" == "restconf_response") | {
+      timestamp: ."@timestamp",
+      action: ."event.action",
+      router: ."network.router.name",
+      metric: ."network.router.metric",
+      request: ."restconf.request.payload",
+      status: ."http.response.status_code",
+      response: ."restconf.response.payload"
+    }'
+```
 
 ```bash
 kubectl -n network-devops get daemonset,deployment,cronjob,pods -o wide
@@ -375,6 +390,26 @@ Metricbeat writes a new document every 15 seconds. Therefore, **Count**, **Sum**
 ### Panel 3: Ready database Pods
 
 The database uses a StatefulSet rather than a Deployment. The Lab 6 Metricbeat manifest enables `state_statefulset` for this panel.
+
+Before creating this panel, make sure the latest Lab 6 commit has been merged into `main` and that its pipeline has completed successfully. The deploy stage applies the updated Metricbeat ConfigMap and restarts `metricbeat-state`. Wait at least 30 seconds after the deployment, and then verify that StatefulSet documents are being collected:
+
+```bash
+kubectl -n network-devops get configmap metricbeat-state-config \
+  -o jsonpath='{.data.metricbeat\.yml}' | grep state_statefulset
+
+curl -s 'http://127.0.0.1:9200/kubernetes-metrics-*/_count' \
+  -H 'Content-Type: application/json' \
+  -d '{"query":{"term":{"metricset.name":"state_statefulset"}}}'
+```
+
+The first command must show `state_statefulset`, and the Elasticsearch response must show a `count` greater than zero. If the count is zero, confirm that `metricbeat-state` is running and check its recent logs:
+
+```bash
+kubectl -n network-devops get pods -l app=metricbeat,role=state
+kubectl -n network-devops logs deployment/metricbeat-state --since=5m
+```
+
+Do not create the database visualization until Elasticsearch contains at least one `state_statefulset` document. Kibana can list mapped StatefulSet fields even when those fields do not yet contain data.
 
 1. On the dashboard, select **Add > New visualization**.
 2. Select the **Kubernetes metrics** data view.
@@ -572,7 +607,7 @@ The Pod-count panels may take up to one Metricbeat collection interval to reflec
 - Kubernetes node, Pod, container, readiness, restart, and replica metrics are visible.
 - Pod-count panels show web `3`, application `3`, and database `1` during normal operation.
 - NGINX, Flask, MySQL, and synthetic logs are searchable.
-- Every RESTCONF CPU and memory query creates a short request event and response event without recording the payload.
+- Every RESTCONF CPU and memory query records a sanitized request object and the complete response payload without recording credentials.
 - The synthetic CronJob runs every two minutes.
 - The synthetic dashboard shows HTTP status codes, availability, and response time.
 - Scaling changes are committed, merged, and deployed through GitLab CI/CD.
