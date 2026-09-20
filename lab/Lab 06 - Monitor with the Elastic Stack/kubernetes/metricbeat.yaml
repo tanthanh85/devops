@@ -113,7 +113,7 @@ data:
   metricbeat.yml: |
     metricbeat.modules:
       - module: kubernetes
-        metricsets: [state_node, state_pod, state_container, state_deployment, state_replicaset, state_service]
+        metricsets: [state_node, state_pod, state_container, state_deployment, state_replicaset, state_statefulset, state_service]
         period: 15s
         hosts: ["kube-state-metrics:8080"]
     output.logstash:

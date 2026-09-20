@@ -334,33 +334,35 @@ The Lens editor contains these controls:
 - Select a configured field in a field well to change its operation, display name, value format, or other options.
 - **Save and return** remains unavailable until the visualization has at least one metric.
 
-Create the first Pod-count panel exactly as follows:
+Metricbeat writes a new document every 15 seconds. Therefore, **Count**, **Sum**, or a count of Pod documents over **Last 15 minutes** measures historical samples, not the current number of Pods. For the three current-value tiles, use **Last value** of the controller's ready or available replica gauge.
+
+Create the web Pod-count panel exactly as follows:
 
 1. Confirm that **Data view** shows **Kubernetes metrics**.
 2. In the right pane, select **Bar**, and then select **Metric**.
 3. Enter this complete filter in the KQL bar and press **Enter**:
 
    ```text
-   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running
+   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.deployment AND metricset.name: state_deployment AND kubernetes.deployment.name: "network-monitor-web"
    ```
 
-4. In the left **Search field names** box, search for `kubernetes.pod.name`.
-5. Drag `kubernetes.pod.name` to the **Primary metric** field well in the right pane. Selecting the field instead of dragging it also adds it to the visualization.
-6. Select the added field, change **Operation** to **Unique count**, and set **Name** or **Display name** to `Running web Pods`.
+4. In the left **Search field names** box, search for `kubernetes.deployment.replicas.available`.
+5. Drag `kubernetes.deployment.replicas.available` to the **Primary metric** field well in the right pane. Selecting the field instead of dragging it also adds it to the visualization.
+6. Select the added field, change **Operation** to **Last value**, and set **Name** or **Display name** to `Available web Pods`.
 7. Confirm that the preview shows a number, and select **Save and return**.
 8. On the dashboard, open the panel actions menu, select **Edit visualization**, and use the same process whenever a panel needs correction.
 
-Create the application and database Pod metrics with the same procedure. Replace only the tier value and panel title. Include `event.dataset: kubernetes.pod AND metricset.name: state_pod` in all three filters.
+Create the application tile from its Deployment gauge in the same way. The database is a StatefulSet, so use its ready-replica gauge. The Lab 6 Metricbeat manifest enables `state_statefulset` for this purpose.
 
 Create three **Metric** panels with the **Kubernetes metrics** data view:
 
-| Panel | Filter | Expected |
-|---|---|---:|
-| Running web Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: web AND kubernetes.pod.status.phase: running` | 3 |
-| Running application Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: app AND kubernetes.pod.status.phase: running` | 3 |
-| Running database Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.pod AND metricset.name: state_pod AND kubernetes.labels.tier: db AND kubernetes.pod.status.phase: running` | 1 |
+| Panel | Panel filter | Primary metric | Operation | Expected |
+|---|---|---|---|---:|
+| Available web Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.deployment AND metricset.name: state_deployment AND kubernetes.deployment.name: "network-monitor-web"` | `kubernetes.deployment.replicas.available` | Last value | 3 |
+| Available application Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.deployment AND metricset.name: state_deployment AND kubernetes.deployment.name: "network-monitor-app"` | `kubernetes.deployment.replicas.available` | Last value | 3 |
+| Ready database Pods | `kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.statefulset AND metricset.name: state_statefulset AND kubernetes.statefulset.name: "network-monitor-db"` | `kubernetes.statefulset.replicas.ready` | Last value | 1 |
 
-For each metric, select **Unique count** of `kubernetes.pod.name` as the primary metric. If Pod counts include recently terminated Pods, reduce the dashboard time range to **Last 5 minutes** and wait for the next 15-second Metricbeat collection.
+Keep the dashboard at **Last 15 minutes** and auto-refresh every 30 seconds. **Last value** selects the newest gauge inside that time window, so scaling changes appear after the next 15-second Metricbeat collection. Do not use **Count**, **Sum**, or **Unique count** for these three tiles.
 
 Add the Kubernetes charts with these Lens settings:
 
