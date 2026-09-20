@@ -1,0 +1,12 @@
+services:
+  kibana:
+    environment:
+      # Stable lab-only key required for Kibana rules and connector secrets.
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "lab07-kibana-encrypted-objects-key-2026"
+      # Restrict webhook actions to the GitLab host used by this lab.
+      XPACK_ACTIONS_ALLOWEDHOSTS: '["gitlab.com"]'
+  logstash:
+    ports:
+      - "0.0.0.0:15044:5044"
+    volumes:
+      - ./pipeline:/usr/share/logstash/pipeline:ro

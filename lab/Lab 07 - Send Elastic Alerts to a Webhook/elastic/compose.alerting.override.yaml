@@ -1,5 +1,0 @@
-services:
-  kibana:
-    environment:
-      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTION_KEY:?Set a 32-character-or-longer key}
-

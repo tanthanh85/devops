@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: network-monitor-synthetic, namespace: network-devops}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: network-monitor-synthetic, tier: test}
+  template:
+    metadata:
+      labels: {app: network-monitor-synthetic, tier: test}
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: synthetic-monitor
+          image: network-monitor-synthetic:lab07
+          imagePullPolicy: Never
+          env:
+            - {name: HOME, value: /tmp}
+            - {name: TEST_BASE_URL, value: "http://network-monitor-web:8080"}
+            - {name: CONFIG_API_URL, value: "http://network-monitor-app:8000"}
+            - {name: SYNTHETIC_API_TOKEN, valueFrom: {secretKeyRef: {name: network-monitor-runtime, key: FLASK_SECRET_KEY}}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: temporary-files, mountPath: /tmp}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+      volumes:
+        - name: temporary-files
+          emptyDir: {medium: Memory, sizeLimit: 256Mi}

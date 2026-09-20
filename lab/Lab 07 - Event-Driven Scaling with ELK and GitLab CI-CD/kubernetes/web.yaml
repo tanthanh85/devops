@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-monitor-web
+  namespace: network-devops
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: network-monitor
+      tier: web
+  template:
+    metadata:
+      labels:
+        app: network-monitor
+        tier: web
+    spec:
+      containers:
+        - name: web
+          image: network-monitor-web:lab07
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+            - name: temporary-files
+              mountPath: /tmp
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: temporary-files
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: network-monitor-web
+  namespace: network-devops
+spec:
+  type: NodePort
+  selector:
+    app: network-monitor
+    tier: web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
