@@ -16,6 +16,16 @@ def test_inventory_requires_authentication(client):
     assert client.get("/api/routers").status_code==401
 
 
+def test_session_status_controls_authenticated_application(client):
+    assert client.get("/api/session").get_json() == {"authenticated": False}
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    status = client.get("/api/session").get_json()
+    assert status == {"authenticated": True, "username": "admin", "is_admin": True}
+    client.delete("/api/session")
+    assert client.get("/api/session").get_json() == {"authenticated": False}
+
+
 def test_application_instance_is_visible(client):
     response=client.get("/api/instance")
     assert response.status_code==200
