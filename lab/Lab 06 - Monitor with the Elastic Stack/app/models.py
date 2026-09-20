@@ -29,3 +29,21 @@ class Router(db.Model):
     password_ciphertext = db.Column(db.Text, nullable=False)
     enabled = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+
+
+class SyntheticConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True, default=1)
+    username = db.Column(db.String(64), nullable=False)
+    password_ciphertext = db.Column(db.Text, nullable=False)
+    interval_seconds = db.Column(db.Integer, nullable=False, default=120)
+    enabled = db.Column(db.Boolean, nullable=False, default=True)
+    updated_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
+class SyntheticResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    outcome = db.Column(db.String(16), nullable=False)
+    status_code = db.Column(db.Integer)
+    response_time_ms = db.Column(db.Float, nullable=False)
+    error_message = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)

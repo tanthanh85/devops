@@ -53,8 +53,6 @@ deploy-minikube:
     - test -n "$FLASK_SECRET_KEY"
     - test -n "$INVENTORY_ENCRYPTION_KEY"
     - test -n "$LOGSTASH_HOST"
-    - test -n "$E2E_USERNAME"
-    - test -n "$E2E_PASSWORD"
     - minikube update-context --profile network-devops
     - kubectl apply -f kubernetes/namespace.yaml
     - export DATABASE_URL="mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@network-monitor-db:3306/${MYSQL_DATABASE}"
@@ -64,7 +62,6 @@ deploy-minikube:
     - 'sed "s|image: network-monitor-app:lab06|image: $APP_IMAGE|" kubernetes/app.yaml | kubectl apply -f -'
     - 'sed "s|image: network-monitor-web:lab06|image: $WEB_IMAGE|" kubernetes/web.yaml | kubectl apply -f -'
     - kubectl -n "$KUBE_NAMESPACE" create configmap observability-endpoints --from-literal=LOGSTASH_HOST="$LOGSTASH_HOST" --dry-run=client -o yaml | kubectl apply -f -
-    - kubectl -n "$KUBE_NAMESPACE" create secret generic synthetic-monitor-credentials --from-literal=username="$E2E_USERNAME" --from-literal=password="$E2E_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
     - kubectl apply -f kubernetes/filebeat.yaml
     - kubectl apply -f kubernetes/metricbeat.yaml
     - kubectl -n "$KUBE_NAMESPACE" rollout restart daemonset/filebeat daemonset/metricbeat
@@ -77,6 +74,7 @@ deploy-minikube:
     - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/metricbeat --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/kube-state-metrics --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/metricbeat-state --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-synthetic --timeout=180s
 
 verify-deployment:
   stage: verify

@@ -1,6 +1,8 @@
 const $ = id => document.getElementById(id);
 let samples = [];
 let refreshTimer = null;
+let syntheticRefreshTimer = null;
+let syntheticResults = [];
 let collecting = false;
 
 async function call(url, options = {}) {
@@ -17,8 +19,9 @@ function message(text = "", type = "error") {
 
 function selectTab(name) {
   document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === name));
-  $("monitoring-panel").hidden = name !== "monitoring"; $("inventory-panel").hidden = name !== "inventory";
+  $("monitoring-panel").hidden = name !== "monitoring"; $("inventory-panel").hidden = name !== "inventory"; $("synthetic-panel").hidden = name !== "synthetic";
   if (name === "monitoring") requestAnimationFrame(drawCharts);
+  if (name === "synthetic") { loadSynthetic(); requestAnimationFrame(drawSyntheticChart); }
 }
 document.querySelectorAll(".tab").forEach(tab => tab.onclick = () => selectTab(tab.dataset.tab));
 
@@ -71,9 +74,39 @@ async function loadRouters() {
   } catch (error) { if (error.message !== "authentication required") message(error.message); }
 }
 
+async function loadSynthetic() {
+  try {
+    const data = await call("/api/synthetic/config");
+    syntheticResults = data.results || [];
+    if (data.configured) {
+      $("synthetic-form").username.value = data.username;
+      $("synthetic-interval").value = String(data.interval_seconds);
+      $("synthetic-config-status").textContent = `Active as ${data.username}; checking every ${formatInterval(data.interval_seconds)}.`;
+    }
+    const result = data.last_result;
+    if (result) {
+      $("synthetic-last-outcome").textContent = result.outcome === "success" ? "Success" : "Failure";
+      $("synthetic-last-outcome").className = result.outcome === "success" ? "result-success" : "result-failure";
+      const code = result.status_code == null ? "no HTTP status" : `HTTP ${result.status_code}`;
+      $("synthetic-last-detail").textContent = `${code} · ${result.response_time_ms.toFixed(2)} ms · ${new Date(result.timestamp).toLocaleString()}`;
+    }
+    $("synthetic-chart-empty").hidden = syntheticResults.length > 0;
+    drawSyntheticChart();
+    if (!syntheticRefreshTimer) syntheticRefreshTimer = setInterval(loadSynthetic, 5000);
+  } catch (error) {
+    if (error.message !== "administrator access required") message(error.message);
+  }
+}
+
+function formatInterval(seconds) {
+  if (seconds < 60) return `${seconds} seconds`;
+  return `${seconds / 60} minute${seconds === 60 ? "" : "s"}`;
+}
+
 $("setup-form").onsubmit = async event => { event.preventDefault(); try { await call("/api/setup/admin", {method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(event.target)))}); $("setup").hidden = true; $("login").hidden = false; message("Administrator created. Sign in.", "success"); } catch (error) { message(error.message); } };
 $("login-form").onsubmit = async event => { event.preventDefault(); try { await call("/api/session", {method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(event.target)))}); message(); await loadRouters(); } catch (error) { message(error.message); } };
 $("router-form").onsubmit = async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(event.target)); data.port = Number(data.port); try { await call("/api/routers", {method: "POST", body: JSON.stringify(data)}); event.target.reset(); event.target.port.value = 443; await loadRouters(); message("Router added.", "success"); } catch (error) { message(error.message); } };
+$("synthetic-form").onsubmit = async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(event.target)); data.interval_seconds = Number(data.interval_seconds); try { await call("/api/synthetic/config", {method: "POST", body: JSON.stringify(data)}); event.target.password.value = ""; await loadSynthetic(); message("Synthetic test account and interval saved.", "success"); } catch (error) { message(error.message); } };
 
 async function collectMetrics() {
   const id = $("router-select").value;
@@ -97,7 +130,7 @@ async function collectMetrics() {
 $("collect").onclick = collectMetrics;
 $("refresh-interval").onchange = () => startAutoRefresh(true);
 $("router-select").onchange = () => { samples = []; $("cpu-chart-empty").hidden = false; $("memory-chart-empty").hidden = false; startAutoRefresh(true); };
-$("logout").onclick = async () => { stopAutoRefresh(); await call("/api/session", {method: "DELETE"}); location.reload(); };
+$("logout").onclick = async () => { stopAutoRefresh(); if (syntheticRefreshTimer) clearInterval(syntheticRefreshTimer); await call("/api/session", {method: "DELETE"}); location.reload(); };
 
 function drawChart(canvasId, key, color) {
   const canvas = $(canvasId); if (!canvas || !samples.length || canvas.parentElement.clientWidth === 0) return;
@@ -115,5 +148,19 @@ function drawChart(canvasId, key, color) {
 }
 
 function drawCharts() { drawChart("cpu-chart", "cpu_percent", "#2563eb"); drawChart("memory-chart", "memory_percent", "#10b981"); }
-window.addEventListener("resize", drawCharts);
+function drawSyntheticChart() {
+  const canvas = $("synthetic-chart");
+  if (!canvas || !syntheticResults.length || canvas.parentElement.clientWidth === 0) return;
+  const ratio = devicePixelRatio || 1, width = canvas.parentElement.clientWidth, height = 280;
+  canvas.width = width * ratio; canvas.height = height * ratio; canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
+  const context = canvas.getContext("2d"); context.scale(ratio, ratio);
+  const pad = {left: 62, right: 18, top: 18, bottom: 34}, plotW = width - pad.left - pad.right, plotH = height - pad.top - pad.bottom;
+  const maximum = Math.max(100, ...syntheticResults.map(result => Number(result.response_time_ms) || 0));
+  context.font = "12px system-ui"; context.fillStyle = "#718096"; context.strokeStyle = "#e4eaf1"; context.lineWidth = 1;
+  for (let step = 0; step <= 4; step += 1) { const value = maximum * step / 4, y = pad.top + plotH - step * plotH / 4; context.beginPath(); context.moveTo(pad.left, y); context.lineTo(width - pad.right, y); context.stroke(); context.fillText(`${Math.round(value)} ms`, 3, y + 4); }
+  const points = syntheticResults.map((result, index) => ({x: pad.left + (syntheticResults.length < 2 ? plotW / 2 : index * plotW / (syntheticResults.length - 1)), y: pad.top + plotH - (Number(result.response_time_ms) || 0) * plotH / maximum, outcome: result.outcome}));
+  context.strokeStyle = "#2563eb"; context.lineWidth = 3; context.beginPath(); points.forEach((point, index) => index ? context.lineTo(point.x, point.y) : context.moveTo(point.x, point.y)); context.stroke();
+  points.forEach(point => { context.fillStyle = point.outcome === "success" ? "#10b981" : "#dc2626"; context.beginPath(); context.arc(point.x, point.y, 5, 0, Math.PI * 2); context.fill(); });
+}
+window.addEventListener("resize", () => { drawCharts(); drawSyntheticChart(); });
 boot(); loadRouters();

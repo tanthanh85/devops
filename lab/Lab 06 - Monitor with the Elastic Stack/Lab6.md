@@ -14,8 +14,8 @@ The normal application capacity is three web Pods, three application Pods, and o
 - Display the number of running Pods for each application tier.
 - Centralize NGINX, Flask, MySQL, and synthetic-monitor logs.
 - Log each RESTCONF request and its complete response payload without storing credentials.
-- Display synthetic HTTP status, availability, and response time.
-- Correlate a failed or slow check with application and Kubernetes telemetry.
+- Build a Kubernetes metrics dashboard for the Minikube node and application tiers.
+- Explore Kubernetes, application, RESTCONF, and synthetic-monitor logs in Discover.
 
 ## How the components work
 
@@ -26,7 +26,7 @@ flowchart LR
       W[Web Pods x3]
       A[App Pods x3]
       DB[(MySQL Pod x1)]
-      S[Synthetic CronJob]
+      S[Synthetic test Deployment]
       F[Filebeat]
       KM[Kubernetes Metricbeat]
       KS[kube-state-metrics]
@@ -40,10 +40,10 @@ flowchart LR
     F --> L
     KM --> L
     L --> E[(Elasticsearch)]
-    E --> B[Kibana dashboards]
+    E --> B[Kibana dashboard and Discover]
 ```
 
-Kubernetes Metricbeat monitors the node, Pods, containers, and volumes inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects Pod logs and detailed RESTCONF request/response events from the application. The synthetic CronJob uses the real web interface and records the HTTP status and total response time.
+Kubernetes Metricbeat monitors the node, Pods, containers, and volumes inside Minikube. kube-state-metrics provides desired and current workload state, including Pod counts. Filebeat collects Pod logs and detailed RESTCONF request/response events from the application. The synthetic test Deployment uses the real web interface at the interval selected by the learner and records the HTTP status and web response time.
 
 ## Before you begin: clean up Lab 5
 
@@ -154,8 +154,6 @@ In GitLab, open **Settings > CI/CD > Variables** and create:
 | `FLASK_SECRET_KEY` | 32-byte hexadecimal value |
 | `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
 | `LOGSTASH_HOST` | The value printed in Step 4 |
-| `E2E_USERNAME` | Chosen application username |
-| `E2E_PASSWORD` | Chosen application password |
 
 Select **Masked and hidden** when GitLab accepts the value. Use environment scope `course/minikube` when that field is available.
 
@@ -211,7 +209,7 @@ The feature-branch push does not create a pipeline. In GitLab:
 4. Open **Build > Pipelines** and select the new `main` pipeline.
 5. Wait for `unit-test`, `build-images`, `deploy-minikube`, `verify-deployment`, and `post-deployment-web-test` to succeed.
 
-The pipeline builds all three images and deploys the application, Filebeat, Metricbeat, kube-state-metrics, and the synthetic CronJob. Do not run `docker build`, `minikube image load`, or `kubectl apply` manually.
+The pipeline builds all three images and deploys the application, Filebeat, Metricbeat, kube-state-metrics, and the synthetic test Deployment. Do not run `docker build`, `minikube image load`, or `kubectl apply` manually.
 
 Verify the deployed capacity:
 
@@ -231,7 +229,16 @@ minikube service network-monitor-web \
   --profile network-devops
 ```
 
-Create the administrator with the same username and password stored in `E2E_USERNAME` and `E2E_PASSWORD`. Sign in and add the instructor-provided router in **Inventory management**.
+On the first visit, create the administrator account and sign in. Add the instructor-provided router in **Inventory management**.
+
+Open **Synthetic testing** and configure the test:
+
+1. Enter a new username that is different from the administrator username.
+2. Enter a password for this dedicated synthetic-test account.
+3. Select an interval: **30 seconds**, **1 minute**, **2 minutes**, **5 minutes**, **10 minutes**, or **30 minutes**.
+4. Select **Save and start testing**. The application creates the non-administrator account and stores the synthetic configuration.
+5. Wait for the first check. The **Last synthetic test** panel changes to **Success** or **Failure** and shows the HTTP status, response time, and timestamp.
+6. Confirm that the **Web response time** chart receives a point. This duration starts immediately before the synthetic client requests the network-monitor web page and stops when the initial web response finishes loading; it does not include login or RESTCONF collection time.
 
 Generate a router collection from the web interface, and then confirm that the application logged RESTCONF request and response events:
 
@@ -258,16 +265,11 @@ kubectl -n network-devops logs deployment/network-monitor-app --since=10m \
 ```
 
 ```bash
-kubectl -n network-devops get daemonset,deployment,cronjob,pods -o wide
+kubectl -n network-devops get daemonset,deployment,pods -o wide
 kubectl -n network-devops logs daemonset/filebeat --tail=20
 kubectl -n network-devops logs daemonset/metricbeat --tail=20
 kubectl -n network-devops logs deployment/metricbeat-state --tail=20
-export SYNTHETIC_JOB="synthetic-manual-$(date +%s)"
-kubectl -n network-devops create job \
-  --from=cronjob/network-monitor-synthetic "$SYNTHETIC_JOB"
-kubectl -n network-devops wait --for=condition=complete \
-  "job/$SYNTHETIC_JOB" --timeout=120s
-kubectl -n network-devops logs "job/$SYNTHETIC_JOB" | jq
+kubectl -n network-devops logs deployment/network-monitor-synthetic --tail=20
 ```
 
 A successful result contains:
@@ -276,13 +278,13 @@ A successful result contains:
 - `event.outcome: success`
 - `http.response.status_code: 200`
 - `event.duration_ms`
-- Router CPU and memory values returned through the application
+- `event.duration_ms`, containing the network-monitor web response time
 
-The duration covers page access, sign-in, router selection, RESTCONF collection, and display of the result.
+The synthetic Deployment checks for configuration changes every five seconds. A newly saved account or interval takes effect without redeploying the application.
 
 ## Step 8: Confirm Elasticsearch data
 
-Use the web application at least once, wait approximately 30 seconds, and then run:
+Use the web application, configure synthetic testing, wait for its first result, and then run:
 
 ```bash
 for INDEX_PATTERN in \
@@ -300,7 +302,7 @@ curl -s 'http://127.0.0.1:9200/network-monitor-synthetic-*/_search?size=1&sort=@
 
 Do not continue to Step 9 until all four index families are listed. Kibana cannot create a data view for an index pattern that has not received any documents.
 
-Filebeat mounts the Minikube node's `/var/log` tree and Docker's `/var/lib/docker/containers` directory read-only. Kubernetes container links resolve through `/var/log/pods` to the Docker runtime log, and Filebeat enriches each event with Pod metadata. Its fingerprint length is reduced to 64 bytes so the single short record produced by a synthetic Job is harvested. The Step 10 namespace filter keeps the dashboard scoped to this lab.
+Filebeat mounts the Minikube node's `/var/log` tree and Docker's `/var/lib/docker/containers` directory read-only. Kubernetes container links resolve through `/var/log/pods` to the Docker runtime log, and Filebeat enriches each event with Pod metadata. Its fingerprint length is reduced to 64 bytes so short synthetic records are harvested. The Step 10 namespace filter keeps the dashboard scoped to this lab.
 
 ## Step 9: Create Kibana data views
 
@@ -322,9 +324,9 @@ Confirm the data in **Discover**:
 5. Select each of the four data views and confirm that recent documents appear.
 6. Set the time picker to **Last 24 hours** if no documents are initially displayed.
 
-## Step 10: Build the Kubernetes and application dashboard
+## Step 10: Build the Kubernetes metrics dashboard
 
-Open the main navigation menu, select **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Kubernetes and Application**.
+Open the main navigation menu, select **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Kubernetes Metrics**.
 
 Set the time picker to **Last 15 minutes**. To enable automatic refresh:
 
@@ -334,13 +336,13 @@ Set the time picker to **Last 15 minutes**. To enable automatic refresh:
 
 The circular-arrow button to the right of the time range performs one manual refresh; it does not display the configured interval.
 
-Leave the dashboard-level KQL query bar empty. Apply the namespace in the individual Pod, deployment, container, and application panel filters below. Node metric documents do not contain `kubernetes.namespace`, so a dashboard-wide namespace filter would hide the node panels.
+Leave the dashboard-level KQL query bar empty. Apply the namespace in the individual Pod, deployment, and container panel filters below. Node metric documents do not contain `kubernetes.namespace`, so a dashboard-wide namespace filter would hide the node panels.
 
 Select **Add panel > New visualization** to open Lens. For every panel, first select the data view shown below, choose the visualization type, configure the fields, enter the panel filter, and select **Save and return**.
 
 The Lens editor contains these controls:
 
-- **Data view** is at the upper left and should show **Kubernetes metrics** or **Application logs**.
+- **Data view** is at the upper left and should show **Kubernetes metrics** for every dashboard panel.
 - The KQL query bar runs across the top. Enter the panel filter here and press **Enter**.
 - The visualization-type dropdown is the first control in the right pane. It initially displays **Bar**.
 - **Horizontal axis**, **Vertical axis**, and **Breakdown** are field wells in the right pane.
@@ -456,70 +458,75 @@ For each chart in the table:
 8. Use **Breakdown** only when the table specifies one. Leave it empty when the table says **None**.
 9. Check the preview, select **Save and return**, open the panel actions menu, select **Edit panel settings**, and enter the panel title.
 
-Add the application charts using the **Application logs** data view:
-
-| Panel title | Visualization | Horizontal axis | Vertical axis | Breakdown | Panel filter |
-|---|---|---|---|---|---|
-| HTTP status codes | Bar | `@timestamp` date histogram | Count of records | Top values of `http.response.status_code` | `kubernetes.namespace: "network-devops" AND event.action: http_request` |
-| Flask response time | Line | `@timestamp` date histogram | Average of `event.duration_ms` | None | `kubernetes.namespace: "network-devops" AND service.name: network-monitor-app AND event.action: http_request` |
-| NGINX response time | Line | `@timestamp` date histogram | Average of `http.request.duration_seconds` | None | `kubernetes.namespace: "network-devops" AND service.name: network-monitor-web AND event.action: http_request` |
-| RESTCONF duration | Line | `@timestamp` date histogram | Average of `event.duration_ms` | Top values of `network.router.metric` | `kubernetes.namespace: "network-devops" AND event.action: restconf_response` |
-| RESTCONF status | Bar | Top values of `network.router.name` | Count of records | Top values of `http.response.status_code` | `kubernetes.namespace: "network-devops" AND event.action: restconf_response` |
-
-Create the recent warning and error table in Discover:
-
-1. Open **Discover** and select **Application logs**.
-2. Enter `kubernetes.namespace: "network-devops" AND log.level: (warning OR error)` in the KQL query bar.
-3. Add `@timestamp`, `service.name`, `kubernetes.pod.name`, `log.level`, and `message` as table columns.
-4. Sort `@timestamp` in descending order.
-5. Select **Save**, name the session **Network DevOps — Recent warnings and errors**, and return to the dashboard.
-6. Select **Add from library**, find the saved Discover session, and add it.
-
-Arrange the three Pod-count metrics across the top, place Kubernetes resource charts in the middle, and place application and RESTCONF panels below them. Select **Save**.
+Arrange the three Pod-count metrics across the top and place the Kubernetes resource charts below them. Select **Save**.
 
 The Pod-count panels use kube-state-metrics. Resource panels use kubelet metrics. Router CPU and memory fields must not be used for Kubernetes resource charts.
 
-## Step 11: Build the synthetic-service dashboard
+## Step 11: Explore logs in Discover
 
-Open **Dashboards**, select **Create dashboard**, and save it as **Network DevOps — Synthetic Service**. Set the time range to **Last 30 minutes**. Open the calendar and down-arrow time-filter control, select **Refresh every**, set it to `30 Seconds`, and enable the interval.
+Do not create dashboards for the log data views. Use **Discover** to investigate Kubernetes logs, application and RESTCONF logs, and synthetic-monitor results.
 
-Select **Add panel > New visualization**, choose the **Synthetic service** data view, and create these Lens panels:
+### Explore Kubernetes Pod logs
 
-For the first synthetic panel:
+1. Open the main navigation menu and select **Discover**.
+2. Select the **Kubernetes logs** data view.
+3. Set the time range to **Last 30 minutes**.
+4. Enter this KQL query and press **Enter**:
 
-1. Select **Add > New visualization**.
-2. Open the data-view dropdown at the upper left and select **Synthetic service**.
-3. Select the visualization-type dropdown in the right pane and choose **Metric**.
-4. Search for `monitor.status` in the left field list and add it as the **Primary metric**.
-5. Select the added field and choose **Last value**. If Lens displays a sort-field option, select `@timestamp` and descending order.
-6. Set its display name to `Latest monitor status`.
-7. Select **Save and return**, and set the panel title to **Latest monitor status**.
+   ```text
+   kubernetes.namespace: "network-devops"
+   ```
 
-Repeat **Add > New visualization** for every row in the following table. Always reselect **Synthetic service**, because Lens can retain the data view used by the previous panel.
+5. Add `@timestamp`, `kubernetes.pod.name`, `kubernetes.container.name`, `log.level`, and `message` as columns when those fields are available.
+6. Sort `@timestamp` in descending order.
+7. Select a document's expand control to inspect its complete JSON document.
 
-| Panel title | Visualization | Configuration | Panel filter |
-|---|---|---|---|
-| Latest monitor status | Metric | Last value of `monitor.status`, sorted by `@timestamp` | None |
-| Latest HTTP code | Metric | Last value of `http.response.status_code`, sorted by `@timestamp` | None |
-| Checks by HTTP code | Bar | `@timestamp` date histogram; count of records; break down by top values of `http.response.status_code` | None |
-| Availability | Metric | Formula: `count(kql='monitor.status: "up"') / count()`; format as Percent | None |
-| Average response time | Metric | Average of `event.duration_ms`; format as milliseconds | None |
-| 95th-percentile response time | Metric | Percentile of `event.duration_ms`; percentile `95`; format as milliseconds | None |
-| Maximum response time | Metric | Maximum of `event.duration_ms`; format as milliseconds | None |
-| Response time | Line | `@timestamp` date histogram; average of `event.duration_ms` | None |
+### Explore application logs
 
-Create the failure table in Discover:
+1. Change the data view to **Application logs**.
+2. Enter this KQL query and press **Enter**:
 
-1. Open **Discover** and select **Synthetic service**.
-2. Enter `event.outcome: failure` in the KQL query bar.
-3. Add `@timestamp`, `monitor.status`, `http.response.status_code`, `error.type`, `error.message`, and `event.duration_ms` as table columns.
+   ```text
+   kubernetes.namespace: "network-devops"
+   ```
+
+3. Add `@timestamp`, `service.name`, `kubernetes.pod.name`, `log.level`, `event.action`, and `message` as columns.
 4. Sort `@timestamp` in descending order.
-5. Select **Save** and name the session **Network DevOps — Synthetic failures**.
-6. Return to **Network DevOps — Synthetic Service**, select **Edit > Add from library**, and add the saved Discover session.
+5. To find warnings and errors, use:
 
-Arrange the status and response-time metrics across the top, place the HTTP-code and response-time charts in the middle, and place the failure table at the bottom. Select **Save**.
+   ```text
+   kubernetes.namespace: "network-devops" AND log.level: (warning OR error)
+   ```
 
-The check runs every two minutes. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
+### Explore RESTCONF requests and responses
+
+1. Keep the **Application logs** data view selected.
+2. Enter this KQL query and press **Enter**:
+
+   ```text
+   kubernetes.namespace: "network-devops" AND event.action: (restconf_request OR restconf_response)
+   ```
+
+3. Add `@timestamp`, `event.action`, `network.router.name`, `network.router.metric`, `http.response.status_code`, and `event.duration_ms` as columns.
+4. Expand a `restconf_request` document and inspect `restconf.request.payload`.
+5. Expand the corresponding `restconf_response` document and inspect the complete `restconf.response.payload`.
+6. Confirm that no username, password, cookie, or authorization header is present.
+
+### Explore synthetic-monitor results
+
+1. Change the data view to **Synthetic service**.
+2. Set the time range to **Last 30 minutes**.
+3. Add `@timestamp`, `monitor.status`, `http.response.status_code`, `event.duration_ms`, `event.outcome`, `error.type`, and `error.message` as columns.
+4. Sort `@timestamp` in descending order.
+5. To display only failed checks, enter:
+
+   ```text
+   event.outcome: failure
+   ```
+
+6. Clear the query to display all checks again.
+
+The synthetic check runs at the interval selected on the application's **Synthetic testing** page. Missing checks indicate a monitoring problem and do not prove that the application is healthy.
 
 ## Step 12: Scale the web and application tiers through CI/CD
 
@@ -608,8 +615,10 @@ The Pod-count panels may take up to one Metricbeat collection interval to reflec
 - Pod-count panels show web `3`, application `3`, and database `1` during normal operation.
 - NGINX, Flask, MySQL, and synthetic logs are searchable.
 - Every RESTCONF CPU and memory query records a sanitized request object and the complete response payload without recording credentials.
-- The synthetic CronJob runs every two minutes.
-- The synthetic dashboard shows HTTP status codes, availability, and response time.
+- The synthetic test Deployment uses the dedicated learner-created account and selected interval.
+- The application shows the last synthetic outcome and a chart of request-to-response time.
+- Kubernetes logs, application logs, complete RESTCONF payloads, and synthetic results have been inspected in Discover.
+- The only learner-created dashboard contains Kubernetes metrics.
 - Scaling changes are committed, merged, and deployed through GitLab CI/CD.
 - Kibana reflects the web and application Pod counts changing from three to one and back to three.
 - No password, cookie, authorization header, or router credential is stored in Elasticsearch.
@@ -698,7 +707,7 @@ docker compose -f compose.yaml -f compose.override.yaml \
 docker compose -f compose.yaml -f compose.override.yaml logs --tail=100 logstash
 ```
 
-Use the application, run the synthetic check from Step 7, wait 30 seconds, and verify the four index families again with the Step 8 commands. Existing events remain in `kubernetes-logs-*`; newly received events are routed to the appropriate indices.
+Use the application, configure the synthetic check from Step 7, wait for its first result, and verify the four index families again with the Step 8 commands. Existing events remain in `kubernetes-logs-*`; newly received events are routed to the appropriate indices.
 
 ### Only `kubernetes-metrics-*` exists
 
@@ -716,20 +725,20 @@ kubectl -n network-devops exec daemonset/filebeat -- sh -c \
 
 The configured path must be `/var/log/containers/*.log`, the fingerprint length must be `64`, and the metadata matcher must use `/var/log/pods/`. The final command must print a readable log-file path. No output means the container symlinks are broken inside the Filebeat Pod.
 
-Commit and push the current Lab 6 files. The main-branch pipeline reapplies the configuration, mounts both the Kubernetes and Docker runtime log paths, restarts Filebeat, and verifies that at least one complete symlink chain is readable. After the pipeline succeeds, use the web application, rerun the Step 7 synthetic Job, wait 30 seconds, and repeat the Step 8 index check.
+Commit and push the current Lab 6 files. The main-branch pipeline reapplies the configuration, mounts both the Kubernetes and Docker runtime log paths, restarts Filebeat, and verifies that at least one complete symlink chain is readable. After the pipeline succeeds, use the web application, configure synthetic testing, wait for a result, and repeat the Step 8 index check.
 
 ### The synthetic check fails
 
-Confirm the application credentials, router inventory, and router reachability. Then inspect the Job log:
+Confirm that the dedicated test account is configured on the **Synthetic testing** page. Then inspect the Deployment log:
 
 ```bash
-kubectl -n network-devops get jobs,pods -l app=network-monitor-synthetic
-kubectl -n network-devops logs "job/$SYNTHETIC_JOB"
+kubectl -n network-devops get deployment,pods -l app=network-monitor-synthetic
+kubectl -n network-devops logs deployment/network-monitor-synthetic --tail=100
 ```
 
-### The synthetic Job succeeds but its index is missing
+### The synthetic test succeeds but its index is missing
 
-Confirm that the Job log contains `"event.dataset":"network_monitor.synthetic"`. Then reinstall the supplied Logstash pipeline and recreate Logstash so the dedicated synthetic routing rule is active:
+Confirm that the Deployment log contains `"event.dataset":"network_monitor.synthetic"`. Then reinstall the supplied Logstash pipeline and recreate Logstash so the dedicated synthetic routing rule is active:
 
 ```bash
 cd ~/course-platform/elastic
@@ -738,7 +747,7 @@ docker compose -f compose.yaml -f compose.override.yaml \
   up -d --force-recreate logstash
 ```
 
-Run a new Step 7 synthetic Job, wait 30 seconds, and verify:
+Wait for the next configured synthetic test and verify:
 
 ```bash
 curl -s 'http://127.0.0.1:9200/_cat/indices/network-monitor-synthetic-*?v'
@@ -748,11 +757,10 @@ Previously collected synthetic events remain in `network-monitor-logs-*`; Logsta
 
 ## Cleanup
 
-Suspend synthetic checks while retaining the collected data:
+Stop synthetic checks while retaining the collected data:
 
 ```bash
-kubectl -n network-devops patch cronjob network-monitor-synthetic \
-  --type=merge -p '{"spec":{"suspend":true}}'
+kubectl -n network-devops scale deployment network-monitor-synthetic --replicas=0
 ```
 
 Stop ELK without deleting its data:

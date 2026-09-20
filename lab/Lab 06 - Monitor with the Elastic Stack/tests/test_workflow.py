@@ -31,3 +31,44 @@ def test_router_password_is_not_returned(client):
     payload=client.get("/api/routers").get_json()
     assert "secret-value" not in str(payload)
     assert "password" not in str(payload)
+
+
+def test_admin_configures_synthetic_account_and_results(client):
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    response = client.post("/api/synthetic/config", json={
+        "username": "synthetic-user",
+        "password": "synthetic-password",
+        "interval_seconds": 30,
+    })
+    assert response.status_code == 200
+
+    config = client.get(
+        "/api/internal/synthetic/config",
+        headers={"X-Synthetic-Token": "test-secret"},
+    )
+    assert config.status_code == 200
+    assert config.get_json()["username"] == "synthetic-user"
+    assert config.get_json()["password"] == "synthetic-password"
+    assert config.get_json()["interval_seconds"] == 30
+
+    recorded = client.post(
+        "/api/internal/synthetic/results",
+        headers={"X-Synthetic-Token": "test-secret"},
+        json={"outcome": "success", "status_code": 200, "response_time_ms": 42.5},
+    )
+    assert recorded.status_code == 201
+    dashboard = client.get("/api/synthetic/config").get_json()
+    assert dashboard["last_result"]["outcome"] == "success"
+    assert dashboard["last_result"]["response_time_ms"] == 42.5
+
+
+def test_synthetic_interval_must_be_allowed(client):
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    response = client.post("/api/synthetic/config", json={
+        "username": "synthetic-user",
+        "password": "synthetic-password",
+        "interval_seconds": 45,
+    })
+    assert response.status_code == 422

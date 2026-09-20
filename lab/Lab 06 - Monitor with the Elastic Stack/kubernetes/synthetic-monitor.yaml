@@ -1,39 +1,33 @@
-apiVersion: batch/v1
-kind: CronJob
+apiVersion: apps/v1
+kind: Deployment
 metadata: {name: network-monitor-synthetic, namespace: network-devops}
 spec:
-  schedule: "*/2 * * * *"
-  concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
-  jobTemplate:
+  replicas: 1
+  selector:
+    matchLabels: {app: network-monitor-synthetic, tier: test}
+  template:
+    metadata:
+      labels: {app: network-monitor-synthetic, tier: test}
     spec:
-      backoffLimit: 1
-      activeDeadlineSeconds: 90
-      ttlSecondsAfterFinished: 600
-      template:
-        metadata:
-          labels: {app: network-monitor-synthetic, tier: test}
-        spec:
-          restartPolicy: Never
-          containers:
-            - name: synthetic-monitor
-              image: network-monitor-synthetic:lab06
-              imagePullPolicy: IfNotPresent
-              env:
-                - {name: HOME, value: /tmp}
-                - {name: TEST_BASE_URL, value: "http://network-monitor-web:8080"}
-                - {name: E2E_USERNAME, valueFrom: {secretKeyRef: {name: synthetic-monitor-credentials, key: username}}}
-                - {name: E2E_PASSWORD, valueFrom: {secretKeyRef: {name: synthetic-monitor-credentials, key: password}}}
-              securityContext:
-                allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: true
-                capabilities: {drop: [ALL]}
-              volumeMounts:
-                - {name: temporary-files, mountPath: /tmp}
-              resources:
-                requests: {cpu: 100m, memory: 256Mi}
-                limits: {cpu: "1", memory: 1Gi}
-          volumes:
-            - name: temporary-files
-              emptyDir: {medium: Memory, sizeLimit: 256Mi}
+      restartPolicy: Always
+      containers:
+        - name: synthetic-monitor
+          image: network-monitor-synthetic:lab06
+          imagePullPolicy: Never
+          env:
+            - {name: HOME, value: /tmp}
+            - {name: TEST_BASE_URL, value: "http://network-monitor-web:8080"}
+            - {name: CONFIG_API_URL, value: "http://network-monitor-app:8000"}
+            - {name: SYNTHETIC_API_TOKEN, valueFrom: {secretKeyRef: {name: network-monitor-runtime, key: FLASK_SECRET_KEY}}}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: temporary-files, mountPath: /tmp}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+      volumes:
+        - name: temporary-files
+          emptyDir: {medium: Memory, sizeLimit: 256Mi}
