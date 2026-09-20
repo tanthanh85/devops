@@ -56,6 +56,8 @@ Complete this section only if you performed Lab 5 on the same Minikube profile:
 5. Select **Run** for the manual `cleanup-minikube` job.
 6. Wait until the cleanup job succeeds.
 
+The Lab 5 cleanup removes its namespace, workloads, MySQL claim, and persistent volume. Its database data is permanently deleted, but its Minikube images are retained.
+
 Confirm that the Lab 5 namespace has been removed:
 
 ```bash
@@ -757,11 +759,12 @@ Previously collected synthetic events remain in `network-monitor-logs-*`; Logsta
 
 ## Cleanup
 
-Stop synthetic checks while retaining the collected data:
+In GitLab, open the successful Lab 6 `main` pipeline and run the manual `cleanup-minikube` job. Wait until it succeeds. The job removes:
 
-```bash
-kubectl -n network-devops scale deployment network-monitor-synthetic --replicas=0
-```
+- The entire `network-devops` namespace and all Lab 6 workloads.
+- The MySQL persistent volume claim and its associated persistent volume, permanently deleting the database.
+
+The cleanup job verifies that the namespace and captured database PV no longer exist. It leaves Minikube images, the shared Minikube profile, and the external ELK installation intact.
 
 Stop ELK without deleting its data:
 

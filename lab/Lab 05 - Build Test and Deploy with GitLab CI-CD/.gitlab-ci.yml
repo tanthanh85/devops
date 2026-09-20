@@ -107,4 +107,11 @@ cleanup-minikube:
   allow_failure: true
   script:
     - minikube update-context --profile network-devops
-    - kubectl delete namespace "$KUBE_NAMESPACE" --ignore-not-found=true
+    - export DB_PVC="mysql-data-network-monitor-db-0"
+    - export DB_PV="$(kubectl -n "$KUBE_NAMESPACE" get pvc "$DB_PVC" -o jsonpath='{.spec.volumeName}' 2>/dev/null || true)"
+    - kubectl -n "$KUBE_NAMESPACE" delete statefulset network-monitor-db --ignore-not-found=true --wait=true --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" delete pvc "$DB_PVC" --ignore-not-found=true --wait=true --timeout=180s
+    - kubectl delete namespace "$KUBE_NAMESPACE" --ignore-not-found=true --wait=true --timeout=300s
+    - 'if [ -n "$DB_PV" ]; then kubectl delete pv "$DB_PV" --ignore-not-found=true --wait=true --timeout=180s; fi'
+    - test -z "$(kubectl get namespace "$KUBE_NAMESPACE" -o name 2>/dev/null || true)"
+    - test -z "$(kubectl get pv "$DB_PV" -o name 2>/dev/null || true)"
