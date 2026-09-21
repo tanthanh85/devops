@@ -208,6 +208,8 @@ Create a GitLab pipeline trigger token now:
 
 Select **Masked and hidden** for every secret when GitLab accepts the value. Keep these variables available to both the normal deployment pipeline and trigger-token pipelines; do not restrict them to an environment scope that prevents trigger pipelines from reading them.
 
+The normal `main` pipeline copies the NetBox values into the application and configuration-tier Kubernetes Secrets but does not validate them. NetBox-specific validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
+
 ## Step 5: Create and start the Lab 8 runner
 
 In GitLab:
@@ -743,7 +745,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The production stage cannot begin unless development verification succeeds. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
+The `validate-netbox-event` job first checks `NETBOX_WEBHOOK_TOKEN`, `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
 
 ### 13.1 Create the required GitLab variables
 
@@ -1080,7 +1082,7 @@ A `401` indicates a token mismatch. An `ignored` response identifies which learn
 
 ### Inventory retrieval from NetBox fails
 
-Confirm that the most recent normal `main` pipeline succeeded after `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` were configured. The NetBox token must be permitted to read devices, and each device that should appear must be active and have a primary IPv4 address. If the optional `restconf_port` custom field is populated, its value must be an integer from `1` through `65535`; an empty field defaults to `443`.
+Confirm that `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` were configured before the most recent normal `main` deployment copied them into the Kubernetes Secret. The main pipeline intentionally does not validate these NetBox values; the NetBox-triggered pipeline validates them in `validate-netbox-event`. The NetBox token must be permitted to read devices, and each device that should appear must be active and have a primary IPv4 address. If the optional `restconf_port` custom field is populated, its value must be an integer from `1` through `65535`; an empty field defaults to `443`.
 
 Inspect the application tier without exposing the token:
 

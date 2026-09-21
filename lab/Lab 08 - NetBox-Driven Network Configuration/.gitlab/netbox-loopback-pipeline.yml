@@ -11,14 +11,18 @@ stages:
   before_script:
     - test "$CI_PIPELINE_SOURCE" = "trigger"
     - test "$NETBOX_ACTION" = "provision_loopback"
-    - test -n "$NETBOX_URL"
-    - test -n "$NETBOX_API_TOKEN"
     - mkdir -p build
 
 validate-netbox-event:
   extends: .netbox-pipeline-job
   stage: validate-netbox-event
   script:
+    - test -n "$NETBOX_WEBHOOK_TOKEN"
+    - test -n "$NETBOX_URL"
+    - test -n "$NETBOX_API_TOKEN"
+    - printf '%s\n' "$NETBOX_SKIP_TLS_VERIFY" | grep -Eq '^(true|false)$'
+    - test -n "$NETBOX_ROUTER_USERNAME"
+    - test -n "$NETBOX_ROUTER_PASSWORD"
     - test -n "$NETBOX_ROUTER_NAME"
     - test "$NETBOX_DEVICE" = "$NETBOX_ROUTER_NAME"
     - echo "$LOOPBACK_NAME" | grep -Eq '^Loopback[0-9]+$'
