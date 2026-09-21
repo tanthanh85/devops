@@ -566,11 +566,17 @@ The supplied pipeline accepts trigger pipelines only when `ELASTIC_ACTION=scale_
 
 ### 12.2 Enable the Kibana connector license
 
-1. In Kibana, open **Management > Stack Management > License Management**.
-2. If **Webhook** is not available as a connector type, select **Start trial** and confirm the 30-day trial.
-3. Return to **Stack Management** after the license update completes.
+The generic **Webhook** connector requires an Elastic Gold-capable license. The default Basic license does not enable it. For this lab, every learner must activate Elastic's free 30-day trial before creating the connector.
 
-The trial is needed only when the installed license does not include the Webhook connector. The Lab 7 Compose override has already configured the stable encryption key required to store connector secrets.
+1. In Kibana, open the navigation menu.
+2. Select **Management > Stack Management**.
+3. Under **Stack**, select **License Management**.
+4. Select **Start trial**.
+5. Confirm **Start my trial** and wait for Kibana to report that the trial license is active.
+6. Return to **Stack Management > Connectors**.
+7. Select **Create connector** and confirm that the **Webhook** tile is enabled and no longer displays **This connector requires a Gold license**.
+
+An Elastic cluster can start a trial only once. If License Management reports that a trial was previously activated, use an instructor-provided cluster with an active trial or another license that includes the Webhook connector. The Lab 7 Compose override separately configures the encryption key required to store connector secrets; activating the trial does not replace that configuration.
 
 ### 12.3 Create and test the GitLab Webhook connector
 
@@ -803,7 +809,9 @@ Previously collected synthetic events remain in `network-monitor-logs-*`; Logsta
 
 ### Webhook is not available as a connector type
 
-Open **Stack Management > License Management** and activate the 30-day trial, or use an Elastic license that includes the Webhook connector. Then reload **Stack Management > Connectors**. If Kibana reports that encrypted saved objects are unavailable, recopy the Lab 7 override and recreate Kibana:
+If the Webhook tile displays **This connector requires a Gold license**, open **Stack Management > License Management** and activate the free 30-day trial as required in section 12.2. Then reload **Stack Management > Connectors**. If a trial has already been used on this cluster, ask the instructor for a cluster with an active trial or an eligible license.
+
+If the license is active but Kibana instead reports that encrypted saved objects are unavailable, recopy the Lab 7 override and recreate Kibana:
 
 ```bash
 cd ~/course-platform/elastic
