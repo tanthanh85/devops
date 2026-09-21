@@ -13,7 +13,7 @@ Examples include `netdevops-lab02-docker`, `netdevops-lab04-kubernetes`, and `ne
 
 | Lab | Focus | Result |
 |---|---|---|
-| [Lab 1](Lab%2001%20-%20Workstation%20Installation/Lab1.md) | Workstation and platform installation | Verified VS Code, Python, Ansible, Docker, Kubernetes, GitLab, monitoring, and secrets tooling |
+| [Lab 1](Lab%2001%20-%20Workstation%20Installation/Lab1.md) | Workstation and platform installation | Verified VS Code, Python, Ansible, Docker, Kubernetes, GitLab, Elastic, NetBox, and secrets tooling |
 | [Lab 2](Lab%2002%20-%20Package%20the%20Network%20Monitoring%20Application/Lab2.md) | Docker packaging | Tested Flask monitoring application packaged as a reproducible image |
 | [Lab 3](Lab%2003%20-%20Implement%20a%20Three-Tier%20Application/Lab3.md) | Three-tier Docker Compose deployment | Web, application, and persistent MySQL tiers with authenticated router inventory |
 | [Lab 4](Lab%2004%20-%20Deploy%20and%20Scale%20on%20Kubernetes/Lab4.md) | Minikube deployment and scaling | The complete Lab 3 web, application, and persistent MySQL tiers deployed on Minikube |

@@ -2,7 +2,7 @@
 
 ## Duration
 
-**4 hours**
+**5 hours**
 
 This standalone lab prepares a workstation for network DevOps work. You will install command-line development tools locally, secure a GitLab.com account, and deploy selected supporting platforms as containers. You will also create a dedicated Lab 1 folder and GitLab repository. No files from another lab are required.
 
@@ -17,6 +17,7 @@ The instructions target a dedicated 64-bit Ubuntu 26.04 LTS workstation. Complet
 - Create and secure a GitLab.com account.
 - Install and start a local GitLab Runner for later registration when a CI/CD lab requires it.
 - Start an Elastic Stack laboratory environment for log collection and visualization.
+- Install NetBox as the source of truth used by later inventory and automation labs.
 - Start HashiCorp Vault in development mode for secrets exercises.
 - Demonstrate safe platform start, stop, and cleanup operations.
 
@@ -48,6 +49,7 @@ flowchart LR
     D --> GR["Local GitLab Runner"]
     GR --> G
     D --> E["Elasticsearch, Logstash, Kibana"]
+    D --> N["NetBox<br/>PostgreSQL and Redis"]
     D --> V["Vault development server"]
 ```
 
@@ -74,6 +76,7 @@ Suggested local ports:
 | Elasticsearch | `http://127.0.0.1:9200` |
 | Kibana | `http://127.0.0.1:5601` |
 | Logstash input for later labs | `127.0.0.1:5044` |
+| NetBox | `http://127.0.0.1:8000` |
 
 ## Part 1: Prepare the workstation
 
@@ -335,7 +338,71 @@ Stop it when verification is complete:
 docker compose stop
 ```
 
-## Part 10: Install HashiCorp Vault for laboratory use
+## Part 10: Install NetBox for laboratory use
+
+NetBox provides the inventory source of truth used by the later labs. Install the community-maintained NetBox Docker project in `~/course-platform`, outside every learner lab repository. The upstream project supplies compatible NetBox, PostgreSQL, Redis, and worker services in one Compose project.
+
+Clone the supported release branch and record the exact commit used for this course run:
+
+```bash
+cd ~/course-platform
+test ! -e netbox || { echo "~/course-platform/netbox already exists"; exit 1; }
+git clone --depth 1 --branch release \
+  https://github.com/netbox-community/netbox-docker.git netbox
+cd netbox
+git rev-parse HEAD | tee NETBOX_DOCKER_COMMIT
+cp docker-compose.override.yml.example docker-compose.override.yml
+sed -i 's/- "8000:8080"/- "127.0.0.1:8000:8080"/' \
+  docker-compose.override.yml
+grep '127.0.0.1:8000:8080' docker-compose.override.yml
+```
+
+Do not continue unless the final command shows the loopback-only port mapping. If the instructor supplies a particular NetBox Docker release or commit, check out that exact revision before pulling images. The NetBox container image and the checked-out NetBox Docker files must remain compatible; do not update one independently of the other.
+
+Validate, pull, and start the platform:
+
+```bash
+docker compose config --quiet
+docker compose pull
+docker compose up -d
+docker compose ps
+```
+
+Initial database migrations and static-file preparation can take several minutes. Follow startup progress without displaying secrets:
+
+```bash
+docker compose logs --tail=100 netbox
+until curl -fsS http://127.0.0.1:8000/api/status/ >/dev/null; do
+  echo "Waiting for NetBox..."
+  sleep 10
+done
+curl -fsS http://127.0.0.1:8000/api/status/ | jq
+```
+
+Create the first administrator interactively:
+
+```bash
+docker compose exec netbox \
+  /opt/netbox/netbox/manage.py createsuperuser
+```
+
+Choose a unique administrator username, enter the learner's email address, and use a unique password stored in the instructor-approved password manager. Do not place the password in the Compose override, shell history, Git, screenshots, or lab notes.
+
+Open `http://127.0.0.1:8000`, sign in, and confirm that the NetBox home page loads. Later labs will use this instance for devices, management addresses, loopback interfaces, API tokens, event rules, and webhooks. Do not create shared or production device records unless the instructor authorizes them.
+
+Stop and restart NetBox without deleting its PostgreSQL data:
+
+```bash
+cd ~/course-platform/netbox
+docker compose stop
+docker compose up -d
+```
+
+Do not run `docker compose down --volumes`; deleting these volumes removes the NetBox database, administrator account, inventory, tokens, and automation objects.
+
+This procedure follows the official [NetBox Docker quickstart](https://github.com/netbox-community/netbox-docker). It is suitable for the isolated course workstation, not a production deployment. A production service requires TLS, backups, restricted access, external secret management, monitoring, and an approved upgrade process.
+
+## Part 11: Install HashiCorp Vault for laboratory use
 
 Use the supplied Compose definition to start Vault in development mode bound to the workstation loopback address:
 
@@ -357,7 +424,7 @@ docker stop course-vault
 docker start course-vault
 ```
 
-## Part 11: Run the workstation verification
+## Part 12: Run the workstation verification
 
 Copy and run the supplied verification program after all command-line tools have been installed:
 
@@ -377,6 +444,7 @@ Every entry should report `PASS`. This check confirms that the required commands
 | Runner | `docker compose up -d` in `~/course-platform/gitlab-runner` | `docker compose stop` |
 | Minikube | `minikube start -p network-devops` | `minikube stop -p network-devops` |
 | Elastic | `docker compose up -d` in its directory | `docker compose stop` |
+| NetBox | `docker compose up -d` in `~/course-platform/netbox` | `docker compose stop` |
 | Vault | `docker compose up -d` in `platform/vault` | `docker compose stop` |
 
 ## Completion criteria
@@ -390,6 +458,7 @@ Every entry should report `PASS`. This check confirms that the required commands
 - The GitLab.com account is verified and protected with two-factor authentication.
 - The local runner container starts and reports its version.
 - Elasticsearch, Logstash, and Kibana start, and Elasticsearch answers its local health request.
+- NetBox and its supporting services start, its status API responds, and the learner can sign in with the administrator account.
 - Vault's health endpoint responds.
 
 ## Cleanup
@@ -398,6 +467,7 @@ For normal course continuation, stop unused local platforms but retain their con
 
 ```bash
 docker stop course-vault course-gitlab-runner 2>/dev/null || true
+(cd ~/course-platform/netbox && docker compose stop)
 minikube stop --profile network-devops
 docker system df
 ```
