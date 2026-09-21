@@ -4,7 +4,7 @@
 
 **8 hours**
 
-This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7, plus a fourth **configuration tier**. NetBox sends the configuration tier a webhook when an IPv4 `/32` is assigned to a new loopback interface on **Router 1**. The configuration tier triggers a dedicated GitLab pipeline that creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the authorized lab router, verifies production, and destroys the temporary CML lab.
+This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7, plus a fourth **configuration tier**. Each learner may choose a name for their authorized router in NetBox. NetBox sends the configuration tier a webhook when an IPv4 `/32` is assigned to a new loopback interface on that **learner's router**. The configuration tier triggers a dedicated GitLab pipeline that creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
 
 All application, monitoring, configuration, Terraform, Ansible, test, Kubernetes, and pipeline files are included in the Lab 8 package. Completing an earlier lab is not required, although learners need access to the shared NetBox, CML 2.9 or newer, and instructor-authorized IOS XE lab-router services described below.
 
@@ -60,7 +60,7 @@ flowchart LR
     NB[NetBox] -->|Authenticated webhook| C
     C -->|Trigger token| GP[GitLab network pipeline]
     GP -->|Terraform CML2| CML[Temporary C8000V]
-    GP -->|Ansible after dev verification| R1[Router 1]
+    GP -->|Ansible after dev verification| LR[Learner's router]
     GP -->|Terraform destroy| CML
 ```
 
@@ -93,7 +93,7 @@ Before starting, obtain instructor-authorized access to:
 
 - NetBox with permission to create interfaces, IP addresses, webhooks, and event rules and to create a read-only API token. Each monitored device must be active, have a primary IPv4 address, and may have an integer custom field named `restconf_port`; the application uses `443` when the field is empty.
 - CML 2.9 or newer with the `cat8000v` node definition, an installed C8000V image definition, and an external connector reachable from the GitLab runner.
-- Router 1, the production lab router, with SSH access for Ansible. Never target a production or shared device that the instructor has not explicitly authorized.
+- A learner's router, authorized by the instructor and available in NetBox, with SSH access for Ansible. Learners may choose its NetBox device name. Never target a production or shared device that the instructor has not explicitly authorized.
 - A shell GitLab runner with `terraform`, `ansible-playbook`, `ansible-galaxy`, `python3`, `kubectl`, `minikube`, and `docker` available.
 
 ## Step 1: Create the Lab 8 repository
@@ -204,7 +204,7 @@ Create a GitLab pipeline trigger token now:
 2. Create a token named `Lab 8 automation` and copy it immediately.
 3. Return to the project's main page, open the top-right three-dot menu, and select **Copy project ID: NUMBER**.
 4. Add `GITLAB_TRIGGER_TOKEN` and `GITLAB_PROJECT_ID` as GitLab CI/CD variables using those values.
-5. Add `NETBOX_ROUTER_NAME` with the exact NetBox device name `Router 1`.
+5. In NetBox, choose a unique name for your authorized learner router. Add `NETBOX_ROUTER_NAME` with that exact, case-sensitive device name. Do not use a shared example name from another learner.
 
 Select **Masked and hidden** for every secret when GitLab accepts the value. Keep these variables available to both the normal deployment pipeline and trigger-token pipelines; do not restrict them to an environment scope that prevents trigger pipelines from reading them.
 
@@ -738,8 +738,8 @@ validate NetBox event
   → create and start a temporary C8000V with Terraform CML2
   → configure C8000V loopbacks with Ansible
   → verify C8000V loopback count against NetBox
-  → configure Router 1 with Ansible
-  → verify Router 1 loopback count against NetBox
+  → configure the learner's router with Ansible
+  → verify the learner's router loopback count against NetBox
   → destroy the temporary CML lab with Terraform
 ```
 
@@ -758,9 +758,9 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `TF_VAR_external_connector` | CML connector device name, normally `bridge0` |
 | `TF_VAR_dev_username` | Temporary C8000V administrator username |
 | `TF_VAR_dev_password` | Temporary C8000V administrator password |
-| `PROD_ROUTER_HOST` | SSH address of the instructor-authorized Router 1 |
-| `PROD_ROUTER_USERNAME` | Router 1 automation username |
-| `PROD_ROUTER_PASSWORD` | Router 1 automation password |
+| `PROD_ROUTER_HOST` | SSH address of the instructor-authorized learner router |
+| `PROD_ROUTER_USERNAME` | Learner-router automation username |
+| `PROD_ROUTER_PASSWORD` | Learner-router automation password |
 
 The CML2 provider reads `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY` directly. Terraform reads variables prefixed with `TF_VAR_`. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
@@ -796,22 +796,22 @@ The health response must report `"tier":"config"`. Record `CONFIG_WEBHOOK_URL` f
 9. Enable SSL verification unless the instructor explicitly identifies the isolated endpoint as self-signed.
 10. Save the webhook.
 
-The configuration tier rejects requests without the matching shared token. It ignores objects other than created or updated IP addresses, addresses other than IPv4 `/32`, interfaces whose names do not match `Loopback<number>`, and devices other than `Router 1`.
+The configuration tier rejects requests without the matching shared token. It ignores objects other than created or updated IP addresses, addresses other than IPv4 `/32`, interfaces whose names do not match `Loopback<number>`, and devices whose name does not exactly match the learner-selected `NETBOX_ROUTER_NAME`.
 
 ### 13.4 Create the NetBox event rule
 
 1. Open **Operations > Event Rules** and select **Add**.
-2. Name the rule `Router 1 loopback assigned IPv4 address`.
+2. Name the rule `Learner router loopback assigned IPv4 address`.
 3. Select object type **IPAM > IP Address**.
 4. Enable the **Object created** and **Object updated** events. Enabling updated is necessary when an existing address is assigned to an interface after its creation.
 5. Add the `Lab 8 configuration tier` webhook as the action.
 6. Save and enable the rule.
 
-The receiver performs the Router 1, Loopback, and `/32` checks even if the event rule matches other IP-address events. This defense-in-depth prevents unrelated NetBox changes from reaching production automation.
+The receiver checks the learner-selected device name, Loopback naming convention, and `/32` prefix even if the event rule matches other IP-address events. This defense-in-depth prevents unrelated NetBox changes from reaching production automation.
 
-### 13.5 Create the Router 1 loopback intent
+### 13.5 Create the learner-router loopback intent
 
-1. In NetBox, open **Devices > Devices > Router 1**.
+1. In NetBox, open **Devices > Devices** and select the device whose name exactly matches your `NETBOX_ROUTER_NAME` value.
 2. Open **Interfaces** and select **Add interfaces**.
 3. Enter an unused name such as `Loopback108`.
 4. Select interface type **Virtual**, leave **Enabled** selected, and create the interface.
@@ -841,11 +841,11 @@ Open **Build > Pipelines** and select the new pipeline marked **trigger token**.
 
 Confirm the following evidence in order:
 
-- `validate-netbox-event` retrieves every Router 1 virtual loopback with an IPv4 `/32` from NetBox and writes `build/netbox-loopbacks.json`.
+- `validate-netbox-event` retrieves every virtual loopback with an IPv4 `/32` from the learner's NetBox device and writes `build/netbox-loopbacks.json`.
 - `create-c8000v-development` creates and starts a temporary `cat8000v` node through the CML2 provider and obtains its management address.
 - `configure-c8000v-development` applies all NetBox loopbacks idempotently.
 - `verify-c8000v-development` succeeds only when the development C8000V loopback count equals the NetBox count.
-- `configure-production-router` runs only after successful development verification and applies the same intent to Router 1.
+- `configure-production-router` runs only after successful development verification and applies the same intent to the learner's router.
 - `verify-production-router` succeeds only when the production count equals the NetBox count.
 - `destroy-c8000v-development` destroys the temporary CML lab even when an earlier job fails.
 
@@ -855,11 +855,11 @@ Do not retry only the production job after changing NetBox intent. Start a new e
 
 1. Sign in to the Lab 8 web application.
 2. Open **Inventory management**.
-3. Locate Router 1 and select **Loopbacks**.
+3. Locate your learner-named router and select **Loopbacks**.
 4. Confirm that the table displays each loopback's **Name**, **Admin status**, **Protocol status**, **IP address**, and **Mask**.
 5. Confirm that the new interface appears with the expected `/32` address and mask `255.255.255.255`.
 
-The table is collected live from Router 1 through RESTCONF; it is not a copy of NetBox data. A mismatch therefore provides visible evidence that automation or verification needs investigation.
+The table is collected live from the learner's router through RESTCONF; it is not a copy of NetBox data. A mismatch therefore provides visible evidence that automation or verification needs investigation.
 
 ## Completion criteria
 
@@ -878,10 +878,10 @@ The table is collected live from Router 1 through RESTCONF; it is not a copy of 
 - The Webhook connector starts the dedicated GitLab scale-out pipeline with `ELASTIC_ACTION=scale_out`.
 - The dedicated trigger pipeline completes its validation, scale-out, and capacity-verification stages without loading the normal application pipeline or rebuilding images.
 - Kibana reflects web `6`, application `6`, and database `1` after automatic scaling.
-- The configuration tier accepts only authenticated Router 1 loopback `/32` events and creates a dedicated GitLab trigger pipeline.
+- The configuration tier accepts only authenticated loopback `/32` events for the learner-selected NetBox device and creates a dedicated GitLab trigger pipeline.
 - Terraform creates and later destroys a temporary C8000V lab through the CML2 provider.
 - Development verification proves that the C8000V and NetBox loopback counts match before production configuration begins.
-- Production verification proves that Router 1 and NetBox contain the same number of loopbacks.
+- Production verification proves that the learner's router and its NetBox device contain the same number of loopbacks.
 - Inventory management displays live loopback name, administrative status, protocol status, IP address, and mask.
 - No password, cookie, authorization header, or router credential is stored in Elasticsearch.
 
@@ -1076,7 +1076,7 @@ kubectl -n network-devops get pods -l app=network-config
 kubectl -n network-devops logs deployment/network-config --tail=100
 ```
 
-A `401` indicates a token mismatch. An `ignored` response identifies which Router 1, loopback-name, event-type, or `/32` condition did not match.
+A `401` indicates a token mismatch. An `ignored` response identifies which learner-router name, loopback-name, event-type, or `/32` condition did not match.
 
 ### Inventory retrieval from NetBox fails
 
@@ -1121,7 +1121,7 @@ In GitLab, open the successful Lab 8 `main` pipeline and run the manual `cleanup
 
 The cleanup job verifies that the namespace and captured database PV no longer exist. It leaves Minikube images, the shared Minikube profile, and the external ELK installation intact.
 
-Confirm that the most recent NetBox-triggered pipeline completed `destroy-c8000v-development` and that the temporary `Lab 8 loopback validation` lab is absent from CML. In NetBox, disable and delete `Router 1 loopback assigned IPv4 address`, then delete the `Lab 8 configuration tier` webhook. Remove only the loopback/IP objects that the instructor authorizes learners to remove.
+Confirm that the most recent NetBox-triggered pipeline completed `destroy-c8000v-development` and that the temporary `Lab 8 loopback validation` lab is absent from CML. In NetBox, disable and delete `Learner router loopback assigned IPv4 address`, then delete the `Lab 8 configuration tier` webhook. Remove only the loopback/IP objects that the instructor authorizes learners to remove.
 
 In Kibana, delete the `Repeated slow synthetic responses` rule and the `GitLab - scale network monitor to six` connector. In GitLab, return to **Settings > CI/CD > Pipeline trigger tokens** and revoke `Lab 8 automation`. These external objects cannot be removed safely by the Kubernetes cleanup job.
 

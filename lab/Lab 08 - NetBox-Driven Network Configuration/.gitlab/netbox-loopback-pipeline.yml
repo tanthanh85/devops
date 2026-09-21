@@ -19,7 +19,8 @@ validate-netbox-event:
   extends: .netbox-pipeline-job
   stage: validate-netbox-event
   script:
-    - test "$NETBOX_DEVICE" = "${NETBOX_ROUTER_NAME:-Router 1}"
+    - test -n "$NETBOX_ROUTER_NAME"
+    - test "$NETBOX_DEVICE" = "$NETBOX_ROUTER_NAME"
     - echo "$LOOPBACK_NAME" | grep -Eq '^Loopback[0-9]+$'
     - python3 -c 'import ipaddress,os; value=ipaddress.ip_interface(os.environ["LOOPBACK_ADDRESS"]); assert value.version == 4 and value.network.prefixlen == 32'
     - python3 automation/scripts/netbox_loopbacks.py
@@ -82,7 +83,7 @@ verify-c8000v-development:
 configure-production-router:
   extends: .netbox-pipeline-job
   stage: configure-production
-  environment: {name: production/router-1}
+  environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
     - test -n "$PROD_ROUTER_HOST"
@@ -99,7 +100,7 @@ configure-production-router:
 verify-production-router:
   extends: .netbox-pipeline-job
   stage: verify-production
-  environment: {name: production/router-1}
+  environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
     - ansible-galaxy collection install -r automation/requirements.yml

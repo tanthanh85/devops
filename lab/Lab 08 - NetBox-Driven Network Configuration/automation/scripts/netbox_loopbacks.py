@@ -20,7 +20,7 @@ def get(path, params):
         return json.load(response).get("results", [])
 
 
-device = os.environ.get("NETBOX_DEVICE", "Router 1")
+device = os.environ["NETBOX_DEVICE"]
 interfaces = get("dcim/interfaces", {"device": device, "type": "virtual", "limit": 0})
 loopbacks = []
 for interface in interfaces:

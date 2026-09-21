@@ -36,7 +36,7 @@ def test_application_instance_is_visible(client):
 def test_netbox_inventory_sync_does_not_return_router_password(client, monkeypatch):
     client.post("/api/setup/admin",json={"username":"admin","password":"correct-horse-battery"})
     client.post("/api/session",json={"username":"admin","password":"correct-horse-battery"})
-    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Router 1", "host": "192.0.2.10", "port": 443}])
+    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
     response=client.post("/api/inventory/netbox",json={})
     assert response.status_code==200
     payload=client.get("/api/routers").get_json()
@@ -94,7 +94,7 @@ def test_synthetic_interval_must_be_allowed(client):
 def test_authenticated_user_can_read_router_loopbacks(client, monkeypatch):
     client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
     client.post("/api/session", json={"username": "admin", "password": "admin-password"})
-    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Router 1", "host": "192.0.2.10", "port": 443}])
+    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
     client.post("/api/inventory/netbox", json={})
     router_id = client.get("/api/routers").get_json()["items"][0]["id"]
     monkeypatch.setattr("app.routes.collect_loopbacks", lambda router, password: [{

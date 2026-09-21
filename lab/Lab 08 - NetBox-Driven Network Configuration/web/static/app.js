@@ -68,7 +68,7 @@ async function loadRouters() {
     $("application").hidden = false; $("login").hidden = true; $("setup").hidden = true; $("logout").hidden = false;
     $("routers").innerHTML = ""; $("router-select").innerHTML = ""; $("router-count").textContent = data.items.length;
     if (!data.items.length) {
-      $("routers").innerHTML = '<div class="empty-state">No routers configured.</div>';
+      $("routers").innerHTML = '<div class="empty-state">No active NetBox devices retrieved.</div>';
       $("router-select").innerHTML = '<option value="">Retrieve inventory from NetBox first</option>';
       $("collect").disabled = true; stopAutoRefresh(); return;
     }

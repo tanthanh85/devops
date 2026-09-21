@@ -37,7 +37,9 @@ def netbox_webhook():
     assigned = data.get("assigned_object") or {}
     interface_name = str(assigned.get("name", data.get("interface_name", ""))).strip()
     device_name = str(nested(assigned, "device", "name") or data.get("device_name", "")).strip()
-    expected_device = os.environ.get("NETBOX_ROUTER_NAME", "Router 1")
+    expected_device = os.environ.get("NETBOX_ROUTER_NAME", "").strip()
+    if not expected_device:
+        return jsonify(error="learner router name is not configured"), 503
 
     try:
         network = ipaddress.ip_interface(address)
@@ -49,7 +51,7 @@ def netbox_webhook():
         return jsonify(status="ignored", reason="not an IP address create/update event"), 202
     if network.version != 4 or network.network.prefixlen != 32:
         return jsonify(status="ignored", reason="address is not IPv4 /32"), 202
-    if device_name.casefold() != expected_device.casefold():
+    if device_name != expected_device:
         return jsonify(status="ignored", reason="event is not for the lab router"), 202
     if not re.fullmatch(r"Loopback\d+", interface_name, re.IGNORECASE):
         return jsonify(status="ignored", reason="assigned interface is not a loopback"), 202

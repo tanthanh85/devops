@@ -4,7 +4,7 @@ from pathlib import Path
 
 def load_service(monkeypatch):
     monkeypatch.setenv("NETBOX_WEBHOOK_TOKEN", "shared-secret")
-    monkeypatch.setenv("NETBOX_ROUTER_NAME", "Router 1")
+    monkeypatch.setenv("NETBOX_ROUTER_NAME", "Learner Edge Router")
     monkeypatch.setenv("GITLAB_PROJECT_ID", "123")
     monkeypatch.setenv("GITLAB_TRIGGER_TOKEN", "trigger-secret")
     path = Path(__file__).parents[1] / "config-tier" / "service.py"
@@ -21,7 +21,7 @@ def valid_payload():
         "object_type": "ipam.ipaddress",
         "data": {
             "address": "192.0.2.108/32",
-            "assigned_object": {"name": "Loopback108", "device": {"name": "Router 1"}},
+            "assigned_object": {"name": "Loopback108", "device": {"name": "Learner Edge Router"}},
         },
     }
 
