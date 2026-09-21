@@ -1,0 +1,31 @@
+---
+- name: Verify IOS XE loopbacks against NetBox
+  hosts: routers
+  gather_facts: false
+  connection: ansible.netcommon.network_cli
+  tasks:
+    - name: Wait for IOS XE SSH to become ready
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+        sleep: 10
+
+    - name: Read the loopback interface table
+      cisco.ios.ios_command:
+        commands:
+          - show ip interface brief | include ^Loopback
+      register: loopback_output
+
+    - name: Count configured loopbacks
+      ansible.builtin.set_fact:
+        device_loopback_count: "{{ loopback_output.stdout_lines[0] | length }}"
+
+    - name: Require the device and NetBox counts to match
+      ansible.builtin.assert:
+        that:
+          - device_loopback_count | int == netbox_loopback_count | int
+        fail_msg: "NetBox has {{ netbox_loopback_count }} loopbacks but the device has {{ device_loopback_count }}"
+        success_msg: "NetBox and the device both have {{ netbox_loopback_count }} loopbacks"
+
+    - name: Display the verified loopbacks
+      ansible.builtin.debug:
+        var: loopback_output.stdout_lines[0]

@@ -1,0 +1,53 @@
+stages:
+  - validate-alert
+  - scale-out
+  - verify-capacity
+  - capacity-management
+
+validate-elastic-alert:
+  stage: validate-alert
+  script:
+    - test "$CI_PIPELINE_SOURCE" = "trigger"
+    - test "$ELASTIC_ACTION" = "scale_out"
+    - minikube status --profile network-devops
+    - minikube update-context --profile network-devops
+    - kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web network-monitor-app
+
+scale-out-web-and-app:
+  stage: scale-out
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  script:
+    - minikube update-context --profile network-devops
+    - kubectl -n "$KUBE_NAMESPACE" scale deployment/network-monitor-web --replicas=6
+    - kubectl -n "$KUBE_NAMESPACE" scale deployment/network-monitor-app --replicas=6
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
+
+verify-scaled-capacity:
+  stage: verify-capacity
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  script:
+    - minikube update-context --profile network-devops
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web -o jsonpath='{.spec.replicas}')" = "6"
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-app -o jsonpath='{.spec.replicas}')" = "6"
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web -o jsonpath='{.status.availableReplicas}')" = "6"
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-app -o jsonpath='{.status.availableReplicas}')" = "6"
+    - kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web network-monitor-app
+
+reset-capacity:
+  stage: capacity-management
+  environment: {name: course/minikube}
+  resource_group: course-minikube
+  when: manual
+  allow_failure: true
+  script:
+    - minikube update-context --profile network-devops
+    - kubectl -n "$KUBE_NAMESPACE" scale deployment/network-monitor-web --replicas=3
+    - kubectl -n "$KUBE_NAMESPACE" scale deployment/network-monitor-app --replicas=3
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web -o jsonpath='{.status.availableReplicas}')" = "3"
+    - test "$(kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-app -o jsonpath='{.status.availableReplicas}')" = "3"
+    - kubectl -n "$KUBE_NAMESPACE" get deployment network-monitor-web network-monitor-app

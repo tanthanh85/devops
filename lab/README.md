@@ -19,7 +19,7 @@ Examples include `netdevops-lab02-docker`, `netdevops-lab04-kubernetes`, and `ne
 | [Lab 4](Lab%2004%20-%20Deploy%20and%20Scale%20on%20Kubernetes/Lab4.md) | Minikube deployment and scaling | The complete Lab 3 web, application, and persistent MySQL tiers deployed on Minikube |
 | [Lab 5](Lab%2005%20-%20Build%20Test%20and%20Deploy%20with%20GitLab%20CI-CD/Lab5.md) | GitLab CI/CD delivery | Approved merge requests trigger main-only testing, image builds, and three-tier Minikube deployment |
 | [Lab 6](Lab%2006%20-%20Monitor%20with%20the%20Elastic%20Stack/Lab6.md) | Kubernetes and application observability | Correlated logs, container metrics, synthetic checks, and Kibana dashboards |
-| [Lab 7](Lab%2007%20-%20Send%20Elastic%20Alerts%20to%20a%20Webhook/Lab7.md) | Elastic webhook alerting | Authenticated active and recovery alerts for latency, cluster health, CPU, and memory |
-| [Lab 8](Lab%2008%20-%20Production-Grade%20Network%20CI-CD/Lab8.md) | Production-grade network CI/CD | NetBox intent delivered through on-demand CML testing, Ansible deployment, pyATS validation, controlled production promotion, and complete Elastic audit evidence |
+| [Lab 7](Lab%2007%20-%20Event-Driven%20Scaling%20with%20ELK%20and%20GitLab%20CI-CD/Lab7.md) | Elastic event-driven scaling | Repeated slow synthetic results trigger a dedicated GitLab pipeline that scales the web and application tiers |
+| [Lab 8](Lab%2008%20-%20NetBox-Driven%20Network%20Configuration/Lab8.md) | NetBox-driven four-tier network CI/CD | Authenticated NetBox loopback intent is validated on a temporary C8000V before Ansible deploys and verifies the authorized lab router |
 
-The application performs read-only monitoring against instructor-authorized Cisco IOS XE routers. Credentials, tokens, private keys, `.env` files, and sensitive device output must remain outside Git.
+Labs 1 through 7 perform read-only monitoring against instructor-authorized Cisco IOS XE routers. Lab 8 writes only the explicitly authorized loopback intent after development validation. Credentials, tokens, private keys, `.env` files, and sensitive device output must remain outside Git.

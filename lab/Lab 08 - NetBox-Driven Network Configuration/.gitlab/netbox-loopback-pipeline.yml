@@ -1,0 +1,123 @@
+stages:
+  - validate-netbox-event
+  - terraform-dev
+  - configure-dev
+  - verify-dev
+  - configure-production
+  - verify-production
+  - cleanup-dev
+
+.netbox-pipeline-job:
+  before_script:
+    - test "$CI_PIPELINE_SOURCE" = "trigger"
+    - test "$NETBOX_ACTION" = "provision_loopback"
+    - test -n "$NETBOX_URL"
+    - test -n "$NETBOX_API_TOKEN"
+    - mkdir -p build
+
+validate-netbox-event:
+  extends: .netbox-pipeline-job
+  stage: validate-netbox-event
+  script:
+    - test "$NETBOX_DEVICE" = "${NETBOX_ROUTER_NAME:-Router 1}"
+    - echo "$LOOPBACK_NAME" | grep -Eq '^Loopback[0-9]+$'
+    - python3 -c 'import ipaddress,os; value=ipaddress.ip_interface(os.environ["LOOPBACK_ADDRESS"]); assert value.version == 4 and value.network.prefixlen == 32'
+    - python3 automation/scripts/netbox_loopbacks.py
+  artifacts:
+    paths: [build/netbox-loopbacks.json]
+    expire_in: 1 day
+
+create-c8000v-development:
+  extends: .netbox-pipeline-job
+  stage: terraform-dev
+  resource_group: cml-lab8-development
+  script:
+    - test -n "$CML2_ADDRESS"
+    - test -n "$CML2_TOKEN"
+    - test -n "$TF_VAR_c8000v_image_definition"
+    - test -n "$TF_VAR_dev_username"
+    - test -n "$TF_VAR_dev_password"
+    - export TF_HTTP_ADDRESS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/lab8-${CI_PIPELINE_ID}"
+    - export TF_HTTP_LOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
+    - export TF_HTTP_UNLOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
+    - export TF_HTTP_USERNAME="gitlab-ci-token"
+    - export TF_HTTP_PASSWORD="$CI_JOB_TOKEN"
+    - export TF_HTTP_LOCK_METHOD="POST"
+    - export TF_HTTP_UNLOCK_METHOD="DELETE"
+    - export TF_HTTP_RETRY_WAIT_MIN="5"
+    - terraform -chdir=automation/terraform init -input=false
+    - terraform -chdir=automation/terraform apply -auto-approve -input=false
+    - terraform -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"
+    - test -s build/dev-router-ip
+  artifacts:
+    when: always
+    access: developer
+    paths: [build/dev-router-ip]
+    expire_in: 1 day
+
+configure-c8000v-development:
+  extends: .netbox-pipeline-job
+  stage: configure-dev
+  resource_group: cml-lab8-development
+  script:
+    - ansible-galaxy collection install -r automation/requirements.yml
+    - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
+    - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
+    - ansible-playbook -i build/dev-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+  artifacts:
+    access: developer
+    paths: [build/dev-router-ip, build/netbox-loopbacks.json]
+    expire_in: 1 day
+
+verify-c8000v-development:
+  extends: .netbox-pipeline-job
+  stage: verify-dev
+  resource_group: cml-lab8-development
+  script:
+    - ansible-galaxy collection install -r automation/requirements.yml
+    - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
+    - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
+    - ansible-playbook -i build/dev-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+
+configure-production-router:
+  extends: .netbox-pipeline-job
+  stage: configure-production
+  environment: {name: production/router-1}
+  resource_group: lab-router-production
+  script:
+    - test -n "$PROD_ROUTER_HOST"
+    - test -n "$PROD_ROUTER_USERNAME"
+    - test -n "$PROD_ROUTER_PASSWORD"
+    - ansible-galaxy collection install -r automation/requirements.yml
+    - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
+    - ansible-playbook -i build/prod-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+  artifacts:
+    access: developer
+    paths: [build/netbox-loopbacks.json]
+    expire_in: 1 day
+
+verify-production-router:
+  extends: .netbox-pipeline-job
+  stage: verify-production
+  environment: {name: production/router-1}
+  resource_group: lab-router-production
+  script:
+    - ansible-galaxy collection install -r automation/requirements.yml
+    - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
+    - ansible-playbook -i build/prod-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+
+destroy-c8000v-development:
+  stage: cleanup-dev
+  resource_group: cml-lab8-development
+  when: always
+  script:
+    - export TF_HTTP_ADDRESS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/lab8-${CI_PIPELINE_ID}"
+    - export TF_HTTP_LOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
+    - export TF_HTTP_UNLOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
+    - export TF_HTTP_USERNAME="gitlab-ci-token"
+    - export TF_HTTP_PASSWORD="$CI_JOB_TOKEN"
+    - export TF_HTTP_LOCK_METHOD="POST"
+    - export TF_HTTP_UNLOCK_METHOD="DELETE"
+    - export TF_HTTP_RETRY_WAIT_MIN="5"
+    - terraform -chdir=automation/terraform init -input=false
+    - terraform -chdir=automation/terraform destroy -auto-approve -input=false

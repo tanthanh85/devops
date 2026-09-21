@@ -1,0 +1,28 @@
+---
+- name: Configure NetBox loopbacks on IOS XE
+  hosts: routers
+  gather_facts: false
+  connection: ansible.netcommon.network_cli
+  tasks:
+    - name: Wait for IOS XE SSH to become ready
+      ansible.builtin.wait_for_connection:
+        timeout: 600
+        sleep: 10
+
+    - name: Validate loopback input
+      ansible.builtin.assert:
+        that:
+          - netbox_loopbacks | length > 0
+
+    - name: Configure all NetBox loopback interfaces idempotently
+      cisco.ios.ios_config:
+        parents: "interface {{ item.name }}"
+        lines:
+          - "ip address {{ item.ip }} {{ item.mask }}"
+          - no shutdown
+      loop: "{{ netbox_loopbacks }}"
+      no_log: false
+
+    - name: Save the IOS XE configuration
+      cisco.ios.ios_config:
+        save_when: modified

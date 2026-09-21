@@ -1,3 +1,0 @@
-ansible-core==2.19.2
-hvac==2.3.0
-requests==2.32.5

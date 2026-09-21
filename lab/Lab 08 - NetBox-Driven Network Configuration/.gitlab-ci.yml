@@ -1,0 +1,24 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $NETBOX_ACTION == "provision_loopback"'
+    - if: '$CI_PIPELINE_SOURCE == "trigger" && $ELASTIC_ACTION == "scale_out"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - when: never
+
+include:
+  - local: .gitlab/main-pipeline.yml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  - local: .gitlab/elastic-scale-out-pipeline.yml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "trigger" && $ELASTIC_ACTION == "scale_out"'
+  - local: .gitlab/netbox-loopback-pipeline.yml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "trigger" && $NETBOX_ACTION == "provision_loopback"'
+
+default:
+  tags: [lab8, minikube]
+  interruptible: true
+
+variables:
+  KUBE_NAMESPACE: "network-devops"

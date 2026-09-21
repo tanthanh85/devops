@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: filebeat, namespace: network-devops}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: network-devops-filebeat}
+rules:
+  - apiGroups: [""]
+    resources: [nodes, namespaces, pods]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: network-devops-filebeat}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: network-devops-filebeat}
+subjects:
+  - {kind: ServiceAccount, name: filebeat, namespace: network-devops}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: filebeat-config, namespace: network-devops}
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+      - type: filestream
+        id: kubernetes-container-logs
+        paths:
+          - /var/log/containers/*.log
+        prospector.scanner.symlinks: true
+        # Synthetic checks emit short JSON records. Filebeat 9.2 otherwise
+        # waits for 1024 bytes before fingerprinting and harvesting the file.
+        prospector.scanner.fingerprint.length: 64
+        parsers:
+          - container: ~
+        processors:
+          - add_kubernetes_metadata:
+              host: ${NODE_NAME}
+              default_indexers.enabled: false
+              default_matchers.enabled: false
+              indexers:
+                - pod_uid:
+              matchers:
+                - logs_path:
+                    logs_path: /var/log/pods/
+                    resource_type: pod
+    output.logstash:
+      hosts: ["${LOGSTASH_HOST}"]
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: {name: filebeat, namespace: network-devops}
+spec:
+  selector: {matchLabels: {app: filebeat}}
+  template:
+    metadata: {labels: {app: filebeat}}
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat:9.2.3
+          args: ["-e", "-c", "/etc/filebeat.yml"]
+          env:
+            - {name: NODE_NAME, valueFrom: {fieldRef: {fieldPath: spec.nodeName}}}
+            - {name: LOGSTASH_HOST, valueFrom: {configMapKeyRef: {name: observability-endpoints, key: LOGSTASH_HOST}}}
+          securityContext: {runAsUser: 0, readOnlyRootFilesystem: true}
+          volumeMounts:
+            - {name: config, mountPath: /etc/filebeat.yml, subPath: filebeat.yml, readOnly: true}
+            # Keep container symlinks and Pod targets in one mounted tree.
+            - {name: host-logs, mountPath: /var/log, readOnly: true}
+            # Minikube's Docker runtime links Pod logs to this directory.
+            - {name: docker-container-logs, mountPath: /var/lib/docker/containers, readOnly: true}
+            - {name: data, mountPath: /usr/share/filebeat/data}
+          resources:
+            requests: {cpu: 50m, memory: 100Mi}
+            limits: {cpu: 300m, memory: 300Mi}
+      volumes:
+        - {name: config, configMap: {name: filebeat-config}}
+        - {name: host-logs, hostPath: {path: /var/log, type: Directory}}
+        - {name: docker-container-logs, hostPath: {path: /var/lib/docker/containers, type: Directory}}
+        - {name: data, emptyDir: {}}
