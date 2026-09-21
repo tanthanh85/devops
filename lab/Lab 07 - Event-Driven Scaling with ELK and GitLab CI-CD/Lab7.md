@@ -553,8 +553,12 @@ A useful starting point is `x = 3`, `y = 5`, and `z = 500`. Adjust `z` after obs
 1. Open the Lab 7 project in GitLab.
 2. Select **Settings > CI/CD** and expand **Pipeline trigger tokens**.
 3. Select **Add new trigger**, name it `Elastic scale-out`, and create it.
-4. Copy the trigger token immediately and record the project's numeric **Project ID** from the project overview page.
-5. Construct this URL, replacing all three uppercase placeholders:
+4. Copy the trigger token immediately and store it temporarily in a secure location.
+5. Return to the Lab 7 project's main page.
+6. In the upper-right corner of the project page, select the three-dot **More actions** menu next to **Fork**.
+7. Select **Copy project ID: NUMBER**. GitLab copies the numeric Project ID to the clipboard. Do not copy the project name or repository URL; the webhook requires this numeric ID.
+8. Paste the Project ID into a temporary text editor so it is available for the next step.
+9. Construct this URL, replacing all three uppercase placeholders:
 
    ```text
    https://gitlab.com/api/v4/projects/PROJECT_ID/trigger/pipeline?token=TRIGGER_TOKEN&ref=BRANCH&variables%5BELASTIC_ACTION%5D=scale_out
@@ -562,7 +566,13 @@ A useful starting point is `x = 3`, `y = 5`, and `z = 500`. Adjust `z` after obs
 
    Use `main` for `BRANCH` unless your GitLab project uses another default branch. Keep the token secret and never add this URL to Git.
 
-The supplied pipeline accepts trigger pipelines only when `ELASTIC_ACTION=scale_out`. Such a pipeline skips build, deployment, and cleanup jobs and runs only `elastic-alert-scale-out`.
+The root `.gitlab-ci.yml` conditionally loads one of two independent pipeline definitions. A normal push to `main` loads `.gitlab/main-pipeline.yml`; it contains the application test, build, deployment, verification, capacity-reset, and cleanup workflow and contains no scale-out stage. A trigger request with `ELASTIC_ACTION=scale_out` instead loads `.gitlab/elastic-scale-out-pipeline.yml`.
+
+The Elastic-triggered pipeline has its own three stages:
+
+1. `validate-alert` verifies the trigger source, action value, Minikube profile, and target deployments.
+2. `scale-out` scales the web and application Deployments to six replicas and waits for both rollouts.
+3. `verify-capacity` verifies six desired and six available replicas for both tiers.
 
 ### 12.2 Enable the Kibana connector license
 
@@ -585,15 +595,16 @@ An Elastic cluster can start a trial only once. If License Management reports th
 3. Enter `GitLab - scale network monitor to six` as the connector name.
 4. Set **Method** to `POST`.
 5. Paste the URL constructed in section 12.1.
-6. Leave authentication disabled and, if a request body is requested, enter:
+6. Under **Authentication**, select **None**. The GitLab pipeline trigger token is already contained in the connector URL, so do not configure Basic authentication, a username, or a password.
+7. If a request body is requested, enter:
 
    ```json
    {}
    ```
 
-7. Save the connector.
-8. Select **Test**, send `{}`, and confirm that GitLab creates a pipeline.
-9. In GitLab, open **Build > Pipelines**, open the trigger pipeline, and confirm that `elastic-alert-scale-out` succeeds.
+8. Save the connector.
+9. Select **Test**, send `{}`, and confirm that GitLab creates a pipeline.
+10. In GitLab, open **Build > Pipelines** and open the pipeline marked **trigger token**. Confirm that its `validate-alert`, `scale-out`, and `verify-capacity` stages all succeed. It must not contain the normal test, build, deploy, or cleanup stages.
 
 Testing the connector performs a real scale-out. Verify the result, then restore the baseline before testing the rule:
 
@@ -632,7 +643,7 @@ Kibana versions label some fields differently. The resulting rule must express t
 3. Confirm that the dedicated synthetic-test account is configured and the latest checks succeed.
 4. Wait until at least `x` results whose `event.duration_ms` exceeds `z` fall inside the `y`-minute window. For a quick demonstration, temporarily choose `z` slightly below the normal response time you observed in Discover.
 5. In Kibana, open the rule details and confirm that its state becomes active.
-6. In GitLab, open **Build > Pipelines** and confirm that a pipeline with source **trigger** starts. Its `elastic-alert-scale-out` job must succeed.
+6. In GitLab, open **Build > Pipelines** and confirm that a pipeline marked **trigger token** starts. Confirm that `validate-elastic-alert`, `scale-out-web-and-app`, and `verify-scaled-capacity` succeed in sequence.
 7. Verify the live Kubernetes state:
 
    ```bash
@@ -670,8 +681,8 @@ Revoke the GitLab pipeline trigger token after completing the lab if the project
 - Kubernetes logs, application logs, complete RESTCONF payloads, and synthetic results have been inspected in Discover.
 - The only learner-created dashboard contains Kubernetes metrics.
 - A learner-selected `x`, `y`, and `z` are configured in the repeated-slow-response Kibana rule.
-- The Webhook connector starts a restricted GitLab trigger pipeline with `ELASTIC_ACTION=scale_out`.
-- The trigger pipeline scales the web and application tiers to six replicas without rebuilding images or redeploying the database.
+- The Webhook connector starts the dedicated GitLab scale-out pipeline with `ELASTIC_ACTION=scale_out`.
+- The dedicated trigger pipeline completes its validation, scale-out, and capacity-verification stages without loading the normal application pipeline or rebuilding images.
 - Kibana reflects web `6`, application `6`, and database `1` after automatic scaling.
 - No password, cookie, authorization header, or router credential is stored in Elasticsearch.
 
@@ -840,7 +851,7 @@ Use the connector's **Test** function and check its HTTP response. A successful 
 
 ### A trigger pipeline is created but the scaling job is skipped
 
-Confirm that the pipeline source is `trigger` and the request contains the exact variable `ELASTIC_ACTION=scale_out`. Do not use a normal project access token in place of a pipeline trigger token. Confirm that an online runner has both `lab7` and `minikube` tags.
+Confirm that the pipeline source is `trigger` and the request contains the exact variable `ELASTIC_ACTION=scale_out`. This condition causes the root configuration to load `.gitlab/elastic-scale-out-pipeline.yml`; any other value loads no scale-out jobs. Do not use a normal project access token in place of a pipeline trigger token. Confirm that an online runner has both `lab7` and `minikube` tags.
 
 ### The rule starts too many pipelines
 
