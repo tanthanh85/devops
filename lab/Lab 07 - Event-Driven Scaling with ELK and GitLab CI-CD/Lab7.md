@@ -129,13 +129,17 @@ cd ~/course-platform/elastic
 cp ~/netdevops-labs/netdevops-lab07-elk/elastic/compose.override.yaml .
 cp ~/netdevops-labs/netdevops-lab07-elk/elastic/logstash/pipeline/logstash.conf pipeline/
 docker compose -f compose.yaml -f compose.override.yaml config --quiet
+docker compose -f compose.yaml -f compose.override.yaml config \
+  | grep -E 'XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY|XPACK_ACTIONS_ALLOWEDHOSTS'
 docker compose -f compose.yaml -f compose.override.yaml up -d
 docker compose -f compose.yaml -f compose.override.yaml up -d --force-recreate kibana logstash
 docker compose -f compose.yaml -f compose.override.yaml ps
+docker compose -f compose.yaml -f compose.override.yaml exec kibana \
+  printenv XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
 curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=120s'
 ```
 
-Recreating Logstash activates the Lab 7 index-routing pipeline even when the ELK containers were already running from Lab 1. Recreating Kibana applies the stable encrypted-saved-object key required by connectors and restricts outbound connector traffic to `gitlab.com`. The Logstash row must include `0.0.0.0:15044->5044/tcp`. Port `5044` remains available only on localhost for Lab 1, while port `15044` is the Lab 7 ingestion port for Kubernetes. Use this only on the isolated course workstation.
+The merged configuration must display both `XPACK_` settings, and `printenv` must display `lab07-kibana-encrypted-objects-key-2026`. Do not continue if either check is empty. Recreating Logstash activates the Lab 7 index-routing pipeline even when the ELK containers were already running from Lab 1. Recreating Kibana applies the stable encrypted-saved-object key required by connectors and restricts outbound connector traffic to `gitlab.com`. The Logstash row must include `0.0.0.0:15044->5044/tcp`. Port `5044` remains available only on localhost for Lab 1, while port `15044` is the Lab 7 ingestion port for Kubernetes. Use this only on the isolated course workstation.
 
 ## Step 4: Determine the Logstash address
 
@@ -808,6 +812,15 @@ docker compose -f compose.yaml -f compose.override.yaml \
   up -d --force-recreate kibana
 docker compose -f compose.yaml -f compose.override.yaml logs --tail=100 kibana
 ```
+
+Confirm that the running container received the key:
+
+```bash
+docker compose -f compose.yaml -f compose.override.yaml exec kibana \
+  printenv XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
+```
+
+If the command prints nothing, the override was not included when Kibana was recreated. Run the commands from `~/course-platform/elastic` and include both `-f compose.yaml` and `-f compose.override.yaml`. When the command prints the Lab 7 key, wait for Kibana to become ready, reload the browser page, and then select **Create connector** again.
 
 ### The Webhook connector test fails
 
