@@ -4,7 +4,6 @@ stages:
   - deploy
   - verify
   - post-deployment-test
-  - capacity-management
   - cleanup
 
 default:
@@ -108,19 +107,6 @@ post-deployment-web-test:
     when: always
     expire_in: 7 days
     paths: [port-forward.log]
-
-reset-capacity:
-  extends: .main-pipeline-job
-  stage: capacity-management
-  environment: {name: course/minikube}
-  resource_group: course-minikube
-  when: manual
-  allow_failure: true
-  script:
-    - minikube update-context --profile network-devops
-    - kubectl -n "$KUBE_NAMESPACE" scale deployment/network-monitor-web deployment/network-monitor-app --replicas=3
-    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
-    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
 
 cleanup-minikube:
   stage: cleanup

@@ -566,13 +566,14 @@ A useful starting point is `x = 3`, `y = 5`, and `z = 500`. Adjust `z` after obs
 
    Use `main` for `BRANCH` unless your GitLab project uses another default branch. Keep the token secret and never add this URL to Git.
 
-The root `.gitlab-ci.yml` conditionally loads one of two independent pipeline definitions. A normal push to `main` loads `.gitlab/main-pipeline.yml`; it contains the application test, build, deployment, verification, capacity-reset, and cleanup workflow and contains no scale-out stage. A trigger request with `ELASTIC_ACTION=scale_out` instead loads `.gitlab/elastic-scale-out-pipeline.yml`.
+The root `.gitlab-ci.yml` conditionally loads one of two independent pipeline definitions. A normal push to `main` loads `.gitlab/main-pipeline.yml`; it contains only the application test, build, deployment, verification, and cleanup workflow. It contains no scale-out or capacity-management stage. A trigger request with `ELASTIC_ACTION=scale_out` instead loads `.gitlab/elastic-scale-out-pipeline.yml`.
 
-The Elastic-triggered pipeline has its own three stages:
+The Elastic-triggered pipeline has its own four stages:
 
 1. `validate-alert` verifies the trigger source, action value, Minikube profile, and target deployments.
 2. `scale-out` scales the web and application Deployments to six replicas and waits for both rollouts.
 3. `verify-capacity` verifies six desired and six available replicas for both tiers.
+4. `capacity-management` provides the manual `reset-capacity` job that restores both tiers to three replicas for another experiment.
 
 ### 12.2 Enable the Kibana connector license
 
@@ -604,7 +605,7 @@ An Elastic cluster can start a trial only once. If License Management reports th
 
 8. Save the connector.
 9. Select **Test**, send `{}`, and confirm that GitLab creates a pipeline.
-10. In GitLab, open **Build > Pipelines** and open the pipeline marked **trigger token**. Confirm that its `validate-alert`, `scale-out`, and `verify-capacity` stages all succeed. It must not contain the normal test, build, deploy, or cleanup stages.
+10. In GitLab, open **Build > Pipelines** and open the pipeline marked **trigger token**. Confirm that its `validate-alert`, `scale-out`, and `verify-capacity` stages all succeed. Its final `capacity-management` stage contains the optional manual reset job. It must not contain the normal test, build, deploy, or cleanup stages.
 
 Testing the connector performs a real scale-out. Verify the result, then restore the baseline before testing the rule:
 
@@ -612,7 +613,7 @@ Testing the connector performs a real scale-out. Verify the result, then restore
 kubectl -n network-devops get deployment network-monitor-web network-monitor-app
 ```
 
-In the most recent successful `main` pipeline, run the manual `reset-capacity` job. Confirm that both deployments return to three replicas before continuing.
+In the trigger-token pipeline created by the connector test, open the `capacity-management` stage and run the manual `reset-capacity` job. Confirm that both deployments return to three replicas before continuing.
 
 ### 12.4 Create the repeated-slow-response rule
 
@@ -666,7 +667,7 @@ Database Pods     1
 - Increase `x` to ignore isolated slow checks.
 - Increase `y` to detect sustained degradation over a longer period; decrease it to react faster.
 - Let the rule recover before starting another trial. Running the action only when the alert becomes active prevents a new GitLab pipeline on every evaluation.
-- To return to the three-replica baseline, run `reset-capacity` from a successful `main` pipeline. Do not edit the manifests: they intentionally retain the normal value of three replicas.
+- To return to the three-replica baseline, run `reset-capacity` from the Elastic-triggered pipeline's `capacity-management` stage. Do not edit the manifests: they intentionally retain the normal value of three replicas.
 
 Revoke the GitLab pipeline trigger token after completing the lab if the project will no longer use this automation.
 
