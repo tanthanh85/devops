@@ -238,7 +238,7 @@ Menu names can differ slightly between NetBox releases. Use the global search fo
 2. Enter a unique learner-selected name, for example `thandoan-router`. Record the spelling and capitalization; this becomes `NETBOX_ROUTER_NAME`.
 3. Select the device type, role, site, and platform created above.
 4. Set **Status** to **Active** and save.
-5. Open the new device, select **Interfaces**, and select **Add interfaces**.
+5. Open the new device. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row. Do not first open an Interfaces tab; the add control is in the Device Components panel.
 6. Name the management interface exactly as it exists on the router, for example `GigabitEthernet1`.
 7. Select the appropriate physical interface type, leave **Enabled** selected, optionally select **Management only**, and create the interface.
 8. Open the management interface and select **Add IP address**.
@@ -923,7 +923,7 @@ The receiver checks the learner-selected device name, Loopback naming convention
 ### 13.5 Create the learner-router loopback intent
 
 1. In NetBox, open **Devices > Devices** and select the device whose name exactly matches your `NETBOX_ROUTER_NAME` value.
-2. Open **Interfaces** and select **Add interfaces**.
+2. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row.
 3. Enter an unused name such as `Loopback108`.
 4. Select interface type **Virtual**, leave **Enabled** selected, and create the interface.
 5. Open the new interface and select **Add IP address**.
