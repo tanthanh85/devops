@@ -6,7 +6,7 @@
 
 This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7, plus a fourth **configuration tier**. Each learner may choose a name for their authorized router in NetBox. NetBox sends the configuration tier a webhook when an IPv4 `/32` is assigned to a new loopback interface on that **learner's router**. The configuration tier triggers a dedicated GitLab pipeline that creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
 
-All application, monitoring, configuration, Terraform, Ansible, test, Kubernetes, and pipeline files are included in the Lab 8 package. Completing an earlier lab is not required, although learners need access to the shared NetBox, CML 2.9 or newer, and instructor-authorized IOS XE lab-router services described below.
+All application, monitoring, configuration, Terraform, Ansible, test, Kubernetes, and pipeline files are included in the Lab 8 package. Completing an earlier lab is not required, although learners need access to the Lab 1 NetBox instance or an instructor-provided equivalent, CML 2.9 or newer, and the instructor-authorized IOS XE lab-router services described below.
 
 The normal application capacity is three web Pods, three application Pods, one MySQL Pod, and one configuration-tier Pod.
 
@@ -222,11 +222,11 @@ For an isolated NetBox installation with a self-signed certificate, use `curl -k
 
 #### B. Create the minimum device catalog
 
-NetBox requires a site, manufacturer, device type, device role, and platform before a device can be added. Skip an object only if the instructor has already created the equivalent one.
+Build the small device catalog used by this lab in the order below. A manufacturer must exist before its device type can be created. The platform is optional in NetBox, but this lab records it so the learner's router is clearly identified as IOS XE. Skip an object only if the instructor has already created the correct equivalent.
 
 1. Open **Organization > Sites**, select **Add**, enter a name such as `Network DevOps Lab`, set **Status** to **Active**, and save.
 2. Open **Devices > Manufacturers**, select **Add**, enter the router manufacturer (for example `Cisco`), and save.
-3. Open **Devices > Device Types**, select **Add**, then choose the manufacturer, enter a model such as `C8000V`, and save. NetBox may generate the slug automatically.
+3. Open **Devices > Device Types**, select **Add**, choose the manufacturer, enter the actual model of the learner's router, and save.
 4. Open **Devices > Device Roles**, select **Add**, enter `Learner Router`, choose a color, and save.
 5. Open **Devices > Platforms**, select **Add**, enter `IOS XE`, optionally select the manufacturer, and save.
 
@@ -238,15 +238,15 @@ Menu names can differ slightly between NetBox releases. Use the global search fo
 2. Enter a unique learner-selected name, for example `thandoan-router`. Record the spelling and capitalization; this becomes `NETBOX_ROUTER_NAME`.
 3. Select the device type, role, site, and platform created above.
 4. Set **Status** to **Active** and save.
-5. Open the new device. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row. Do not first open an Interfaces tab; the add control is in the Device Components panel.
+5. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row.
 6. Name the management interface exactly as it exists on the router, for example `GigabitEthernet1`.
 7. Select the appropriate physical interface type, leave **Enabled** selected, optionally select **Management only**, and create the interface.
 8. In the main left navigation, open **IPAM > IP Addresses**. This is a separate IPAM menu; do not look for an IP-address action inside the device or interface page.
 9. Select **Add** in the IP Addresses page.
 10. Enter the instructor-provided management address with its real prefix length, for example `192.0.2.10/24`, and set **Status** to **Active**.
-11. In the assignment section, set the assigned-object type to **Device interface**, select the learner's router as the **Device**, and select the management interface created above as the **Interface**.
-12. Save the IP address.
-13. Return to **Devices > Devices**, open the learner's router, select **Edit**, set **Primary IPv4** to the management address, and save.
+11. In **Assignment**, select the **Device** tab. Use the **Interface** selector to choose the learner's router and then the management interface created above.
+12. Select **Make this the primary IP for the device/VM**.
+13. Save the IP address. NetBox assigns it to the selected interface and records it as the device's primary IPv4 address in the same operation.
 
 The application ignores inactive devices and devices without a primary IPv4 address. Do not enter the RESTCONF TCP port as part of the IP address.
 
@@ -254,8 +254,8 @@ The application ignores inactive devices and devices without a primary IPv4 addr
 
 The web application uses TCP port `443` when no custom value is set. If the learner's router uses another externally reachable RESTCONF port:
 
-1. Open **Customization > Custom Fields** and select **Add**. On older versions, use **Admin > Customization > Custom Fields**.
-2. Set **Name** to `RESTCONF port` and **Key** or **Slug** to exactly `restconf_port`.
+1. Open **Customization > Custom Fields** and select **Add**.
+2. Set **Name** to exactly `restconf_port`. If the form shows a separate **Label** field, set it to `RESTCONF port`.
 3. Set **Type** to **Integer**.
 4. Under **Object types**, select **DCIM > Device**.
 5. Make the field optional, then save.
@@ -267,7 +267,7 @@ Use a value from `1` through `65535`. Leave the field empty when the router uses
 
 For this isolated learner lab, the simplest setup is to create a token for the learner account that owns the lab objects. In a shared environment, the instructor should instead provide a dedicated service account with view permission for devices, interfaces, and IP addresses.
 
-1. Open the user menu in the upper-right corner and select **API Tokens**. In some versions this is **Profile > API Tokens**.
+1. Open the user profile menu and select **API Tokens**.
 2. Select **Add a token**. If NetBox offers a token-version selector, choose the legacy/v1 token required by this lab's `Authorization: Token` API client.
 3. Enter the description `Lab 8 inventory read access`.
 4. Leave **Write enabled** disabled; Lab 8 reads NetBox through the API and creates new intent through the NetBox UI.
@@ -278,7 +278,7 @@ For this isolated learner lab, the simplest setup is to create a token for the l
 Test the token from the Ubuntu runner host, replacing the placeholders without printing the token:
 
 ```bash
-export NETBOX_URL="https://NETBOX-HOST"
+: "${NETBOX_URL:?Set NETBOX_URL to the reachable base URL from section A}"
 read -rsp 'NetBox API token: ' NETBOX_API_TOKEN; echo
 curl -fsS \
   -H "Authorization: Token $NETBOX_API_TOKEN" \
@@ -316,7 +316,7 @@ Create a GitLab pipeline trigger token now:
 2. Create a token named `Lab 8 automation` and copy it immediately.
 3. Return to the project's main page, open the top-right three-dot menu, and select **Copy project ID: NUMBER**.
 4. Add `GITLAB_TRIGGER_TOKEN` and `GITLAB_PROJECT_ID` as GitLab CI/CD variables using those values.
-5. In NetBox, choose a unique name for your authorized learner router. Add `NETBOX_ROUTER_NAME` with that exact, case-sensitive device name. Do not use a shared example name from another learner.
+5. Add `NETBOX_ROUTER_NAME` using the exact, case-sensitive learner-router name recorded in Step 4.1. Do not use a shared example name from another learner.
 
 Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the NetBox API and router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_WEBHOOK_TOKEN` is different: the normal deployment copies it into the configuration-tier Secret, but the triggered pipeline neither receives nor validates it.
 
@@ -895,15 +895,15 @@ The health response must report `"tier":"config"`. Record `CONFIG_WEBHOOK_URL` f
 ### 13.3 Create the NetBox webhook
 
 1. Sign in to NetBox with the instructor-authorized account.
-2. Open **Operations > Integrations > Webhooks**. In older NetBox versions, open **Admin > Webhooks**.
+2. Open **Webhooks** from the NetBox navigation. If it is not visible in the expanded navigation, use NetBox's navigation search for `Webhooks`; do not use the browser's global page search.
 3. Select **Add**.
 4. Name the webhook `Lab 8 configuration tier`.
 5. Set **URL** to the `CONFIG_WEBHOOK_URL` value.
 6. Set **HTTP method** to `POST` and **HTTP content type** to `application/json`.
-7. Add this header, replacing `TOKEN` with the value of the GitLab variable `NETBOX_WEBHOOK_TOKEN`:
+7. In **Additional headers**, enter the following single header line, replacing `TOKEN` with the value of the GitLab variable `NETBOX_WEBHOOK_TOKEN`:
 
-   ```json
-   {"X-NetBox-Webhook-Token": "TOKEN"}
+   ```text
+   X-NetBox-Webhook-Token: TOKEN
    ```
 
 8. Leave the body template empty so NetBox sends its standard event payload, including `event`, `object_type`, `data.address`, and `data.assigned_object`.
@@ -914,11 +914,11 @@ The configuration tier rejects webhook requests without the matching `NETBOX_WEB
 
 ### 13.4 Create the NetBox event rule
 
-1. Open **Operations > Event Rules** and select **Add**.
+1. Open **Event Rules** from the NetBox navigation and select **Add**. If it is not visible in the expanded navigation, use NetBox's navigation search for `Event Rules`.
 2. Name the rule `Learner router loopback assigned IPv4 address`.
 3. Select object type **IPAM > IP Address**.
 4. Enable the **Object created** and **Object updated** events. Enabling updated is necessary when an existing address is assigned to an interface after its creation.
-5. Add the `Lab 8 configuration tier` webhook as the action.
+5. Set **Action type** to **Webhook**, then set **Webhook** (the action choice) to `Lab 8 configuration tier`.
 6. Save and enable the rule.
 
 The receiver checks the learner-selected device name, Loopback naming convention, and `/32` prefix even if the event rule matches other IP-address events. This defense-in-depth prevents unrelated NetBox changes from reaching production automation.
@@ -932,7 +932,7 @@ The receiver checks the learner-selected device name, Loopback naming convention
 5. In the main left navigation, open **IPAM > IP Addresses** and select **Add**.
 6. Enter an instructor-approved, unused IPv4 `/32`, for example `192.0.2.108/32` only when that documentation prefix is appropriate for the isolated lab.
 7. Set **Status** to **Active** and, when the field is available, set **Role** to **Loopback**.
-8. In the assignment section, set the assigned-object type to **Device interface**, select the learner's router as the **Device**, and select the new loopback as the **Interface**.
+8. In **Assignment**, select the **Device** tab. Use the **Interface** selector to choose the learner's router and then the new loopback interface. Do not select **Make this the primary IP for the device/VM** for a test loopback.
 9. Save the IP address. Creating this assigned IP-address object is the NetBox event that the Lab 8 event rule observes.
 
 NetBox now sends the event. Inspect the receiver without exposing its secret:
