@@ -889,6 +889,21 @@ The table is collected live from the learner's router through RESTCONF; it is no
 
 ## Troubleshooting
 
+### Application Pods enter `CrashLoopBackOff` during deployment
+
+Inspect the current and previous application-container output first:
+
+```bash
+kubectl -n network-devops get pods -l app=network-monitor,tier=app
+kubectl -n network-devops logs deployment/network-monitor-app --tail=100
+kubectl -n network-devops logs deployment/network-monitor-app \
+  --previous --tail=100
+```
+
+The deployment job now prints the Pod descriptions and the last 100 application log lines automatically when the application rollout fails. If the output contains MySQL `Access denied`, an existing database volume was initialized with different credentials. Restore the original `MYSQL_PASSWORD` and `MYSQL_ROOT_PASSWORD` GitLab variables, or run `cleanup-minikube` to permanently delete the Lab 8 database and volume before generating a new pair. Do not delete the volume if its records must be retained.
+
+If the logs report a missing NetBox setting after an earlier deployment, run the updated normal `main` pipeline. The application Deployment now maps `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` from `network-monitor-runtime` into every application Pod. The pipeline does not validate their contents; the NetBox-triggered workflow performs the applicable NetBox validation.
+
 ### Kubernetes collectors cannot reach Logstash
 
 Repeat the gateway and port test from Step 4. Confirm that the Compose project publishes `0.0.0.0:15044->5044/tcp` and that the workstation firewall permits traffic from the Minikube network.

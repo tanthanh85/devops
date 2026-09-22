@@ -62,6 +62,21 @@ deploy-minikube:
     - minikube update-context --profile network-devops
     - kubectl apply -f kubernetes/namespace.yaml
     - export DATABASE_URL="mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@network-monitor-db:3306/${MYSQL_DATABASE}"
+    - |
+      if kubectl -n "$KUBE_NAMESPACE" get statefulset network-monitor-db >/dev/null 2>&1; then
+        if ! kubectl -n "$KUBE_NAMESPACE" exec statefulset/network-monitor-db -- \
+          env MYSQL_PWD="$MYSQL_PASSWORD" mysql -u"$MYSQL_USER" -e 'SELECT 1' "$MYSQL_DATABASE" >/dev/null; then
+          echo "Existing MySQL data does not accept the configured MYSQL_USER/MYSQL_PASSWORD."
+          echo "Restore the original GitLab variables or run the manual cleanup job to remove the Lab 8 database volume before generating new credentials."
+          exit 1
+        fi
+        if ! kubectl -n "$KUBE_NAMESPACE" exec statefulset/network-monitor-db -- \
+          env MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e 'SELECT 1' >/dev/null; then
+          echo "Existing MySQL data does not accept the configured MYSQL_ROOT_PASSWORD."
+          echo "Restore the original GitLab variable before deployment or database cleanup."
+          exit 1
+        fi
+      fi
     - kubectl -n "$KUBE_NAMESPACE" create secret generic network-monitor-runtime --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" --from-literal=MYSQL_USER="$MYSQL_USER" --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --from-literal=DATABASE_URL="$DATABASE_URL" --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" --from-literal=SESSION_COOKIE_SECURE=false --from-literal=NETBOX_URL="$NETBOX_URL" --from-literal=NETBOX_API_TOKEN="$NETBOX_API_TOKEN" --from-literal=NETBOX_SKIP_TLS_VERIFY="${NETBOX_SKIP_TLS_VERIFY:-false}" --from-literal=NETBOX_ROUTER_USERNAME="$NETBOX_ROUTER_USERNAME" --from-literal=NETBOX_ROUTER_PASSWORD="$NETBOX_ROUTER_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
     - kubectl apply -f kubernetes/mysql.yaml
     - kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/network-monitor-db --timeout=240s
@@ -75,7 +90,14 @@ deploy-minikube:
     - 'sed "s|image: network-monitor-synthetic:lab08|image: $SYNTHETIC_IMAGE|" kubernetes/synthetic-monitor.yaml | kubectl apply -f -'
     - kubectl -n "$KUBE_NAMESPACE" create secret generic network-config-runtime --from-literal=NETBOX_WEBHOOK_TOKEN="$NETBOX_WEBHOOK_TOKEN" --from-literal=NETBOX_ROUTER_NAME="$NETBOX_ROUTER_NAME" --from-literal=GITLAB_URL="${CI_SERVER_URL}" --from-literal=GITLAB_PROJECT_ID="$GITLAB_PROJECT_ID" --from-literal=GITLAB_TRIGGER_TOKEN="$GITLAB_TRIGGER_TOKEN" --from-literal=GITLAB_REF="$CI_DEFAULT_BRANCH" --dry-run=client -o yaml | kubectl apply -f -
     - 'sed "s|image: network-config:lab08|image: $CONFIG_IMAGE|" kubernetes/config-tier.yaml | kubectl apply -f -'
-    - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s
+    - kubectl -n "$KUBE_NAMESPACE" rollout restart deployment/network-monitor-app deployment/network-config
+    - |
+      if ! kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-app --timeout=180s; then
+        kubectl -n "$KUBE_NAMESPACE" get pods -l app=network-monitor,tier=app -o wide || true
+        kubectl -n "$KUBE_NAMESPACE" describe pods -l app=network-monitor,tier=app || true
+        kubectl -n "$KUBE_NAMESPACE" logs -l app=network-monitor,tier=app --all-containers --prefix=true --tail=100 || true
+        exit 1
+      fi
     - kubectl -n "$KUBE_NAMESPACE" rollout status deployment/network-monitor-web --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" rollout status daemonset/filebeat --timeout=180s
     - kubectl -n "$KUBE_NAMESPACE" exec daemonset/filebeat -- sh -c 'find -L /var/log/containers -type f -print -quit | grep -q .'

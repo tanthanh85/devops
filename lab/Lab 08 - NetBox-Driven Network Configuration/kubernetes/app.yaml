@@ -48,6 +48,31 @@ spec:
                 secretKeyRef:
                   name: network-monitor-runtime
                   key: INVENTORY_ENCRYPTION_KEY
+            - name: NETBOX_URL
+              valueFrom:
+                secretKeyRef:
+                  name: network-monitor-runtime
+                  key: NETBOX_URL
+            - name: NETBOX_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: network-monitor-runtime
+                  key: NETBOX_API_TOKEN
+            - name: NETBOX_SKIP_TLS_VERIFY
+              valueFrom:
+                secretKeyRef:
+                  name: network-monitor-runtime
+                  key: NETBOX_SKIP_TLS_VERIFY
+            - name: NETBOX_ROUTER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: network-monitor-runtime
+                  key: NETBOX_ROUTER_USERNAME
+            - name: NETBOX_ROUTER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: network-monitor-runtime
+                  key: NETBOX_ROUTER_PASSWORD
             - name: SESSION_COOKIE_SECURE
               valueFrom:
                 secretKeyRef:
