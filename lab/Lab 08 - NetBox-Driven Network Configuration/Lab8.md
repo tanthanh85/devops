@@ -902,6 +902,8 @@ kubectl -n network-devops logs deployment/network-monitor-app \
 
 The deployment job now prints the Pod descriptions and the last 100 application log lines automatically when the application rollout fails. If the output contains MySQL `Access denied`, an existing database volume was initialized with different credentials. Restore the original `MYSQL_PASSWORD` and `MYSQL_ROOT_PASSWORD` GitLab variables, or run `cleanup-minikube` to permanently delete the Lab 8 database and volume before generating a new pair. Do not delete the volume if its records must be retained.
 
+If the deployment reports `Unknown database 'network_monitor'`, authentication is working but an interrupted cleanup left the MySQL StatefulSet or volume after dropping the application database. The updated deployment checks credentials without selecting a database, then uses the verified root credential to run `CREATE DATABASE IF NOT EXISTS` and restore the application user's grant before deploying the app. Rerun the updated `main` pipeline; a manual database command is not required.
+
 If the logs report a missing NetBox setting after an earlier deployment, run the updated normal `main` pipeline. The application Deployment now maps `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` from `network-monitor-runtime` into every application Pod. The pipeline does not validate their contents; the NetBox-triggered workflow performs the applicable NetBox validation.
 
 ### Kubernetes collectors cannot reach Logstash

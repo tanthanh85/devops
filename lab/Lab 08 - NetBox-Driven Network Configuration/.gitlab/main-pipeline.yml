@@ -57,6 +57,8 @@ deploy-minikube:
     - test -n "$FLASK_SECRET_KEY"
     - test -n "$INVENTORY_ENCRYPTION_KEY"
     - test -n "$LOGSTASH_HOST"
+    - printf '%s\n' "$MYSQL_DATABASE" | grep -Eq '^[A-Za-z0-9_]+$'
+    - printf '%s\n' "$MYSQL_USER" | grep -Eq '^[A-Za-z0-9_]+$'
     - test -n "$GITLAB_TRIGGER_TOKEN"
     - test -n "$GITLAB_PROJECT_ID"
     - minikube update-context --profile network-devops
@@ -65,7 +67,7 @@ deploy-minikube:
     - |
       if kubectl -n "$KUBE_NAMESPACE" get statefulset network-monitor-db >/dev/null 2>&1; then
         if ! kubectl -n "$KUBE_NAMESPACE" exec statefulset/network-monitor-db -- \
-          env MYSQL_PWD="$MYSQL_PASSWORD" mysql -u"$MYSQL_USER" -e 'SELECT 1' "$MYSQL_DATABASE" >/dev/null; then
+          env MYSQL_PWD="$MYSQL_PASSWORD" mysql -u"$MYSQL_USER" -e 'SELECT 1' >/dev/null; then
           echo "Existing MySQL data does not accept the configured MYSQL_USER/MYSQL_PASSWORD."
           echo "Restore the original GitLab variables or run the manual cleanup job to remove the Lab 8 database volume before generating new credentials."
           exit 1
@@ -76,6 +78,9 @@ deploy-minikube:
           echo "Restore the original GitLab variable before deployment or database cleanup."
           exit 1
         fi
+        kubectl -n "$KUBE_NAMESPACE" exec statefulset/network-monitor-db -- \
+          env MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e \
+          "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`; GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%'; FLUSH PRIVILEGES;"
       fi
     - kubectl -n "$KUBE_NAMESPACE" create secret generic network-monitor-runtime --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" --from-literal=MYSQL_USER="$MYSQL_USER" --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --from-literal=DATABASE_URL="$DATABASE_URL" --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" --from-literal=SESSION_COOKIE_SECURE=false --from-literal=NETBOX_URL="$NETBOX_URL" --from-literal=NETBOX_API_TOKEN="$NETBOX_API_TOKEN" --from-literal=NETBOX_SKIP_TLS_VERIFY="${NETBOX_SKIP_TLS_VERIFY:-false}" --from-literal=NETBOX_ROUTER_USERNAME="$NETBOX_ROUTER_USERNAME" --from-literal=NETBOX_ROUTER_PASSWORD="$NETBOX_ROUTER_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
     - kubectl apply -f kubernetes/mysql.yaml
