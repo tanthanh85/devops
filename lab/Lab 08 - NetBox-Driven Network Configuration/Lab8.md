@@ -1,14 +1,14 @@
-# Lab 8: NetBox-Driven Four-Tier Network Configuration
+# Lab 8: NetBox-Driven Network Configuration
 
 ## Duration
 
 **8 hours**
 
-This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7, plus a fourth **configuration tier**. Each learner may choose a name for their authorized router in NetBox. NetBox sends the configuration tier a webhook when an IPv4 `/32` is assigned to a new loopback interface on that **learner's router**. The configuration tier triggers a dedicated GitLab pipeline that creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
+This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7. Each learner may choose a name for their authorized router in NetBox. When an IPv4 `/32` is assigned to a loopback interface, NetBox triggers a dedicated GitLab pipeline directly. The pipeline creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
 
 All application, monitoring, configuration, Terraform, Ansible, test, Kubernetes, and pipeline files are included in the Lab 8 package. Completing an earlier lab is not required, although learners need access to the Lab 1 NetBox instance or an instructor-provided equivalent, CML 2.9 or newer, and the instructor-authorized IOS XE lab-router services described below.
 
-The normal application capacity is three web Pods, three application Pods, one MySQL Pod, and one configuration-tier Pod.
+The normal application capacity is three web Pods, three application Pods, and one MySQL Pod.
 
 ## Objectives
 
@@ -21,7 +21,7 @@ The normal application capacity is three web Pods, three application Pods, one M
 - Create an Elasticsearch query rule with learner-selected `x`, `y`, and `z` thresholds.
 - Send an alert action through a Kibana webhook connector to a GitLab pipeline trigger.
 - Scale the web and application tiers automatically from three to six replicas.
-- Receive and authenticate NetBox IP-address webhooks in a dedicated configuration tier.
+- Trigger the dedicated network-configuration pipeline directly from a NetBox IP-address event.
 - Create and start a temporary C8000V development router with Terraform and the CML2 provider.
 - Configure and verify all NetBox loopbacks on the development router with Ansible.
 - Configure the authorized production lab router only after development verification succeeds.
@@ -38,7 +38,6 @@ flowchart LR
       W[Web Pods x3]
       A[App Pods x3]
       DB[(MySQL Pod x1)]
-      C[Config tier Pod x1]
       S[Synthetic test Deployment]
       F[Filebeat]
       KM[Kubernetes Metricbeat]
@@ -57,8 +56,7 @@ flowchart LR
     E --> R[Kibana slow-response rule]
     R -->|Webhook| G[GitLab trigger pipeline]
     G -->|Scale to 6 + 6| K
-    NB[NetBox] -->|Webhook + NETBOX_WEBHOOK_TOKEN| C
-    C -->|GITLAB_TRIGGER_TOKEN + event variables| GP[GitLab network pipeline]
+    NB[NetBox] -->|GitLab trigger webhook| GP[GitLab network pipeline]
     GP -->|Terraform CML2| CML[Temporary C8000V]
     GP -->|Ansible after dev verification| LR[Learner's router]
     GP -->|Terraform destroy| CML
@@ -117,7 +115,7 @@ cp -R "/path/to/Lab 08 - NetBox-Driven Network Configuration/." .
 git status
 ```
 
-Lab 8 has its own application source, tests, Dockerfiles, Kubernetes manifests, monitoring configuration, configuration-tier receiver, Terraform, Ansible, and namespace. Do not copy files from a Lab 7 learner repository.
+Lab 8 has its own application source, tests, Dockerfiles, Kubernetes manifests, monitoring configuration, Terraform, Ansible, and namespace. Do not copy files from a Lab 7 learner repository.
 
 ## Step 2: Prepare the Lab 8 configuration
 
@@ -136,10 +134,7 @@ openssl rand -hex 16
 openssl rand -hex 16
 openssl rand -hex 32
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-openssl rand -hex 32
 ```
-
-Use the final value as the NetBox webhook shared token.
 
 ## Step 3: Start ELK
 
@@ -309,7 +304,6 @@ In GitLab, open **Settings > CI/CD > Variables** and create:
 | `FLASK_SECRET_KEY` | 32-byte hexadecimal value |
 | `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
 | `LOGSTASH_HOST` | The value printed in Step 4 |
-| `NETBOX_WEBHOOK_TOKEN` | Final 32-byte hexadecimal value generated in Step 2; used only to authenticate NetBox requests to the configuration tier |
 | `NETBOX_SKIP_TLS_VERIFY` | `false`; use `true` only for the instructor's isolated self-signed service |
 | `NETBOX_ROUTER_USERNAME` | Shared IOS XE RESTCONF username stored separately from inventory data |
 | `NETBOX_ROUTER_PASSWORD` | Shared IOS XE RESTCONF password stored separately from inventory data |
@@ -321,12 +315,12 @@ Create a GitLab pipeline trigger token now:
 1. Open **Settings > CI/CD > Pipeline trigger tokens**.
 2. Create a token named `Lab 8 automation` and copy it immediately.
 3. Return to the project's main page, open the top-right three-dot menu, and select **Copy project ID: NUMBER**.
-4. Add `GITLAB_TRIGGER_TOKEN` and `GITLAB_PROJECT_ID` as GitLab CI/CD variables using those values.
-5. Add `NETBOX_ROUTER_NAME` using the exact, case-sensitive learner-router name recorded in Step 4.1. Do not use a shared example name from another learner.
+4. Keep the trigger token and project ID available for Step 13.2. Do not add either value as a GitLab CI/CD variable; NetBox uses them in its direct webhook URL.
+5. Add `NETBOX_ROUTER_NAME` as a GitLab CI/CD variable using the exact, case-sensitive learner-router name recorded in Step 4.1. Do not use a shared example name from another learner.
 
-Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_WEBHOOK_TOKEN` is different: the normal deployment copies it into the configuration-tier Secret, but the triggered pipeline neither receives nor validates it. `NETBOX_URL` and `NETBOX_API_TOKEN` are deliberately absent: learners enter them in the web application.
+Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_URL` and `NETBOX_API_TOKEN` are deliberately absent: learners enter them in the web application.
 
-The normal `main` pipeline copies the NetBox values into the application and configuration-tier Kubernetes Secrets but does not validate them. The configuration tier uses `NETBOX_WEBHOOK_TOKEN` to authenticate the incoming webhook and then uses the separate `GITLAB_TRIGGER_TOKEN` to create the GitLab pipeline. NetBox API and router-variable validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
+The normal `main` pipeline does not handle the GitLab trigger token or project ID. NetBox stores the direct webhook URL, including those values, and calls GitLab without an application-tier relay. NetBox API and router-variable validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
 
 ## Step 5: Create and start the Lab 8 runner
 
@@ -368,7 +362,7 @@ Commit and push the supplied Lab 8 implementation:
 git status
 git add .
 git diff --staged
-git commit -m "Build NetBox-driven four-tier network automation"
+git commit -m "Build NetBox-driven network automation"
 git push -u origin feature/lab08-netbox-cicd
 ```
 
@@ -380,7 +374,7 @@ The feature-branch push does not create a pipeline. In GitLab:
 4. Open **Build > Pipelines** and select the new `main` pipeline.
 5. Wait for `unit-test`, `build-images`, `deploy-minikube`, `verify-deployment`, and `post-deployment-web-test` to succeed.
 
-The pipeline builds four images and deploys the web, application, database, and configuration tiers together with Filebeat, Metricbeat, kube-state-metrics, and the synthetic test Deployment. Do not run `docker build`, `minikube image load`, or `kubectl apply` manually.
+The pipeline builds three images and deploys the web, application, and database tiers together with Filebeat, Metricbeat, kube-state-metrics, and the synthetic test Deployment. Do not run `docker build`, `minikube image load`, or `kubectl apply` manually.
 
 Verify the deployed capacity:
 
@@ -620,23 +614,7 @@ Do not create the database visualization until Elasticsearch contains at least o
 10. Select **Save and return**.
 11. Set the panel title to **Ready database Pods**.
 
-### Panel 4: Available configuration Pods
-
-1. On the dashboard, select **Add > New visualization**.
-2. Select the **Kubernetes metrics** data view.
-3. Change the visualization type from **Bar** to **Metric**.
-4. Enter this filter and press **Enter**:
-
-   ```text
-   kubernetes.namespace: "network-devops" AND event.dataset: kubernetes.deployment AND metricset.name: state_deployment AND kubernetes.deployment.name: "network-config"
-   ```
-
-5. Search for `kubernetes.deployment.replicas.available`.
-6. Drag it into **Primary metric** and set **Operation** to **Last value**.
-7. Set its display name and panel title to **Available configuration Pods**.
-8. Confirm that the preview displays `1`, then select **Save and return**.
-
-Keep the dashboard at **Last 15 minutes** and auto-refresh every 30 seconds. **Last value** selects the newest gauge inside that time window, so scaling changes appear after the next 15-second Metricbeat collection. Do not use **Count**, **Sum**, or **Unique count** for these four tiles.
+Keep the dashboard at **Last 15 minutes** and auto-refresh every 30 seconds. **Last value** selects the newest gauge inside that time window, so scaling changes appear after the next 15-second Metricbeat collection. Do not use **Count**, **Sum**, or **Unique count** for these three tiles.
 
 Add the Kubernetes charts with these Lens settings:
 
@@ -874,7 +852,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. It does not check `NETBOX_WEBHOOK_TOKEN`: the configuration tier already consumed that token before it submitted the GitLab trigger request. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
+The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
 
 ### 13.1 Create the required GitLab variables
 
@@ -895,39 +873,35 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 
 The CML2 provider reads `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY` directly. Terraform reads variables prefixed with `TF_VAR_`. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
-### 13.2 Verify the configuration-tier receiver
+### 13.2 Build the direct GitLab trigger URL
 
-Confirm that the main pipeline deployed the fourth tier:
+Use the project ID and pipeline trigger token copied in Step 4.3. Replace all four placeholders below, but do not run or paste the completed URL into a shared terminal because it contains the trigger token:
 
-```bash
-kubectl -n network-devops get deployment,service -l app=network-config
-kubectl -n network-devops rollout status deployment/network-config --timeout=180s
-export CONFIG_WEBHOOK_URL="http://$(minikube ip --profile network-devops):30089/webhooks/netbox"
-curl -fsS "http://$(minikube ip --profile network-devops):30089/health" | jq
-echo "$CONFIG_WEBHOOK_URL"
+```text
+https://GITLAB-HOST/api/v4/projects/PROJECT-ID/trigger/pipeline?token=TRIGGER-TOKEN&ref=DEFAULT-BRANCH
 ```
 
-The health response must report `"tier":"config"`. Record `CONFIG_WEBHOOK_URL` for the NetBox webhook. Port `30089` is intentionally exposed only for this isolated lab; do not use this design directly on a public network.
+For GitLab.com, `GITLAB-HOST` is `gitlab.com`. `PROJECT-ID` is the numeric project ID, `TRIGGER-TOKEN` is the Lab 8 pipeline trigger token, and `DEFAULT-BRANCH` is normally `main`. Keep the completed URL ready for the next section.
 
 ### 13.3 Create the NetBox webhook
 
-1. Sign in to NetBox with the instructor-authorized account.
+1. Sign in to NetBox.
 2. Open **Webhooks** from the NetBox navigation. If it is not visible in the expanded navigation, use NetBox's navigation search for `Webhooks`; do not use the browser's global page search.
 3. Select **Add**.
-4. Name the webhook `Lab 8 configuration tier`.
-5. Set **URL** to the `CONFIG_WEBHOOK_URL` value.
+4. Name the webhook `Lab 8 GitLab network pipeline`.
+5. Set **URL** to the complete direct GitLab trigger URL from Step 13.2.
 6. Set **HTTP method** to `POST` and **HTTP content type** to `application/json`.
-7. In **Additional headers**, enter the following single header line, replacing `TOKEN` with the value of the GitLab variable `NETBOX_WEBHOOK_TOKEN`:
+7. Leave **Additional headers** empty.
+8. Set **Body template** to this JSON. It supplies the variable that selects the dedicated NetBox pipeline:
 
-   ```text
-   X-NetBox-Webhook-Token: TOKEN
+   ```json
+   {"variables":{"NETBOX_ACTION":"provision_loopback"}}
    ```
 
-8. Leave the body template empty so NetBox sends its standard event payload, including `event`, `object_type`, `data.address`, and `data.assigned_object`.
-9. Enable SSL verification unless the instructor explicitly identifies the isolated endpoint as self-signed.
+9. Keep SSL verification enabled.
 10. Save the webhook.
 
-The configuration tier rejects webhook requests without the matching `NETBOX_WEBHOOK_TOKEN`. After authentication and event filtering, it uses `GITLAB_TRIGGER_TOKEN` to create the dedicated pipeline and passes only the event variables—not the webhook token—to GitLab. It ignores objects other than created or updated IP addresses, addresses other than IPv4 `/32`, interfaces whose names do not match `Loopback<number>`, and devices whose name does not exactly match the learner-selected `NETBOX_ROUTER_NAME`.
+Treat the webhook URL as a secret because it contains the GitLab trigger token. NetBox sends the POST request directly to GitLab; no application tier relays the webhook. The triggered pipeline uses `NETBOX_ROUTER_NAME` and the NetBox connection saved in **Inventory management** to retrieve and validate the learner router's complete current loopback intent.
 
 ### 13.4 Create the NetBox event rule
 
@@ -935,10 +909,10 @@ The configuration tier rejects webhook requests without the matching `NETBOX_WEB
 2. Name the rule `Learner router loopback assigned IPv4 address`.
 3. Select object type **IPAM > IP Address**.
 4. Enable the **Object created** and **Object updated** events. Enabling updated is necessary when an existing address is assigned to an interface after its creation.
-5. Set **Action type** to **Webhook**, then set **Webhook** (the action choice) to `Lab 8 configuration tier`.
+5. Set **Action type** to **Webhook**, then set **Webhook** (the action choice) to `Lab 8 GitLab network pipeline`.
 6. Save and enable the rule.
 
-The receiver checks the learner-selected device name, Loopback naming convention, and `/32` prefix even if the event rule matches other IP-address events. This defense-in-depth prevents unrelated NetBox changes from reaching production automation.
+The event rule can start the pipeline for any created or updated IP-address object. The pipeline always retrieves the complete current IPv4 `/32` loopback intent for the device named by `NETBOX_ROUTER_NAME`; it does not trust event data as configuration input.
 
 ### 13.5 Create the learner-router loopback intent
 
@@ -952,13 +926,7 @@ The receiver checks the learner-selected device name, Loopback naming convention
 8. In **Assignment**, select the **Device** tab. Use the **Interface** selector to choose the learner's router and then the new loopback interface. Do not select **Make this the primary IP for the device/VM** for a test loopback.
 9. Save the IP address. Creating this assigned IP-address object is the NetBox event that the Lab 8 event rule observes.
 
-NetBox now sends the event. Inspect the receiver without exposing its secret:
-
-```bash
-kubectl -n network-devops logs deployment/network-config --tail=100
-```
-
-The response log should identify the GitLab pipeline number but must not contain the trigger token, NetBox token, or router credentials.
+NetBox now sends the event directly to GitLab. Open the webhook's delivery/log view in NetBox and confirm that GitLab returned a successful `2xx` response. Do not copy a logged request URL into screenshots because it contains the trigger token.
 
 ### 13.6 Follow the dedicated GitLab pipeline
 
@@ -998,7 +966,6 @@ The table is collected live from the learner's router through RESTCONF; it is no
 
 - Kubernetes node, Pod, container, readiness, restart, and replica metrics are visible.
 - Pod-count panels show web `3`, application `3`, and database `1` during normal operation.
-- The configuration-tier Pod-count panel shows `1` during normal operation.
 - Inventory management provides no manual device create or delete control.
 - The application tier retrieves each active device's name, primary management IPv4 address, and RESTCONF port from NetBox, and the web tier displays those synchronized fields.
 - NGINX, Flask, MySQL, and synthetic logs are searchable.
@@ -1011,7 +978,7 @@ The table is collected live from the learner's router through RESTCONF; it is no
 - The Webhook connector starts the dedicated GitLab scale-out pipeline with `ELASTIC_ACTION=scale_out`.
 - The dedicated trigger pipeline completes its validation, scale-out, and capacity-verification stages without loading the normal application pipeline or rebuilding images.
 - Kibana reflects web `6`, application `6`, and database `1` after automatic scaling.
-- The configuration tier accepts only authenticated loopback `/32` events for the learner-selected NetBox device and creates a dedicated GitLab trigger pipeline.
+- NetBox sends its event webhook directly to the dedicated GitLab trigger pipeline.
 - Terraform creates and later destroys a temporary C8000V lab through the CML2 provider.
 - Development verification proves that the C8000V and NetBox loopback counts match before production configuration begins.
 - Production verification proves that the learner's router and its NetBox device contain the same number of loopbacks.
@@ -1219,14 +1186,7 @@ If either deployment is absent, run the normal `main` pipeline before testing th
 
 ### NetBox reports a failed webhook
 
-Confirm that NetBox can route to the Minikube IP and port `30089`, that the webhook URL ends in `/webhooks/netbox`, and that the `X-NetBox-Webhook-Token` header exactly matches the masked `NETBOX_WEBHOOK_TOKEN` variable used by the last main pipeline. Inspect the receiver:
-
-```bash
-kubectl -n network-devops get pods -l app=network-config
-kubectl -n network-devops logs deployment/network-config --tail=100
-```
-
-A `401` indicates a token mismatch. An `ignored` response identifies which learner-router name, loopback-name, event-type, or `/32` condition did not match.
+Open the NetBox webhook delivery/log entry and inspect the GitLab response code. Confirm that the URL uses the correct GitLab host, numeric project ID, unrevoked trigger token, and default branch. Confirm that the JSON body contains `"NETBOX_ACTION":"provision_loopback"`. A `401` indicates an invalid or revoked trigger token, `404` commonly indicates the wrong GitLab host or project ID, and a successful request returns `2xx`. Never place the complete URL in screenshots or shared logs because it contains the trigger token.
 
 ### Inventory retrieval from NetBox fails
 
@@ -1253,7 +1213,7 @@ Do not print or decode the Secret in shared output. For a NetBox instance using 
 
 ### The NetBox trigger pipeline has no jobs
 
-Confirm that the configuration tier submitted the exact variable `NETBOX_ACTION=provision_loopback`. This value conditionally loads `.gitlab/netbox-loopback-pipeline.yml`. Confirm that the trigger token has not been revoked and that its ref is the default branch containing that file.
+Confirm that the direct NetBox webhook body is valid JSON and contains `{"variables":{"NETBOX_ACTION":"provision_loopback"}}`. This value conditionally loads `.gitlab/netbox-loopback-pipeline.yml`. Confirm that the trigger token has not been revoked and that the URL's `ref` names the default branch containing that file.
 
 ### Terraform cannot create the C8000V
 
@@ -1281,7 +1241,7 @@ In GitLab, open the successful Lab 8 `main` pipeline and run the manual `cleanup
 
 The cleanup job verifies that the namespace and captured database PV no longer exist. It leaves Minikube images, the shared Minikube profile, and the external ELK installation intact.
 
-Confirm that the most recent NetBox-triggered pipeline completed `destroy-c8000v-development` and that the temporary `Lab 8 loopback validation` lab is absent from CML. In NetBox, disable and delete `Learner router loopback assigned IPv4 address`, then delete the `Lab 8 configuration tier` webhook. Remove only the loopback/IP objects that the instructor authorizes learners to remove.
+Confirm that the most recent NetBox-triggered pipeline completed `destroy-c8000v-development` and that the temporary `Lab 8 loopback validation` lab is absent from CML. In NetBox, disable and delete `Learner router loopback assigned IPv4 address`, then delete the `Lab 8 GitLab network pipeline` webhook. Remove only the loopback/IP objects that the instructor authorizes learners to remove.
 
 In Kibana, delete the `Repeated slow synthetic responses` rule and the `GitLab - scale network monitor to six` connector. In GitLab, return to **Settings > CI/CD > Pipeline trigger tokens** and revoke `Lab 8 automation`. These external objects cannot be removed safely by the Kubernetes cleanup job.
 

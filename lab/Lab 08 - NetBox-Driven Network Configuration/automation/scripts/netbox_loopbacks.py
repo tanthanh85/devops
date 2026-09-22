@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 base = os.environ["NETWORK_MONITOR_URL"].rstrip("/")
-device = os.environ["NETBOX_DEVICE"]
+device = os.environ["NETBOX_ROUTER_NAME"]
 request = Request(
     f"{base}/api/internal/netbox/loopbacks?{urlencode({'device': device})}",
     headers={"X-Internal-Token": os.environ["FLASK_SECRET_KEY"], "Accept": "application/json"},

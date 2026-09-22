@@ -21,9 +21,6 @@ validate-netbox-event:
     - test -n "$NETBOX_ROUTER_USERNAME"
     - test -n "$NETBOX_ROUTER_PASSWORD"
     - test -n "$NETBOX_ROUTER_NAME"
-    - test "$NETBOX_DEVICE" = "$NETBOX_ROUTER_NAME"
-    - echo "$LOOPBACK_NAME" | grep -Eq '^Loopback[0-9]+$'
-    - python3 -c 'import ipaddress,os; value=ipaddress.ip_interface(os.environ["LOOPBACK_ADDRESS"]); assert value.version == 4 and value.network.prefixlen == 32'
     - minikube update-context --profile network-devops
     - export NETWORK_MONITOR_URL="$(minikube service network-monitor-web -n network-devops --profile network-devops --url | head -n 1)"
     - test -n "$NETWORK_MONITOR_URL"
