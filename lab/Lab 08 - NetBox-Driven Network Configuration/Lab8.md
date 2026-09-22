@@ -57,8 +57,8 @@ flowchart LR
     E --> R[Kibana slow-response rule]
     R -->|Webhook| G[GitLab trigger pipeline]
     G -->|Scale to 6 + 6| K
-    NB[NetBox] -->|Authenticated webhook| C
-    C -->|Trigger token| GP[GitLab network pipeline]
+    NB[NetBox] -->|Webhook + NETBOX_WEBHOOK_TOKEN| C
+    C -->|GITLAB_TRIGGER_TOKEN + event variables| GP[GitLab network pipeline]
     GP -->|Terraform CML2| CML[Temporary C8000V]
     GP -->|Ansible after dev verification| LR[Learner's router]
     GP -->|Terraform destroy| CML
@@ -191,7 +191,7 @@ In GitLab, open **Settings > CI/CD > Variables** and create:
 | `FLASK_SECRET_KEY` | 32-byte hexadecimal value |
 | `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
 | `LOGSTASH_HOST` | The value printed in Step 4 |
-| `NETBOX_WEBHOOK_TOKEN` | Final 32-byte hexadecimal value generated in Step 2 |
+| `NETBOX_WEBHOOK_TOKEN` | Final 32-byte hexadecimal value generated in Step 2; used only to authenticate NetBox requests to the configuration tier |
 | `NETBOX_URL` | Base URL of the instructor-provided NetBox service |
 | `NETBOX_API_TOKEN` | Read-only token allowed to read devices, interfaces, and IP addresses |
 | `NETBOX_SKIP_TLS_VERIFY` | `false`; use `true` only for the instructor's isolated self-signed service |
@@ -206,9 +206,9 @@ Create a GitLab pipeline trigger token now:
 4. Add `GITLAB_TRIGGER_TOKEN` and `GITLAB_PROJECT_ID` as GitLab CI/CD variables using those values.
 5. In NetBox, choose a unique name for your authorized learner router. Add `NETBOX_ROUTER_NAME` with that exact, case-sensitive device name. Do not use a shared example name from another learner.
 
-Select **Masked and hidden** for every secret when GitLab accepts the value. Keep these variables available to both the normal deployment pipeline and trigger-token pipelines; do not restrict them to an environment scope that prevents trigger pipelines from reading them.
+Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the NetBox API and router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_WEBHOOK_TOKEN` is different: the normal deployment copies it into the configuration-tier Secret, but the triggered pipeline neither receives nor validates it.
 
-The normal `main` pipeline copies the NetBox values into the application and configuration-tier Kubernetes Secrets but does not validate them. NetBox-specific validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
+The normal `main` pipeline copies the NetBox values into the application and configuration-tier Kubernetes Secrets but does not validate them. The configuration tier uses `NETBOX_WEBHOOK_TOKEN` to authenticate the incoming webhook and then uses the separate `GITLAB_TRIGGER_TOKEN` to create the GitLab pipeline. NetBox API and router-variable validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
 
 ## Step 5: Create and start the Lab 8 runner
 
@@ -745,7 +745,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job first checks `NETBOX_WEBHOOK_TOKEN`, `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
+The `validate-netbox-event` job first checks `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`. It does not check `NETBOX_WEBHOOK_TOKEN`: the configuration tier already consumed that token before it submitted the GitLab trigger request. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
 
 ### 13.1 Create the required GitLab variables
 
@@ -798,7 +798,7 @@ The health response must report `"tier":"config"`. Record `CONFIG_WEBHOOK_URL` f
 9. Enable SSL verification unless the instructor explicitly identifies the isolated endpoint as self-signed.
 10. Save the webhook.
 
-The configuration tier rejects requests without the matching shared token. It ignores objects other than created or updated IP addresses, addresses other than IPv4 `/32`, interfaces whose names do not match `Loopback<number>`, and devices whose name does not exactly match the learner-selected `NETBOX_ROUTER_NAME`.
+The configuration tier rejects webhook requests without the matching `NETBOX_WEBHOOK_TOKEN`. After authentication and event filtering, it uses `GITLAB_TRIGGER_TOKEN` to create the dedicated pipeline and passes only the event variables—not the webhook token—to GitLab. It ignores objects other than created or updated IP addresses, addresses other than IPv4 `/32`, interfaces whose names do not match `Loopback<number>`, and devices whose name does not exactly match the learner-selected `NETBOX_ROUTER_NAME`.
 
 ### 13.4 Create the NetBox event rule
 
