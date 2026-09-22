@@ -8,8 +8,8 @@ import requests
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from .models import Router, SyntheticConfig, SyntheticResult, User, db
-from .netbox_client import fetch_devices
+from .models import NetBoxConfig, Router, SyntheticConfig, SyntheticResult, User, db
+from .netbox_client import fetch_devices, fetch_loopbacks
 from .restconf_client import collect, collect_loopbacks
 from .security import admin_required, decrypt, encrypt, login_required
 
@@ -205,11 +205,23 @@ def list_routers():
 @admin_required
 def sync_netbox_inventory():
     try:
+        data = body()
+        netbox_url = str(data.get("netbox_url", "")).strip()
+        netbox_api_token = str(data.get("netbox_api_token", "")).strip()
+        if not netbox_url or not netbox_api_token:
+            return jsonify(error="provide both the NetBox URL and API token"), 422
         username = current_app.config["NETBOX_ROUTER_USERNAME"]
         password = current_app.config["NETBOX_ROUTER_PASSWORD"]
         if not username or not password:
             raise RuntimeError("router automation credentials are not configured")
-        devices = fetch_devices()
+        devices = fetch_devices(netbox_url, netbox_api_token)
+        netbox_config = db.session.get(NetBoxConfig, 1)
+        if netbox_config is None:
+            netbox_config = NetBoxConfig(id=1, base_url=netbox_url, token_ciphertext=encrypt(netbox_api_token))
+            db.session.add(netbox_config)
+        netbox_config.base_url = netbox_url.rstrip("/")
+        netbox_config.token_ciphertext = encrypt(netbox_api_token)
+        netbox_config.updated_at = datetime.now(timezone.utc)
         active_names = set()
         for item in devices:
             active_names.add(item["name"])
@@ -230,6 +242,27 @@ def sync_netbox_inventory():
     except (requests.RequestException, RuntimeError, ValueError, KeyError) as exc:
         db.session.rollback()
         return jsonify(error=f"NetBox synchronization failed: {type(exc).__name__}"), 502
+
+
+@api.get("/api/internal/netbox/loopbacks")
+def internal_netbox_loopbacks():
+    supplied = request.headers.get("X-Internal-Token", "")
+    expected = current_app.config["SECRET_KEY"]
+    if not supplied or not hmac.compare_digest(supplied, expected):
+        return jsonify(error="unauthorized"), 401
+    device = request.args.get("device", "").strip()
+    if not device:
+        return jsonify(error="device is required"), 422
+    netbox_config = db.session.get(NetBoxConfig, 1)
+    if netbox_config is None:
+        return jsonify(error="configure and retrieve NetBox inventory in the web application first"), 409
+    try:
+        loopbacks = fetch_loopbacks(device, netbox_config.base_url, decrypt(netbox_config.token_ciphertext))
+        if not loopbacks:
+            return jsonify(error=f"no IPv4 /32 loopback addresses found for {device}"), 404
+        return jsonify(netbox_device=device, netbox_loopback_count=len(loopbacks), netbox_loopbacks=loopbacks)
+    except (requests.RequestException, RuntimeError, ValueError, KeyError) as exc:
+        return jsonify(error=f"NetBox query failed: {type(exc).__name__}"), 502
 
 
 @api.get("/api/routers/<int:router_id>/metrics")

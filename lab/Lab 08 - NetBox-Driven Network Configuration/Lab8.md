@@ -192,7 +192,9 @@ Complete this section with the NetBox administrator account created during the N
 2. Copy only the base URL, for example `https://netbox.example.edu` or `http://192.0.2.20:8000`. Do not include `/api/`, a UI page path, or a trailing object ID.
 3. Confirm that both the Ubuntu GitLab-runner host and the Minikube environment can reach this URL. Do not use `127.0.0.1` unless NetBox runs inside the same network namespace as the caller.
 
-If NetBox was installed locally by Lab 1, it initially listens only on `127.0.0.1`. The Lab 8 application Pods must also reach it. Bind the published port to the Minikube host-side gateway address on this isolated course workstation:
+If NetBox was installed locally by Lab 1, Docker initially publishes it only on the Ubuntu loopback address. Inside an application Pod, `127.0.0.1` means that Pod—not the Ubuntu host—so it cannot reach host NetBox at `http://127.0.0.1:8000`.
+
+Use the gateway that the Minikube node uses to reach the Ubuntu host. Publish NetBox on that host-side gateway address:
 
 ```bash
 export MINIKUBE_HOST_IP=$(minikube ssh --profile network-devops -- \
@@ -204,12 +206,18 @@ grep "${MINIKUBE_HOST_IP}:8000:8080" docker-compose.override.yml
 docker compose config --quiet
 docker compose up -d --force-recreate netbox
 export NETBOX_URL="http://${MINIKUBE_HOST_IP}:8000"
+echo "$NETBOX_URL"
+ss -lnt | grep "${MINIKUBE_HOST_IP}:8000"
 curl -fsS "$NETBOX_URL/api/status/" | jq
 minikube ssh --profile network-devops -- \
   "curl -fsS '${NETBOX_URL}/api/status/'" | jq
 ```
 
-Do not continue unless `grep` displays the new binding and the status request succeeds. This binding is for the isolated lab host; do not expose an unauthenticated HTTP NetBox service on a shared or public network. If the instructor provides a separate NetBox service, do not change its deployment—use its supplied URL instead.
+The checks prove three different things: the Compose override contains the binding, Ubuntu is listening on the gateway address, and the Minikube node can reach the NetBox API. Do not continue unless all three succeed. If a host firewall blocks the final request, permit TCP port `8000` only from the Minikube profile's node address or subnet; do not open it to every network.
+
+Record the printed URL. Enter this exact value in the application's **Inventory management** form. Never substitute `localhost` or `127.0.0.1` there. Do not create a `NETBOX_URL` GitLab variable.
+
+This binding is for the isolated lab host; do not expose an unauthenticated HTTP NetBox service on a shared or public network. If the instructor provides a separate NetBox service, do not change its deployment—use its supplied URL instead.
 
 For an instructor-provided NetBox service, set its supplied base URL and test the API endpoint from the Ubuntu host:
 
@@ -268,12 +276,12 @@ Use a value from `1` through `65535`. Leave the field empty when the router uses
 For this isolated learner lab, the simplest setup is to create a token for the learner account that owns the lab objects. In a shared environment, the instructor should instead provide a dedicated service account with view permission for devices, interfaces, and IP addresses.
 
 1. Open the user profile menu and select **API Tokens**.
-2. Select **Add a token**. If NetBox offers a token-version selector, choose the legacy/v1 token required by this lab's `Authorization: Token` API client.
+2. Select **Add a token**. The application supports both legacy tokens and NetBox v2 tokens.
 3. Enter the description `Lab 8 inventory read access`.
 4. Leave **Write enabled** disabled; Lab 8 reads NetBox through the API and creates new intent through the NetBox UI.
 5. Set an expiration time if required by the course policy.
 6. Create the token and copy its plaintext value immediately. NetBox may not display it again.
-7. Store the value as `NETBOX_API_TOKEN`; never commit it to the repository or paste it into screenshots.
+7. Keep the value ready for the application's **Inventory management** form; never commit it, create a GitLab variable for it, or paste it into screenshots.
 
 Test the token from the Ubuntu runner host, replacing the placeholders without printing the token:
 
@@ -302,8 +310,6 @@ In GitLab, open **Settings > CI/CD > Variables** and create:
 | `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
 | `LOGSTASH_HOST` | The value printed in Step 4 |
 | `NETBOX_WEBHOOK_TOKEN` | Final 32-byte hexadecimal value generated in Step 2; used only to authenticate NetBox requests to the configuration tier |
-| `NETBOX_URL` | Reachable NetBox base URL established in Step 4.1; do not append `/api/` |
-| `NETBOX_API_TOKEN` | Read-only token allowed to read devices, interfaces, and IP addresses |
 | `NETBOX_SKIP_TLS_VERIFY` | `false`; use `true` only for the instructor's isolated self-signed service |
 | `NETBOX_ROUTER_USERNAME` | Shared IOS XE RESTCONF username stored separately from inventory data |
 | `NETBOX_ROUTER_PASSWORD` | Shared IOS XE RESTCONF password stored separately from inventory data |
@@ -318,7 +324,7 @@ Create a GitLab pipeline trigger token now:
 4. Add `GITLAB_TRIGGER_TOKEN` and `GITLAB_PROJECT_ID` as GitLab CI/CD variables using those values.
 5. Add `NETBOX_ROUTER_NAME` using the exact, case-sensitive learner-router name recorded in Step 4.1. Do not use a shared example name from another learner.
 
-Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the NetBox API and router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_WEBHOOK_TOKEN` is different: the normal deployment copies it into the configuration-tier Secret, but the triggered pipeline neither receives nor validates it.
+Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_WEBHOOK_TOKEN` is different: the normal deployment copies it into the configuration-tier Secret, but the triggered pipeline neither receives nor validates it. `NETBOX_URL` and `NETBOX_API_TOKEN` are deliberately absent: learners enter them in the web application.
 
 The normal `main` pipeline copies the NetBox values into the application and configuration-tier Kubernetes Secrets but does not validate them. The configuration tier uses `NETBOX_WEBHOOK_TOKEN` to authenticate the incoming webhook and then uses the separate `GITLAB_TRIGGER_TOKEN` to create the GitLab pipeline. NetBox API and router-variable validation belongs to the dedicated NetBox-triggered pipeline so the normal build and deployment workflow remains independent of NetBox automation readiness.
 
@@ -394,7 +400,18 @@ minikube service network-monitor-web \
   --profile network-devops
 ```
 
-On the first visit, create the administrator account and sign in. Open **Inventory management** and select **Retrieve inventory from NetBox**. The browser calls the application tier, and the application tier—not the browser—authenticates to the NetBox API.
+On the first visit, create the administrator account and sign in. Open **Inventory management**, enter the reachable **NetBox URL** and the read-only **NetBox API token** created in Step 4.1, then select **Retrieve inventory from NetBox**. The browser sends those values to the authenticated application-tier endpoint; the application tier—not the browser—calls the NetBox API. After a successful request, the application stores the URL and an encrypted token in its database so the NetBox-triggered pipeline can retrieve current loopback intent through the application. The plaintext token is never returned to the browser, and the token field is cleared after every attempt.
+
+For host-installed NetBox, verify access from the actual application tier before retrieving inventory. Use the `NETBOX_URL` recorded in Step 4.1:
+
+```bash
+: "${NETBOX_URL:?Export the NetBox URL recorded in Step 4.1}"
+kubectl -n network-devops exec deployment/network-monitor-app -- \
+  python -c 'import sys,urllib.request; print(urllib.request.urlopen(sys.argv[1], timeout=10).status)' \
+  "${NETBOX_URL}/api/status/"
+```
+
+The command must print `200`. It executes inside an application Pod, so success proves that the application tier—not merely the Ubuntu shell—can reach NetBox. Enter that same `NETBOX_URL` in the form.
 
 Confirm that each retrieved row displays only:
 
@@ -402,7 +419,7 @@ Confirm that each retrieved row displays only:
 - Primary management IPv4 address
 - Management RESTCONF port from the NetBox custom field `restconf_port`, or port `443` when that field is empty
 
-Lab 8 intentionally provides no form or API route for manually creating or deleting devices. NetBox is the inventory source of truth. RESTCONF credentials come from the masked `NETBOX_ROUTER_USERNAME` and `NETBOX_ROUTER_PASSWORD` GitLab variables and are never returned to the browser.
+Lab 8 intentionally provides no form or API route for manually creating or deleting devices. NetBox is the inventory source of truth. The dedicated NetBox-triggered pipeline requests sanitized loopback intent from the application and never receives the NetBox API token. RESTCONF credentials come from the masked `NETBOX_ROUTER_USERNAME` and `NETBOX_ROUTER_PASSWORD` GitLab variables and are never returned to the browser.
 
 Open **Synthetic testing** and configure the test:
 
@@ -857,7 +874,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job first checks `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`. It does not check `NETBOX_WEBHOOK_TOKEN`: the configuration tier already consumed that token before it submitted the GitLab trigger request. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
+The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. It does not check `NETBOX_WEBHOOK_TOKEN`: the configuration tier already consumed that token before it submitted the GitLab trigger request. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
 
 ### 13.1 Create the required GitLab variables
 
@@ -1018,7 +1035,7 @@ The deployment job now prints the Pod descriptions and the last 100 application 
 
 If the deployment reports `Unknown database 'network_monitor'`, authentication is working but an interrupted cleanup left the MySQL StatefulSet or volume after dropping the application database. The updated deployment checks credentials without selecting a database, then uses the verified root credential to run `CREATE DATABASE IF NOT EXISTS` and restore the application user's grant before deploying the app. Rerun the updated `main` pipeline; a manual database command is not required.
 
-If the logs report a missing NetBox setting after an earlier deployment, run the updated normal `main` pipeline. The application Deployment now maps `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` from `network-monitor-runtime` into every application Pod. The pipeline does not validate their contents; the NetBox-triggered workflow performs the applicable NetBox validation.
+If the application reports that NetBox is not configured, sign in, open **Inventory management**, enter the NetBox URL and API token, and retrieve inventory successfully. The application Deployment maps only `NETBOX_SKIP_TLS_VERIFY`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` from `network-monitor-runtime`; the URL and token do not exist as GitLab or Kubernetes variables.
 
 ### Kubernetes collectors cannot reach Logstash
 
@@ -1213,7 +1230,17 @@ A `401` indicates a token mismatch. An `ignored` response identifies which learn
 
 ### Inventory retrieval from NetBox fails
 
-Confirm that `NETBOX_URL`, `NETBOX_API_TOKEN`, `NETBOX_ROUTER_USERNAME`, and `NETBOX_ROUTER_PASSWORD` were configured before the most recent normal `main` deployment copied them into the Kubernetes Secret. The main pipeline intentionally does not validate these NetBox values; the NetBox-triggered pipeline validates them in `validate-netbox-event`. The NetBox token must be permitted to read devices, and each device that should appear must be active and have a primary IPv4 address. If the optional `restconf_port` custom field is populated, its value must be an integer from `1` through `65535`; an empty field defaults to `443`.
+Confirm that the learner entered the URL and token in **Inventory management** and completed a successful retrieval. Do not add `NETBOX_URL` or `NETBOX_API_TOKEN` to GitLab. The token must be permitted to read devices, interfaces, and IP addresses; each device that should appear must be active and have a primary IPv4 address. Also confirm that `NETBOX_ROUTER_USERNAME` and `NETBOX_ROUTER_PASSWORD` are configured in GitLab. If the optional `restconf_port` custom field is populated, its value must be an integer from `1` through `65535`; an empty field defaults to `443`.
+
+When NetBox runs on the Ubuntu host, confirm that the URL uses the Minikube host-gateway address established in Step 4.1. `127.0.0.1` and `localhost` cannot work from the application Pod. Repeat both connectivity checks:
+
+```bash
+minikube ssh --profile network-devops -- \
+  "curl -fsS '${NETBOX_URL}/api/status/'" | jq
+kubectl -n network-devops exec deployment/network-monitor-app -- \
+  python -c 'import sys,urllib.request; print(urllib.request.urlopen(sys.argv[1], timeout=10).status)' \
+  "${NETBOX_URL}/api/status/"
+```
 
 Inspect the application tier without exposing the token:
 

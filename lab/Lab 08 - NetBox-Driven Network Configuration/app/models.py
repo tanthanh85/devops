@@ -31,6 +31,13 @@ class Router(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
 
+class NetBoxConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True, default=1)
+    base_url = db.Column(db.String(512), nullable=False)
+    token_ciphertext = db.Column(db.Text, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
 class SyntheticConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True, default=1)
     username = db.Column(db.String(64), nullable=False)

@@ -4,8 +4,6 @@ from cryptography.fernet import Fernet
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["INVENTORY_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
 os.environ["FLASK_SECRET_KEY"] = "test-secret"
-os.environ["NETBOX_URL"] = "https://netbox.test"
-os.environ["NETBOX_API_TOKEN"] = "test-netbox-token"
 os.environ["NETBOX_ROUTER_USERNAME"] = "student"
 os.environ["NETBOX_ROUTER_PASSWORD"] = "secret-value"
 

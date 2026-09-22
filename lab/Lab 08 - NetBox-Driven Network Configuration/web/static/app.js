@@ -137,15 +137,20 @@ function formatInterval(seconds) {
 
 $("setup-form").onsubmit = async event => { event.preventDefault(); try { await call("/api/setup/admin", {method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(event.target)))}); $("setup").hidden = true; $("login").hidden = false; message("Administrator created. Sign in.", "success"); } catch (error) { message(error.message); } };
 $("login-form").onsubmit = async event => { event.preventDefault(); try { await call("/api/session", {method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(event.target)))}); message(); await loadRouters(); } catch (error) { message(error.message); } };
-$("sync-netbox").onclick = async () => {
+$("netbox-form").onsubmit = async event => {
+  event.preventDefault();
   const button = $("sync-netbox");
   button.disabled = true; button.textContent = "Retrieving…";
   try {
-    const result = await call("/api/inventory/netbox", {method: "POST", body: "{}"});
+    const payload = Object.fromEntries(new FormData(event.target));
+    const result = await call("/api/inventory/netbox", {method: "POST", body: JSON.stringify(payload)});
     await loadRouters();
     message(`Retrieved ${result.imported} active device${result.imported === 1 ? "" : "s"} from NetBox.`, "success");
   } catch (error) { message(error.message); }
-  finally { button.disabled = false; button.textContent = "Retrieve inventory from NetBox"; }
+  finally {
+    event.target.netbox_api_token.value = "";
+    button.disabled = false; button.textContent = "Retrieve inventory from NetBox";
+  }
 };
 $("synthetic-form").onsubmit = async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(event.target)); data.interval_seconds = Number(data.interval_seconds); try { await call("/api/synthetic/config", {method: "POST", body: JSON.stringify(data)}); event.target.password.value = ""; await loadSynthetic(); message("Synthetic test account and interval saved.", "success"); } catch (error) { message(error.message); } };
 

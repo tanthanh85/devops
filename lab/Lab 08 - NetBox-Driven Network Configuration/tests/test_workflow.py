@@ -36,12 +36,71 @@ def test_application_instance_is_visible(client):
 def test_netbox_inventory_sync_does_not_return_router_password(client, monkeypatch):
     client.post("/api/setup/admin",json={"username":"admin","password":"correct-horse-battery"})
     client.post("/api/session",json={"username":"admin","password":"correct-horse-battery"})
-    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
-    response=client.post("/api/inventory/netbox",json={})
+    monkeypatch.setattr("app.routes.fetch_devices", lambda *_: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
+    response=client.post("/api/inventory/netbox",json={"netbox_url":"https://netbox.test","netbox_api_token":"test-netbox-token"})
     assert response.status_code==200
     payload=client.get("/api/routers").get_json()
     assert "secret-value" not in str(payload)
     assert "password" not in str(payload)
+
+
+def test_admin_can_supply_netbox_connection_for_one_inventory_request(client, monkeypatch):
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    captured = {}
+
+    def fetch(url, token):
+        captured.update(url=url, token=token)
+        return [{"name": "Learner Router", "host": "192.0.2.10", "port": 443}]
+
+    monkeypatch.setattr("app.routes.fetch_devices", fetch)
+    response = client.post("/api/inventory/netbox", json={
+        "netbox_url": "https://learner-netbox.test",
+        "netbox_api_token": "nbt_key.secret",
+    })
+    assert response.status_code == 200
+    assert captured == {"url": "https://learner-netbox.test", "token": "nbt_key.secret"}
+    assert "nbt_key.secret" not in response.get_data(as_text=True)
+
+    from app.models import NetBoxConfig
+    from app.security import decrypt
+    with client.application.app_context():
+        config = client.application.extensions["sqlalchemy"].session.get(NetBoxConfig, 1)
+        assert config.base_url == "https://learner-netbox.test"
+        assert config.token_ciphertext != "nbt_key.secret"
+        assert decrypt(config.token_ciphertext) == "nbt_key.secret"
+
+
+def test_inventory_rejects_partial_learner_connection(client):
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    response = client.post("/api/inventory/netbox", json={"netbox_url": "https://learner-netbox.test"})
+    assert response.status_code == 422
+
+
+def test_trigger_pipeline_reads_loopback_intent_without_netbox_credentials(client, monkeypatch):
+    client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
+    client.post("/api/session", json={"username": "admin", "password": "admin-password"})
+    monkeypatch.setattr("app.routes.fetch_devices", lambda *_: [])
+    client.post("/api/inventory/netbox", json={
+        "netbox_url": "https://learner-netbox.test",
+        "netbox_api_token": "nbt_key.secret",
+    })
+    monkeypatch.setattr("app.routes.fetch_loopbacks", lambda device, url, token: [{
+        "name": "Loopback8", "ip": "192.0.2.8", "mask": "255.255.255.255",
+    }])
+
+    assert client.get("/api/internal/netbox/loopbacks?device=learner-router").status_code == 401
+    response = client.get(
+        "/api/internal/netbox/loopbacks?device=learner-router",
+        headers={"X-Internal-Token": "test-secret"},
+    )
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "netbox_device": "learner-router",
+        "netbox_loopback_count": 1,
+        "netbox_loopbacks": [{"name": "Loopback8", "ip": "192.0.2.8", "mask": "255.255.255.255"}],
+    }
 
 
 def test_manual_router_creation_is_not_available(client):
@@ -94,8 +153,8 @@ def test_synthetic_interval_must_be_allowed(client):
 def test_authenticated_user_can_read_router_loopbacks(client, monkeypatch):
     client.post("/api/setup/admin", json={"username": "admin", "password": "admin-password"})
     client.post("/api/session", json={"username": "admin", "password": "admin-password"})
-    monkeypatch.setattr("app.routes.fetch_devices", lambda: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
-    client.post("/api/inventory/netbox", json={})
+    monkeypatch.setattr("app.routes.fetch_devices", lambda *_: [{"name": "Learner Edge Router", "host": "192.0.2.10", "port": 443}])
+    client.post("/api/inventory/netbox", json={"netbox_url":"https://netbox.test","netbox_api_token":"test-netbox-token"})
     router_id = client.get("/api/routers").get_json()["items"][0]["id"]
     monkeypatch.setattr("app.routes.collect_loopbacks", lambda router, password: [{
         "name": "Loopback108", "admin_status": "up", "protocol_status": "up",

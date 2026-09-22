@@ -79,7 +79,7 @@ deploy-minikube:
           exit 1
         fi
       fi
-    - kubectl -n "$KUBE_NAMESPACE" create secret generic network-monitor-runtime --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" --from-literal=MYSQL_USER="$MYSQL_USER" --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --from-literal=DATABASE_URL="$DATABASE_URL" --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" --from-literal=SESSION_COOKIE_SECURE=false --from-literal=NETBOX_URL="$NETBOX_URL" --from-literal=NETBOX_API_TOKEN="$NETBOX_API_TOKEN" --from-literal=NETBOX_SKIP_TLS_VERIFY="${NETBOX_SKIP_TLS_VERIFY:-false}" --from-literal=NETBOX_ROUTER_USERNAME="$NETBOX_ROUTER_USERNAME" --from-literal=NETBOX_ROUTER_PASSWORD="$NETBOX_ROUTER_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl -n "$KUBE_NAMESPACE" create secret generic network-monitor-runtime --from-literal=MYSQL_DATABASE="$MYSQL_DATABASE" --from-literal=MYSQL_USER="$MYSQL_USER" --from-literal=MYSQL_PASSWORD="$MYSQL_PASSWORD" --from-literal=MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --from-literal=DATABASE_URL="$DATABASE_URL" --from-literal=FLASK_SECRET_KEY="$FLASK_SECRET_KEY" --from-literal=INVENTORY_ENCRYPTION_KEY="$INVENTORY_ENCRYPTION_KEY" --from-literal=SESSION_COOKIE_SECURE=false --from-literal=NETBOX_SKIP_TLS_VERIFY="${NETBOX_SKIP_TLS_VERIFY:-false}" --from-literal=NETBOX_ROUTER_USERNAME="$NETBOX_ROUTER_USERNAME" --from-literal=NETBOX_ROUTER_PASSWORD="$NETBOX_ROUTER_PASSWORD" --dry-run=client -o yaml | kubectl apply -f -
     - kubectl apply -f kubernetes/mysql.yaml
     - kubectl -n "$KUBE_NAMESPACE" rollout status statefulset/network-monitor-db --timeout=240s
     - |
