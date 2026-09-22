@@ -9,4 +9,8 @@ terraform {
   }
 }
 
-provider "cml2" {}
+provider "cml2" {
+  address     = var.address
+  token       = var.token
+  skip_verify = var.skip_verify
+}

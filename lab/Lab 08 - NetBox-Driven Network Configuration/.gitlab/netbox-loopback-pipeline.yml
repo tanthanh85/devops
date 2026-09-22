@@ -36,9 +36,13 @@ create-c8000v-development:
   script:
     - test -n "$CML2_ADDRESS"
     - test -n "$CML2_TOKEN"
+    - printf '%s\n' "${CML2_SKIP_VERIFY:-false}" | grep -Eq '^(true|false)$'
     - test -n "$TF_VAR_c8000v_image_definition"
     - test -n "$TF_VAR_dev_username"
     - test -n "$TF_VAR_dev_password"
+    - export TF_VAR_address="$CML2_ADDRESS"
+    - export TF_VAR_token="$CML2_TOKEN"
+    - export TF_VAR_skip_verify="${CML2_SKIP_VERIFY:-false}"
     - export TF_HTTP_ADDRESS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/lab8-${CI_PIPELINE_ID}"
     - export TF_HTTP_LOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
     - export TF_HTTP_UNLOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
@@ -113,6 +117,12 @@ destroy-c8000v-development:
   resource_group: cml-lab8-development
   when: always
   script:
+    - test -n "$CML2_ADDRESS"
+    - test -n "$CML2_TOKEN"
+    - printf '%s\n' "${CML2_SKIP_VERIFY:-false}" | grep -Eq '^(true|false)$'
+    - export TF_VAR_address="$CML2_ADDRESS"
+    - export TF_VAR_token="$CML2_TOKEN"
+    - export TF_VAR_skip_verify="${CML2_SKIP_VERIFY:-false}"
     - export TF_HTTP_ADDRESS="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/lab8-${CI_PIPELINE_ID}"
     - export TF_HTTP_LOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"
     - export TF_HTTP_UNLOCK_ADDRESS="${TF_HTTP_ADDRESS}/lock"

@@ -871,7 +871,7 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `PROD_ROUTER_USERNAME` | Learner-router automation username |
 | `PROD_ROUTER_PASSWORD` | Learner-router automation password |
 
-The CML2 provider reads `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY` directly. Terraform reads variables prefixed with `TF_VAR_`. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
+The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
 ### 13.2 Build the direct GitLab trigger URL
 
@@ -1217,7 +1217,7 @@ Confirm that the direct NetBox webhook body is valid JSON and contains `{"variab
 
 ### Terraform cannot create the C8000V
 
-Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, and `TF_VAR_external_connector`. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
+Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, and `TF_VAR_external_connector`. `CML2_ADDRESS` must be the full controller URL beginning with `https://`; do not enter only an IP address. The pipeline explicitly maps these CML values into the provider's required `address`, `token`, and `skip_verify` arguments. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
 
 ### Development Ansible cannot connect
 
