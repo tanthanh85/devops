@@ -91,7 +91,7 @@ The expected result is `NotFound`. Lab 8 creates and uses the separate `network-
 
 Before starting, obtain instructor-authorized access to:
 
-- NetBox with permission to create interfaces, IP addresses, webhooks, and event rules and to create a read-only API token. Each monitored device must be active, have a primary IPv4 address, and may have an integer custom field named `restconf_port`; the application uses `443` when the field is empty.
+- The new NetBox instance installed in Lab 1, or an instructor-provided equivalent, with an administrator account for this isolated lab. Step 4 creates the catalog, learner-router record, management address, API token, custom field, event rule, and webhook from scratch. Each monitored device must be active and have a primary IPv4 address.
 - CML 2.9 or newer with the `cat8000v` node definition, an installed C8000V image definition, and an external connector reachable from the GitLab runner.
 - A learner's router, authorized by the instructor and available in NetBox, with SSH access for Ansible. Learners may choose its NetBox device name. Never target a production or shared device that the instructor has not explicitly authorized.
 - A shell GitLab runner with `terraform`, `ansible-playbook`, `ansible-galaxy`, `python3`, `kubectl`, `minikube`, and `docker` available.
@@ -182,6 +182,113 @@ minikube ssh --profile network-devops -- "nc -zv ${LOGSTASH_IP} 15044"
 
 Do not continue until the connection test reaches port `15044`.
 
+### 4.1 Configure a new NetBox instance
+
+Complete this section with the NetBox administrator account created during the NetBox installation. NetBox is the source of truth: create the learner's router in NetBox before deploying Lab 8. Names in this section are examples; learners may choose their own router name, but must use that exact case-sensitive name everywhere the guide says `NETBOX_ROUTER_NAME`.
+
+#### A. Sign in and confirm the NetBox URL
+
+1. Open the NetBox URL and sign in with the administrator account created during installation.
+2. Copy only the base URL, for example `https://netbox.example.edu` or `http://192.0.2.20:8000`. Do not include `/api/`, a UI page path, or a trailing object ID.
+3. Confirm that both the Ubuntu GitLab-runner host and the Minikube environment can reach this URL. Do not use `127.0.0.1` unless NetBox runs inside the same network namespace as the caller.
+
+If NetBox was installed locally by Lab 1, it initially listens only on `127.0.0.1`. The Lab 8 application Pods must also reach it. Bind the published port to the Minikube host-side gateway address on this isolated course workstation:
+
+```bash
+export MINIKUBE_HOST_IP=$(minikube ssh --profile network-devops -- \
+  "ip route show default" | awk '{print $3; exit}')
+cd ~/course-platform/netbox
+sed -i "s/127.0.0.1:8000:8080/${MINIKUBE_HOST_IP}:8000:8080/" \
+  docker-compose.override.yml
+grep "${MINIKUBE_HOST_IP}:8000:8080" docker-compose.override.yml
+docker compose config --quiet
+docker compose up -d --force-recreate netbox
+export NETBOX_URL="http://${MINIKUBE_HOST_IP}:8000"
+curl -fsS "$NETBOX_URL/api/status/" | jq
+minikube ssh --profile network-devops -- \
+  "curl -fsS '${NETBOX_URL}/api/status/'" | jq
+```
+
+Do not continue unless `grep` displays the new binding and the status request succeeds. This binding is for the isolated lab host; do not expose an unauthenticated HTTP NetBox service on a shared or public network. If the instructor provides a separate NetBox service, do not change its deployment—use its supplied URL instead.
+
+For an instructor-provided NetBox service, set its supplied base URL and test the API endpoint from the Ubuntu host:
+
+```bash
+export NETBOX_URL="https://NETBOX-HOST"
+curl -fsS "$NETBOX_URL/api/status/" | jq
+```
+
+For an isolated NetBox installation with a self-signed certificate, use `curl -k` only for this connectivity test and later set `NETBOX_SKIP_TLS_VERIFY=true`. Prefer a trusted certificate whenever available.
+
+#### B. Create the minimum device catalog
+
+NetBox requires a site, manufacturer, device type, device role, and platform before a device can be added. Skip an object only if the instructor has already created the equivalent one.
+
+1. Open **Organization > Sites**, select **Add**, enter a name such as `Network DevOps Lab`, set **Status** to **Active**, and save.
+2. Open **Devices > Manufacturers**, select **Add**, enter the router manufacturer (for example `Cisco`), and save.
+3. Open **Devices > Device Types**, select **Add**, then choose the manufacturer, enter a model such as `C8000V`, and save. NetBox may generate the slug automatically.
+4. Open **Devices > Device Roles**, select **Add**, enter `Learner Router`, choose a color, and save.
+5. Open **Devices > Platforms**, select **Add**, enter `IOS XE`, optionally select the manufacturer, and save.
+
+Menu names can differ slightly between NetBox releases. Use the global search for **Sites**, **Manufacturers**, **Device Types**, **Device Roles**, or **Platforms** if an item is not under the stated menu.
+
+#### C. Create the learner's router
+
+1. Open **Devices > Devices** and select **Add**.
+2. Enter a unique learner-selected name, for example `thandoan-router`. Record the spelling and capitalization; this becomes `NETBOX_ROUTER_NAME`.
+3. Select the device type, role, site, and platform created above.
+4. Set **Status** to **Active** and save.
+5. Open the new device, select **Interfaces**, and select **Add interfaces**.
+6. Name the management interface exactly as it exists on the router, for example `GigabitEthernet1`.
+7. Select the appropriate physical interface type, leave **Enabled** selected, optionally select **Management only**, and create the interface.
+8. Open the management interface and select **Add IP address**.
+9. Enter the instructor-provided management address with its real prefix length, for example `192.0.2.10/24`; set **Status** to **Active**, keep it assigned to this interface, and save.
+10. Return to the device, select **Edit**, set **Primary IPv4** to that management address, and save.
+
+The application ignores inactive devices and devices without a primary IPv4 address. Do not enter the RESTCONF TCP port as part of the IP address.
+
+#### D. Add the optional RESTCONF-port field
+
+The web application uses TCP port `443` when no custom value is set. If the learner's router uses another externally reachable RESTCONF port:
+
+1. Open **Customization > Custom Fields** and select **Add**. On older versions, use **Admin > Customization > Custom Fields**.
+2. Set **Name** to `RESTCONF port` and **Key** or **Slug** to exactly `restconf_port`.
+3. Set **Type** to **Integer**.
+4. Under **Object types**, select **DCIM > Device**.
+5. Make the field optional, then save.
+6. Return to **Devices > Devices**, edit the learner's router, enter the externally reachable RESTCONF port in **RESTCONF port**, and save.
+
+Use a value from `1` through `65535`. Leave the field empty when the router uses port `443`.
+
+#### E. Create the NetBox API token
+
+For this isolated learner lab, the simplest setup is to create a token for the learner account that owns the lab objects. In a shared environment, the instructor should instead provide a dedicated service account with view permission for devices, interfaces, and IP addresses.
+
+1. Open the user menu in the upper-right corner and select **API Tokens**. In some versions this is **Profile > API Tokens**.
+2. Select **Add a token**. If NetBox offers a token-version selector, choose the legacy/v1 token required by this lab's `Authorization: Token` API client.
+3. Enter the description `Lab 8 inventory read access`.
+4. Leave **Write enabled** disabled; Lab 8 reads NetBox through the API and creates new intent through the NetBox UI.
+5. Set an expiration time if required by the course policy.
+6. Create the token and copy its plaintext value immediately. NetBox may not display it again.
+7. Store the value as `NETBOX_API_TOKEN`; never commit it to the repository or paste it into screenshots.
+
+Test the token from the Ubuntu runner host, replacing the placeholders without printing the token:
+
+```bash
+export NETBOX_URL="https://NETBOX-HOST"
+read -rsp 'NetBox API token: ' NETBOX_API_TOKEN; echo
+curl -fsS \
+  -H "Authorization: Token $NETBOX_API_TOKEN" \
+  -H 'Accept: application/json' \
+  "$NETBOX_URL/api/dcim/devices/?name=YOUR-ROUTER-NAME" \
+  | jq '{count, devices: [.results[] | {name, status: .status.value, primary_ip4: .primary_ip4.address}]}'
+unset NETBOX_API_TOKEN
+```
+
+The result must show `count: 1`, status `active`, and the expected primary IPv4 address. Stop and correct NetBox before continuing if the result is empty or the primary address is `null`.
+
+### 4.2 Create the GitLab CI/CD variables
+
 In GitLab, open **Settings > CI/CD > Variables** and create:
 
 | Key | Value |
@@ -192,11 +299,13 @@ In GitLab, open **Settings > CI/CD > Variables** and create:
 | `INVENTORY_ENCRYPTION_KEY` | Generated Fernet key |
 | `LOGSTASH_HOST` | The value printed in Step 4 |
 | `NETBOX_WEBHOOK_TOKEN` | Final 32-byte hexadecimal value generated in Step 2; used only to authenticate NetBox requests to the configuration tier |
-| `NETBOX_URL` | Base URL of the instructor-provided NetBox service |
+| `NETBOX_URL` | Reachable NetBox base URL established in Step 4.1; do not append `/api/` |
 | `NETBOX_API_TOKEN` | Read-only token allowed to read devices, interfaces, and IP addresses |
 | `NETBOX_SKIP_TLS_VERIFY` | `false`; use `true` only for the instructor's isolated self-signed service |
 | `NETBOX_ROUTER_USERNAME` | Shared IOS XE RESTCONF username stored separately from inventory data |
 | `NETBOX_ROUTER_PASSWORD` | Shared IOS XE RESTCONF password stored separately from inventory data |
+
+### 4.3 Create the GitLab pipeline trigger
 
 Create a GitLab pipeline trigger token now:
 
