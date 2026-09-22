@@ -241,9 +241,12 @@ Menu names can differ slightly between NetBox releases. Use the global search fo
 5. Open the new device. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row. Do not first open an Interfaces tab; the add control is in the Device Components panel.
 6. Name the management interface exactly as it exists on the router, for example `GigabitEthernet1`.
 7. Select the appropriate physical interface type, leave **Enabled** selected, optionally select **Management only**, and create the interface.
-8. Open the management interface and select **Add IP address**.
-9. Enter the instructor-provided management address with its real prefix length, for example `192.0.2.10/24`; set **Status** to **Active**, keep it assigned to this interface, and save.
-10. Return to the device, select **Edit**, set **Primary IPv4** to that management address, and save.
+8. In the main left navigation, open **IPAM > IP Addresses**. This is a separate IPAM menu; do not look for an IP-address action inside the device or interface page.
+9. Select **Add** in the IP Addresses page.
+10. Enter the instructor-provided management address with its real prefix length, for example `192.0.2.10/24`, and set **Status** to **Active**.
+11. In the assignment section, set the assigned-object type to **Device interface**, select the learner's router as the **Device**, and select the management interface created above as the **Interface**.
+12. Save the IP address.
+13. Return to **Devices > Devices**, open the learner's router, select **Edit**, set **Primary IPv4** to the management address, and save.
 
 The application ignores inactive devices and devices without a primary IPv4 address. Do not enter the RESTCONF TCP port as part of the IP address.
 
@@ -926,9 +929,11 @@ The receiver checks the learner-selected device name, Loopback naming convention
 2. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row.
 3. Enter an unused name such as `Loopback108`.
 4. Select interface type **Virtual**, leave **Enabled** selected, and create the interface.
-5. Open the new interface and select **Add IP address**.
+5. In the main left navigation, open **IPAM > IP Addresses** and select **Add**.
 6. Enter an instructor-approved, unused IPv4 `/32`, for example `192.0.2.108/32` only when that documentation prefix is appropriate for the isolated lab.
-7. Set status to **Active**, assign it to the new loopback, and create the address.
+7. Set **Status** to **Active** and, when the field is available, set **Role** to **Loopback**.
+8. In the assignment section, set the assigned-object type to **Device interface**, select the learner's router as the **Device**, and select the new loopback as the **Interface**.
+9. Save the IP address. Creating this assigned IP-address object is the NetBox event that the Lab 8 event rule observes.
 
 NetBox now sends the event. Inspect the receiver without exposing its secret:
 
