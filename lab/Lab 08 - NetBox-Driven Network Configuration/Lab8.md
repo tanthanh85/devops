@@ -333,20 +333,64 @@ In GitLab:
 5. Disable **Run untagged jobs**.
 6. Create the runner and copy its `glrt-` authentication token.
 
-Register the runner as the current Ubuntu user:
+Build the supplied Lab 8 CI image. It contains Python, Docker CLI, `kubectl`, Minikube, Git, SSH, `curl`, `jq`, and `unzip`, so jobs do not depend on commands installed inside the runner container at runtime:
+
+```bash
+cd ~/netdevops-labs/netdevops-lab08-netbox-cicd
+export LAB8_KUBECTL_VERSION="$(kubectl version --client -o json | jq -r '.clientVersion.gitVersion')"
+export LAB8_MINIKUBE_VERSION="$(minikube version --short)"
+docker build \
+  --build-arg KUBECTL_VERSION="$LAB8_KUBECTL_VERSION" \
+  --build-arg MINIKUBE_VERSION="$LAB8_MINIKUBE_VERSION" \
+  -t lab8-ci-runner:latest \
+  -f ci/Dockerfile .
+docker run --rm lab8-ci-runner:latest bash -lc \
+  'python3 --version && docker --version && kubectl version --client && minikube version'
+```
+
+Register a Docker executor as the current Ubuntu user:
 
 ```bash
 mkdir -p ~/.gitlab-runner-lab08
-gitlab-runner register --config "$HOME/.gitlab-runner-lab08/config.toml"
+gitlab-runner register \
+  --config "$HOME/.gitlab-runner-lab08/config.toml" \
+  --url https://gitlab.com \
+  --token YOUR_LAB8_GLRT_TOKEN \
+  --executor docker \
+  --docker-image lab8-ci-runner:latest \
+  --description lab08-minikube-docker-runner
 ```
 
-Enter:
+Open `~/.gitlab-runner-lab08/config.toml`. Preserve the generated runner URL, ID, and token, then make its Docker-related settings match the following. These are TOML values; `$HOME` is not expanded inside the file, so use the literal Ubuntu home path shown.
 
-- GitLab URL: `https://gitlab.com`
-- Token: the Lab 8 project runner token
-- Description: `lab08-minikube-shell-runner`
-- Tags: `lab8,minikube`
-- Executor: `shell`
+```toml
+[[runners]]
+  executor = "docker"
+  environment = ["HOME=/home/ubuntu"]
+
+  [runners.docker]
+    image = "lab8-ci-runner:latest"
+    pull_policy = "if-not-present"
+    network_mode = "host"
+    privileged = true
+    volumes = [
+      "/cache",
+      "/var/run/docker.sock:/var/run/docker.sock",
+      "/home/ubuntu/.kube:/home/ubuntu/.kube:rw",
+      "/home/ubuntu/.minikube:/home/ubuntu/.minikube:rw"
+    ]
+```
+
+`network_mode = "host"` is required so the job container can reach CML and the temporary C8000V through the Ubuntu host's VPN and routes. The Docker socket lets image-build jobs use the host Docker daemon. Mounting the two Ubuntu directories at the same absolute paths preserves the certificate paths stored by Minikube and gives `kubectl` access to the existing `network-devops` profile. This trusted project runner is privileged and controls the host Docker daemon; never enable it for untrusted repositories.
+
+Verify the executor before starting it:
+
+```bash
+gitlab-runner list --config "$HOME/.gitlab-runner-lab08/config.toml"
+gitlab-runner verify --config "$HOME/.gitlab-runner-lab08/config.toml"
+grep -E 'executor = "docker"|network_mode = "host"|image = "lab8-ci-runner:latest"' \
+  "$HOME/.gitlab-runner-lab08/config.toml"
+```
 
 Start the runner in a separate terminal and keep it running:
 
@@ -879,9 +923,9 @@ RSA key generation is an operational command and must not be placed directly in 
 
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
-Each Ansible job creates `.ansible-venv`, installs the pinned version from `automation/requirements-python.txt`, installs the required collections from `automation/requirements.yml`, and calls `.ansible-venv/bin/ansible-playbook` explicitly. Do not activate a learner-owned virtual environment in the runner configuration and do not rely on `ansible-playbook` or `ansible-galaxy` being present in the shell runner's interactive `PATH`.
+Each Ansible job creates `.ansible-venv` inside its clean Docker job container, installs the pinned version from `automation/requirements-python.txt`, installs the required collections from `automation/requirements.yml`, and calls `.ansible-venv/bin/ansible-playbook` explicitly. Do not rely on a learner-owned virtual environment or commands from the Ubuntu host.
 
-Each Terraform job runs `automation/scripts/install_terraform.sh`, which downloads the pinned Linux build for the runner architecture, verifies it against HashiCorp's published SHA-256 checksum, and installs it as `.tools/terraform`. All Terraform commands use that explicit path. The `.tools/terraform` cache avoids downloading the same verified version for every job. Do not rely on a learner-installed `terraform` command being present in the shell runner's interactive `PATH`.
+Each Terraform job runs `automation/scripts/install_terraform.sh`, which downloads the pinned Linux build for the Docker job architecture, verifies it against HashiCorp's published SHA-256 checksum, and installs it as `.tools/terraform`. All Terraform commands use that explicit path. The `.tools/terraform` cache avoids downloading the same verified version for every job. Do not rely on Terraform installed on the Ubuntu host.
 
 ### 13.2 Build the direct GitLab trigger URL
 
@@ -1229,7 +1273,7 @@ Confirm that the direct NetBox webhook body is valid JSON and contains `{"variab
 
 Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, `TF_VAR_external_connector`, `TF_VAR_dev_router_ip`, and `TF_VAR_dev_default_gateway`. `CML2_ADDRESS` must be the full controller URL beginning with `https://`; do not enter only an IP address. The development router value must include its prefix, its gateway must be in the same external-connector subnet, and the address must be reachable from the GitLab runner. The pipeline explicitly maps the CML values into the provider's required `address`, `token`, and `skip_verify` arguments. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
 
-If the job reports that `terraform` is not found, confirm it is using the current pipeline definition. The log must show `automation/scripts/install_terraform.sh`, the pinned Terraform version, and commands executed through `$CI_PROJECT_DIR/.tools/terraform`. Confirm `curl`, `sha256sum`, and Python 3 are available to the shell runner; a bare `terraform` command indicates an older pipeline file.
+If the job reports that `terraform` is not found, confirm it is using the current pipeline definition. The log must show `automation/scripts/install_terraform.sh`, the pinned Terraform version, and commands executed through `$CI_PROJECT_DIR/.tools/terraform`. Confirm the job uses `lab8-ci-runner:latest`; a bare `terraform` command indicates an older pipeline file.
 
 ### Development Ansible cannot connect
 
