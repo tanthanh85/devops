@@ -12,6 +12,10 @@ variables:
   ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
   ANSIBLE_CONFIG: "$CI_PROJECT_DIR/automation/ansible/ansible.cfg"
   ANSIBLE_NETWORK_CLI_SSH_TYPE: "paramiko"
+  ANSIBLE_HOST_KEY_CHECKING: "False"
+  ANSIBLE_PARAMIKO_HOST_KEY_CHECKING: "False"
+  ANSIBLE_HOST_KEY_AUTO_ADD: "True"
+  ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD: "True"
   TERRAFORM_VERSION: "1.16.3"
   TERRAFORM_BIN: "$CI_PROJECT_DIR/.tools/terraform"
 
@@ -92,7 +96,7 @@ create-c8000v-development:
     - '"$TERRAFORM_BIN" -chdir=automation/terraform apply -auto-approve -input=false'
     - '"$TERRAFORM_BIN" -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"'
     - test -s build/dev-router-ip
-    - python3 automation/scripts/wait_for_tcp.py "$(cat build/dev-router-ip)" 22 600
+    - python3 automation/scripts/wait_for_ssh.py "$(cat build/dev-router-ip)" 600
   artifacts:
     when: always
     access: developer
