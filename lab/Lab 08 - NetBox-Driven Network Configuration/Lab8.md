@@ -852,7 +852,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The cleanup job uses GitLab's normal success behavior, so it is skipped when Terraform creation, development configuration, or development verification fails.
+The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The automatic cleanup job uses GitLab's normal success behavior, so it runs only after all preceding stages succeed. The same `cleanup-dev` stage also provides the optional `manually-destroy-c8000v-development` job so learners can remove the temporary CML environment after a failed or stopped pipeline.
 
 ### 13.1 Create the required GitLab variables
 
@@ -961,7 +961,8 @@ Confirm the following evidence in order:
 - `verify-c8000v-development` succeeds only when the development C8000V loopback count equals the NetBox count.
 - `configure-production-router` runs only after successful development verification and applies the same intent to the learner's router.
 - `verify-production-router` succeeds only when the production count equals the NetBox count.
-- `destroy-c8000v-development` runs only after the preceding development stages have succeeded and then destroys the temporary CML lab.
+- `destroy-c8000v-development` runs automatically only after all preceding stages succeed and then destroys the temporary CML lab.
+- `manually-destroy-c8000v-development` is an optional manual action that uses the same Terraform state and destroy procedure. Run it when a failed or stopped trigger pipeline leaves the temporary CML lab behind.
 
 Do not retry only the production job after changing NetBox intent. Start a new event-driven pipeline so the current intent passes development validation first.
 
@@ -1262,7 +1263,7 @@ Download `build/netbox-loopbacks.json` from the trigger pipeline and compare its
 
 ### CML cleanup fails
 
-Do not delete the pipeline's GitLab-managed Terraform state before cleanup. If `destroy-c8000v-development` runs and fails, retry that job. If an earlier development stage fails, GitLab intentionally skips `cleanup-dev`; use the CML UI to locate the lab named `Lab 8 loopback validation`, confirm that it belongs to this learner pipeline, and delete only that temporary lab before retrying the workflow. If state is unavailable, the same instructor-authorized manual cleanup is required.
+Do not delete the pipeline's GitLab-managed Terraform state before cleanup. If `destroy-c8000v-development` runs and fails, retry that job. If an earlier stage fails or the pipeline is stopped, open its `cleanup-dev` stage and run `manually-destroy-c8000v-development`. This job uses that pipeline's own GitLab-managed Terraform state, so run the manual job from the same trigger pipeline that created the CML lab. If the state is unavailable, use the CML UI to locate `Lab 8 loopback validation`, confirm that it belongs to this learner pipeline, and delete only that instructor-authorized temporary lab.
 
 ## Cleanup
 

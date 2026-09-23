@@ -150,7 +150,7 @@ verify-production-router:
     - python3 automation/scripts/write_ansible_inventory.py production build/prod-inventory.json
     - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.json automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
-destroy-c8000v-development:
+.destroy-c8000v-development:
   extends: .terraform-pipeline-job
   stage: cleanup-dev
   resource_group: cml-lab8-development
@@ -171,3 +171,11 @@ destroy-c8000v-development:
     - export TF_HTTP_RETRY_WAIT_MIN="5"
     - '"$TERRAFORM_BIN" -chdir=automation/terraform init -input=false'
     - '"$TERRAFORM_BIN" -chdir=automation/terraform destroy -auto-approve -input=false'
+
+destroy-c8000v-development:
+  extends: .destroy-c8000v-development
+
+manually-destroy-c8000v-development:
+  extends: .destroy-c8000v-development
+  when: manual
+  allow_failure: true
