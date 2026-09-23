@@ -23,7 +23,7 @@ resource "cml2_node" "router" {
     hostname LAB8-C8000V-DEV
     username ${var.dev_username} privilege 15 secret ${var.dev_password}
     ip domain name lab.local
-    crypto key generate rsa modulus 2048
+    crypto key generate rsa general-keys modulus 2048
     ip ssh version 2
     restconf
     netconf-yang

@@ -873,7 +873,7 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `PROD_ROUTER_USERNAME` | Learner-router automation username |
 | `PROD_ROUTER_PASSWORD` | Learner-router automation password |
 
-Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. Terraform configures the static address and mask on `GigabitEthernet1`, adds `ip route 0.0.0.0 0.0.0.0 <gateway>`, and exports the address without its prefix for the Ansible stages.
+Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. During `terraform-dev`, Terraform supplies C8000V day-zero configuration that sets the hostname and domain name, generates 2048-bit RSA general keys, enables SSH version 2, permits SSH on the VTY lines, configures the static address and mask on `GigabitEthernet1`, and adds `ip route 0.0.0.0 0.0.0.0 <gateway>`. It exports the address without its prefix for the Ansible stages.
 
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
@@ -1231,7 +1231,7 @@ If the job reports that `terraform` is not found, confirm it is using the curren
 
 ### Development Ansible cannot connect
 
-Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and SSH is allowed from the GitLab runner. The playbook waits up to ten minutes for IOS XE to finish booting.
+Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and TCP port 22 is allowed from the GitLab runner. In the C8000V console, use `show ip ssh` to confirm SSH version 2 is enabled and `show crypto key mypubkey rsa` to confirm the 2048-bit RSA key exists. The playbook waits up to ten minutes for IOS XE to finish booting and SSH to accept connections.
 
 If an Ansible job reports that `ansible-galaxy` or `ansible-playbook` is not found, confirm the job is using the current pipeline definition and that `python3 -m venv .ansible-venv` succeeded. The commands must appear as `.ansible-venv/bin/ansible-galaxy` and `.ansible-venv/bin/ansible-playbook` in the job log; a bare command indicates an older pipeline file.
 
