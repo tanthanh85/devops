@@ -6,7 +6,7 @@
   tasks:
     - name: Wait for IOS XE SSH to become ready
       ansible.builtin.wait_for_connection:
-        timeout: 600
+        timeout: 120
         sleep: 10
 
     - name: Validate loopback input

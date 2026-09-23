@@ -10,6 +10,8 @@ stages:
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
+  ANSIBLE_CONFIG: "$CI_PROJECT_DIR/automation/ansible/ansible.cfg"
+  ANSIBLE_NETWORK_CLI_SSH_TYPE: "paramiko"
   TERRAFORM_VERSION: "1.16.3"
   TERRAFORM_BIN: "$CI_PROJECT_DIR/.tools/terraform"
 
@@ -30,6 +32,7 @@ variables:
     - mkdir -p build "$ANSIBLE_COLLECTIONS_PATH"
     - python3 -m venv .ansible-venv
     - .ansible-venv/bin/python -m pip install --disable-pip-version-check -r automation/requirements-python.txt
+    - .ansible-venv/bin/python -c 'import paramiko; print("Paramiko", paramiko.__version__)'
     - .ansible-venv/bin/ansible-galaxy collection install -p "$ANSIBLE_COLLECTIONS_PATH" -r automation/requirements.yml
     - .ansible-venv/bin/ansible-playbook --version
 

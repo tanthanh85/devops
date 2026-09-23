@@ -1237,6 +1237,8 @@ Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the 
 
 If an Ansible job reports that `ansible-galaxy` or `ansible-playbook` is not found, confirm the job is using the current pipeline definition and that `python3 -m venv .ansible-venv` succeeded. The commands must appear as `.ansible-venv/bin/ansible-galaxy` and `.ansible-venv/bin/ansible-playbook` in the job log; a bare command indicates an older pipeline file.
 
+If `wait_for_connection` reports `paramiko is not installed`, the pipeline is using an older Python dependency list. The current job installs Paramiko inside `.ansible-venv`, verifies the import before running Ansible, sets `ANSIBLE_NETWORK_CLI_SSH_TYPE=paramiko`, and loads `automation/ansible/ansible.cfg`. In the `ansible-playbook --version` output, `config file` must show that file rather than `None`. The connection check now fails after two minutes instead of hiding a missing SSH transport for ten minutes.
+
 ### Loopback verification fails
 
 Download `build/netbox-loopbacks.json` from the trigger pipeline and compare its non-secret intent with `show ip interface brief | include ^Loopback`. Correct NetBox or device drift and generate a new NetBox event. Never bypass `verify-dev` to run the production stage.
