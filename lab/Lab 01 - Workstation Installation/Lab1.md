@@ -99,7 +99,7 @@ git config --global init.defaultBranch main
 git --version
 ```
 
-## Part 2: Install Python, pip, and virtual-environment support
+## Part 2: Install Python, Ansible, and Terraform
 
 Install the Python runtime and the standard virtual-environment capability that Lab 2 will use for the course project.
 
@@ -112,12 +112,33 @@ python3 -m venv --help | head
 
 The `python3-venv` package supplies the standard-library module used to create isolated Python environments. Each application lab creates its own `.venv` inside its own repository.
 
-Install Ansible from the Ubuntu package repository so its command is available for workstation verification:
+Install Ansible from the Ubuntu package repository. This package must provide the `ansible`, `ansible-playbook`, and `ansible-galaxy` commands required by later labs and GitLab jobs:
 
 ```bash
 sudo apt install -y ansible
 ansible --version
+ansible-playbook --version
+ansible-galaxy --version
 ```
+
+All three version commands must succeed. If `ansible-galaxy` is not found, do not continue to runner registration; confirm that the `ansible` package installed successfully and that `/usr/bin` is present in `PATH`.
+
+Install Terraform from HashiCorp's signed APT repository:
+
+```bash
+wget -O- https://apt.releases.hashicorp.com/gpg \
+  | gpg --dearmor \
+  | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg >/dev/null
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
+  | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update
+sudo apt install -y terraform
+terraform version
+```
+
+The final command must report Terraform `1.6.0` or newer, which is required by the Lab 8 configuration. Do not substitute an unrelated Ubuntu community package for HashiCorp's signed package.
 
 Verify that Python can load the `venv` module:
 
@@ -451,7 +472,8 @@ Every entry should report `PASS`. This check confirms that the required commands
 
 - Python, pip, and the `venv` module run successfully on the workstation.
 - Python virtual environments can be created inside individual lab repositories.
-- Ansible reports its executable, Python, and collection paths.
+- Ansible, `ansible-playbook`, and `ansible-galaxy` are installed and report their versions, executable locations, Python runtime, and collection paths.
+- Terraform `1.6.0` or newer is installed from HashiCorp's signed repository and reports its version.
 - Visual Studio Code opens the Lab 1 workspace and contains the required extensions.
 - Docker Engine and Docker Compose pass their verification commands.
 - `kubectl` reaches the `network-devops` Minikube profile.
