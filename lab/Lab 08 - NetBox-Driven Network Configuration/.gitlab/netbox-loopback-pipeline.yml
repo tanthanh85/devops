@@ -126,8 +126,8 @@ configure-production-router:
   resource_group: lab-router-production
   script:
     - test -n "$PROD_ROUTER_HOST"
-    - test -n "$PROD_ROUTER_USERNAME"
-    - test -n "$PROD_ROUTER_PASSWORD"
+    - test -n "$VAULT_ADDR"
+    - test -n "$VAULT_TOKEN"
     - printf '%s\n' "${PROD_ROUTER_RESTCONF_PORT:-443}" | grep -Eq '^[0-9]+$'
     - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -ge 1
     - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -le 65535
@@ -144,6 +144,9 @@ verify-production-router:
   environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
+    - test -n "$PROD_ROUTER_HOST"
+    - test -n "$VAULT_ADDR"
+    - test -n "$VAULT_TOKEN"
     - printf '%s\n' "${PROD_ROUTER_RESTCONF_PORT:-443}" | grep -Eq '^[0-9]+$'
     - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -ge 1
     - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -le 65535

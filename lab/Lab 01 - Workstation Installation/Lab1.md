@@ -436,9 +436,9 @@ export VAULT_ADDR=http://127.0.0.1:8200
 curl -s "$VAULT_ADDR/v1/sys/health" | jq
 ```
 
-The development server is initialized, unsealed, in-memory, and deliberately insecure. Its root token grants complete access, and its data disappears when the container is removed. Never use this configuration or token outside the lab.
+The development server is initialized, unsealed, in-memory, and deliberately insecure. Its root token grants complete access. Its data disappears whenever the Vault process stops or restarts, even if the container itself is retained. Never use this configuration or token outside the lab.
 
-Stop and restart it without deleting the container:
+You can stop and restart the container, but the restarted development server is empty. Recreate any secrets required by later labs after running these commands:
 
 ```bash
 docker stop course-vault

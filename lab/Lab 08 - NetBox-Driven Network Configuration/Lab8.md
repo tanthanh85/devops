@@ -315,7 +315,7 @@ Create a GitLab pipeline trigger token now:
 1. Open **Settings > CI/CD > Pipeline trigger tokens**.
 2. Create a token named `Lab 8 automation` and copy it immediately.
 3. Return to the project's main page, open the top-right three-dot menu, and select **Copy project ID: NUMBER**.
-4. Keep the trigger token and project ID available for Step 13.2. Do not add either value as a GitLab CI/CD variable; NetBox uses them in its direct webhook URL.
+4. Keep the trigger token and project ID available for Step 13.3. Do not add either value as a GitLab CI/CD variable; NetBox uses them in its direct webhook URL.
 5. Add `NETBOX_ROUTER_NAME` as a GitLab CI/CD variable using the exact, case-sensitive learner-router name recorded in Step 4.1. Do not use a shared example name from another learner.
 
 Select **Masked and hidden** for every secret when GitLab accepts the value. Keep the router variables available to trigger-token pipelines; do not restrict them to an environment scope that prevents those pipelines from reading them. `NETBOX_URL` and `NETBOX_API_TOKEN` are deliberately absent: learners enter them in the web application.
@@ -852,9 +852,90 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The automatic cleanup job uses GitLab's normal success behavior, so it runs only after all preceding stages succeed. The same `cleanup-dev` stage also provides the optional `manually-destroy-c8000v-development` job so learners can remove the temporary CML environment after a failed or stopped pipeline.
+The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. Immediately before each production Ansible operation, the trigger pipeline reads the learner-router RESTCONF username and password from the Lab 1 Vault server. The production stage cannot begin unless variable validation and development verification succeed. The automatic cleanup job uses GitLab's normal success behavior, so it runs only after all preceding stages succeed. The same `cleanup-dev` stage also provides the optional `manually-destroy-c8000v-development` job so learners can remove the temporary CML environment after a failed or stopped pipeline.
 
-### 13.1 Create the required GitLab variables
+### 13.1 Store the production-router credentials in Vault
+
+Lab 1 installed `course-vault` in development mode on the same Ubuntu host as the shell runner. Confirm that it is running:
+
+```bash
+cd ~/course-platform/vault
+docker compose up -d
+curl -fsS http://127.0.0.1:8200/v1/sys/health | jq
+```
+
+Read the development root token from the local Vault `.env` file. Then enter the learner-router RESTCONF credentials interactively. The password is not echoed, and the JSON document is sent directly to the Vault CLI inside the container:
+
+```bash
+export LAB_VAULT_TOKEN="$(sed -n 's/^VAULT_DEV_ROOT_TOKEN_ID=//p' .env)"
+test -n "$LAB_VAULT_TOKEN"
+
+read -r -p 'Learner-router RESTCONF username: ' LAB_ROUTER_USERNAME
+read -r -s -p 'Learner-router RESTCONF password: ' LAB_ROUTER_PASSWORD
+printf '\n'
+
+jq -n \
+  --arg username "$LAB_ROUTER_USERNAME" \
+  --arg password "$LAB_ROUTER_PASSWORD" \
+  '{username: $username, password: $password}' \
+| docker exec -i \
+    -e VAULT_ADDR=http://127.0.0.1:8200 \
+    -e VAULT_TOKEN="$LAB_VAULT_TOKEN" \
+    course-vault \
+    vault kv put -mount=secret lab8/production-router -
+
+unset LAB_ROUTER_USERNAME LAB_ROUTER_PASSWORD
+```
+
+Confirm that the secret exists without displaying its values:
+
+```bash
+docker exec \
+  -e VAULT_ADDR=http://127.0.0.1:8200 \
+  -e VAULT_TOKEN="$LAB_VAULT_TOKEN" \
+  course-vault \
+  vault kv metadata get -mount=secret lab8/production-router
+```
+
+Create a policy that grants the pipeline read access only to this KV v2 data path, then issue a token with that policy:
+
+```bash
+cat <<'EOF' \
+| docker exec -i \
+    -e VAULT_ADDR=http://127.0.0.1:8200 \
+    -e VAULT_TOKEN="$LAB_VAULT_TOKEN" \
+    course-vault \
+    vault policy write lab8-production-router-read -
+path "secret/data/lab8/production-router" {
+  capabilities = ["read"]
+}
+EOF
+
+export LAB8_PIPELINE_VAULT_TOKEN="$(docker exec \
+  -e VAULT_ADDR=http://127.0.0.1:8200 \
+  -e VAULT_TOKEN="$LAB_VAULT_TOKEN" \
+  course-vault \
+  vault token create \
+    -policy=lab8-production-router-read \
+    -field=token)"
+test -n "$LAB8_PIPELINE_VAULT_TOKEN"
+```
+
+In this private terminal, display the token once and copy it directly into the masked GitLab variable in the next section:
+
+```bash
+printf '%s\n' "$LAB8_PIPELINE_VAULT_TOKEN"
+```
+
+Do not place this output in screenshots, notes, chat, or shell commands, and do not use the development root token as the pipeline token. After creating the GitLab variable, run:
+
+```bash
+unset LAB8_PIPELINE_VAULT_TOKEN LAB_VAULT_TOKEN
+```
+
+The pipeline reads the KV v2 API path `/v1/secret/data/lab8/production-router` and requires the fields `username` and `password`. Do not use different field names. Vault development mode stores data only in memory: stopping or restarting `course-vault` loses the secret, policy, and token, so repeat this section and update the GitLab token after every Vault restart. The fixed development root token and unencrypted loopback listener are acceptable only on this isolated course workstation, never in production.
+
+### 13.2 Create the required GitLab variables
 
 Open **Settings > CI/CD > Variables** and add the following. Mark credentials and tokens **Masked and hidden**. Mark production and CML credentials **Protected** only if trigger-token pipelines on your default branch are allowed to read protected variables.
 
@@ -870,9 +951,9 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `TF_VAR_dev_username` | Temporary C8000V administrator username |
 | `TF_VAR_dev_password` | Temporary C8000V administrator password |
 | `PROD_ROUTER_HOST` | Management address of the instructor-authorized learner router |
-| `PROD_ROUTER_USERNAME` | Learner-router automation username |
-| `PROD_ROUTER_PASSWORD` | Learner-router automation password |
 | `PROD_ROUTER_RESTCONF_PORT` | Learner-router HTTPS RESTCONF port; optional, defaults to `443` |
+| `VAULT_ADDR` | Lab 1 Vault URL reachable by the shell runner: `http://127.0.0.1:8200` |
+| `VAULT_TOKEN` | Value of `LAB8_PIPELINE_VAULT_TOKEN`, restricted by the `lab8-production-router-read` policy; mark **Masked and hidden** |
 
 Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. During `terraform-dev`, Terraform supplies C8000V day-zero configuration that sets the hostname and domain name, creates the privilege-15 learner account with an explicitly clear-text input (`secret 0`) that IOS XE immediately hashes, enables AAA and local HTTP authentication, enables RESTCONF and the HTTPS server, disables plain HTTP, configures the static address and mask on `GigabitEthernet1`, and adds `ip route 0.0.0.0 0.0.0.0 <gateway>`.
 
@@ -880,13 +961,15 @@ The `terraform-dev` job then waits up to ten minutes for an authenticated RESTCO
 
 Ansible configures each loopback with `ansible.netcommon.restconf_config` and verifies the resulting YANG data with `ansible.netcommon.restconf_get`. After configuration, Ansible sends a direct RESTCONF `POST` to `/restconf/operations/cisco-ia:save-config/` to copy the running configuration to startup configuration. The RPC uses `ansible.builtin.uri` because `restconf_config` performs a preliminary `GET`, while an IOS XE operation resource permits `POST` but rejects `GET` with HTTP `405 Method Not Allowed`.
 
+`PROD_ROUTER_USERNAME` and `PROD_ROUTER_PASSWORD` are no longer GitLab variables. `write_ansible_inventory.py` authenticates to Vault separately in both production jobs, reads those values only in job memory, and writes the resulting Ansible inventory with mode `0600`. That inventory is not included in job artifacts. Remove the obsolete production username and password variables from **Settings > CI/CD > Variables** if they exist.
+
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
 Each Ansible job creates `.ansible-venv`, installs the pinned version from `automation/requirements-python.txt`, installs the required collections from `automation/requirements.yml`, and calls `.ansible-venv/bin/ansible-playbook` explicitly. Do not activate a learner-owned virtual environment in the runner configuration and do not rely on `ansible-playbook` or `ansible-galaxy` being present in the shell runner's interactive `PATH`.
 
 Each Terraform job runs `automation/scripts/install_terraform.sh`, which downloads the pinned Linux build for the runner architecture, verifies it against HashiCorp's published SHA-256 checksum, and installs it as `.tools/terraform`. All Terraform commands use that explicit path. The `.tools/terraform` cache avoids downloading the same verified version for every job. Do not rely on a learner-installed `terraform` command being present in the shell runner's interactive `PATH`.
 
-### 13.2 Build the direct GitLab trigger URL
+### 13.3 Build the direct GitLab trigger URL
 
 Use the project ID and pipeline trigger token copied in Step 4.3. Replace all four placeholders below, but do not run or paste the completed URL into a shared terminal because it contains the trigger token:
 
@@ -896,13 +979,13 @@ https://GITLAB-HOST/api/v4/projects/PROJECT-ID/trigger/pipeline?token=TRIGGER-TO
 
 For GitLab.com, `GITLAB-HOST` is `gitlab.com`. `PROJECT-ID` is the numeric project ID, `TRIGGER-TOKEN` is the Lab 8 pipeline trigger token, and `DEFAULT-BRANCH` is normally `main`. Keep the completed URL ready for the next section.
 
-### 13.3 Create the NetBox webhook
+### 13.4 Create the NetBox webhook
 
 1. Sign in to NetBox.
 2. Open **Webhooks** from the NetBox navigation. If it is not visible in the expanded navigation, use NetBox's navigation search for `Webhooks`; do not use the browser's global page search.
 3. Select **Add**.
 4. Name the webhook `Lab 8 GitLab network pipeline`.
-5. Set **URL** to the complete direct GitLab trigger URL from Step 13.2.
+5. Set **URL** to the complete direct GitLab trigger URL from Step 13.3.
 6. Set **HTTP method** to `POST` and **HTTP content type** to `application/json`.
 7. Leave **Additional headers** empty.
 8. Set **Body template** to this JSON. It supplies the variable that selects the dedicated NetBox pipeline:
@@ -916,7 +999,7 @@ For GitLab.com, `GITLAB-HOST` is `gitlab.com`. `PROJECT-ID` is the numeric proje
 
 Treat the webhook URL as a secret because it contains the GitLab trigger token. NetBox sends the POST request directly to GitLab; no application tier relays the webhook. The triggered pipeline uses `NETBOX_ROUTER_NAME` and the NetBox connection saved in **Inventory management** to retrieve and validate the learner router's complete current loopback intent.
 
-### 13.4 Create the NetBox event rule
+### 13.5 Create the NetBox event rule
 
 1. Open **Event Rules** from the NetBox navigation and select **Add**. If it is not visible in the expanded navigation, use NetBox's navigation search for `Event Rules`.
 2. Name the rule `Learner router loopback assigned IPv4 address`.
@@ -927,7 +1010,7 @@ Treat the webhook URL as a secret because it contains the GitLab trigger token. 
 
 The event rule can start the pipeline for any created or updated IP-address object. The pipeline always retrieves the complete current IPv4 `/32` loopback intent for the device named by `NETBOX_ROUTER_NAME`; it does not trust event data as configuration input.
 
-### 13.5 Create the learner-router loopback intent
+### 13.6 Create the learner-router loopback intent
 
 1. In NetBox, open **Devices > Devices** and select the device whose name exactly matches your `NETBOX_ROUTER_NAME` value.
 2. In the left-side **Device Components** panel, locate **Interfaces** and select the **+ (Add)** icon on the same row.
@@ -941,7 +1024,7 @@ The event rule can start the pipeline for any created or updated IP-address obje
 
 NetBox now sends the event directly to GitLab. Open the webhook's delivery/log view in NetBox and confirm that GitLab returned a successful `2xx` response. Do not copy a logged request URL into screenshots because it contains the trigger token.
 
-### 13.6 Follow the dedicated GitLab pipeline
+### 13.7 Follow the dedicated GitLab pipeline
 
 Open **Build > Pipelines** and select the new pipeline marked **trigger token**. It must show only these stages:
 
@@ -966,7 +1049,7 @@ Confirm the following evidence in order:
 
 Do not retry only the production job after changing NetBox intent. Start a new event-driven pipeline so the current intent passes development validation first.
 
-### 13.7 Display live loopbacks in the web application
+### 13.8 Display live loopbacks in the web application
 
 1. Sign in to the Lab 8 web application.
 2. Open **Inventory management**.
@@ -1256,6 +1339,17 @@ curl --insecure --user 'YOUR_USERNAME:YOUR_PASSWORD' \
 `--insecure` is used only because the temporary lab router has a self-signed HTTPS certificate. A timeout indicates routing, gateway, firewall, or HTTPS-service trouble; HTTP `401` indicates rejected credentials; HTTP `200` confirms authenticated RESTCONF access.
 
 If the loopback task succeeds but the save task reports HTTP `405`, confirm the current playbook uses `ansible.builtin.uri` and that its URL ends with `/restconf/operations/cisco-ia:save-config/`. A log showing `ansible.netcommon.restconf_config` for the save task is from an older revision that tries an unsupported preliminary `GET` against the RPC resource.
+
+### The production job cannot read Vault
+
+Confirm `course-vault` is running and that the shell runner can reach the Lab 1 loopback listener:
+
+```bash
+docker ps --filter name=course-vault
+curl -fsS http://127.0.0.1:8200/v1/sys/health | jq
+```
+
+Confirm that GitLab contains `VAULT_ADDR=http://127.0.0.1:8200` and the masked, read-only `VAULT_TOKEN` created in Step 13.1. Do not place `VAULT_DEV_ROOT_TOKEN_ID` in GitLab. A protected variable is available to this trigger pipeline only when its target branch is protected. HTTP `403` means the token is incorrect, expired, or cannot read the secret. HTTP `404`, or a message that the secret is missing `username` or `password`, usually means the development server was restarted and its in-memory data was lost. Repeat Step 13.1, update `VAULT_TOKEN`, then start a new trigger pipeline. Do not print the secret with `vault kv get` in shared output.
 
 ### Loopback verification fails
 
