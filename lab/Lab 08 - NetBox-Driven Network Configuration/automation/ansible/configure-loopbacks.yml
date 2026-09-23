@@ -34,9 +34,20 @@
       loop_control:
         label: "{{ item.name }} {{ item.ip }} {{ item.mask }}"
 
+    # restconf_config performs a GET before a write. IOS XE correctly rejects
+    # GET on an RPC resource with 405, so invoke this POST-only RPC directly.
     - name: Save running configuration through the IOS XE RESTCONF RPC
-      ansible.netcommon.restconf_config:
-        path: /operations/cisco-ia:save-config
-        method: post
-        format: json
-        content: '{}'
+      ansible.builtin.uri:
+        url: "https://{{ ansible_host }}:{{ ansible_port }}/restconf/operations/cisco-ia:save-config/"
+        method: POST
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: true
+        validate_certs: false
+        headers:
+          Accept: application/yang-data+json
+          Content-Type: application/yang-data+json
+        body_format: json
+        body: {}
+        status_code: [200, 201, 204]
+      delegate_to: localhost

@@ -878,6 +878,8 @@ Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML exte
 
 The `terraform-dev` job then waits up to ten minutes for an authenticated RESTCONF request to succeed on HTTPS port `443`. It cannot release `configure-dev` merely because the TCP port is open. The Ansible inventory uses the `ansible.netcommon.httpapi` connection with the `ansible.netcommon.restconf` network OS. Because the temporary C8000V uses a lab-generated HTTPS certificate, certificate validation is disabled for this isolated exercise; do not copy that setting into production.
 
+Ansible configures each loopback with `ansible.netcommon.restconf_config` and verifies the resulting YANG data with `ansible.netcommon.restconf_get`. After configuration, Ansible sends a direct RESTCONF `POST` to `/restconf/operations/cisco-ia:save-config/` to copy the running configuration to startup configuration. The RPC uses `ansible.builtin.uri` because `restconf_config` performs a preliminary `GET`, while an IOS XE operation resource permits `POST` but rejects `GET` with HTTP `405 Method Not Allowed`.
+
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
 Each Ansible job creates `.ansible-venv`, installs the pinned version from `automation/requirements-python.txt`, installs the required collections from `automation/requirements.yml`, and calls `.ansible-venv/bin/ansible-playbook` explicitly. Do not activate a learner-owned virtual environment in the runner configuration and do not rely on `ansible-playbook` or `ansible-galaxy` being present in the shell runner's interactive `PATH`.
@@ -1251,6 +1253,8 @@ curl --insecure --user 'YOUR_USERNAME:YOUR_PASSWORD' \
 ```
 
 `--insecure` is used only because the temporary lab router has a self-signed HTTPS certificate. A timeout indicates routing, gateway, firewall, or HTTPS-service trouble; HTTP `401` indicates rejected credentials; HTTP `200` confirms authenticated RESTCONF access.
+
+If the loopback task succeeds but the save task reports HTTP `405`, confirm the current playbook uses `ansible.builtin.uri` and that its URL ends with `/restconf/operations/cisco-ia:save-config/`. A log showing `ansible.netcommon.restconf_config` for the save task is from an older revision that tries an unsupported preliminary `GET` against the RPC resource.
 
 ### Loopback verification fails
 
