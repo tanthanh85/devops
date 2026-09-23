@@ -89,6 +89,7 @@ create-c8000v-development:
     - '"$TERRAFORM_BIN" -chdir=automation/terraform apply -auto-approve -input=false'
     - '"$TERRAFORM_BIN" -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"'
     - test -s build/dev-router-ip
+    - python3 automation/scripts/wait_for_tcp.py "$(cat build/dev-router-ip)" 22 600
   artifacts:
     when: always
     access: developer
