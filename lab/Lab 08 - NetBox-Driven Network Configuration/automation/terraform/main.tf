@@ -21,7 +21,10 @@ resource "cml2_node" "router" {
   y               = 0
   configuration   = <<-EOT
     hostname LAB8-C8000V-DEV
-    username ${var.dev_username} privilege 15 secret ${var.dev_password}
+    username ${var.dev_username} privilege 15 secret 0 ${var.dev_password}
+    aaa new-model
+    aaa authentication login default local
+    aaa authorization exec default local
     ip domain name lab.local
     ip ssh rsa keypair-name LAB8-SSH
     ip ssh version 2
@@ -32,7 +35,8 @@ resource "cml2_node" "router" {
      no shutdown
     ip route 0.0.0.0 0.0.0.0 ${var.dev_default_gateway}
     line vty 0 4
-     login local
+     login authentication default
+     authorization exec default
      transport input ssh
     event manager applet LAB8-GENERATE-SSH-KEY authorization bypass
      event timer countdown time 30
