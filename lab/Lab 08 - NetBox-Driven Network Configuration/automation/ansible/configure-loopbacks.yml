@@ -1,23 +1,42 @@
 ---
-- name: Configure NetBox loopbacks on IOS XE
+- name: Configure NetBox loopbacks on IOS XE through RESTCONF
   hosts: routers
   gather_facts: false
-  connection: ansible.netcommon.network_cli
+  connection: ansible.netcommon.httpapi
   tasks:
     - name: Validate loopback input
       ansible.builtin.assert:
         that:
           - netbox_loopbacks | length > 0
 
-    - name: Configure all NetBox loopback interfaces idempotently
-      cisco.ios.ios_config:
-        parents: "interface {{ item.name }}"
-        lines:
-          - "ip address {{ item.ip }} {{ item.mask }}"
-          - no shutdown
+    - name: Create or replace every NetBox loopback through RESTCONF
+      ansible.netcommon.restconf_config:
+        path: "/data/Cisco-IOS-XE-native:native/interface/Loopback={{ item.name | regex_replace('^Loopback', '') }}"
+        method: put
+        format: json
+        content: >-
+          {{
+            {
+              'Cisco-IOS-XE-native:Loopback': {
+                'name': (item.name | regex_replace('^Loopback', '') | int),
+                'ip': {
+                  'address': {
+                    'primary': {
+                      'address': item.ip,
+                      'mask': item.mask
+                    }
+                  }
+                }
+              }
+            } | to_json
+          }}
       loop: "{{ netbox_loopbacks }}"
-      no_log: false
+      loop_control:
+        label: "{{ item.name }} {{ item.ip }} {{ item.mask }}"
 
-    - name: Save the IOS XE configuration
-      cisco.ios.ios_config:
-        save_when: modified
+    - name: Save running configuration through the IOS XE RESTCONF RPC
+      ansible.netcommon.restconf_config:
+        path: /operations/cisco-ia:save-config
+        method: post
+        format: json
+        content: '{}'

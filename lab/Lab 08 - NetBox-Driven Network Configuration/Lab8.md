@@ -91,7 +91,7 @@ Before starting, obtain instructor-authorized access to:
 
 - The new NetBox instance installed in Lab 1, or an instructor-provided equivalent, with an administrator account for this isolated lab. Step 4 creates the catalog, learner-router record, management address, API token, custom field, event rule, and webhook from scratch. Each monitored device must be active and have a primary IPv4 address.
 - CML 2.9 or newer with the `cat8000v` node definition, an installed C8000V image definition, and an external connector reachable from the GitLab runner.
-- A learner's router, authorized by the instructor and available in NetBox, with SSH access for Ansible. Learners may choose its NetBox device name. Never target a production or shared device that the instructor has not explicitly authorized.
+- A learner's router, authorized by the instructor and available in NetBox, with HTTPS RESTCONF enabled for Ansible. Learners may choose its NetBox device name. Never target a production or shared device that the instructor has not explicitly authorized.
 - A shell GitLab runner with `python3`, Python virtual-environment support, `curl`, `sha256sum`, `kubectl`, `minikube`, and `docker` available. The pipeline installs pinned Ansible and Terraform executables inside the project workspace and does not depend on the runner user's interactive environment or `PATH`.
 
 ## Step 1: Create the Lab 8 repository
@@ -869,13 +869,14 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `TF_VAR_dev_default_gateway` | IPv4 default gateway for that subnet, without a prefix |
 | `TF_VAR_dev_username` | Temporary C8000V administrator username |
 | `TF_VAR_dev_password` | Temporary C8000V administrator password |
-| `PROD_ROUTER_HOST` | SSH address of the instructor-authorized learner router |
+| `PROD_ROUTER_HOST` | Management address of the instructor-authorized learner router |
 | `PROD_ROUTER_USERNAME` | Learner-router automation username |
 | `PROD_ROUTER_PASSWORD` | Learner-router automation password |
+| `PROD_ROUTER_RESTCONF_PORT` | Learner-router HTTPS RESTCONF port; optional, defaults to `443` |
 
-Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. During `terraform-dev`, Terraform supplies C8000V day-zero configuration that sets the hostname and domain name, creates the privilege-15 learner account with an explicitly clear-text input (`secret 0`) that IOS XE immediately hashes, enables AAA with the local user database for default login and EXEC authorization, enables SSH version 2, associates SSH with the `LAB8-SSH` key pair, applies the default AAA method to the VTY lines, configures the static address and mask on `GigabitEthernet1`, and adds `ip route 0.0.0.0 0.0.0.0 <gateway>`.
+Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. During `terraform-dev`, Terraform supplies C8000V day-zero configuration that sets the hostname and domain name, creates the privilege-15 learner account with an explicitly clear-text input (`secret 0`) that IOS XE immediately hashes, enables AAA and local HTTP authentication, enables RESTCONF and the HTTPS server, disables plain HTTP, configures the static address and mask on `GigabitEthernet1`, and adds `ip route 0.0.0.0 0.0.0.0 <gateway>`.
 
-RSA key generation is an operational command and must not be placed directly in startup-config. The day-zero configuration therefore registers the `LAB8-GENERATE-SSH-KEY` EEM applet. Thirty seconds after boot, the applet checks whether `LAB8-SSH` exists and generates a labeled 2048-bit RSA general key only when it is absent. The `terraform-dev` job exports the configured address and waits up to ten minutes for TCP port 22; it cannot succeed and release `configure-dev` until SSH is listening.
+The `terraform-dev` job then waits up to ten minutes for an authenticated RESTCONF request to succeed on HTTPS port `443`. It cannot release `configure-dev` merely because the TCP port is open. The Ansible inventory uses the `ansible.netcommon.httpapi` connection with the `ansible.netcommon.restconf` network OS. Because the temporary C8000V uses a lab-generated HTTPS certificate, certificate validation is disabled for this isolated exercise; do not copy that setting into production.
 
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
@@ -1233,17 +1234,23 @@ If the job reports that `terraform` is not found, confirm it is using the curren
 
 ### Development Ansible cannot connect
 
-Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and TCP port 22 is allowed from the GitLab runner. The Terraform job waits up to ten minutes for an actual SSH protocol banner rather than treating an open TCP socket as sufficient. In the C8000V console, use `show event manager policy registered` and `show event manager history events` to inspect `LAB8-GENERATE-SSH-KEY`, `show ip ssh` to confirm SSH version 2 is enabled, and `show crypto key mypubkey rsa` to confirm the labeled 2048-bit RSA key exists.
+Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and HTTPS port `443` is allowed from the GitLab runner. The Terraform job waits for an authenticated RESTCONF response rather than treating an open TCP socket as sufficient. In the C8000V console, use `show running-config | include ^restconf|^ip http` and confirm that `restconf`, `ip http secure-server`, and `ip http authentication local` are present.
 
 If an Ansible job reports that `ansible-galaxy` or `ansible-playbook` is not found, confirm the job is using the current pipeline definition and that `python3 -m venv .ansible-venv` succeeded. The commands must appear as `.ansible-venv/bin/ansible-galaxy` and `.ansible-venv/bin/ansible-playbook` in the job log; a bare command indicates an older pipeline file.
 
-If a job reports `paramiko is not installed`, the pipeline is using an older Python dependency list. The current job installs Paramiko inside `.ansible-venv`, verifies the import before running Ansible, sets `ANSIBLE_NETWORK_CLI_SSH_TYPE=paramiko`, and loads `automation/ansible/ansible.cfg`. In the `ansible-playbook --version` output, `config file` must show that file rather than `None`.
+The slow Ansible `wait_for_connection` task is not used. Readiness belongs to `terraform-dev`, where `wait_for_restconf.py` repeatedly performs an authenticated RESTCONF GET. The following Ansible stage can therefore begin directly with its configuration or verification task.
 
-The slow Ansible `wait_for_connection` task is not used. Readiness belongs to `terraform-dev`, where `wait_for_ssh.py` waits until IOS XE returns a valid `SSH-` protocol banner. The following Ansible stage can therefore begin directly with its configuration or verification task.
+If RESTCONF reports `401 Unauthorized`, confirm `TF_VAR_dev_username` and `TF_VAR_dev_password` exactly match the username and password supplied to the temporary C8000V by Terraform. In GitLab, both entries must use **Type: Variable**, not **File**. Start a new NetBox-triggered pipeline after correcting either value, because changing a variable cannot change credentials already embedded in an existing temporary router's day-zero configuration. The pipeline writes credentials to a mode-`0600` JSON inventory and never publishes it as an artifact.
 
-**Linux performs SSH host-key checking independently of username/password authentication. Every temporary C8000V receives a newly generated SSH host key, even though the lab reuses the same development IP address. Linux therefore sees a legitimate replacement router as `REMOTE HOST IDENTIFICATION HAS CHANGED`.** For this isolated instructional lab, `ansible.cfg` and the pipeline variables disable SSH host-key checking and enable Paramiko host-key auto-add for all development and production Ansible jobs. Learners therefore do not have to maintain the runner user's `~/.ssh/known_hosts`. This lab-wide setting trades host identity verification for repeatable automation and must not be copied into a production environment.
+For a direct test from the Ubuntu host, substitute the development address and credentials:
 
-If IOS XE reports `Authentication failed`, confirm `TF_VAR_dev_username` and `TF_VAR_dev_password` exactly match the username and password supplied to the temporary C8000V by Terraform. In GitLab, both entries must use **Type: Variable**, not **File**. Start a new NetBox-triggered pipeline after correcting either value, because changing a variable cannot change the credentials already embedded in an existing temporary router's day-zero configuration. The pipeline writes credentials to a mode-`0600` JSON inventory and never publishes it as an artifact. The day-zero configuration explicitly uses `secret 0`, `aaa authentication login default local`, and `aaa authorization exec default local`; this prevents a leading password digit from being misread as an IOS secret type and prevents image-default AAA behavior from overriding the local account.
+```bash
+curl --insecure --user 'YOUR_USERNAME:YOUR_PASSWORD' \
+  --header 'Accept: application/yang-data+json' \
+  'https://YOUR_DEV_ROUTER_IP/restconf/data/Cisco-IOS-XE-native:native/hostname'
+```
+
+`--insecure` is used only because the temporary lab router has a self-signed HTTPS certificate. A timeout indicates routing, gateway, firewall, or HTTPS-service trouble; HTTP `401` indicates rejected credentials; HTTP `200` confirms authenticated RESTCONF access.
 
 ### Loopback verification fails
 

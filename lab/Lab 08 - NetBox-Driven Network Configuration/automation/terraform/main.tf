@@ -26,29 +26,14 @@ resource "cml2_node" "router" {
     aaa authentication login default local
     aaa authorization exec default local
     ip domain name lab.local
-    ip ssh rsa keypair-name LAB8-SSH
-    ip ssh version 2
     restconf
-    netconf-yang
+    no ip http server
+    ip http secure-server
+    ip http authentication local
     interface GigabitEthernet1
      ip address ${split("/", var.dev_router_ip)[0]} ${cidrnetmask(var.dev_router_ip)}
      no shutdown
     ip route 0.0.0.0 0.0.0.0 ${var.dev_default_gateway}
-    line vty 0 4
-     login authentication default
-     authorization exec default
-     transport input ssh
-    event manager applet LAB8-GENERATE-SSH-KEY authorization bypass
-     event timer countdown time 30
-     action 1.0 cli command "enable"
-     action 2.0 cli command "show crypto key mypubkey rsa | include LAB8-SSH"
-     action 3.0 regexp "LAB8-SSH" "$_cli_result"
-     action 4.0 if $_regexp_result eq "0"
-     action 4.1 cli command "configure terminal"
-     action 4.2 cli command "crypto key generate rsa general-keys modulus 2048 label LAB8-SSH"
-     action 4.3 cli command "end"
-     action 4.4 syslog msg "LAB8 generated the 2048-bit RSA SSH key"
-     action 4.5 end
     end
   EOT
 }

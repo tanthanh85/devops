@@ -1,26 +1,50 @@
 ---
-- name: Verify IOS XE loopbacks against NetBox
+- name: Verify IOS XE loopbacks against NetBox through RESTCONF
   hosts: routers
   gather_facts: false
-  connection: ansible.netcommon.network_cli
+  connection: ansible.netcommon.httpapi
   tasks:
-    - name: Read the loopback interface table
-      cisco.ios.ios_command:
-        commands:
-          - show ip interface brief | include ^Loopback
-      register: loopback_output
+    - name: Read the loopback configuration through RESTCONF
+      ansible.netcommon.restconf_get:
+        path: /data/Cisco-IOS-XE-native:native/interface/Loopback
+        content: config
+        output: json
+      register: restconf_loopbacks
 
-    - name: Count configured loopbacks
+    - name: Normalize the RESTCONF loopback list
       ansible.builtin.set_fact:
-        device_loopback_count: "{{ loopback_output.stdout_lines[0] | length }}"
+        device_loopbacks: >-
+          {{
+            restconf_loopbacks.response['Cisco-IOS-XE-native:Loopback']
+            | default(restconf_loopbacks.response['Loopback'] | default([]), true)
+          }}
 
     - name: Require the device and NetBox counts to match
       ansible.builtin.assert:
         that:
-          - device_loopback_count | int == netbox_loopback_count | int
-        fail_msg: "NetBox has {{ netbox_loopback_count }} loopbacks but the device has {{ device_loopback_count }}"
-        success_msg: "NetBox and the device both have {{ netbox_loopback_count }} loopbacks"
+          - device_loopbacks | length == netbox_loopback_count | int
+        fail_msg: "NetBox has {{ netbox_loopback_count }} loopbacks but RESTCONF returned {{ device_loopbacks | length }}"
+        success_msg: "NetBox and RESTCONF both have {{ netbox_loopback_count }} loopbacks"
 
-    - name: Display the verified loopbacks
+    - name: Require every NetBox loopback address and mask to match
+      ansible.builtin.assert:
+        that:
+          - configured_loopback | length == 1
+          - configured_loopback[0].ip.address.primary.address == item.ip
+          - configured_loopback[0].ip.address.primary.mask == item.mask
+        fail_msg: "RESTCONF does not match NetBox intent for {{ item.name }}"
+        success_msg: "RESTCONF matches NetBox intent for {{ item.name }}"
+      vars:
+        configured_loopback: >-
+          {{
+            device_loopbacks
+            | selectattr('name', 'equalto', (item.name | regex_replace('^Loopback', '') | int))
+            | list
+          }}
+      loop: "{{ netbox_loopbacks }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Display the verified RESTCONF loopbacks
       ansible.builtin.debug:
-        var: loopback_output.stdout_lines[0]
+        var: device_loopbacks

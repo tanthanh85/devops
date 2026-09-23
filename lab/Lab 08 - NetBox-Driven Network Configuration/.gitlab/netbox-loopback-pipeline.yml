@@ -11,11 +11,6 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
   ANSIBLE_CONFIG: "$CI_PROJECT_DIR/automation/ansible/ansible.cfg"
-  ANSIBLE_NETWORK_CLI_SSH_TYPE: "paramiko"
-  ANSIBLE_HOST_KEY_CHECKING: "False"
-  ANSIBLE_PARAMIKO_HOST_KEY_CHECKING: "False"
-  ANSIBLE_HOST_KEY_AUTO_ADD: "True"
-  ANSIBLE_PARAMIKO_HOST_KEY_AUTO_ADD: "True"
   TERRAFORM_VERSION: "1.16.3"
   TERRAFORM_BIN: "$CI_PROJECT_DIR/.tools/terraform"
 
@@ -36,7 +31,6 @@ variables:
     - mkdir -p build "$ANSIBLE_COLLECTIONS_PATH"
     - python3 -m venv .ansible-venv
     - .ansible-venv/bin/python -m pip install --disable-pip-version-check -r automation/requirements-python.txt
-    - .ansible-venv/bin/python -c 'import paramiko; print("Paramiko", paramiko.__version__)'
     - .ansible-venv/bin/ansible-galaxy collection install -p "$ANSIBLE_COLLECTIONS_PATH" -r automation/requirements.yml
     - .ansible-venv/bin/ansible-playbook --version
 
@@ -96,7 +90,7 @@ create-c8000v-development:
     - '"$TERRAFORM_BIN" -chdir=automation/terraform apply -auto-approve -input=false'
     - '"$TERRAFORM_BIN" -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"'
     - test -s build/dev-router-ip
-    - python3 automation/scripts/wait_for_ssh.py "$(cat build/dev-router-ip)" 600
+    - DEV_ROUTER_IP="$(cat build/dev-router-ip)" python3 automation/scripts/wait_for_restconf.py 600
   artifacts:
     when: always
     access: developer
@@ -134,6 +128,9 @@ configure-production-router:
     - test -n "$PROD_ROUTER_HOST"
     - test -n "$PROD_ROUTER_USERNAME"
     - test -n "$PROD_ROUTER_PASSWORD"
+    - printf '%s\n' "${PROD_ROUTER_RESTCONF_PORT:-443}" | grep -Eq '^[0-9]+$'
+    - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -ge 1
+    - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -le 65535
     - python3 automation/scripts/write_ansible_inventory.py production build/prod-inventory.json
     - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.json automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
   artifacts:
@@ -147,6 +144,9 @@ verify-production-router:
   environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
+    - printf '%s\n' "${PROD_ROUTER_RESTCONF_PORT:-443}" | grep -Eq '^[0-9]+$'
+    - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -ge 1
+    - test "${PROD_ROUTER_RESTCONF_PORT:-443}" -le 65535
     - python3 automation/scripts/write_ansible_inventory.py production build/prod-inventory.json
     - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.json automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
