@@ -7,11 +7,42 @@ stages:
   - verify-production
   - cleanup-dev
 
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
+  TERRAFORM_VERSION: "1.16.3"
+  TERRAFORM_BIN: "$CI_PROJECT_DIR/.tools/terraform"
+
 .netbox-pipeline-job:
   before_script:
     - test "$CI_PIPELINE_SOURCE" = "trigger"
     - test "$NETBOX_ACTION" = "provision_loopback"
     - mkdir -p build
+
+.ansible-pipeline-job:
+  extends: .netbox-pipeline-job
+  cache:
+    key: lab8-ansible-python
+    paths: [.cache/pip]
+  before_script:
+    - test "$CI_PIPELINE_SOURCE" = "trigger"
+    - test "$NETBOX_ACTION" = "provision_loopback"
+    - mkdir -p build "$ANSIBLE_COLLECTIONS_PATH"
+    - python3 -m venv .ansible-venv
+    - .ansible-venv/bin/python -m pip install --disable-pip-version-check -r automation/requirements-python.txt
+    - .ansible-venv/bin/ansible-galaxy collection install -p "$ANSIBLE_COLLECTIONS_PATH" -r automation/requirements.yml
+    - .ansible-venv/bin/ansible-playbook --version
+
+.terraform-pipeline-job:
+  extends: .netbox-pipeline-job
+  cache:
+    key: "lab8-terraform-$TERRAFORM_VERSION"
+    paths: [.tools/terraform]
+  before_script:
+    - test "$CI_PIPELINE_SOURCE" = "trigger"
+    - test "$NETBOX_ACTION" = "provision_loopback"
+    - mkdir -p build
+    - sh automation/scripts/install_terraform.sh
 
 validate-netbox-event:
   extends: .netbox-pipeline-job
@@ -30,7 +61,7 @@ validate-netbox-event:
     expire_in: 1 day
 
 create-c8000v-development:
-  extends: .netbox-pipeline-job
+  extends: .terraform-pipeline-job
   stage: terraform-dev
   resource_group: cml-lab8-development
   script:
@@ -54,9 +85,9 @@ create-c8000v-development:
     - export TF_HTTP_LOCK_METHOD="POST"
     - export TF_HTTP_UNLOCK_METHOD="DELETE"
     - export TF_HTTP_RETRY_WAIT_MIN="5"
-    - terraform -chdir=automation/terraform init -input=false
-    - terraform -chdir=automation/terraform apply -auto-approve -input=false
-    - terraform -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"
+    - '"$TERRAFORM_BIN" -chdir=automation/terraform init -input=false'
+    - '"$TERRAFORM_BIN" -chdir=automation/terraform apply -auto-approve -input=false'
+    - '"$TERRAFORM_BIN" -chdir=automation/terraform output -raw dev_router_ip > "$CI_PROJECT_DIR/build/dev-router-ip"'
     - test -s build/dev-router-ip
   artifacts:
     when: always
@@ -65,31 +96,29 @@ create-c8000v-development:
     expire_in: 1 day
 
 configure-c8000v-development:
-  extends: .netbox-pipeline-job
+  extends: .ansible-pipeline-job
   stage: configure-dev
   resource_group: cml-lab8-development
   script:
-    - ansible-galaxy collection install -r automation/requirements.yml
     - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
     - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
-    - ansible-playbook -i build/dev-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
   artifacts:
     access: developer
     paths: [build/dev-router-ip, build/netbox-loopbacks.json]
     expire_in: 1 day
 
 verify-c8000v-development:
-  extends: .netbox-pipeline-job
+  extends: .ansible-pipeline-job
   stage: verify-dev
   resource_group: cml-lab8-development
   script:
-    - ansible-galaxy collection install -r automation/requirements.yml
     - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
     - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
-    - ansible-playbook -i build/dev-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
 configure-production-router:
-  extends: .netbox-pipeline-job
+  extends: .ansible-pipeline-job
   stage: configure-production
   environment: {name: production/learners-router}
   resource_group: lab-router-production
@@ -97,25 +126,24 @@ configure-production-router:
     - test -n "$PROD_ROUTER_HOST"
     - test -n "$PROD_ROUTER_USERNAME"
     - test -n "$PROD_ROUTER_PASSWORD"
-    - ansible-galaxy collection install -r automation/requirements.yml
     - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
-    - ansible-playbook -i build/prod-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
   artifacts:
     access: developer
     paths: [build/netbox-loopbacks.json]
     expire_in: 1 day
 
 verify-production-router:
-  extends: .netbox-pipeline-job
+  extends: .ansible-pipeline-job
   stage: verify-production
   environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
-    - ansible-galaxy collection install -r automation/requirements.yml
     - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
-    - ansible-playbook -i build/prod-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
 destroy-c8000v-development:
+  extends: .terraform-pipeline-job
   stage: cleanup-dev
   resource_group: cml-lab8-development
   script:
@@ -133,5 +161,5 @@ destroy-c8000v-development:
     - export TF_HTTP_LOCK_METHOD="POST"
     - export TF_HTTP_UNLOCK_METHOD="DELETE"
     - export TF_HTTP_RETRY_WAIT_MIN="5"
-    - terraform -chdir=automation/terraform init -input=false
-    - terraform -chdir=automation/terraform destroy -auto-approve -input=false
+    - '"$TERRAFORM_BIN" -chdir=automation/terraform init -input=false'
+    - '"$TERRAFORM_BIN" -chdir=automation/terraform destroy -auto-approve -input=false'

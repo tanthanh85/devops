@@ -92,7 +92,7 @@ Before starting, obtain instructor-authorized access to:
 - The new NetBox instance installed in Lab 1, or an instructor-provided equivalent, with an administrator account for this isolated lab. Step 4 creates the catalog, learner-router record, management address, API token, custom field, event rule, and webhook from scratch. Each monitored device must be active and have a primary IPv4 address.
 - CML 2.9 or newer with the `cat8000v` node definition, an installed C8000V image definition, and an external connector reachable from the GitLab runner.
 - A learner's router, authorized by the instructor and available in NetBox, with SSH access for Ansible. Learners may choose its NetBox device name. Never target a production or shared device that the instructor has not explicitly authorized.
-- A shell GitLab runner with `terraform`, `ansible-playbook`, `ansible-galaxy`, `python3`, `kubectl`, `minikube`, and `docker` available.
+- A shell GitLab runner with `python3`, Python virtual-environment support, `curl`, `sha256sum`, `kubectl`, `minikube`, and `docker` available. The pipeline installs pinned Ansible and Terraform executables inside the project workspace and does not depend on the runner user's interactive environment or `PATH`.
 
 ## Step 1: Create the Lab 8 repository
 
@@ -877,6 +877,10 @@ Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML exte
 
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
+Each Ansible job creates `.ansible-venv`, installs the pinned version from `automation/requirements-python.txt`, installs the required collections from `automation/requirements.yml`, and calls `.ansible-venv/bin/ansible-playbook` explicitly. Do not activate a learner-owned virtual environment in the runner configuration and do not rely on `ansible-playbook` or `ansible-galaxy` being present in the shell runner's interactive `PATH`.
+
+Each Terraform job runs `automation/scripts/install_terraform.sh`, which downloads the pinned Linux build for the runner architecture, verifies it against HashiCorp's published SHA-256 checksum, and installs it as `.tools/terraform`. All Terraform commands use that explicit path. The `.tools/terraform` cache avoids downloading the same verified version for every job. Do not rely on a learner-installed `terraform` command being present in the shell runner's interactive `PATH`.
+
 ### 13.2 Build the direct GitLab trigger URL
 
 Use the project ID and pipeline trigger token copied in Step 4.3. Replace all four placeholders below, but do not run or paste the completed URL into a shared terminal because it contains the trigger token:
@@ -1223,9 +1227,13 @@ Confirm that the direct NetBox webhook body is valid JSON and contains `{"variab
 
 Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, `TF_VAR_external_connector`, `TF_VAR_dev_router_ip`, and `TF_VAR_dev_default_gateway`. `CML2_ADDRESS` must be the full controller URL beginning with `https://`; do not enter only an IP address. The development router value must include its prefix, its gateway must be in the same external-connector subnet, and the address must be reachable from the GitLab runner. The pipeline explicitly maps the CML values into the provider's required `address`, `token`, and `skip_verify` arguments. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
 
+If the job reports that `terraform` is not found, confirm it is using the current pipeline definition. The log must show `automation/scripts/install_terraform.sh`, the pinned Terraform version, and commands executed through `$CI_PROJECT_DIR/.tools/terraform`. Confirm `curl`, `sha256sum`, and Python 3 are available to the shell runner; a bare `terraform` command indicates an older pipeline file.
+
 ### Development Ansible cannot connect
 
 Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and SSH is allowed from the GitLab runner. The playbook waits up to ten minutes for IOS XE to finish booting.
+
+If an Ansible job reports that `ansible-galaxy` or `ansible-playbook` is not found, confirm the job is using the current pipeline definition and that `python3 -m venv .ansible-venv` succeeded. The commands must appear as `.ansible-venv/bin/ansible-galaxy` and `.ansible-venv/bin/ansible-playbook` in the job log; a bare command indicates an older pipeline file.
 
 ### Loopback verification fails
 
