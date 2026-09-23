@@ -38,6 +38,9 @@ create-c8000v-development:
     - test -n "$CML2_TOKEN"
     - printf '%s\n' "${CML2_SKIP_VERIFY:-false}" | grep -Eq '^(true|false)$'
     - test -n "$TF_VAR_c8000v_image_definition"
+    - test -n "$TF_VAR_dev_router_ip"
+    - test -n "$TF_VAR_dev_default_gateway"
+    - python3 -c 'import ipaddress,os; interface=ipaddress.ip_interface(os.environ["TF_VAR_dev_router_ip"]); gateway=ipaddress.ip_address(os.environ["TF_VAR_dev_default_gateway"]); assert interface.version == gateway.version == 4 and gateway in interface.network and interface.ip not in {interface.network.network_address, interface.network.broadcast_address}'
     - test -n "$TF_VAR_dev_username"
     - test -n "$TF_VAR_dev_password"
     - export TF_VAR_address="$CML2_ADDRESS"
@@ -115,7 +118,6 @@ verify-production-router:
 destroy-c8000v-development:
   stage: cleanup-dev
   resource_group: cml-lab8-development
-  when: always
   script:
     - test -n "$CML2_ADDRESS"
     - test -n "$CML2_TOKEN"

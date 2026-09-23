@@ -26,7 +26,7 @@ The normal application capacity is three web Pods, three application Pods, and o
 - Configure and verify all NetBox loopbacks on the development router with Ansible.
 - Configure the authorized production lab router only after development verification succeeds.
 - Verify that NetBox, development, and production contain the same number of loopbacks.
-- Destroy the temporary CML development lab automatically after every pipeline outcome.
+- Destroy the temporary CML development lab only after the development creation, configuration, and verification stages succeed.
 - Display each inventory router's live loopback name, administrative status, protocol status, IP address, and mask.
 
 ## How the components work
@@ -852,7 +852,7 @@ validate NetBox event
   → destroy the temporary CML lab with Terraform
 ```
 
-The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The cleanup stage uses `when: always`, so GitLab attempts to remove the temporary CML lab after either success or failure.
+The `validate-netbox-event` job checks `FLASK_SECRET_KEY`, `NETBOX_ROUTER_USERNAME`, `NETBOX_ROUTER_PASSWORD`, and `NETBOX_ROUTER_NAME`, resolves the running web service URL, and requests sanitized loopback intent from the application. It does not require `NETBOX_URL` or `NETBOX_API_TOKEN`; learners saved those through **Inventory management**. The production stage cannot begin unless variable validation and development verification succeed. The cleanup job uses GitLab's normal success behavior, so it is skipped when Terraform creation, development configuration, or development verification fails.
 
 ### 13.1 Create the required GitLab variables
 
@@ -864,12 +864,16 @@ Open **Settings > CI/CD > Variables** and add the following. Mark credentials an
 | `CML2_TOKEN` | JWT copied from the CML user menu |
 | `CML2_SKIP_VERIFY` | `false`; use `true` only for the isolated self-signed CML lab |
 | `TF_VAR_c8000v_image_definition` | Exact installed C8000V image definition name |
-| `TF_VAR_external_connector` | CML connector device name, normally `bridge0` |
+| `TF_VAR_external_connector` | CML external connector label, normally `System Bridge` |
+| `TF_VAR_dev_router_ip` | Unused static IPv4 address and prefix for C8000V `GigabitEthernet1`, for example `192.0.2.50/24` |
+| `TF_VAR_dev_default_gateway` | IPv4 default gateway for that subnet, without a prefix |
 | `TF_VAR_dev_username` | Temporary C8000V administrator username |
 | `TF_VAR_dev_password` | Temporary C8000V administrator password |
 | `PROD_ROUTER_HOST` | SSH address of the instructor-authorized learner router |
 | `PROD_ROUTER_USERNAME` | Learner-router automation username |
 | `PROD_ROUTER_PASSWORD` | Learner-router automation password |
+
+Choose `TF_VAR_dev_router_ip` from the subnet connected to the selected CML external connector. It must be unused, reachable from the Ubuntu GitLab runner, and written in CIDR notation. Set `TF_VAR_dev_default_gateway` to the gateway on the same subnet. The pipeline rejects an invalid address or a gateway outside that subnet. Terraform configures the static address and mask on `GigabitEthernet1`, adds `ip route 0.0.0.0 0.0.0.0 <gateway>`, and exports the address without its prefix for the Ansible stages.
 
 The pipeline validates `CML2_ADDRESS`, `CML2_TOKEN`, and `CML2_SKIP_VERIFY`, then maps them explicitly to the Terraform variables `TF_VAR_address`, `TF_VAR_token`, and `TF_VAR_skip_verify`. The provider block consumes those variables directly; it does not depend on implicit provider environment discovery. Other Terraform inputs already use the `TF_VAR_` prefix. The pipeline stores Terraform state in GitLab's authenticated HTTP state backend named for the trigger pipeline; it does not upload state as a downloadable job artifact. Never place credentials in Terraform, Ansible, YAML, or Markdown files.
 
@@ -948,7 +952,7 @@ Confirm the following evidence in order:
 - `verify-c8000v-development` succeeds only when the development C8000V loopback count equals the NetBox count.
 - `configure-production-router` runs only after successful development verification and applies the same intent to the learner's router.
 - `verify-production-router` succeeds only when the production count equals the NetBox count.
-- `destroy-c8000v-development` destroys the temporary CML lab even when an earlier job fails.
+- `destroy-c8000v-development` runs only after the preceding development stages have succeeded and then destroys the temporary CML lab.
 
 Do not retry only the production job after changing NetBox intent. Start a new event-driven pipeline so the current intent passes development validation first.
 
@@ -1217,11 +1221,11 @@ Confirm that the direct NetBox webhook body is valid JSON and contains `{"variab
 
 ### Terraform cannot create the C8000V
 
-Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, and `TF_VAR_external_connector`. `CML2_ADDRESS` must be the full controller URL beginning with `https://`; do not enter only an IP address. The pipeline explicitly maps these CML values into the provider's required `address`, `token`, and `skip_verify` arguments. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
+Confirm CML is version 2.9 or newer and check `CML2_ADDRESS`, `CML2_TOKEN`, `CML2_SKIP_VERIFY`, `TF_VAR_c8000v_image_definition`, `TF_VAR_external_connector`, `TF_VAR_dev_router_ip`, and `TF_VAR_dev_default_gateway`. `CML2_ADDRESS` must be the full controller URL beginning with `https://`; do not enter only an IP address. The development router value must include its prefix, its gateway must be in the same external-connector subnet, and the address must be reachable from the GitLab runner. The pipeline explicitly maps the CML values into the provider's required `address`, `token`, and `skip_verify` arguments. The image definition must already be installed and compatible with the `cat8000v` node definition. Check CML capacity before retrying; a C8000V requires substantial CPU and memory.
 
 ### Development Ansible cannot connect
 
-Open the `create-c8000v-development` job and confirm `dev_router_ip` was nonempty. The external connector must give the C8000V an address reachable from the GitLab runner, and SSH must be allowed between them. The playbook waits up to ten minutes for IOS XE to finish booting.
+Open the `create-c8000v-development` job and confirm `dev_router_ip` equals the host portion of `TF_VAR_dev_router_ip`. Confirm that the static address is unused, its gateway is reachable through the selected external connector, and SSH is allowed from the GitLab runner. The playbook waits up to ten minutes for IOS XE to finish booting.
 
 ### Loopback verification fails
 
@@ -1229,7 +1233,7 @@ Download `build/netbox-loopbacks.json` from the trigger pipeline and compare its
 
 ### CML cleanup fails
 
-Do not delete the pipeline's GitLab-managed Terraform state before cleanup. Retry `destroy-c8000v-development`. If state is unavailable, use the CML UI to locate the lab named `Lab 8 loopback validation`, confirm that it belongs to this learner pipeline, and delete only that temporary lab.
+Do not delete the pipeline's GitLab-managed Terraform state before cleanup. If `destroy-c8000v-development` runs and fails, retry that job. If an earlier development stage fails, GitLab intentionally skips `cleanup-dev`; use the CML UI to locate the lab named `Lab 8 loopback validation`, confirm that it belongs to this learner pipeline, and delete only that temporary lab before retrying the workflow. If state is unavailable, the same instructor-authorized manual cleanup is required.
 
 ## Cleanup
 

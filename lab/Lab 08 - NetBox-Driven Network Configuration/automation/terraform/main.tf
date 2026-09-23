@@ -28,8 +28,9 @@ resource "cml2_node" "router" {
     restconf
     netconf-yang
     interface GigabitEthernet1
-     ip address dhcp
+     ip address ${split("/", var.dev_router_ip)[0]} ${cidrnetmask(var.dev_router_ip)}
      no shutdown
+    ip route 0.0.0.0 0.0.0.0 ${var.dev_default_gateway}
     line vty 0 4
      login local
      transport input ssh
@@ -57,15 +58,8 @@ resource "cml2_lifecycle" "validation" {
   }
 }
 
-locals {
-  router_ipv4_addresses = flatten([
-    for interface in cml2_lifecycle.validation.nodes[cml2_node.router.id].interfaces :
-    interface.ip4 == null ? [] : interface.ip4
-  ])
-}
-
 output "dev_router_ip" {
-  value = length(local.router_ipv4_addresses) > 0 ? split("/", local.router_ipv4_addresses[0])[0] : ""
+  value = split("/", var.dev_router_ip)[0]
 }
 
 output "cml_lab_id" {

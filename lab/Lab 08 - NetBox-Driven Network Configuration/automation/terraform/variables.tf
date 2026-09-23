@@ -26,9 +26,29 @@ variable "c8000v_image_definition" {
 }
 
 variable "external_connector" {
-  description = "CML external connector device name, for example bridge0."
+  description = "CML external connector label."
   type        = string
-  default     = "bridge0"
+  default     = "System Bridge"
+}
+
+variable "dev_router_ip" {
+  description = "Static IPv4 address and prefix for C8000V GigabitEthernet1, in CIDR notation."
+  type        = string
+
+  validation {
+    condition     = can(cidrhost(var.dev_router_ip, 0)) && !strcontains(var.dev_router_ip, ":")
+    error_message = "TF_VAR_dev_router_ip must be an IPv4 address with a prefix, for example 192.0.2.50/24."
+  }
+}
+
+variable "dev_default_gateway" {
+  description = "IPv4 default gateway reachable through C8000V GigabitEthernet1."
+  type        = string
+
+  validation {
+    condition     = can(cidrhost("${var.dev_default_gateway}/32", 0)) && !strcontains(var.dev_default_gateway, ":")
+    error_message = "TF_VAR_dev_default_gateway must be an IPv4 address without a prefix."
+  }
 }
 
 variable "dev_username" {
