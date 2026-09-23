@@ -4,11 +4,6 @@
   gather_facts: false
   connection: ansible.netcommon.network_cli
   tasks:
-    - name: Wait for IOS XE SSH to become ready
-      ansible.builtin.wait_for_connection:
-        timeout: 120
-        sleep: 10
-
     - name: Read the loopback interface table
       cisco.ios.ios_command:
         commands:

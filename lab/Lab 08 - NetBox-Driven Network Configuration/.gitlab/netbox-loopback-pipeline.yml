@@ -105,8 +105,8 @@ configure-c8000v-development:
   resource_group: cml-lab8-development
   script:
     - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
-    - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
-    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+    - python3 automation/scripts/write_ansible_inventory.py dev build/dev-inventory.json
+    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.json automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
   artifacts:
     access: developer
     paths: [build/dev-router-ip, build/netbox-loopbacks.json]
@@ -118,8 +118,8 @@ verify-c8000v-development:
   resource_group: cml-lab8-development
   script:
     - export DEV_ROUTER_IP="$(cat build/dev-router-ip)"
-    - printf '[routers]\ndev ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$DEV_ROUTER_IP" "$TF_VAR_dev_username" "$TF_VAR_dev_password" > build/dev-inventory.ini
-    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+    - python3 automation/scripts/write_ansible_inventory.py dev build/dev-inventory.json
+    - .ansible-venv/bin/ansible-playbook -i build/dev-inventory.json automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
 configure-production-router:
   extends: .ansible-pipeline-job
@@ -130,8 +130,8 @@ configure-production-router:
     - test -n "$PROD_ROUTER_HOST"
     - test -n "$PROD_ROUTER_USERNAME"
     - test -n "$PROD_ROUTER_PASSWORD"
-    - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
-    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.ini automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
+    - python3 automation/scripts/write_ansible_inventory.py production build/prod-inventory.json
+    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.json automation/ansible/configure-loopbacks.yml -e @build/netbox-loopbacks.json
   artifacts:
     access: developer
     paths: [build/netbox-loopbacks.json]
@@ -143,8 +143,8 @@ verify-production-router:
   environment: {name: production/learners-router}
   resource_group: lab-router-production
   script:
-    - printf '[routers]\nproduction ansible_host=%s ansible_user=%s ansible_password=%s ansible_network_os=cisco.ios.ios\n' "$PROD_ROUTER_HOST" "$PROD_ROUTER_USERNAME" "$PROD_ROUTER_PASSWORD" > build/prod-inventory.ini
-    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.ini automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
+    - python3 automation/scripts/write_ansible_inventory.py production build/prod-inventory.json
+    - .ansible-venv/bin/ansible-playbook -i build/prod-inventory.json automation/ansible/verify-loopbacks.yml -e @build/netbox-loopbacks.json
 
 destroy-c8000v-development:
   extends: .terraform-pipeline-job
