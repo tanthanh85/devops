@@ -4,7 +4,7 @@
 
 **8 hours**
 
-This standalone lab includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7. Each learner may choose a name for their authorized router in NetBox. When an IPv4 `/32` is assigned to a loopback interface, NetBox triggers a dedicated GitLab pipeline directly. The pipeline creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
+This lab 8 includes the complete application, Elastic observability, and alert-driven scaling capabilities from Lab 7. Each learner may choose a name for their authorized router in NetBox. When an IPv4 `/32` is assigned to a loopback interface, NetBox triggers a dedicated GitLab pipeline directly. The pipeline creates a temporary C8000V in Cisco Modeling Labs (CML), validates the intended configuration there, deploys it to the learner's authorized lab router, verifies production, and destroys the temporary CML lab.
 
 All application, monitoring, configuration, Terraform, Ansible, test, Kubernetes, and pipeline files are included in the Lab 8 package. Completing an earlier lab is not required, although learners need access to the Lab 1 NetBox instance or an instructor-provided equivalent, CML 2.9 or newer, and the instructor-authorized IOS XE lab-router services described below.
 

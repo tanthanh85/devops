@@ -5,3 +5,4 @@
 /tools/
 /.codex-pptx-build/
 /.codex-work/
+/.pytest_cache
