@@ -1,4 +1,4 @@
-# Final Lab: A Practical CI/CD Pipeline with NetBox, Vault, CML, and ELK
+# Final Lab: A Practical DevOps with NetBox, Vault, CML, and ELK
 
 ## Duration
 
