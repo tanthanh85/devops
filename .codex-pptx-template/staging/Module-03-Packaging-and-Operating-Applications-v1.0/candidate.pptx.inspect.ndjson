@@ -1,0 +1,341 @@
+{"kind":"deck","id":"pr/3rso3x","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"Module 3","textShapes":4}
+{"kind":"shape","id":"sh/547294r6","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/k3yl0zql","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/7qp4be9c","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"text":"Packaging and Operating Applications","textPreview":"Packaging and Operating Applications","textChars":36,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/sryl4zqx","slide":1,"text":"Docker, Compose, and Kubernetes","textPreview":"Docker, Compose, and Kubernetes","textChars":31,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/fu94fe98","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/7mp0jixo","slide":1,"name":"","bbox":[0,0,1280,720]}
+{"kind":"image","id":"im/jqxw72dk","slide":1,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/ipofexcz","slide":1,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"Purpose: Open Module 3 and establish the subject of the deck.\n\nExplain: Packaging and Operating Applications. Docker, Compose, and Kubernetes.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/ahwrqhgj","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9072xkry","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ozy1ofad","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/x4r21kru","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"text":"This module packages an automation service into containers, combines its tiers, and deploys the application on an orchestration platform.","textPreview":"This module packages an automation service into containers, combines its tiers, and deploys the application on an orchestration platform.","textChars":137,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/r65knqtk","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/q5wjelsz","slide":2,"text":"Explain image and container boundaries","textPreview":"Explain image and container boundaries","textChars":38,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/ove9o7yd","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/9wnqhczy","slide":2,"text":"Build a secure and reproducible image","textPreview":"Build a secure and reproducible image","textChars":37,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/mtwrmxg7","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/nu58f2hs","slide":2,"text":"Operate a multitier application with Compose","textPreview":"Operate a multitier application with Compose","textChars":44,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/wjy9sry9","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/xk7qlczu","slide":2,"text":"Deploy and scale services with Kubernetes","textPreview":"Deploy and scale services with Kubernetes","textChars":41,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"image","id":"im/wved8fit","slide":2,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/nqlwvq1w","slide":2,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module packages an automation service into containers, combines its tiers, and deploys the application on an orchestration platform.\n\nDiscuss: Explain image and container boundaries Build a secure and reproducible image Operate a multitier application with Compose Deploy and scale services with Kubernetes\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/n2l4fq98","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/cza94vmx","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"text":"Containers and virtual machines","textPreview":"Containers and virtual machines","textChars":31,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/obq90bml","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/m5cra54z","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"text":"Containers share the host kernel, while virtual machines include a guest operating system. Each model provides a different isolation boundary.","textPreview":"Containers share the host kernel, while virtual machines include a guest operating system. Each model provides a different isolation boun...","textChars":142,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/5cn6p0v2","slide":3,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/ipw7elwr","slide":3,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/3q5onqdc","slide":3,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"Purpose: Explain containers and virtual machines through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Containers share the host kernel, while virtual machines include a guest operating system. Each model provides a different isolation boundary.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"4","textShapes":4}
+{"kind":"shape","id":"sh/kbm987y5","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1cj2d8b6","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"text":"Docker architecture","textPreview":"Docker architecture","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/doj29oba","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/3ihk3et8","slide":4,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"text":"The client requests operations from the daemon. The daemon builds images, manages networks and volumes, and starts containers.","textPreview":"The client requests operations from the daemon. The daemon builds images, manages networks and volumes, and starts containers.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/ed4nel0n","slide":4,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/1gfm90ze","slide":4,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/gfm5gvit","slide":4,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"Purpose: Explain docker architecture through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The client requests operations from the daemon. The daemon builds images, manages networks and volumes, and starts containers.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"5","textShapes":21}
+{"kind":"shape","id":"sh/ihw3mxg3","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/dgbulwnm","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/cf2tcr61","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/z2tcnm5s","slide":5,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"text":"Docker object model","textPreview":"Docker object model","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l4bupwny","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/032tgr6d","slide":5,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/n6dcr65o","slide":5,"text":"Build objects","textPreview":"Build objects","textChars":13,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"text":"Runtime objects","textPreview":"Runtime objects","textChars":15,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/w32dkbuh","slide":5,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/ahkvi1cb","slide":5,"text":"Dockerfile","textPreview":"Dockerfile","textChars":10,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/v2twb6dw","slide":5,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/k7mxovud","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/58vehgvy","slide":5,"text":"Build context","textPreview":"Build context","textChars":13,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/i54fmlc7","slide":5,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/j6dwfqds","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/sb6xsvu9","slide":5,"text":"Image layers","textPreview":"Image layers","textChars":12,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/tcfel0vu","slide":5,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/hgrmpwj2","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/gfi5grih","slide":5,"text":"Immutable image reference","textPreview":"Immutable image reference","textChars":25,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/fe94nm1w","slide":5,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/ud0ne10b","slide":5,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/pkr6tgjy","slide":5,"text":"Container process","textPreview":"Container process","textChars":17,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/4ji5kbid","slide":5,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/3i94r61s","slide":5,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/2h0ni107","slide":5,"text":"Network attachment","textPreview":"Network attachment","textChars":18,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/5o7mhcju","slide":5,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/kny587i9","slide":5,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/atcjidg7","slide":5,"text":"Volume mount","textPreview":"Volume mount","textChars":12,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/vu5kbihc","slide":5,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/wve1knyx","slide":5,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/xwn2dszi","slide":5,"text":"Environment and secret inputs","textPreview":"Environment and secret inputs","textChars":29,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/sj61kzqd","slide":5,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/rix0bu9s","slide":5,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"Purpose: Compare the two sides of docker object model.\n\nLeft side, Build objects: Dockerfile Build context Image layers Immutable image reference\n\nRight side, Runtime objects: Container process Network attachment Volume mount Environment and secret inputs\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"6","textShapes":4}
+{"kind":"shape","id":"sh/h4bupgn6","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/yhg7epsj","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/87ipkzal","slide":6,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"text":"Image and container lifecycle","textPreview":"Image and container lifecycle","textChars":29,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/ml07i9sv","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/oryp8fah","slide":6,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/pc76hkr2","slide":6,"text":"A Dockerfile produces an image. A container is a runtime instance whose writable state should remain disposable unless data uses a volume.","textPreview":"A Dockerfile produces an image. A container is a runtime instance whose writable state should remain disposable unless data uses a volume.","textChars":138,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/7ylcjetk","slide":6,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/8zutsju5","slide":6,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/t03ulobq","slide":6,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"Purpose: Explain image and container lifecycle through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A Dockerfile produces an image. A container is a runtime instance whose writable state should remain disposable unless data uses a volume.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"7","textShapes":4}
+{"kind":"shape","id":"sh/baxkjqlk","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/cb2tkvap","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/dcbud0ra","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"text":"Image layers and cache","textPreview":"Image layers and cache","textChars":22,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/kzmdova1","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/eh0ba1sr","slide":7,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/fi9c369c","slide":7,"text":"Layer order affects rebuild speed and reproducibility. Stable dependencies should precede frequently changing application source.","textPreview":"Layer order affects rebuild speed and reproducibility. Stable dependencies should precede frequently changing application source.","textChars":129,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/x0fet8ze","slide":7,"name":"","bbox":[64,170.26,1152,414.49]}
+{"kind":"image","id":"im/axovit03","slide":7,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/byxwryh8","slide":7,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"Purpose: Explain image layers and cache through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Layer order affects rebuild speed and reproducibility. Stable dependencies should precede frequently changing application source.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"8","textShapes":4}
+{"kind":"shape","id":"sh/o7ydoret","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/18byd4zy","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ri9g7uhw","slide":8,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"text":"Runtime boundary","textPreview":"Runtime boundary","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/tkby9kzm","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/je9g3ahk","slide":8,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"text":"Configuration, secrets, persistent data, logs, and network access cross the container boundary through explicit runtime interfaces.","textPreview":"Configuration, secrets, persistent data, logs, and network access cross the container boundary through explicit runtime interfaces.","textChars":131,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/q1k7i9kr","slide":8,"name":"","bbox":[64,170.26,1152,414.49]}
+{"kind":"image","id":"im/d4vqd4j2","slide":8,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/c32pkj2x","slide":8,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"Purpose: Explain runtime boundary through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Configuration, secrets, persistent data, logs, and network access cross the container boundary through explicit runtime interfaces.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/udsvah03","slide":9,"title":"9","textShapes":4}
+{"kind":"shape","id":"sh/oza1gfyh","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1cfmhgne","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0b65obm9","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/nex4jq5k","slide":9,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/mdonql4z","slide":9,"text":"Container network planes","textPreview":"Container network planes","textChars":24,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/9gzml0nq","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/bih4na5w","slide":9,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ah8nu54b","slide":9,"text":"Application traffic, management access, and external device connections have different reachability and security requirements.","textPreview":"Application traffic, management access, and external device connections have different reachability and security requirements.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/u987u5cf","slide":9,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/hcz65kbq","slide":9,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/gbqpwful","slide":9,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"Purpose: Explain container network planes through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Application traffic, management access, and external device connections have different reachability and security requirements.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"10","textShapes":4}
+{"kind":"shape","id":"sh/s7yt4b21","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xc3mho32","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/cbu58j2h","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/zelojyl8","slide":10,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ydcnatkn","slide":10,"text":"Dockerfile anatomy","textPreview":"Dockerfile anatomy","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l036l83y","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/725onyl4","slide":10,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/m1cnetkj","slide":10,"text":"A useful Dockerfile selects a trusted base, installs pinned dependencies, copies only required files, sets a non-root user, and defines startup behavior.","textPreview":"A useful Dockerfile selects a trusted base, installs pinned dependencies, copies only required files, sets a non-root user, and defines s...","textChars":153,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/uhgz6tkr","slide":10,"name":"","bbox":[134.78,165,1010.44,425]}
+{"kind":"image","id":"im/h47i1oj2","slide":10,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/g3yh832h","slide":10,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/m90b6t0r","slide":10,"text":"Purpose: Explain dockerfile anatomy through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A useful Dockerfile selects a trusted base, installs pinned dependencies, copies only required files, sets a non-root user, and defines startup behavior.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/jetc3ut0","slide":11,"title":"11","textShapes":4}
+{"kind":"shape","id":"sh/ofqtgnyt","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xcryxg7y","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/wbih4b6d","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/n69grmpw","slide":11,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/250zy18b","slide":11,"text":"Multistage build","textPreview":"Multistage build","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/98rytw72","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/72t03qp0","slide":11,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/61kzalof","slide":11,"text":"Build tools remain in an intermediate stage, while the runtime image receives only the application and required dependencies.","textPreview":"Build tools remain in an intermediate stage, while the runtime image receives only the application and required dependencies.","textChars":125,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/qpwnm1kb","slide":11,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/dsn6xw32","slide":11,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/cre5or2h","slide":11,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/jetc3ut0","slide":11,"text":"Purpose: Explain multistage build through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Build tools remain in an intermediate stage, while the runtime image receives only the application and required dependencies.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/8f2psfyx","slide":12,"title":"12","textShapes":4}
+{"kind":"shape","id":"sh/wvupgz6t","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1gbm9s3a","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0f2lgnmp","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ra943il8","slide":12,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/q903ad4n","slide":12,"text":"Secure image supply chain","textPreview":"Secure image supply chain","textChars":25,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/dcbm583y","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/b6d4f2lc","slide":12,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/a543mx4r","slide":12,"text":"Scanning, signing, provenance, and registry policy help the platform distinguish a trusted release from an arbitrary image.","textPreview":"Scanning, signing, provenance, and registry policy help the platform distinguish a trusted release from an arbitrary image.","textChars":123,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/qp47yl47","slide":12,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/dsv6903i","slide":12,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/srmp0vmd","slide":12,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/8f2psfyx","slide":12,"text":"Purpose: Explain secure image supply chain through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Scanning, signing, provenance, and registry policy help the platform distinguish a trusted release from an arbitrary image.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/hgzapcr6","slide":13,"title":"13","textShapes":4}
+{"kind":"shape","id":"sh/hcfy9k3u","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/q50nydsj","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/bq9orito","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/o3i5w3ad","slide":13,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/p4r6p8by","slide":13,"text":"Compose service model","textPreview":"Compose service model","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/21gnuts7","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/gzy5s3a1","slide":13,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/1076lobm","slide":13,"text":"Compose declares services, networks, volumes, health checks, and runtime inputs for a complete application on one Docker host.","textPreview":"Compose declares services, networks, volumes, health checks, and runtime inputs for a complete application on one Docker host.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/vy10zqtc","slide":13,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/wza1svux","slide":13,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/x0ji10bi","slide":13,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/hgzapcr6","slide":13,"text":"Purpose: Explain compose service model through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Compose declares services, networks, volumes, health checks, and runtime inputs for a complete application on one Docker host.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/6lsnupw7","slide":14,"title":"14","textShapes":4}
+{"kind":"shape","id":"sh/c3e1gjyd","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xc7eds76","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/wbydknq1","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/jepwf2pc","slide":14,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/idgvmx8r","slide":14,"text":"Compose failure boundaries","textPreview":"Compose failure boundaries","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/5grehs7i","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/zi5c3y98","slide":14,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ehwvat8n","slide":14,"text":"A service failure should remain diagnosable through independent health checks, logs, restart behavior, and dependency timeouts.","textPreview":"A service failure should remain diagnosable through independent health checks, logs, restart behavior, and dependency timeouts.","textChars":127,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/etsv65k7","slide":14,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/1w3u10jy","slide":14,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/0vud8v2d","slide":14,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/6lsnupw7","slide":14,"text":"Purpose: Explain compose failure boundaries through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A service failure should remain diagnosable through independent health checks, logs, restart behavior, and dependency timeouts.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/vaxsvy10","slide":15,"title":"15","textShapes":4}
+{"kind":"shape","id":"sh/wrm9kvep","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/547mhg3m","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/k3y5ov21","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/76p4jqls","slide":15,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/65gnqlk7","slide":15,"text":"Service contracts","textPreview":"Service contracts","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/t87ml0ji","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/na5476l8","slide":15,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/m9c3e1kn","slide":15,"text":"The web, application, and database tiers depend on explicit ports, data formats, readiness signals, and failure behavior.","textPreview":"The web, application, and database tiers depend on explicit ports, data formats, readiness signals, and failure behavior.","textChars":121,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/u9s3etsb","slide":15,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/hcjm98rm","slide":15,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/wbalg3a1","slide":15,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/vaxsvy10","slide":15,"text":"Purpose: Explain service contracts through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The web, application, and database tiers depend on explicit ports, data formats, readiness signals, and failure behavior.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/gny5sjyp","slide":16,"title":"16","textShapes":4}
+{"kind":"shape","id":"sh/fm1gzq5o","slide":16,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/8z2h8bq1","slide":16,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/9kby1g7m","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ytkf2h8j","slide":16,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/zutgvm94","slide":16,"text":"Readiness chain","textPreview":"Readiness chain","textChars":15,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/kv2h4rqp","slide":16,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/ip4zel83","slide":16,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/3qdg7qpo","slide":16,"text":"A running process may still be unable to serve requests. Readiness checks should reflect the next service dependency.","textPreview":"A running process may still be unable to serve requests. Readiness checks should reflect the next service dependency.","textChars":117,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/tobadkrm","slide":16,"name":"","bbox":[64,170.26,1152,414.49]}
+{"kind":"image","id":"im/6l0b25sv","slide":16,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/7mtsba9g","slide":16,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/gny5sjyp","slide":16,"text":"Purpose: Explain readiness chain through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A running process may still be unable to serve requests. Readiness checks should reflect the next service dependency.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/14bup87q","slide":17,"title":"17","textShapes":4}
+{"kind":"shape","id":"sh/4by9or6l","slide":17,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1c7e50ni","slide":17,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/gbedwfmx","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/rm5czq50","slide":17,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/6lwvql4v","slide":17,"text":"Kubernetes suitability","textPreview":"Kubernetes suitability","textChars":22,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/t8ne10n6","slide":17,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/jilcvq54","slide":17,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ihcvml4j","slide":17,"text":"Kubernetes adds scheduling, health reconciliation, service discovery, and scaling, but it also adds operational complexity.","textPreview":"Kubernetes adds scheduling, health reconciliation, service discovery, and scaling, but it also adds operational complexity.","textChars":123,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/mxkzal0n","slide":17,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/90bi5gze","slide":17,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/oz2hcvit","slide":17,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/14bup87q","slide":17,"text":"Purpose: Explain kubernetes suitability through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Kubernetes adds scheduling, health reconciliation, service discovery, and scaling, but it also adds operational complexity.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/y5wne50z","slide":18,"title":"18","textShapes":4}
+{"kind":"shape","id":"sh/fapkr6pw","slide":18,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/wrelszu9","slide":18,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/hsn2l4bu","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/itw3upcf","slide":18,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/je5knut0","slide":18,"text":"Kubernetes architecture","textPreview":"Kubernetes architecture","textChars":23,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/4felwzu5","slide":18,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/6hw3y9sb","slide":18,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/rip4retw","slide":18,"text":"The control plane maintains desired state while worker nodes run Pods and expose services through stable discovery and routing.","textPreview":"The control plane maintains desired state while worker nodes run Pods and expose services through stable discovery and routing.","textChars":127,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/h8j2pofa","slide":18,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/ul83e9gj","slide":18,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/vmhknex4","slide":18,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/y5wne50z","slide":18,"text":"Purpose: Explain kubernetes architecture through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The control plane maintains desired state while worker nodes run Pods and expose services through stable discovery and routing.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/nid43ytk","slide":19,"title":"19","textShapes":4}
+{"kind":"shape","id":"sh/cri1gnql","slide":19,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9gb6xgbi","slide":19,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/8v2pobax","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vitozqt8","slide":19,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ahk7qls3","slide":19,"text":"Automation on Kubernetes","textPreview":"Automation on Kubernetes","textChars":24,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/xkbq10be","slide":19,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/jmd83atk","slide":19,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/il47u5sz","slide":19,"text":"Deployments operate stateless application tiers, Services provide discovery, and stateful dependencies use deliberate persistence and recovery controls.","textPreview":"Deployments operate stateless application tiers, Services provide discovery, and stateful dependencies use deliberate persistence and rec...","textChars":152,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/eton2tkn","slide":19,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/1wzmx8je","slide":19,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/0v65432t","slide":19,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/nid43ytk","slide":19,"text":"Purpose: Explain automation on kubernetes through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Deployments operate stateless application tiers, Services provide discovery, and stateful dependencies use deliberate persistence and recovery controls.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/zyxsni5k","slide":20,"title":"20","textShapes":4}
+{"kind":"shape","id":"sh/dkfmp4zy","slide":20,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/qpwjmh8n","slide":20,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/rq50vmp8","slide":20,"text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/4nu1krqh","slide":20,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/po3itc72","slide":20,"text":"Worker access to managed systems","textPreview":"Worker access to managed systems","textChars":32,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/2lczih8r","slide":20,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/gjuhg7ql","slide":20,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/hk3ipcr6","slide":20,"text":"Network reach, workload identity, secrets, and policy determine whether a Pod can reach and change an external managed system.","textPreview":"Network reach, workload identity, secrets, and policy determine whether a Pod can reach and change an external managed system.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/n6doj6x8","slide":20,"name":"","bbox":[134.78,165,1010.44,425]}
+{"kind":"image","id":"im/87mpsbyt","slide":20,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/98v6lgfe","slide":20,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/zyxsni5k","slide":20,"text":"Purpose: Explain worker access to managed systems through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Network reach, workload identity, secrets, and policy determine whether a Pod can reach and change an external managed system.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/m1wvqtk3","slide":21,"title":"21","textShapes":4}
+{"kind":"shape","id":"sh/4jax4nqd","slide":21,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1gbmxs7a","slide":21,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0f2lon6p","slide":21,"text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ra9kryp8","slide":21,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/qp03yt8n","slide":21,"text":"Health probes and recovery","textPreview":"Health probes and recovery","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/dcb2t87y","slide":21,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/b6d432pc","slide":21,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/al43uxor","slide":21,"text":"Startup, readiness, and liveness probes answer different questions and drive different recovery actions.","textPreview":"Startup, readiness, and liveness probes answer different questions and drive different recovery actions.","textChars":104,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/i50bu5cb","slide":21,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/58ru5kv2","slide":21,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/47itwfuh","slide":21,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/m1wvqtk3","slide":21,"text":"Purpose: Explain health probes and recovery through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Startup, readiness, and liveness probes answer different questions and drive different recovery actions.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/5onypobq","slide":22,"title":"22","textShapes":8}
+{"kind":"shape","id":"sh/fexon290","slide":22,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/6987itcr","slide":22,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/7a18rydc","slide":22,"text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/k7qpgjul","slide":22,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/58zqpov6","slide":22,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/il87etcv","slide":22,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/jmh8nyd0","slide":22,"text":"A container image packages the application. Compose connects services on one host. Kubernetes operates replicated services across a cluster.","textPreview":"A container image packages the application. Compose connects services on one host. Kubernetes operates replicated services across a cluster.","textChars":140,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/43u9snu5","slide":22,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/p43q1sva","slide":22,"text":"Keep images small, pinned, and non-root","textPreview":"Keep images small, pinned, and non-root","textChars":39,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/p4z6tcri","slide":22,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/436507qx","slide":22,"text":"Move configuration and secrets outside the image","textPreview":"Move configuration and secrets outside the image","textChars":48,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/3ixor29c","slide":22,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/2honyx8r","slide":22,"text":"Design explicit service and readiness contracts","textPreview":"Design explicit service and readiness contracts","textChars":47,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/hgf6pcr6","slide":22,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/gf65w7ql","slide":22,"text":"Scale stateless tiers while protecting persistent state","textPreview":"Scale stateless tiers while protecting persistent state","textChars":55,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"image","id":"im/98b2dc3i","slide":22,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/29gjqdkn","slide":22,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/5onypobq","slide":22,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: A container image packages the application. Compose connects services on one host. Kubernetes operates replicated services across a cluster.\n\nDiscuss: Keep images small, pinned, and non-root Move configuration and secrets outside the image Design explicit service and readiness contracts Scale stateless tiers while protecting persistent state\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/c7uhcr6t","slide":23,"title":"23","textShapes":7}
+{"kind":"shape","id":"sh/0fi94jmx","slide":23,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/90vqdczq","slide":23,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/8zm9k7y5","slide":23,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/v2d8fmhw","slide":23,"text":"Module 3","textPreview":"Module 3","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/a14rmhgb","slide":23,"text":"Module 3 complete","textPreview":"Module 3 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/xovqhcz2","slide":23,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/w3m9o7yh","slide":23,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/jqd8jmhs","slide":23,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/ip4rqhgn","slide":23,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/sby90zm1","slide":23,"text":"Module 3 complete","textPreview":"Module 3 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/tc7at436","slide":23,"text":"Next: Continuous Integration, Delivery, and Deployment Validation","textPreview":"Next: Continuous Integration, Delivery, and Deployment Validation","textChars":65,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/69gry94v","slide":23,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/rapsrelg","slide":23,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"image","id":"im/694nu1of","slide":23,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/twvmpw7q","slide":23,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/c7uhcr6t","slide":23,"text":"Purpose: Close Module 3.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Continuous Integration, Delivery, and Deployment Validation\n\nPresenter cue: Confirm the class is ready before moving to the next module."}

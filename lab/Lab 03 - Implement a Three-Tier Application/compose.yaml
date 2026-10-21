@@ -60,7 +60,7 @@ services:
 
 networks:
   frontend:
-  data: {internal: true}
+  data:
 
 volumes:
   mysql_data:

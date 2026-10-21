@@ -1,0 +1,385 @@
+{"kind":"deck","id":"pr/mbl8iv","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"Module 4","textShapes":4}
+{"kind":"shape","id":"sh/547294r6","slide":1,"bbox":[0,0,590,720]}
+{"kind":"shape","id":"sh/k3yl0zql","slide":1,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/7qp4be9c","slide":1,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,410,34]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"text":"Continuous Integration, Delivery, and Deployment Validation","textPreview":"Continuous Integration, Delivery, and Deployment Validation","textChars":59,"textLines":1,"bbox":[48,120,500,210]}
+{"kind":"textbox","id":"sh/sryl4zqx","slide":1,"text":"Pipeline design, evidence, promotion, and recovery","textPreview":"Pipeline design, evidence, promotion, and recovery","textChars":50,"textLines":1,"bbox":[52,340,470,70]}
+{"kind":"textbox","id":"sh/fu94fe98","slide":1,"text":"Cisco learning and professional development","textPreview":"Cisco learning and professional development","textChars":43,"textLines":1,"bbox":[52,635,480,30]}
+{"kind":"image","id":"im/7mp0jixo","slide":1,"name":"","bbox":[0,0,1280,720]}
+{"kind":"image","id":"im/jqxw72dk","slide":1,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/ipofexcz","slide":1,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"Purpose: Open Module 4 and establish the subject of the deck.\n\nExplain: Continuous Integration, Delivery, and Deployment Validation. Pipeline design, evidence, promotion, and recovery.\n\nPresenter cue: Briefly connect this module to the previous part of the course before discussing details.\n\nTransition: Move to the module introduction and learning focus."}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"2","textShapes":8}
+{"kind":"shape","id":"sh/ahwrqhgj","slide":2,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9072xkry","slide":2,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/ozy1ofad","slide":2,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"text":"Module introduction","textPreview":"Module introduction","textChars":19,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/x4r21kru","slide":2,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"text":"This module turns build, test, deployment, and verification activities into pipelines with clear responsibilities and promotion evidence.","textPreview":"This module turns build, test, deployment, and verification activities into pipelines with clear responsibilities and promotion evidence.","textChars":137,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/r65knqtk","slide":2,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/q5wjelsz","slide":2,"text":"Design GitLab stages and job dependencies","textPreview":"Design GitLab stages and job dependencies","textChars":41,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/ove9o7yd","slide":2,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/9wnqhczy","slide":2,"text":"Choose runner boundaries and protected execution","textPreview":"Choose runner boundaries and protected execution","textChars":48,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/mtwrmxg7","slide":2,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/nu58f2hs","slide":2,"text":"Build once and promote the same artifact","textPreview":"Build once and promote the same artifact","textChars":40,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/wjy9sry9","slide":2,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/xk7qlczu","slide":2,"text":"Validate the target service and handle failure","textPreview":"Validate the target service and handle failure","textChars":46,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"image","id":"im/wved8fit","slide":2,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/nqlwvq1w","slide":2,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"Purpose: Establish the scope of Module introduction.\n\nExplain: This module turns build, test, deployment, and verification activities into pipelines with clear responsibilities and promotion evidence.\n\nDiscuss: Design GitLab stages and job dependencies Choose runner boundaries and protected execution Build once and promote the same artifact Validate the target service and handle failure\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"3","textShapes":4}
+{"kind":"shape","id":"sh/n2l4fq98","slide":3,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/cza94vmx","slide":3,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/d0jax03i","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"text":"Pipeline gates","textPreview":"Pipeline gates","textChars":14,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/obq90bml","slide":3,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/m5cra54z","slide":3,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"text":"Each gate should answer a specific release question and stop promotion when the evidence does not support the next action.","textPreview":"Each gate should answer a specific release question and stop promotion when the evidence does not support the next action.","textChars":122,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/5cn6p0v2","slide":3,"name":"","bbox":[64,170.26,1152,414.49]}
+{"kind":"image","id":"im/ipw7elwr","slide":3,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/3q5onqdc","slide":3,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"Purpose: Explain pipeline gates through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Each gate should answer a specific release question and stop promotion when the evidence does not support the next action.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"4","textShapes":21}
+{"kind":"shape","id":"sh/axcf29kj","slide":4,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1cj2d8b6","slide":4,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"text":"GitLab pipeline structure","textPreview":"GitLab pipeline structure","textChars":25,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/doj29oba","slide":4,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/sna103ap","slide":4,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/3ihk3et8","slide":4,"text":"Pipeline definition","textPreview":"Pipeline definition","textChars":19,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"text":"Execution context","textPreview":"Execution context","textChars":17,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/kbm987y5","slide":4,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/i94r6xgz","slide":4,"text":"Stages establish broad order","textPreview":"Stages establish broad order","textChars":28,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/jadsz2xk","slide":4,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/w72947yt","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"text":"Jobs define executable work","textPreview":"Jobs define executable work","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/a5kr2xg3","slide":4,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/g36tgryd","slide":4,"text":"Rules select when jobs run","textPreview":"Rules select when jobs run","textChars":26,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/h4fa9wfy","slide":4,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/p0batw72","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/oz29krqh","slide":4,"text":"Needs express direct dependencies","textPreview":"Needs express direct dependencies","textChars":33,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/3ytsrmpw","slide":4,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/2xkrih8b","slide":4,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/1wbapc7q","slide":4,"text":"Runner and executor","textPreview":"Runner and executor","textChars":19,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/gv29g7q5","slide":4,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/fu9sn2p0","slide":4,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/et0reh8f","slide":4,"text":"Container image","textPreview":"Container image","textChars":15,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/tsrqlc7u","slide":4,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/sri9s7q9","slide":4,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/ilwf69kv","slide":4,"text":"Variables and protected secrets","textPreview":"Variables and protected secrets","textChars":31,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/jm5gze1g","slide":4,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/knex8j21","slide":4,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/5ony1oj6","slide":4,"text":"Artifacts and environment scope","textPreview":"Artifacts and environment scope","textChars":31,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/grytg7mp","slide":4,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/fqps72l4","slide":4,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"Purpose: Compare the two sides of gitlab pipeline structure.\n\nLeft side, Pipeline definition: Stages establish broad order Jobs define executable work Rules select when jobs run Needs express direct dependencies\n\nRight side, Execution context: Runner and executor Container image Variables and protected secrets Artifacts and environment scope\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"5","textShapes":4}
+{"kind":"shape","id":"sh/w32dkbuh","slide":5,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/dgbulwnm","slide":5,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/cf2tcr61","slide":5,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/z2tcnm5s","slide":5,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"text":"Test confidence","textPreview":"Test confidence","textChars":15,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l4bupwny","slide":5,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/n6dcr65o","slide":5,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"text":"Fast unit checks cover logic broadly. Integration and end-to-end tests cover fewer paths but provide stronger system evidence.","textPreview":"Fast unit checks cover logic broadly. Integration and end-to-end tests cover fewer paths but provide stronger system evidence.","textChars":126,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/6p4fyl47","slide":5,"name":"","bbox":[64,190.2,1152,374.59]}
+{"kind":"image","id":"im/tcve903i","slide":5,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/srmx0vmd","slide":5,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"Purpose: Explain test confidence through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Fast unit checks cover logic broadly. Integration and end-to-end tests cover fewer paths but provide stronger system evidence.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"6","textShapes":4}
+{"kind":"shape","id":"sh/h4bupgn6","slide":6,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/yhg7epsj","slide":6,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/zi98nu94","slide":6,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/87ipkzal","slide":6,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"text":"Artifacts and caches","textPreview":"Artifacts and caches","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/ml07i9sv","slide":6,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/oryp8fah","slide":6,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/pc76hkr2","slide":6,"text":"Artifacts carry identified outputs between jobs and releases. Caches accelerate work but should never determine release identity.","textPreview":"Artifacts carry identified outputs between jobs and releases. Caches accelerate work but should never determine release identity.","textChars":129,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/7ylcjetk","slide":6,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/8zutsju5","slide":6,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/t03ulobq","slide":6,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"Purpose: Explain artifacts and caches through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Artifacts carry identified outputs between jobs and releases. Caches accelerate work but should never determine release identity.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"7","textShapes":4}
+{"kind":"shape","id":"sh/baxkjqlk","slide":7,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/cb2tkvap","slide":7,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/dcbud0ra","slide":7,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"text":"Runner trust model","textPreview":"Runner trust model","textChars":18,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/kzmdova1","slide":7,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/eh0ba1sr","slide":7,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/fi9c369c","slide":7,"text":"Runner placement, executor type, credentials, network access, and branch protection determine what a job can affect.","textPreview":"Runner placement, executor type, credentials, network access, and branch protection determine what a job can affect.","textChars":116,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/x0fet8ze","slide":7,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/axovit03","slide":7,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/byxwryh8","slide":7,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"Purpose: Explain runner trust model through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Runner placement, executor type, credentials, network access, and branch protection determine what a job can affect.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"8","textShapes":21}
+{"kind":"shape","id":"sh/y5sbed4j","slide":8,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/18byd4zy","slide":8,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ri9g7uhw","slide":8,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"text":"Runner selection","textPreview":"Runner selection","textChars":16,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/tkby9kzm","slide":8,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/sjix0zy1","slide":8,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/je9g3ahk","slide":8,"text":"General runner","textPreview":"General runner","textChars":14,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"text":"Protected runner","textPreview":"Protected runner","textChars":16,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/o7ydoret","slide":8,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/m5gvmhwn","slide":8,"text":"Build and unit test work","textPreview":"Build and unit test work","textChars":24,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/n6pwfmd8","slide":8,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/0jydkreh","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/1k7edwv2","slide":8,"text":"No production credentials","textPreview":"No production credentials","textChars":25,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/ehgvihwr","slide":8,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/zipwbmdc","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/kfixwbe1","slide":8,"text":"Restricted network reach","textPreview":"Restricted network reach","textChars":24,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/lgbepgvm","slide":8,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/tw7e9gnq","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/svydgb65","slide":8,"text":"Disposable execution environment","textPreview":"Disposable execution environment","textChars":32,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/7u5w765k","slide":8,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/6twve1oz","slide":8,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/5sne5wne","slide":8,"text":"Protected branch or tag","textPreview":"Protected branch or tag","textChars":23,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/kredcr6t","slide":8,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/jq5w365o","slide":8,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/i5wva1o3","slide":8,"text":"Bounded deployment identity","textPreview":"Bounded deployment identity","textChars":27,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/x4ne1wni","slide":8,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/w3ed8r6x","slide":8,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/m9sb2x4v","slide":8,"text":"Restricted target access","textPreview":"Restricted target access","textChars":24,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/na1sb2lg","slide":8,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/8bat47ml","slide":8,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/9w3uds36","slide":8,"text":"Enhanced audit and approval","textPreview":"Enhanced audit and approval","textChars":27,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/gnudcr65","slide":8,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/fm1cj650","slide":8,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"Purpose: Compare the two sides of runner selection.\n\nLeft side, General runner: Build and unit test work No production credentials Restricted network reach Disposable execution environment\n\nRight side, Protected runner: Protected branch or tag Bounded deployment identity Restricted target access Enhanced audit and approval\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/udsvah03","slide":9,"title":"9","textShapes":4}
+{"kind":"shape","id":"sh/oza1gfyh","slide":9,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1cfmhgne","slide":9,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0b65obm9","slide":9,"text":"9","textPreview":"9","textChars":1,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/nex4jq5k","slide":9,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/mdonql4z","slide":9,"text":"Pipeline purposes","textPreview":"Pipeline purposes","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/9gzml0nq","slide":9,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/bih4na5w","slide":9,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ah8nu54b","slide":9,"text":"An application delivery pipeline and a network intent pipeline can share a project while retaining different triggers, stages, permissions, and evidence.","textPreview":"An application delivery pipeline and a network intent pipeline can share a project while retaining different triggers, stages, permission...","textChars":153,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/u987u5cf","slide":9,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/hcz65kbq","slide":9,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/gbqpwful","slide":9,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/udsvah03","slide":9,"text":"Purpose: Explain pipeline purposes through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: An application delivery pipeline and a network intent pipeline can share a project while retaining different triggers, stages, permissions, and evidence.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/m90b6t0r","slide":10,"title":"10","textShapes":4}
+{"kind":"shape","id":"sh/s7yt4b21","slide":10,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xc3mho32","slide":10,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/cbu58j2h","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/zelojyl8","slide":10,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ydcnatkn","slide":10,"text":"Network job trust sequence","textPreview":"Network job trust sequence","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/l036l83y","slide":10,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/725onyl4","slide":10,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/m1cnetkj","slide":10,"text":"A protected network job should validate the event, resolve approved intent, obtain bounded identity, change the target, and record the outcome.","textPreview":"A protected network job should validate the event, resolve approved intent, obtain bounded identity, change the target, and record the ou...","textChars":143,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/uhgz6tkr","slide":10,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/h47i1oj2","slide":10,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/g3yh832h","slide":10,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/m90b6t0r","slide":10,"text":"Purpose: Explain network job trust sequence through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A protected network job should validate the event, resolve approved intent, obtain bounded identity, change the target, and record the outcome.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/jetc3ut0","slide":11,"title":"11","textShapes":4}
+{"kind":"shape","id":"sh/ofqtgnyt","slide":11,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xcryxg7y","slide":11,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/wbih4b6d","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/n69grmpw","slide":11,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/250zy18b","slide":11,"text":"Network change state","textPreview":"Network change state","textChars":20,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/98rytw72","slide":11,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/72t03qp0","slide":11,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/61kzalof","slide":11,"text":"A deployment moves through preparation, application, verification, and outcome classification. Unknown outcomes require investigation before retry.","textPreview":"A deployment moves through preparation, application, verification, and outcome classification. Unknown outcomes require investigation bef...","textChars":147,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/qpwnm1kb","slide":11,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/dsn6xw32","slide":11,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/cre5or2h","slide":11,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/jetc3ut0","slide":11,"text":"Purpose: Explain network change state through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: A deployment moves through preparation, application, verification, and outcome classification. Unknown outcomes require investigation before retry.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/8f2psfyx","slide":12,"title":"12","textShapes":4}
+{"kind":"shape","id":"sh/wvupgz6t","slide":12,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1gbm9s3a","slide":12,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/0f2lgnmp","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ra943il8","slide":12,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/q903ad4n","slide":12,"text":"Scoped deployment controls","textPreview":"Scoped deployment controls","textChars":26,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/dcbm583y","slide":12,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/b6d4f2lc","slide":12,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/a543mx4r","slide":12,"text":"Target limits, concurrency controls, change windows, and progressive batches reduce the effect of a failed change.","textPreview":"Target limits, concurrency controls, change windows, and progressive batches reduce the effect of a failed change.","textChars":114,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/qp47yl47","slide":12,"name":"","bbox":[64,170.26,1152,414.49]}
+{"kind":"image","id":"im/dsv6903i","slide":12,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/srmp0vmd","slide":12,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/8f2psfyx","slide":12,"text":"Purpose: Explain scoped deployment controls through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Target limits, concurrency controls, change windows, and progressive batches reduce the effect of a failed change.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/hgzapcr6","slide":13,"title":"13","textShapes":21}
+{"kind":"shape","id":"sh/re5kjydo","slide":13,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/q50nydsj","slide":13,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/bq9orito","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/o3i5w3ad","slide":13,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/p4r6p8by","slide":13,"text":"Pre-check and post-check design","textPreview":"Pre-check and post-check design","textChars":31,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/21gnuts7","slide":13,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/32ponyts","slide":13,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/gzy5s3a1","slide":13,"text":"Before change","textPreview":"Before change","textChars":13,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/1076lobm","slide":13,"text":"After change","textPreview":"After change","textChars":12,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/hcfy9k3u","slide":13,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/gb6x0zm9","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/vaxg7ulo","slide":13,"text":"Confirm target identity","textPreview":"Confirm target identity","textChars":23,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/u9ofyp43","slide":13,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/t8fy5k3i","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/876xwfmx","slide":13,"text":"Measure the service baseline","textPreview":"Measure the service baseline","textChars":28,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/7mdg3als","slide":13,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/6l4fu547","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/lkvy103m","slide":13,"text":"Compare intended and current state","textPreview":"Compare intended and current state","textChars":34,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/kjmxsfm1","slide":13,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/cnqh8fux","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/xozyhkbi","slide":13,"text":"Prepare a recovery path","textPreview":"Prepare a recovery path","textChars":23,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/q18f65cr","slide":13,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/bmhgfatc","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/oz6x4vul","slide":13,"text":"Confirm configuration state","textPreview":"Confirm configuration state","textChars":27,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/p0zyd0b6","slide":13,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/2xof2lcv","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/3yxgbqdg","slide":13,"text":"Wait for protocol convergence","textPreview":"Wait for protocol convergence","textChars":29,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/8vahgzu5","slide":13,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/9wjyp4bq","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/jqlkfyds","slide":13,"text":"Test service behavior","textPreview":"Test service behavior","textChars":21,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/ipcjmtw7","slide":13,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/5cn2h8vy","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/4re1o3ed","slide":13,"text":"Compare with the baseline","textPreview":"Compare with the baseline","textChars":25,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/98nm1k3e","slide":13,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/mlw36p4n","slide":13,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/hgzapcr6","slide":13,"text":"Purpose: Compare the two sides of pre-check and post-check design.\n\nLeft side, Before change: Confirm target identity Measure the service baseline Compare intended and current state Prepare a recovery path\n\nRight side, After change: Confirm configuration state Wait for protocol convergence Test service behavior Compare with the baseline\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/6lsnupw7","slide":14,"title":"14","textShapes":4}
+{"kind":"shape","id":"sh/c3e1gjyd","slide":14,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/xc7eds76","slide":14,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/wbydknq1","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/jepwf2pc","slide":14,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/idgvmx8r","slide":14,"text":"Deployment strategies","textPreview":"Deployment strategies","textChars":21,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/5grehs7i","slide":14,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/zi5c3y98","slide":14,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/ehwvat8n","slide":14,"text":"The right strategy depends on state, compatibility, traffic control, rollback cost, and the fidelity of health checks.","textPreview":"The right strategy depends on state, compatibility, traffic control, rollback cost, and the fidelity of health checks.","textChars":118,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/etsv65k7","slide":14,"name":"","bbox":[64,182.91,1152,389.19]}
+{"kind":"image","id":"im/1w3u10jy","slide":14,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/0vud8v2d","slide":14,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/6lsnupw7","slide":14,"text":"Purpose: Explain deployment strategies through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: The right strategy depends on state, compatibility, traffic control, rollback cost, and the fidelity of health checks.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/vaxsvy10","slide":15,"title":"15","textShapes":4}
+{"kind":"shape","id":"sh/wrm9kvep","slide":15,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/547mhg3m","slide":15,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/k3y5ov21","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/76p4jqls","slide":15,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/65gnqlk7","slide":15,"text":"Rollback decision","textPreview":"Rollback decision","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/t87ml0ji","slide":15,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/na5476l8","slide":15,"bbox":[78,612,8,58]}
+{"kind":"textbox","id":"sh/m9c3e1kn","slide":15,"text":"Rollback is one recovery option. Forward remediation may be safer when state changed irreversibly or the previous version cannot interpret current data.","textPreview":"Rollback is one recovery option. Forward remediation may be safer when state changed irreversibly or the previous version cannot interpre...","textChars":152,"textLines":1,"bbox":[100,603,1090,70]}
+{"kind":"image","id":"im/u9s3etsb","slide":15,"name":"","bbox":[64,168.31,1152,418.38]}
+{"kind":"image","id":"im/hcjm98rm","slide":15,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/wbalg3a1","slide":15,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/vaxsvy10","slide":15,"text":"Purpose: Explain rollback decision through the diagram.\n\nReading order: Start with the main boundary or input, follow the connections, then identify the output or feedback path.\n\nKey explanation: Rollback is one recovery option. Forward remediation may be safer when state changed irreversibly or the previous version cannot interpret current data.\n\nAudience question: Where would a failure become visible, and which component should own the response?\n\nTransition: Connect the diagram to the next engineering decision."}
+{"kind":"slide","id":"sl/gny5sjyp","slide":16,"title":"16","textShapes":21}
+{"kind":"shape","id":"sh/58bm9sr2","slide":16,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/8z2h8bq1","slide":16,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/9kby1g7m","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/ytkf2h8j","slide":16,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/zutgvm94","slide":16,"text":"GitLab pipeline design","textPreview":"GitLab pipeline design","textChars":22,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/kv2h4rqp","slide":16,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/lwbyxwra","slide":16,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/ip4zel83","slide":16,"text":"Job contract","textPreview":"Job contract","textChars":12,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/3qdg7qpo","slide":16,"text":"Promotion contract","textPreview":"Promotion contract","textChars":18,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/fm1gzq5o","slide":16,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/e1sf65o3","slide":16,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/1ojy10ne","slide":16,"text":"Declared image and dependencies","textPreview":"Declared image and dependencies","textChars":31,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/gnax8v6t","slide":16,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/nqlg3a5k","slide":16,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/2pcfa5oz","slide":16,"text":"Specific inputs and outputs","textPreview":"Specific inputs and outputs","textChars":27,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/ps3y5knq","slide":16,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/oruhcf65","slide":16,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/bulg7u5g","slide":16,"text":"Clear pass or fail condition","textPreview":"Clear pass or fail condition","textChars":28,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/atczepob","slide":16,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/mpgj6t8j","slide":16,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/7qp0zepo","slide":16,"text":"Evidence retained for review","textPreview":"Evidence retained for review","textChars":28,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/8by18jq9","slide":16,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/9c7i1o7u","slide":16,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/ylwj2987","slide":16,"text":"Protected environment and identity","textPreview":"Protected environment and identity","textChars":34,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/zm50veps","slide":16,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/kne14jqd","slide":16,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/lo7ixo7y","slide":16,"text":"Approval where risk requires it","textPreview":"Approval where risk requires it","textChars":31,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/ih0jedob","slide":16,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/ji9k7ypw","slide":16,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/tcbmdcre","slide":16,"text":"Same artifact across environments","textPreview":"Same artifact across environments","textChars":33,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/sb2l47at","slide":16,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/rat4b298","slide":16,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/69k32xsn","slide":16,"text":"Post-deployment verification","textPreview":"Post-deployment verification","textChars":28,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/jmlon6hc","slide":16,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/4nupwbix","slide":16,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/gny5sjyp","slide":16,"text":"Purpose: Compare the two sides of gitlab pipeline design.\n\nLeft side, Job contract: Declared image and dependencies Specific inputs and outputs Clear pass or fail condition Evidence retained for review\n\nRight side, Promotion contract: Protected environment and identity Approval where risk requires it Same artifact across environments Post-deployment verification\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/14bup87q","slide":17,"title":"17","textShapes":21}
+{"kind":"shape","id":"sh/e98nydwb","slide":17,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/1c7e50ni","slide":17,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/gbedwfmx","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/rm5czq50","slide":17,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/6lwvql4v","slide":17,"text":"Pipeline failure categories","textPreview":"Pipeline failure categories","textChars":27,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/t8ne10n6","slide":17,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/snedsvml","slide":17,"bbox":[640,180,2,445]}
+{"kind":"textbox","id":"sh/jilcvq54","slide":17,"text":"Candidate failures","textPreview":"Candidate failures","textChars":18,"textLines":1,"bbox":[72,176,520,50]}
+{"kind":"textbox","id":"sh/ihcvml4j","slide":17,"text":"Environment failures","textPreview":"Environment failures","textChars":20,"textLines":1,"bbox":[688,176,520,50]}
+{"kind":"shape","id":"sh/4by9or6l","slide":17,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/pc7qhwn6","slide":17,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,252,36,36]}
+{"kind":"textbox","id":"sh/29grm1of","slide":17,"text":"Syntax or schema error","textPreview":"Syntax or schema error","textChars":22,"textLines":1,"bbox":[132,242,450,58]}
+{"kind":"shape","id":"sh/3ap8fm50","slide":17,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/gnepkr69","slide":17,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[82,330,36,36]}
+{"kind":"textbox","id":"sh/honqdwnu","slide":17,"text":"Failed unit or integration test","textPreview":"Failed unit or integration test","textChars":31,"textLines":1,"bbox":[132,320,450,58]}
+{"kind":"shape","id":"sh/ulw7ihoj","slide":17,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/fm58bm54","slide":17,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[82,408,36,36]}
+{"kind":"textbox","id":"sh/0ji9wb6t","slide":17,"text":"Vulnerable dependency","textPreview":"Vulnerable dependency","textChars":21,"textLines":1,"bbox":[132,398,450,58]}
+{"kind":"shape","id":"sh/14rqpgne","slide":17,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/90nq9gfi","slide":17,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[82,486,36,36]}
+{"kind":"textbox","id":"sh/8ze9gbyx","slide":17,"text":"Unqualified artifact","textPreview":"Unqualified artifact","textChars":20,"textLines":1,"bbox":[132,476,450,58]}
+{"kind":"shape","id":"sh/ny5876xc","slide":17,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/mxw7e1gr","slide":17,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[698,252,36,36]}
+{"kind":"textbox","id":"sh/lwnq5gf6","slide":17,"text":"Runner or platform unavailable","textPreview":"Runner or platform unavailable","textChars":30,"textLines":1,"bbox":[748,242,450,58]}
+{"kind":"shape","id":"sh/0vepcbyl","slide":17,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/zul836xg","slide":17,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,330,36,36]}
+{"kind":"textbox","id":"sh/ytc7a1gv","slide":17,"text":"Target baseline unhealthy","textPreview":"Target baseline unhealthy","textChars":25,"textLines":1,"bbox":[748,320,450,58]}
+{"kind":"shape","id":"sh/d83q1wfa","slide":17,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/c7up8ryp","slide":17,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[698,408,36,36]}
+{"kind":"textbox","id":"sh/2dsn2xwn","slide":17,"text":"Deployment outcome unknown","textPreview":"Deployment outcome unknown","textChars":26,"textLines":1,"bbox":[748,398,450,58]}
+{"kind":"shape","id":"sh/3e1ob2d8","slide":17,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/oza547ed","slide":17,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[698,486,36,36]}
+{"kind":"textbox","id":"sh/p0j6dcvy","slide":17,"text":"Cleanup incomplete","textPreview":"Cleanup incomplete","textChars":18,"textLines":1,"bbox":[748,476,450,58]}
+{"kind":"image","id":"im/cvudk7qd","slide":17,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/bulwr2p8","slide":17,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/14bup87q","slide":17,"text":"Purpose: Compare the two sides of pipeline failure categories.\n\nLeft side, Candidate failures: Syntax or schema error Failed unit or integration test Vulnerable dependency Unqualified artifact\n\nRight side, Environment failures: Runner or platform unavailable Target baseline unhealthy Deployment outcome unknown Cleanup incomplete\n\nPresenter cue: Explain the relationship between the columns rather than reading each line verbatim.\n\nAudience question: Which responsibility is unclear or shared in your current environment?\n\nTransition: Use the comparison to frame the next topic."}
+{"kind":"slide","id":"sl/y5wne50z","slide":18,"title":"18","textShapes":8}
+{"kind":"shape","id":"sh/to72pw76","slide":18,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/wrelszu9","slide":18,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/hsn2l4bu","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/itw3upcf","slide":18,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/je5knut0","slide":18,"text":"Key takeaways","textPreview":"Key takeaways","textChars":13,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/4felwzu5","slide":18,"bbox":[48,137,1184,2]}
+{"kind":"textbox","id":"sh/5gnmp4bq","slide":18,"text":"A useful pipeline automates decisions only when its tests and evidence support those decisions.","textPreview":"A useful pipeline automates decisions only when its tests and evidence support those decisions.","textChars":95,"textLines":1,"bbox":[72,165,1136,72]}
+{"kind":"shape","id":"sh/6hw3y9sb","slide":18,"bbox":[78,267,7,38]}
+{"kind":"textbox","id":"sh/rip4retw","slide":18,"text":"Give each pipeline one operational purpose","textPreview":"Give each pipeline one operational purpose","textChars":42,"textLines":1,"bbox":[102,260,1090,52]}
+{"kind":"shape","id":"sh/fapkr6pw","slide":18,"bbox":[78,331,7,38]}
+{"kind":"textbox","id":"sh/upg3i18r","slide":18,"text":"Protect runners according to their reach","textPreview":"Protect runners according to their reach","textChars":40,"textLines":1,"bbox":[102,324,1090,52]}
+{"kind":"shape","id":"sh/1cr2tg72","slide":18,"bbox":[78,395,7,38]}
+{"kind":"textbox","id":"sh/gbylkbqh","slide":18,"text":"Promote one identified artifact","textPreview":"Promote one identified artifact","textChars":31,"textLines":1,"bbox":[102,388,1090,52]}
+{"kind":"shape","id":"sh/7mpknmp0","slide":18,"bbox":[78,459,7,38]}
+{"kind":"textbox","id":"sh/6lg3e18f","slide":18,"text":"Treat deployment verification and cleanup as required stages","textPreview":"Treat deployment verification and cleanup as required stages","textChars":60,"textLines":1,"bbox":[102,452,1090,52]}
+{"kind":"image","id":"im/3a14rex0","slide":18,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/sfulo3yx","slide":18,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/y5wne50z","slide":18,"text":"Purpose: Establish the scope of Key takeaways.\n\nExplain: A useful pipeline automates decisions only when its tests and evidence support those decisions.\n\nDiscuss: Give each pipeline one operational purpose Protect runners according to their reach Promote one identified artifact Treat deployment verification and cleanup as required stages\n\nAudience question: Which point is most familiar, and which point needs the most attention?\n\nTransition: Introduce the first model or engineering boundary."}
+{"kind":"slide","id":"sl/nid43ytk","slide":19,"title":"19","textShapes":7}
+{"kind":"shape","id":"sh/0vi1k7qx","slide":19,"bbox":[0,0,1280,34]}
+{"kind":"shape","id":"sh/9gb6xgbi","slide":19,"bbox":[1025,0,255,34]}
+{"kind":"textbox","id":"sh/8v2pobax","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[8,0,28,34]}
+{"kind":"textbox","id":"sh/vitozqt8","slide":19,"text":"Module 4","textPreview":"Module 4","textChars":8,"textLines":1,"bbox":[42,0,420,34]}
+{"kind":"textbox","id":"sh/ahk7qls3","slide":19,"text":"Module 4 complete","textPreview":"Module 4 complete","textChars":17,"textLines":1,"bbox":[48,48,1184,78]}
+{"kind":"shape","id":"sh/xkbq10be","slide":19,"bbox":[48,137,1184,2]}
+{"kind":"shape","id":"sh/wj2psvat","slide":19,"bbox":[0,140,1280,580]}
+{"kind":"shape","id":"sh/jmd83atk","slide":19,"bbox":[96,222,92,92]}
+{"kind":"textbox","id":"sh/il47u5sz","slide":19,"text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[96,215,92,100]}
+{"kind":"textbox","id":"sh/cri1gnql","slide":19,"text":"Module 4 complete","textPreview":"Module 4 complete","textChars":17,"textLines":1,"bbox":[230,210,900,90]}
+{"kind":"textbox","id":"sh/dsri9sr6","slide":19,"text":"Next: Security and Observability","textPreview":"Next: Security and Observability","textChars":32,"textLines":1,"bbox":[232,320,880,55]}
+{"kind":"shape","id":"sh/qpgjex8f","slide":19,"bbox":[230,410,760,4]}
+{"kind":"textbox","id":"sh/rqp07290","slide":19,"text":"Review the key concepts before continuing.","textPreview":"Review the key concepts before continuing.","textChars":42,"textLines":1,"bbox":[232,445,820,50]}
+{"kind":"image","id":"im/2x8n6dkz","slide":19,"name":"","alt":"BKACAD template header motif","bbox":[1105,0,175,34]}
+{"kind":"image","id":"im/pkzm18ja","slide":19,"name":"","alt":"BKACAD template footer","bbox":[0,667,1280,53]}
+{"kind":"notes","id":"nt/nid43ytk","slide":19,"text":"Purpose: Close Module 4.\n\nRecap: Ask learners to state one concept they can apply and one question that remains.\n\nNext: Next: Security and Observability\n\nPresenter cue: Confirm the class is ready before moving to the next module."}
